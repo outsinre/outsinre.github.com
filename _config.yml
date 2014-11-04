@@ -25,6 +25,6 @@ author:
 # Custom vars
 
 github:
-  repo:		     github.com/outsinre/outsinre.github.com
+  repo:		     https://github.com/outsinre/outsinre.github.com
 
 version:             1.0.0
