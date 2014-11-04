@@ -7,7 +7,7 @@ title: Jekyll Poole Lanyon Blog Building
  This is to record the process of build the blog process.
 </div>
 
-The most important reference is [How I Created a Beautiful and Minimal Blog Using Jekyll, Github Pages, and poole](http://joshualande.com/jekyll-github-pages-poole/). The original pages is [Lanyon](https://github.com/poole/lanyon) which is based on [Poole](https://github.com/poole) on Github.
+The most important reference is [How I Created a Beautiful and Minimal Blog Using Jekyll, Github Pages, and poole](http://joshualande.com/jekyll-github-pages-poole/). The original page is [Lanyon](https://github.com/poole/lanyon) which is based on [Poole](https://github.com/poole) on Github.
 
 If you ever changed some files or folders and found them inappropriate, you can revert/discard the changed by command <strong>checkout</strong> command.
 
