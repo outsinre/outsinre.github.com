@@ -9,18 +9,18 @@ permalink:           pretty
 relative_permalinks: true
 
 # Setup
-title:               Lanyon
-tagline:             'A Jekyll theme'
-description:         'A reserved <a href="http://jekyllrb.com" target="_blank">Jekyll</a> theme that places the utmost gravity on content with a hidden drawer. Made by <a href="https://twitter.com/mdo" target="_blank">@mdo</a>.'
-url:                 http://lanyon.getpoole.com
+title:               ZNHOO
+tagline:             'Whatever you are, be a good one!'
+description:         'I am ZNHOO. Make yourself at home. Contact me at twitter <a href="https://twitter.com/znhoo" target="_blank">@znhoo</a>.'
+url:                 http://outsinre.github.com
 baseurl:             /
 paginate:            5
 
 # About/contact
 author:
-  name:              Mark Otto
-  url:               https://twitter.com/mdo
-  email:             markdotto@gmail.com
+  name:              ZNHOO
+  url:               https://twitter.com/znhoo
+  email:             bob@gmail.com
 
 # Custom vars
 version:             1.0.0
