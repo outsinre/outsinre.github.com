@@ -23,4 +23,8 @@ author:
   email:             bob@gmail.com
 
 # Custom vars
+
+github:
+  repo:		     github.com/outsinre/outsinre.github.com
+
 version:             1.0.0
