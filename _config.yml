@@ -12,7 +12,7 @@ relative_permalinks: true
 title:               ZNHOO
 tagline:             'Whatever you are, be a good one!'
 description:         'I am ZNHOO. Make yourself at home. Contact me at twitter <a href="https://twitter.com/znhoo" target="_blank">@znhoo</a>.'
-# if use custom domain, use / as it. But if don't use custom domain, replace / with "http://outsinre.github.com/" or "http://outsinre.github.io/"
+  # if use custom domain, use / as for baseurl. But if don't use custom domain, replace / with "http://outsinre.github.com/" or "http://outsinre.github.io/"
 baseurl:             /
 paginate:            5
 
