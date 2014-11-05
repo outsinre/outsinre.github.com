@@ -91,7 +91,7 @@ Can I use my top domain for acceleration? Yes, but not easy! First, your DNS pro
   </tr>
  </tbody>
 </table>
-* Now you can access your blog from both subdomain and top domain. Although top domain does not support CDN individually, but if both subdomain CNAME and top domain A records are configured, github will create redirect between the two. Refer to <a href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/#configuring-a-www-subdomain" target="_blank">Configuring a www subdomain</a>. Since the `CNAME` file in githug pages are `www.example.com`, then when you input `example.com` in your browser, github will redirects you to `www.example.com`.
+* Now you can access your blog from both subdomain and top domain. Although top domain does not support CDN individually, but if both subdomain CNAME and top domain A records are configured, github itsefl will create redirect between the two based on the **CNAME file** in the github page root directory. Refer to <a href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/#configuring-a-www-subdomain" target="_blank">Configuring a www subdomain</a>. Since the `CNAME` file in github pages are `www.example.com`, then when you input `example.com` in your browser, github will redirects you to `www.example.com`. Although 
 
 <div class="message">
 Till now, both subdomain and top domain support CDN!

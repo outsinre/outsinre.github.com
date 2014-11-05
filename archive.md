@@ -7,7 +7,7 @@ title: Archive
   {% capture month %}{{ post.date | date: '%m%Y' }}{% endcapture %}
   {% capture nmonth %}{{ post.next.date | date: '%m%Y' }}{% endcapture %}
     {% if month != nmonth %}
-*{{ post.date | date: '%B %Y' }}*
+{{ post.date | date: '%B %Y' }}
     {% endif %}
-  <li><small><span class="time">{{ post.date | date: "%d/%m/%Y" }}</span> <a href="{{ post.url }}">{{ post.title }}</a></small></li>
+  <li><small><span style="color:blue" class="time">{{ post.date | date: "%d/%b" }}</span>&nbsp;&nbsp;<a href="{{ post.url }}">{{ post.title }}</a></small></li>
 {% endfor %}

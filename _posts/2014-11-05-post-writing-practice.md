@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Post Writing Practice
+title: Post Writing Tips
 ---
 
 Use **`** to enclose a code snippet. `int main(void){ printf("hello, world!"); return 1; }`
