@@ -63,6 +63,8 @@ Then paste the DISQUS universal code between the two lines. The *comments.html* 
 
 **Subscribe** page added by modifying `_include/sidebar.html`.
 
+**Site icon** changed referring to [icons](http://modernweb.com/2013/10/28/building-a-blog-with-jekyll/). Check the file `_include/head.html` for where is icon defined.
+
 ## Setup
 
 Some fun facts about the setup of Poole project include:
