@@ -19,13 +19,16 @@ If you want to discard all the changes:
 
     git checkout -- .
 
-Originally the sidebar "Download" and "Github Project" items does not work. I found that it is due to *site.github.repo* is not defined in *_config.yml*.
+Originally the sidebar "Download" and "Github Project" items does not work. I found that it is due to *site.github.repo* is not defined in *_config.yml*. The *site.github.repo* is used in *_include/sidebar.html*.
 
 Just add two lines in *_config.yml* as follows. Pay attention to the indent of the second line.
 
+{% highlight js %}
 github:
-
   repo:	https://github.com/outsinre/outsinre.github.com
+{% endhighlight %}
+
+Though the problem was solved, I don't need the two sidebar items. So I removed them from _config.yml. Correspondingly, the lines in *_include/sidebar.html* should also be removed.
 
 This is called **custom variable**. Solved! Futhermore, I removed the "Download" item since it is not necessary.
 
@@ -39,6 +42,8 @@ For site comments, I use DISQUS. Firsly, create a file *comments.html* and add t
 Then paste the DISQUS universal code below between the two lines. The *comments.html* should be placed under *_include* folder.
 
 After that, in *_layout/post.html* file, add a line *&#123;% include comments.html %}* to the end.
+
+There is a `url` varialble in *_config.yml*, I found it not useful. So I remove it.
 
 ## Setup
 
