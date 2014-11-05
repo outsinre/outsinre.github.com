@@ -45,6 +45,11 @@ After that, in *_layout/post.html* file, add a line *&#123;% include comments.ht
 
 There is a `url` varialble in *_config.yml*, I found it not useful. So I remove it.
 
+For `baseurl` setting, refer to [4. Serving it up](https://github.com/poole/poole#usage) section.
+
+   1. If you're using a custom domain name, modify the **CNAME** file to point to your new domain.
+   2. If you're not using a custom domain name, modify the `baseurl` in *_config.yml* to point to your GitHub Pages URL. Example: for a repo at github.com/username/poole, use http://username.github.io/poole/. Be sure to include the trailing slash.
+
 ## Setup
 
 Some fun facts about the setup of Poole project include:
