@@ -16,7 +16,6 @@ title: Home
 
     {{ post.excerpt | remove: '<p>' | remove: '</p>' }}
 
-<!-- {% if post.content | size > 500 %} -->
     {% if post.content.size > 500 %}
       <br /><br /><a href="{{ post.url }}">Read more...</a>
     {% endif %}
