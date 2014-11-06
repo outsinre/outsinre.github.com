@@ -8,7 +8,7 @@ title: Github Page Domain CDN Acceleration
 </div>
 
 1. *Default domain*  
- The github default domain is `username.github.io` which is also a *subdomain*. But usually we need to use our own domain for blog. Personal domain may be top domain or subdomain. Subdomain is like www.example.com while top domain is like example.com. Github names `A`,`Alias`, and `ANAME` all as `apex` domain (record). Here `apex` domain acctually is not a domain but a domain dns record.  
+ The github default domain is `username.github.io` which is also a *subdomain*. But usually we need to use our own domain for blog. Personal domain may be top domain or subdomain. Subdomain is like `www.example.com` while top domain is like `example.com`. Github names `A`,`Alias`, and `ANAME` all as `apex` domain (record). Here `apex` domain acctually is not a domain but a domain dns record.  
 2. *Acceleration*  
 The key is to set a `CNAME` record for your github page `username.github.io`. For example if you have a top domain `example.com`, A `CNAME` record is like:
 
@@ -91,11 +91,13 @@ Can I use my top domain for acceleration? Yes, but not easy! First, your DNS pro
   </tr>
  </tbody>
 </table>
-* Now you can access your blog from both subdomain and top domain. Although top domain does not support CDN individually, but if both subdomain CNAME and top domain A records are configured, github itsefl will create redirect between the two based on the **CNAME file** in the github page root directory. Refer to <a href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/#configuring-a-www-subdomain" target="_blank">Configuring a www subdomain</a>. Since the `CNAME` file in github pages are `www.example.com`, then when you input `example.com` in your browser, github will redirects you to `www.example.com`. Although 
+* Now you can access your blog from both subdomain and top domain. Although top domain does not support CDN individually, but if both subdomain CNAME and top domain A records are configured, github itsefl will create redirect between the two based on the **CNAME file** in the github page root directory. Refer to <a href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/#configuring-a-www-subdomain" target="_blank">Configuring a www subdomain</a>. Since the `CNAME` file in github pages are `www.example.com`, then when you input `example.com` in your browser, github will redirects you to `www.example.com`. 
 
 <div class="message">
 Till now, both subdomain and top domain support CDN!
 </div>
+
+For more detailed Top domain DNS CNAME discussion refer to [顶级域名不能设置DNS CNAME记录](http://localhost:4000/2014/11/06/%E9%A1%B6%E7%BA%A7%E5%9F%9F%E5%90%8D%E4%B8%BA%E4%BD%95%E4%B8%8D%E8%83%BD%E8%AE%BEDNS%20CNAME%E8%AE%B0%E5%BD%95/).
 
 *Reference*
 
