@@ -4,7 +4,7 @@ comments: true
 title: Assets link
 ---
 
-<img src="{{site.url}}/assets/hknight.jpg" alt="" />
+<img src="{{site.url}}/assets/hknight.jpg" alt="">
 
 ![Test]({{site.url}}/assets/plane.jpg)  
 

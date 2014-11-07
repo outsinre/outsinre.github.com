@@ -65,6 +65,34 @@ Then paste the DISQUS universal code between the two lines. The *comments.html* 
 
 **Site icon** changed referring to [icons](http://modernweb.com/2013/10/28/building-a-blog-with-jekyll/). Check the file `_include/head.html` for where is icon defined.
 
+**read more...*** to only display the first paragraph of a post. Only need to modify the `index.html` file. The original is to display the post content completely:
+{% raw %}
+    {{ post.content }}
+{% endraw %}
+but now replaced by:
+{% raw %}
+    {{ post.excerpt | remove: '<p>' | remove: '</p>' }}
+
+    {% if post.content.size > 500 %}
+      <br /><br /><a href="{{ post.url }}">Read more...</a>
+    {% endif %}
+{% endraw %}
+
+**code line numbers** refer to <a href="http://demisx.github.io/jekyll/2014/01/13/improve-code-highlighting-in-jekyll.html" target="_blank">Improve Code Highlighting in a Jekyll-based Blog Site</a>. Especially pay due attention to its comments. How? Add several lines for `public/css/syntax.css`:
+
+{% highlight c linenos %}
+/* display code line number; the line number is displayed aside from the code separated by a vertical line */
+.highlight .lineno { color: #ccc; display:inline-block; padding: 0 5px; border-right:1px solid #ccc; }
+.highlight pre code { display: block; white-space: pre; overflow-x: auto; word-wrap: normal; }
+
+/* exclude line numbers from copy-paste user operations; if you copy the code, the line numbers are also copied, so this line is to disable line number copy */
+.highlight .lineno {-webkit-user-select: none;-moz-user-select: none; -o-user-select: none;}
+
+/* override text selection hightlighting for line numbers; although the above line disables line number copy, but when you select the code, line numbers are also selected which looks ugly; the transparent color will help erase this */
+.lineno::-moz-selection {background-color: transparent;} /* Mozilla specific */
+.lineno::selection {background-color: transparent;} /* Other major browsers */
+{% endhighlight %}
+
 ## Setup
 
 Some fun facts about the setup of Poole project include:
