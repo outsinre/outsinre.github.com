@@ -12,7 +12,7 @@
 
 .bl, .tl, .br,
 .tr{
-  margin: 1em;
+  margin: 0.5em;
   position: absolute;
 }
 
