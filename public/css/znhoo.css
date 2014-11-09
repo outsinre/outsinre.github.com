@@ -1,0 +1,22 @@
+.txtimg{
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  border-radius: 5px;
+}
+.txtimg img{
+  width: 100%;
+}
+
+.bottom,
+.right{
+  margin:1em;
+  position:absolute;
+}
+.bottom{
+  bottom: 0px;
+}
+.right{
+  top: 0px;
+  right: 0px;
+}

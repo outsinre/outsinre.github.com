@@ -19,7 +19,7 @@ title: Image and file
 <a href="/assets/fx-3650P_3950P_EN.pdf" target="_blank">fx-3650P_3950P_EN</a>  
 
 <!--method 1, place text over image this is the best way. this is combination of method 2 and method 3 -->
-<div style="position: relative; background: url({{site.baseurl}}assets/hknight.jpg); width: 738px; height: 284px; max-width: 100%;border-radius:10px;">
+<div style="position: relative; background: url({{site.baseurl}}assets/hknight.jpg); width: 738px; height: 284px;border-radius:10px;">
 	<div style="position: absolute; bottom: 0; left: 0.5em; width: 400px; font-weight: bold; color: #fff;">
 		<p>(some text ...some text ...some text ...)</p>
 	</div>
@@ -37,7 +37,7 @@ title: Image and file
 <br />
 
 <!--method 3, place text over image, position not accurate -->
-<div style="position:relative">
+<div style="position:relative; ">
 	<div style="position:absolute; left:50px; top:50px; color:#fff; font-weight:bold">some text ...</div>
 	<img src="{{site.baseurl}}assets/hknight.jpg">
 </div>
@@ -50,6 +50,16 @@ title: Image and file
 <FONT SIZE="+1" COLOR="yellow">some text ...</FONT></TD>
 </TR>
 </TABLE>
+
+<!-- method 5, with css support -->
+<link rel="stylesheet" href="{{ site.baseurl }}public/css/znhoo.css">
+<div class="txtimg">
+  
+  <img src="{{site.baseurl}}assets/hknight.jpg">
+  
+  <p class="bottom">(text to appear at the bottom left of the image)</p>
+  <p class="right"> (text to appear at the top right of the image)</p>
+</div>
 
 ## Reference
 [1](http://www.jianshu.com/p/05289a4bc8b2)
