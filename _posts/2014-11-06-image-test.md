@@ -53,12 +53,14 @@ title: Image and file
 
 <!-- method 5, with css support -->
 <link rel="stylesheet" href="{{ site.baseurl }}public/css/znhoo.css">
+
 <div class="txtimg">
   
   <img src="{{site.baseurl}}assets/hknight.jpg">
   
   <p class="bottom">(text to appear at the bottom left of the image)</p>
   <p class="right"> (text to appear at the top right of the image)</p>
+
 </div>
 
 ## Reference

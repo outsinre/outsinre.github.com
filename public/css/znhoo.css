@@ -1,6 +1,6 @@
 .txtimg{
   position: relative;
-  overflow: auto;
+  overflow: visible;
   color: #fff;
   border-radius: 5px;
 }
