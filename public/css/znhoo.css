@@ -1,6 +1,6 @@
 .txtimg{
   position: relative;
-  overflow: visible;
+  overflow: auto;
   color: #fff;
   border-radius: 5px;
 }
@@ -10,15 +10,25 @@
   height: auto;
 }
 
-.bottom,
-.right{
+.bl, .tl, .br,
+.tr{
   margin: 1em;
   position: absolute;
 }
 
-.bottom{
+.bl{
   bottom: 0px;
+  left: 0px;
 }
-.right{
+.tl{
+  top: 0px;
+  left: 0px;
+}
+.br{
+  bottom: 0px;
+  right: 0px;
+}
+.tr{
+  top: 0px;
   right: 0px;
 }

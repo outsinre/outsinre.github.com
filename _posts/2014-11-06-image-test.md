@@ -58,8 +58,8 @@ title: Image and file
   
   <img src="{{site.baseurl}}assets/hknight.jpg">
   
-  <p class="bottom">(text to appear at the bottom left of the image)</p>
-  <p class="right"> (text to appear at the top right of the image)</p>
+  <p class="bl">(text to appear at the bottom left of the image)</p>
+  <p class="tr"> (text to appear at the top right of the image)</p>
 
 </div>
 
@@ -71,4 +71,5 @@ title: Image and file
 [5](http://www.htmldog.com/guides/css/intermediate/backgroundimages/)
 [6](http://zhidao.baidu.com/question/296249405.html)
 [7](http://bbs.csdn.net/topics/120076193)
-[Main](http://www.the-art-of-web.com/css/textoverimage/)
+[8](http://www.the-art-of-web.com/css/textoverimage/)
+[9](http://demosthenes.info/blog/586/CSS-Fluid-Image-Techniques-for-Responsive-Site-Design)
