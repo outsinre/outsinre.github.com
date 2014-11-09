@@ -37,7 +37,7 @@ title: Image and file
 <br />
 
 <!--method 3, place text over image, position not accurate -->
-<div style="position:relative; width: 738px; height: 284px">
+<div style="position:relative">
 	<div style="position:absolute; left:50px; top:50px; color:#fff; font-weight:bold">some text ...</div>
 	<img src="{{site.baseurl}}assets/hknight.jpg">
 </div>
