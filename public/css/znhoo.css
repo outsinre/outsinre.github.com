@@ -6,7 +6,8 @@
 }
 
 .txtimg img{
-  width: 100%;
+  max-width: 100%;
+  height: auto;
 }
 
 .bottom,
@@ -19,6 +20,5 @@
   bottom: 0px;
 }
 .right{
-  right: 0px
-  top: 0px
+  right: 0px;
 }
