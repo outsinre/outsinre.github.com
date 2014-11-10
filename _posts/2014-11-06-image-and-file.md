@@ -63,12 +63,12 @@ Place text over image with `CSS` file support with css support.
 
 >Use the last two methods! They are very good and complete.
 
-## Reference
-[CSS Fluid Image Techniques for Responsive Site Design](http://demosthenes.info/blog/586/CSS-Fluid-Image-Techniques-for-Responsive-Site-Design)
-[background-image](https://docs.webplatform.org/wiki/css/properties/background-image)
-[Text Blocks Over Image](http://css-tricks.com/text-blocks-over-image/)
-[Background Images](http://www.htmldog.com/guides/css/intermediate/backgroundimages/)
-[请问如何利用html代码在一个图片上加上文字](http://zhidao.baidu.com/question/296249405.html)
-[请问怎样能用css作出文字叠加在图片上的效果](http://bbs.csdn.net/topics/120076193)
-[CSS: Placing text over an inline image](http://www.the-art-of-web.com/css/textoverimage/)
-[fallback color](https://github.com/CSSLint/csslint/wiki/Require-fallback-colors)
+### Reference
+[CSS Fluid Image Techniques for Responsive Site Design](http://demosthenes.info/blog/586/CSS-Fluid-Image-Techniques-for-Responsive-Site-Design)  
+[background-image](https://docs.webplatform.org/wiki/css/properties/background-image)  
+[Text Blocks Over Image](http://css-tricks.com/text-blocks-over-image/)  
+[Background Images](http://www.htmldog.com/guides/css/intermediate/backgroundimages/)  
+[请问如何利用html代码在一个图片上加上文字](http://zhidao.baidu.com/question/296249405.html)  
+[请问怎样能用css作出文字叠加在图片上的效果](http://bbs.csdn.net/topics/120076193)  
+[CSS: Placing text over an inline image](http://www.the-art-of-web.com/css/textoverimage/)  
+[fallback color](https://github.com/CSSLint/csslint/wiki/Require-fallback-colors)  
