@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Deadlifts 
+title: Deadlifts
 ---
 
 Deadlifts are one of the best exercises out there to build your back but it's easy to make these 5 mistakes. In this video we'll show you what common Deadlift mistakes to avoid.
