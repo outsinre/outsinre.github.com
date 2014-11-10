@@ -47,10 +47,10 @@ Place text over image, by <span style="color:red; font-weight:bold">table</span>
 </TR>
 </TABLE>
 
-Place text over image. `border-radius` is acctually attribute of `img`. Attention: `border-radius`, `margin` `max-width` and `overflow` is already specified in `poole.css` and `lanyon.css` files. Here is just a complete example to show the method.
+Place text over image. `border-radius` is acctually attribute of `img`. Attention: `border-radius`, `margin` `max-width` and `overflow` is already specified in `poole.css` and `lanyon.css` files. Here is just a complete example to show the method. `rgb(255,255,255)` is called **fallback color** for compatibility issue in that some browsers does not support `rgba`. Similarly, this also applies to `hsl` and `hsla`.
 <div style="position:relative; overflow:hidden; border-radius:5px">
   <img src="{{site.baseurl}}assets/hknight.jpg" style="max-width:100%; height:auto; margin:0 0 0.5rem 0;">
-  <p style="position:absolute; left:100px; top:55px; background:rgba(255, 255, 255, 0.5); color:blue; padding:4px; margin:0.5em;">(text accurately positioned)</p>
+  <p style="position:absolute; left:100px; top:55px; background:rgb(255, 255, 255);background:rgba(255, 255, 255, 0.5); color:blue; padding:4px; margin:0.5em;">(text accurately positioned)</p>
 </div>
 
 Place text over image with `CSS` file support with css support.
