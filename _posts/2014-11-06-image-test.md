@@ -39,7 +39,7 @@ Place text over image, position not accurate.
   <span style="color:#fcc">some text ...</span>
 </div>
 
-Place text over image, by table, position not accurate. No `border-radius` attribute here. So border angle is sharpe.
+Place text over image, by <span style="color:red; font-weight:bold">table</span>, position not accurate. No `border-radius` attribute here. So border angle is sharpe.
 <TABLE BORDER="0" cellpadding="5" CELLSPACING="0">
 <TR>
 <TD WIDTH="738" HEIGHT="284" BACKGROUND="{{site.baseurl}}assets/hknight.jpg" VALIGN="bottom">
