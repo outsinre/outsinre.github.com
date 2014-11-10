@@ -1,3 +1,10 @@
+/* text alignment */
+.container, .page,
+.post{
+  text-align: justify;
+}
+
+
 /* this is a CSS style for text block over images. Refer to http://stackoverflow.com/q/26830227/2336707 and http://stackoverflow.com/a/26825989/2336707 */
 
 .txtimg{
