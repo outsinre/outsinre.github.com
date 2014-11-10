@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Deadlifts - 5 Most Common Deadlift Mistakes 
+title: Deadlifts 
 ---
 
 Deadlifts are one of the best exercises out there to build your back but it's easy to make these 5 mistakes. In this video we'll show you what common Deadlift mistakes to avoid.
@@ -13,4 +13,5 @@ Deadlifts are one of the best exercises out there to build your back but it's ea
 
 <iframe width="560" height="315" src="//www.youtube.com/embed/MDuXuUg15mk" frameborder="0" allowfullscreen></iframe>
 
+How to perform deadlift:
 <iframe width="560" height="315" src="//www.youtube.com/embed/-4qRntuXBSc" frameborder="0" allowfullscreen></iframe>
