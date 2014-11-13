@@ -47,10 +47,30 @@ Excel（包括其他Office 程序）允许用户录制一段宏，并将其记�
 Refer to [什么是宏，什么是VBA，两者有区别吗？](http://t.excelhome.net/forum.php?mod=viewthread&tid=4172&highlight=&page=2)
 
 
-## Excel basics
+## Excel Programming Basics
 
 如何打开VBA IDE编辑器
 
 1. 通过快捷键“ALT + F11”打开VB编辑器IDE
 2. 也可以通过Developer Mode打开VB和Macro
 3. 还可以在邮件点击work shett，选择View Code
+
+VBA中给变量赋值使用set和不使用set的区别
+'给普通变量赋值使用LET ，只是LET 可以省略。
+'给对象变量赋值使用SET，SET 不能省略。例如ADODB.RecordSet等对象。
+
+{% highlight vba linenos %}
+Sub AA()
+    Dim arr As String
+    arr = "hello" '本句也可写成LET arr = "hello"
+End Sub
+Sub bb()
+    Dim arr As String
+    Set arr = "hello"  ' 这样写是错误的。
+End Sub
+{% endhighlight %}
+
+VBA中变量用dim定义和不用dim定义而直接使用有何区别？
+'DIM 语句 的作用似乎声明变量并分配存储空间。
+'如果不指定数据类型或对象类型，也就是不用DIM定义，且在模块中没有 Deftype 语句，
+'则该变量按缺省设置是 Variant 类型。
