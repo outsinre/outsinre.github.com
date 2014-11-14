@@ -1,6 +1,6 @@
 ---
 layout: post
-title: HTML CSS JS PHP MYSQL?
+title: HTML CSS JS PHP MYSQL collaboration
 ---
 
 <div class = "message">

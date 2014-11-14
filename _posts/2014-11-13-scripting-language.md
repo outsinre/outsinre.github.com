@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Scripting Language
+title: What is Scripting Language?
 ---
 
 >详细分析脚本语言的特点，脚本语言的和其他语言的关系。

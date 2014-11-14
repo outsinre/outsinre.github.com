@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title: INTERNET RES
+title: INTERNET RESOURCES
 ---
 
 <div class="message">
