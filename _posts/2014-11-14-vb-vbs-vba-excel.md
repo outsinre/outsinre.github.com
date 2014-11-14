@@ -59,7 +59,7 @@ VBA中给变量赋值使用set和不使用set的区别
 '给普通变量赋值使用LET ，只是LET 可以省略。
 '给对象变量赋值使用SET，SET 不能省略。例如ADODB.RecordSet等对象。
 
-{% highlight vba linenos %}
+{% highlight vb.net linenos %}
 Sub AA()
     Dim arr As String
     arr = "hello" '本句也可写成LET arr = "hello"
