@@ -12,7 +12,7 @@ title: Jekyll Poole Lanyon Blog Building
 ## Procedure
 
 **1** Install git command  
-`$ sudo apt-get install git`
+`$ sudo apt-get install git`  
 **2** Create user pages  
 Create a empty repository called `username.github.com` on Github web without `README` file.  
 **3** Ubuntu Command lines  
@@ -27,7 +27,13 @@ Push locall repository to remote.
 **4** Visit `username.github.io`  
 What you see it not yours, all the contents are from *Lanyon*. We need to modify the contents for our own use. We should firstly validate the modification before push to remote repository. `Jekyll` can do that validation.  
 **5** `Jekyll`  
-For installation, refer to [Install Jekyll 2 on Ubuntu 14.04](http://michaelchelen.net/81fa/install-jekyll-2-ubuntu-14-04/) and [Official site](http://jekyllrb.com/docs/installation/).  
+For installation, refer to [Install Jekyll 2 on Ubuntu 14.04](http://michaelchelen.net/81fa/install-jekyll-2-ubuntu-14-04/) and [Official site](http://jekyllrb.com/docs/installation/).
+
+* `sudo apt-get install ruby ruby-dev make`
+* `sudo gem install jekyll --no-rdoc --no-ri`
+* `sudo apt-get install nodejs` <span style="color:gray">There is a current issue that causes Jekyll to require a JavaScript runtime even if it will not be used. Installing nodejs helps solve the issue</span>
+* `jekyll -v`
+
 Jekyll comes with a built-in development server that will allow you to preview what the generated site will look like in your browser locally by `http://localhost:4000`. You can try now:
 
 * Run `$ jekyll server` in `username.github.com` directory
