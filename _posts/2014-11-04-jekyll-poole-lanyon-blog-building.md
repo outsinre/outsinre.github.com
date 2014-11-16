@@ -13,6 +13,7 @@ title: Jekyll Poole Lanyon Blog Building
 
 **1** Install git command  
 `$ sudo apt-get install git`  
+`$ git config --global ...` For configuration commands refer to official website.
 **2** Create user pages  
 Create a empty repository called `username.github.com` on Github web without `README` file.  
 **3** Ubuntu Command lines  
