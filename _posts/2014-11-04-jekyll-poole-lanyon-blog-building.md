@@ -31,7 +31,7 @@ For installation, refer to [Install Jekyll 2 on Ubuntu 14.04](http://michaelchel
 
 * `sudo apt-get install ruby ruby-dev make`
 * `sudo gem install jekyll --no-rdoc --no-ri`
-* `sudo apt-get install nodejs` <span style="color:red">There is a current issue that causes Jekyll to require a JavaScript runtime even if it will not be used. Installing nodejs helps solve the issue</span>
+* `sudo apt-get install nodejs` {% raw %} <span style="color:red">There is a current issue that causes Jekyll to require a JavaScript runtime even if it will not be used. Installing nodejs helps solve the issue</span> {% endraw %}
 * `jekyll -v`
 
 Jekyll comes with a built-in development server that will allow you to preview what the generated site will look like in your browser locally by `http://localhost:4000`. You can try now:
