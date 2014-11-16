@@ -25,7 +25,8 @@ If you have many untracked or ignored files in your repository, use command:
 
 `i` is used for interactive mode which ask you yes or not when cleaning files. To simplify things, replace `i` with `f` which will force removing without hints.
 
-Detail referring to [cleaning up untracked files](http://gitready.com/beginner/2009/01/16/cleaning-up-untracked-files.html).
+#### Reference
+1. [cleaning up untracked files](http://gitready.com/beginner/2009/01/16/cleaning-up-untracked-files.html).
 
 # Line endings
 Windows adopts `CRLF` while Linux adopts `LF`, which usually incur conflicts if you or your team edit your repository on both platforms. Basically, we set a universal line ending scheme as `LF`, even for Windows. The key for universal line ending is per-repository `.gitattribute` file setting. Never count on `autocrlf` thing under Windows.
@@ -34,12 +35,15 @@ Windows adopts `CRLF` while Linux adopts `LF`, which usually incur conflicts if 
 ```
 git config --global core.autocrlf false
 git config --global core.safecrlf true
+```
 
 ## Linux
+```
+git config --global core.autocrlf input
+git config --global core.safecrlf true
+```
 
->git config --global core.autocrlf input
-
-## Reference
+#### Reference
 1. [dealing-with-line-endings](https://help.github.com/articles/dealing-with-line-endings/#platform-all)
 2. [line-endings-in-git](https://github.com/ninehills/blog.ninehills.info/blob/master/2012-5-line-endings-in-git.md)
 3. [GitHub 第一坑换行符自动转换](http://blog.csdn.net/leonzhouwei/article/details/8933605#t0)
@@ -58,7 +62,8 @@ git config --global core.safecrlf true
   - `git pull origin master` to pull the `README.md` first, otherwise you could not push local directory contents to remote. The git assumes your local copy lags behind of the remote origin.
 8. `git push origin master`. Pushes the changes in your local repository up to the remote repository you specified as the origin.
 
-Refer to [adding an existing project to github using the comand line](https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/)
+#### Reference
+1. [adding an existing project to github using the comand line](https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/)
 
 # Reference
 1. [A very good simple cheatsheet](http://rogerdudler.github.io/git-guide/). It is not a good tutorial. But you can refer to it as you forget something.

@@ -13,7 +13,7 @@ title: Jekyll Poole Lanyon Blog Building
 
 **1** Install git command  
 `$ sudo apt-get install git`  
-`$ git config --global ...` For configuration commands refer to official website.
+`$ git config --global ...` For configuration commands refer to official website.  
 **2** Create user pages  
 Create a empty repository called `username.github.com` on Github web without `README` file.  
 **3** Ubuntu Command lines  
@@ -32,7 +32,7 @@ For installation, refer to [Install Jekyll 2 on Ubuntu 14.04](http://michaelchel
 
 * `sudo apt-get install ruby ruby-dev make`
 * `sudo gem install jekyll --no-rdoc --no-ri`
-* `sudo apt-get install nodejs` {% raw %} <span style="color:gray">There is a current issue that causes Jekyll to require a JavaScript runtime even if it will not be used. Installing nodejs helps solve the issue</span> {% endraw %}
+* `sudo apt-get install nodejs` {% raw %} <span style="color:blue">There is a current issue that causes Jekyll to require a JavaScript runtime even if it will not be used. Installing nodejs helps solve the issue</span> {% endraw %}
 * `jekyll -v`
 
 Jekyll comes with a built-in development server that will allow you to preview what the generated site will look like in your browser locally by `http://localhost:4000`. You can try now:
@@ -62,12 +62,14 @@ Though the problem was solved, I don't need the two sidebar items. So I removed 
 
 **Disqus** comments. Firsly, create a file *comments.html* and add two lines:
 {% raw %}
-*{% if page.comments %}*
 
-<em>{% endif %}</em>
+{% if page.comments %}
+
+{% endif %}
+
 {% endraw %}
 
-Then paste the DISQUS universal code between the two lines. The *comments.html* should be placed under *_include* folder. After that, in *_layout/post.html* file, add a line *&#123;% include comments.html %}* to the end. Also in the header part add `comments: true`.
+Then paste the DISQUS universal code between the two lines. The *comments.html* should be placed under *_include* folder. After that, in *_layout/post.html* file, add a line `{% raw %}{% include comments.html %}{% endraw %}` to the end. Also in the header part add `comments: true`.
 
 **Archive** page added based on the reference at the beginning.
 
