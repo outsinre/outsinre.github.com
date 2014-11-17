@@ -65,5 +65,13 @@ git config --global core.safecrlf true
 #### Reference
 1. [adding an existing project to github using the comand line](https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/)
 
+# gitignore
+
+`gitignore` files can ignore untracked, unwanted files including `.gitignore`, `.gitignore_global`, and `.git/info/exclude`.
+
+#### Reference
+1. [ignoring files](https://help.github.com/articles/ignoring-files/)
+2. [gitignore](http://git-scm.com/docs/gitignore)
+
 # Reference
 1. [A very good simple cheatsheet](http://rogerdudler.github.io/git-guide/). It is not a good tutorial. But you can refer to it as you forget something.
