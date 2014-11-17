@@ -67,7 +67,7 @@ git config --global core.safecrlf true
 
 # gitignore
 
-`gitignore` files can ignore untracked, unwanted files including `.gitignore`, `.gitignore_global`, and `.git/info/exclude`.
+`gitignore` files can ignore files that will not be pushed to remote repository.There are several kinds of `gitignore` files including `.gitignore`, `.gitignore_global`, and `.git/info/exclude`.
 
 #### Reference
 1. [ignoring files](https://help.github.com/articles/ignoring-files/)
