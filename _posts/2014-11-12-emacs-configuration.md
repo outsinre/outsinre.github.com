@@ -21,6 +21,7 @@ Reference: [emacs在win8乱码](http://blog.csdn.net/qianchenglenger/article/det
 ## Emacs Windows Language Environment
 Windows 8.1 英文系统，非Unicode语言设置为Simplified Chinese。在Emacs下编辑中文老遇到编码的问题，特别windows ubuntu之间切换各种乱码问题。所以在`init.el`文件中加入如下代码：
 {% highlight ruby linenos %}
+
 ;; to set UTF-8 language environment
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8-unix)
@@ -28,11 +29,16 @@ Windows 8.1 英文系统，非Unicode语言设置为Simplified Chinese。在Emac
 (set-keyboard-coding-system 'utf-8-unix)
 (setq-default buffer-file-coding-system 'utf-8-unix)
 
-;; priority based on reverse order
+;; priority based on reverse order, so the last one is used first
 (prefer-coding-system 'chinese-gbk)
+(prefer-coding-system 'gb2312)
+(prefer-coding-system 'cp936)
 (prefer-coding-system 'gb18030)
+(prefer-coding-system 'utf-16)
 (prefer-coding-system 'utf-8)
+(prefer-coding-system 'utf-8-dos)
 (prefer-coding-system 'utf-8-unix)
+
 {% endhighlight %}
 
 Refer to [2009-07-09](http://masutaka.net/chalow/2009-07-09-1.html) and [windows下Emacs中文乱码解决办法](http://blog.csdn.net/sanwu2010/article/details/23994977)
