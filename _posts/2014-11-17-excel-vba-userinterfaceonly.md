@@ -16,7 +16,7 @@ Sheet1.Unprotect Password:="abc"
 'Enter Code / Macro
  
 Sheet1.Protect Password:="abc"
-{% enghighlight %} 
+{% endhighlight %} 
  
 However, this method has some shortcomings:
 
