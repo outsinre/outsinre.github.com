@@ -19,7 +19,7 @@ If you have many untracked or ignored files in your repository, use command:
 
     git clean -ndx [path]
 
-`n` is to try a dry-run, only shows what files will be cleaned. For real action, remove `n` argument. `d` means removing unsed folders as well. `x` means remove git ignored files such as those with a `~` trailing. Option `[path]` is to only clean a sub-directory of current repository. For example, many `~` trailing files in `_post` folders:
+`n` is to try a dry-run, only shows what files will be cleaned. For real action, remove `n` argument. `d` means untracked folders as well. `x` means don’t use the standard ignore rules read from .gitignore. `X` means removing only files ignored by Git. Option `[path]` is to only clean a sub-directory of current repository. For example, many `~` trailing files in `_post` folders:
 
     git clean -idx _post/
 
