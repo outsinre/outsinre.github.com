@@ -4,7 +4,7 @@ title: Github Tips
 ---
 
 # Checkout
-If you ever changed some files or folders and found them inappropriate, you can revert/discard the changed by command <strong>checkout</strong> command.
+If you ever changed some files or folders and not yet commited. Then found them inappropriate, you can revert/discard the changed by command <strong>checkout</strong> command.
 
 For example, if you changed the file *file.txt*, then you can use command:
 
@@ -16,13 +16,13 @@ If you want to discard all the changes:
 
 # Clean
 
-> git clean [-d] [-f] [-i] [-n] [-q] [-e <pattern>] [-x | -X] [--] <path>…
+> git clean [-d] [-f] [-i] [-n] [-q] [-e <pattern>] [-x | -X] [--] [path…]
 
 Cleans the working tree by recursively removing files that are not under version control, starting from the current directory.
 
 Normally, only files unknown to Git are removed, but if the <span style="color:blue">-x</span> option is specified, ignored files are also removed. This can, for example, be useful to remove all build products.
 
-If any optional <span style="color:blue"> <path>... </span>arguments are given, only those paths are affected.
+If any optional <span style="color:blue"> [path...] </span>arguments are given, only those paths are affected.
 
 If you have many untracked or ignored files in your repository, use command:
 
@@ -32,7 +32,7 @@ If you have many untracked or ignored files in your repository, use command:
 
     git clean -idx _post/
 
-`i` is used for interactive mode which ask you yes or not when cleaning files. To simplify things, replace `i` with `f` which will force removing without hints.
+`i` is used for interactive mode which ask you yes or not when cleaning files. To simplify things, replace `i` with `f` which will force removing without hints. Most of the time, `*~` files are ignored by git, so we need to include `x` option.
 
 #### Reference
 1. [cleaning up untracked files](http://gitready.com/beginner/2009/01/16/cleaning-up-untracked-files.html).
