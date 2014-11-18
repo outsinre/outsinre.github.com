@@ -15,11 +15,20 @@ If you want to discard all the changes:
     git checkout -- .
 
 # Clean
+
+> git clean [-d] [-f] [-i] [-n] [-q] [-e <pattern>] [-x | -X] [--] <path>…
+
+Cleans the working tree by recursively removing files that are not under version control, starting from the current directory.
+
+Normally, only files unknown to Git are removed, but if the <span style="color:blue">-x</span> option is specified, ignored files are also removed. This can, for example, be useful to remove all build products.
+
+If any optional <span style="color:blue"> <path>... </span>arguments are given, only those paths are affected.
+
 If you have many untracked or ignored files in your repository, use command:
 
     git clean -ndx [path]
 
-`n` is to try a dry-run, only shows what files will be cleaned. For real action, remove `n` argument. `d` means untracked folders as well. `x` means don’t use the standard ignore rules read from .gitignore. `X` means removing only files ignored by Git. Option `[path]` is to only clean a sub-directory of current repository. For example, many `~` trailing files in `_post` folders:
+`n` is to try a dry-run, only shows which files will be cleaned. For real action, remove `n` argument. `d` means untracked folders as well. `x` means don’t use the standard ignore rules read from `.gitignore`. **Therefore, gitignored files won't be ignored by `git clean` and will be removed**. `X` means removing only files ignored by Git. Option `[path]` is to only clean a sub-directory of current repository. For example, many `~` trailing files in `_post` folders:
 
     git clean -idx _post/
 
