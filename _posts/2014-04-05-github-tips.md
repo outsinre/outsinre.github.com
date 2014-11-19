@@ -60,6 +60,7 @@ git config --global core.safecrlf true
 
 The follwing is the question on StackOverflow for line endings:
 ***
+[fatal: LF would be replaced by CRLF](http://stackoverflow.com/questions/26991025/fatal-lf-would-be-replaced-by-crlf)
 ***
 Platform: Windows 8.1 Emacs 24.3
 
@@ -141,6 +142,8 @@ The core is:
 - ***DISABLE AUTO LINE ENDING CONVERSION*** by GitHub.
 
 - ***DEPEND ON PLATFORM FILE EDITOR FOR LINE ENDING***.
+***
+
 
 #### Reference
 1. [dealing-with-line-endings](https://help.github.com/articles/dealing-with-line-endings/#platform-all)

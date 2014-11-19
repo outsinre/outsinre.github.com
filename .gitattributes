@@ -1,5 +1,8 @@
 # Auto detect text files and perform LF normalization
-#* text=auto
+ #* text=auto
+
+# .md file is normalized to LF ending when checkin by text=auto; also normalized to LF ending when checkout by eol=lf
+#*.md text=auto eol=lf
 
 # Custom for Visual Studio
 *.cs     diff=csharp
