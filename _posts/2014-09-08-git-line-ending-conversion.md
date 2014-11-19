@@ -153,11 +153,11 @@ According to the decision precedence, .gitattributes file is consulted before gl
 # Read the first reference carefully!
 
 # Reference
-1. [fatal: LF would be replaced by CRLF in](http://stackoverflow.com/questions/15467507/trying-to-commit-git-files-but-getting-fatal-lf-would-be-replaced-by-crlf-in)
+1. [fatal: LF would be replaced by CRLF](http://stackoverflow.com/questions/26991025/fatal-lf-would-be-replaced-by-crlf)
 2. [dealing-with-line-endings](https://help.github.com/articles/dealing-with-line-endings/#platform-all)
 2. [line-endings-in-git](https://github.com/ninehills/blog.ninehills.info/blob/master/2012-5-line-endings-in-git.md)
 3. [GitHub 第一坑换行符自动转换](http://blog.csdn.net/leonzhouwei/article/details/8933605#t0)
 5. [gitattributes - defining attributes per path](http://git-scm.com/docs/gitattributes)
 6. [Line endings handling in SVN, Git and SubGit](http://blog.subgit.com/line-endings-handling-in-svn-git-and-subgit/)
-7. [fatal: LF would be replaced by CRLF](http://stackoverflow.com/questions/26991025/fatal-lf-would-be-replaced-by-crlf)
+7. [fatal: LF would be replaced by CRLF in](http://stackoverflow.com/questions/15467507/trying-to-commit-git-files-but-getting-fatal-lf-would-be-replaced-by-crlf-in)
 8. [core.eol core.autocrlf](http://git-scm.com/docs/git-config)
