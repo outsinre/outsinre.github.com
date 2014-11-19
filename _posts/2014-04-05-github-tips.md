@@ -58,7 +58,7 @@ git config --global core.autocrlf input
 git config --global core.safecrlf true
 ```
 
-The follwing is the question on StackOverflow for line endings:
+## My post on StackOverflow
 ***
 [fatal: LF would be replaced by CRLF](http://stackoverflow.com/questions/26991025/fatal-lf-would-be-replaced-by-crlf)
 ***
@@ -142,6 +142,34 @@ The core is:
 - ***DISABLE AUTO LINE ENDING CONVERSION*** by GitHub.
 
 - ***DEPEND ON PLATFORM FILE EDITOR FOR LINE ENDING***.
+
+---
+***EDIT 5***
+
+1. `text`
+This attribute enables and controls end-of-line normalization. When a text file is normalized, its line endings are converted to `LF` **in the repository**. To control what line ending style is used **in the working directory**, use the `eol` attribute for a single file and the `core.eol` configuration variable for all text files.
+  - When `text` is set to "`auto`", the path is marked for automatic end-of-line normalization. If *Git decides that the content is text*, its line endings are normalized to **`LF` on checkin**.
+2. `eol`
+This attribute sets a specific line-ending style to be used in the working directory. It enables end-of-line normalization without any content checks, **effectively setting the `text` attribute**.
+  - *That is to say `eol` automatically set `text` attribute*.
+  - Set to string value "crlf"  
+This setting forces Git to normalize line endings for this file on checkin and convert them to CRLF when the file is checked out.
+  - Set to string value "lf"  
+This setting forces Git to normalize line endings to LF on checkin and prevents conversion to CRLF when the file is checked out.
+
+Refer to [gitattributes - defining attributes per path](http://git-scm.com/docs/gitattributes)
+
+---
+***EDIT 6***
+
+Git attributes are specified in `.gitattributes` files. Line endings are controlled by `text` and `eol` attributes.
+
+`text` attribute tells Git whether the file is `binary` (i.e. no `EOL` conversion should be performed while checking out and in) or `text` (perform `EOL` conversion, always convert to `LF` while checking in). Possible values are set (EOLs conversion is turned on), unset(EOLs conversion is turned off, default value) and `auto`(if the file is detected as binary, no conversion, otherwise EOLs conversion is performed).
+
+`eol` attribute: if set implicitly sets `text` attribute and defines EOL to which the file should be converted while checking out.
+
+Refer to [Line endings handling in SVN, Git and SubGit](http://blog.subgit.com/line-endings-handling-in-svn-git-and-subgit/)
+
 ***
 
 
@@ -150,6 +178,7 @@ The core is:
 2. [line-endings-in-git](https://github.com/ninehills/blog.ninehills.info/blob/master/2012-5-line-endings-in-git.md)
 3. [GitHub 第一坑换行符自动转换](http://blog.csdn.net/leonzhouwei/article/details/8933605#t0)
 4. [fatal: LF would be replaced by CRLF in](http://stackoverflow.com/questions/15467507/trying-to-commit-git-files-but-getting-fatal-lf-would-be-replaced-by-crlf-in)
+5. [gitattributes - defining attributes per path](http://git-scm.com/docs/gitattributes)
 
 # Upload local directory as a repository
 

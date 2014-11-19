@@ -1,8 +1,18 @@
-# Auto detect text files and perform LF normalization
- #* text=auto
+# Auto detect text files and perform LF normalization when checkin
+* text=auto
 
-# .md file is normalized to LF ending when checkin by text=auto; also normalized to LF ending when checkout by eol=lf
-#*.md text=auto eol=lf
+# eol=lf when checkout. This will overwrite the first line "text=auto"
+* eol=lf
+
+# For .md file specially
+*.md text eol=lf
+
+# Remove text attribute for binary files，-text and binary are the same purpose
+*.jpg -text
+*.jpeg binary
+*.svg binary
+*.png -text
+*.pdf -text
 
 # Custom for Visual Studio
 *.cs     diff=csharp
