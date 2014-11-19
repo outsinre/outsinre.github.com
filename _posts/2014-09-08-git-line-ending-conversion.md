@@ -150,7 +150,7 @@ According to the decision precedence, .gitattributes file is consulted before gl
   - adjust your the file line ending style to allow staging.
   - add a specific line in .gitattributes for fine-grained control on line ending conversion for that file.
 
-# Read the first reference carefully!
+# Read the 1st and 2nd reference carefully!
 
 # Reference
 1. [fatal: LF would be replaced by CRLF](http://stackoverflow.com/questions/26991025/fatal-lf-would-be-replaced-by-crlf)
