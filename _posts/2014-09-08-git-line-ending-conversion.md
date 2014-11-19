@@ -154,6 +154,7 @@ According to the decision precedence, .gitattributes file is consulted before gl
 
 # Reference
 1. [fatal: LF would be replaced by CRLF](http://stackoverflow.com/questions/26991025/fatal-lf-would-be-replaced-by-crlf)
+2. [Mind the End of Your Line](http://adaptivepatchwork.com/2012/03/01/mind-the-end-of-your-line/)
 2. [dealing-with-line-endings](https://help.github.com/articles/dealing-with-line-endings/#platform-all)
 2. [line-endings-in-git](https://github.com/ninehills/blog.ninehills.info/blob/master/2012-5-line-endings-in-git.md)
 3. [GitHub 第一坑换行符自动转换](http://blog.csdn.net/leonzhouwei/article/details/8933605#t0)
