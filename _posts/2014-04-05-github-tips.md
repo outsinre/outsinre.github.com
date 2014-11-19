@@ -3,16 +3,22 @@ layout: post
 title: Github Tips
 ---
 
+> This post focues on Git configuration and some commands. For complete Git principle and analysis refer to *Git Architecture*
+
 # Checkout
-If you ever changed some files or folders and not yet commited. Then found them inappropriate, you can revert/discard the changed by command <strong>checkout</strong> command.
+If you ever **modified** some files or folders. Then found them inappropriate, you can revert/discard the changes by <strong>checkout</strong> command.
 
 For example, if you changed the file *file.txt*, then you can use command:
 
     git checkout -- file.txt
 
+This command will copy the lasted committed "file.txt" from the git repository. The staging area and working tree are also updated.
+
 If you want to discard all the changes:
 
     git checkout -- .
+
+This command is fairly handy when you want to discard several changes across different files.
 
 # Clean
 
