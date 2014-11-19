@@ -3,7 +3,7 @@ layout: post
 title: Github Tips
 ---
 
-> This post focues on Git configuration and some commands. For complete Git principle and analysis refer to *Git Architecture*
+> This post focues on Git configuration and some commands. For complete Git principle and analysis refer to post *Git Architecture*
 
 # Checkout
 If you ever **modified** some files or folders. Then found them inappropriate, you can revert/discard the changes by <strong>checkout</strong> command.
@@ -44,7 +44,7 @@ If you have many untracked or ignored files in your repository, use command:
 1. [cleaning up untracked files](http://gitready.com/beginner/2009/01/16/cleaning-up-untracked-files.html).
 
 # Line endings
-Windows adopts `CRLF` while Linux adopts `LF`, which usually incur conflicts if you or your team edit your repository on both platforms. Basically, we set a universal line ending scheme as `LF`, even for Windows. The key for universal line ending is per-repository `.gitattribute` file setting. Never count on `autocrlf` thing under Windows.
+Windows adopts `CRLF` while Linux adopts `LF`, which usually incur conflicts if you or your team edit your repository on both platforms. Basically, we set a universal line ending scheme as `LF`, even for Windows. The key is to **depend on your file editor for line ending, not the Git auto conversion**.
 
 ## Windows
 ```
@@ -57,6 +57,90 @@ git config --global core.safecrlf true
 git config --global core.autocrlf input
 git config --global core.safecrlf true
 ```
+
+The follwing is the question on StackOverflow for line endings:
+***
+***
+Platform: Windows 8.1 Emacs 24.3
+
+The git config `--global -l` shows:
+
+    user.name=username
+    user.email=useremail
+    core.autocrlf=false
+    core.safecrlf=true
+
+Git repository `.gitattributes` file:
+
+    # Auto detect text files and perform LF normalization
+    * text=auto
+    
+    # Custom for Visual Studio
+    *.cs     diff=csharp
+    *.sln    merge=union
+    *.csproj merge=union
+    *.vbproj merge=union
+    *.fsproj merge=union
+    *.dbproj merge=union
+    
+    # Standard to msysgit
+    *.doc	 diff=astextplain
+    *.DOC	 diff=astextplain
+    *.docx diff=astextplain
+    *.DOCX diff=astextplain
+    *.dot  diff=astextplain
+    *.DOT  diff=astextplain
+    *.pdf  diff=astextplain
+    *.PDF	 diff=astextplain
+    *.rtf	 diff=astextplain
+    *.RTF	 diff=astextplain
+
+I do think my Git and repository settings are right.
+
+But everytime I create a new file with Emacs, I cannot run `git add <new file>`. The file is encoded by `utf-8-unix`.
+
+The error message is as:
+
+    E:\workspace\repository [master +0 ~2 -0]> git add .
+    fatal: LF would be replaced by CRLF in _posts/new file.md
+
+I don't think is due to emacs editor problem. Because I opened the new file and pretty sure the line ending is `LF` not the windows default `CRLF`.
+
+What is wrong with my git on windows?
+
+---
+***EDIT 1***  
+If `safecrlf` is set to `warn` the output is:
+
+    warning: LF will be replaced by CRLF in _posts/2014-11-19-test.md.
+    The file will have its original line endings in your working directory.
+
+This means that the file was successfully added to the index. My file is encoded by `utf-8-unix`.
+
+---
+***EDIT 2***  
+
+Interestingly, if I create a new file with Notepad not the Emacs 24.3, the file can be added without any problem. The difference is Notepad adopts `CRLF` line ending while Emacs 24.3 adopts `LF` line ending.
+
+So the problem is somewhere somehow Git converts `CRLF` to `LF` then back to `CRLF` which generates error for original `LF` line ending file.
+
+---
+***EDIT 3***  
+
+Previously, GitHub Windows GUI client warned me no `.gitattributes` file for my repository and recommend a default `.gitattributes` file as above.
+
+I think the problem is from the line `* text=auto`. So I comment out this line.
+
+Everything works good now!
+
+---
+***EDIT 4***  
+
+The core is:
+
+- ***DISABLE AUTO LINE ENDING CONVERSION*** by GitHub.
+
+- ***DEPEND ON PLATFORM FILE EDITOR FOR LINE ENDING***.
 
 #### Reference
 1. [dealing-with-line-endings](https://help.github.com/articles/dealing-with-line-endings/#platform-all)
