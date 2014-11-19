@@ -98,16 +98,16 @@ Git repository `.gitattributes` file:
 
 I do think my Git and repository settings are right.
 
-But everytime I create a new file with Emacs, I cannot run `git add <new file>`. The file is encoded by `utf-8-unix`.
+But everytime I create a new text file with Emacs, I cannot run `git add <newfile>`. The file is encoded by `utf-8-unix`.
 
 The error message is as:
 
     E:\workspace\repository [master +0 ~2 -0]> git add .
-    fatal: LF would be replaced by CRLF in _posts/new file.md
+    fatal: LF would be replaced by CRLF in newfile.txt
 
 I don't think is due to emacs editor problem. Because I opened the new file and pretty sure the line ending is `LF` not the windows default `CRLF`.
 
-What is wrong with my git on windows?
+Which configuration part decides LF will be replaced by CRLF?
 
 ---
 ***EDIT 1***  
@@ -147,7 +147,9 @@ The core is:
 ***EDIT 5***
 
 1. `text`
-This attribute enables and controls end-of-line normalization. When a text file is normalized, its line endings are converted to `LF` **in the repository**. To control what line ending style is used **in the working directory**, use the `eol` attribute for a single file and the `core.eol` configuration variable for all text files.
+This attribute enables and controls end-of-line normalization. When a text file is normalized, its line endings are converted to `LF` **in the repository**. To control what line ending style is used **in the working directory**, use the `eol` attribute **for a single file** and the `core.eol` configuration variable **for all text files**.
+  - Setting the `text` attribute on a path enables end-of-line normalization and marks the path as a text file. End-of-line conversion takes place **without guessing the content type**.
+  - Unsetting the `text` attribute on a path tells Git **not to attempt any end-of-line conversion upon checkin or checkout**.
   - When `text` is set to "`auto`", the path is marked for automatic end-of-line normalization. If *Git decides that the content is text*, its line endings are normalized to **`LF` on checkin**.
 2. `eol`
 This attribute sets a specific line-ending style to be used in the working directory. It enables end-of-line normalization without any content checks, **effectively setting the `text` attribute**.
@@ -156,6 +158,8 @@ This attribute sets a specific line-ending style to be used in the working direc
 This setting forces Git to normalize line endings for this file on checkin and convert them to CRLF when the file is checked out.
   - Set to string value "lf"  
 This setting forces Git to normalize line endings to LF on checkin and prevents conversion to CRLF when the file is checked out.
+
+3. If `eol` is put in `.gitattributes` file, it should be applied to specific file type. At the same time, it automatically marks the specific file type as `text` at the same time for LF normalization when checkin. If `eol` is set as `git config --global core.eol xxx`, then `eol` is set for all text files.
 
 Refer to [gitattributes - defining attributes per path](http://git-scm.com/docs/gitattributes)
 
@@ -169,7 +173,6 @@ Git attributes are specified in `.gitattributes` files. Line endings are control
 `eol` attribute: if set implicitly sets `text` attribute and defines EOL to which the file should be converted while checking out.
 
 Refer to [Line endings handling in SVN, Git and SubGit](http://blog.subgit.com/line-endings-handling-in-svn-git-and-subgit/)
-
 ***
 
 

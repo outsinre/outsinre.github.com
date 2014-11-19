@@ -1,17 +1,18 @@
-# Auto detect text files and perform LF normalization when checkin
+# Auto detect text files and perform LF normalization when checkin. This should be the first line for other lines below to override it.
 * text=auto
 
-# eol=lf when checkout. This will overwrite the first line "text=auto"
-* eol=lf
-
 # For .md file specially
-*.md text eol=lf
+ #*.md text eol=lf #eol will overwrite text, so there is no need of text attribute here
+ #*.md eol=lf # eol depends on core.eol=native
+*.md text
+
+.gitattributes text
 
 # Remove text attribute for binary files，-text and binary are the same purpose
 *.jpg -text
 *.jpeg binary
-*.svg binary
-*.png -text
+*.svg -text
+*.png binary
 *.pdf -text
 
 # Custom for Visual Studio
