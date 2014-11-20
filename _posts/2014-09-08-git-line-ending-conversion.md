@@ -185,6 +185,24 @@ For writing to repository database, `core.safecrlf` will check EOL conversion sa
   - adjust your the file line ending style to allow staging.
   - add a specific line in .gitattributes for fine-grained control on line ending conversion for that file.
 
+# Refreshing a repository after changing line endings
+
+According to the previous setting scheme, EOL in repository databse both in Windows and Linux should be LF. If the database or working tree contains CRLF previously, you may found git wants to commit files that you have not modified.
+
+The best way to automatically configure your repository's line endings is to first backup your files with Git, delete every file in your repository (except the .git directory), and then restore the files all at once.
+
+```
+git add . -u
+git commit -m "Saving files before refreshing line endings"
+git rm --cached -r .
+git reset --hard
+git add .
+# It is perfectly safe to see a lot of messages here that read
+# "warning: CRLF will be replaced by LF in file." or "fatal: CRLF will be replaced by LF in file."
+# How to solve the fatal error read the first reference.
+git commit -m "Normalize all the line endings"
+```
+
 # Read the 1st and 2nd reference carefully!
 
 # Reference
