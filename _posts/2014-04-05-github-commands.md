@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Github Tips
+title: Github Commands
 ---
 
 > This post focues on Git configuration and some commands. For complete Git principle and analysis refer to post *Git Architecture*
