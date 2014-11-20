@@ -75,6 +75,8 @@ Then paste the DISQUS universal code between the two lines. The *comments.html* 
 
 **Subscribe** page added by modifying `_include/sidebar.html`.
 
+**znhoo.css** added in `public/css/znhoo.css`, especially for blog `text-align: justify`.
+
 **Site icon** changed referring to [icons](http://modernweb.com/2013/10/28/building-a-blog-with-jekyll/). Check the file `_include/head.html` for where is icon defined.
 
 **read more...*** to only display the first paragraph of a post. Only need to modify the `index.html` file. The original is to display the post content completely:

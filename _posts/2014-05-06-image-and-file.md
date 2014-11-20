@@ -53,7 +53,7 @@ Place text over image. `border-radius` is acctually attribute of `img`. Attentio
   <p style="position:absolute; left:100px; top:55px; background:rgb(255, 255, 255);background:rgba(255, 255, 255, 0.5); color:blue; padding:4px; margin:0.5em;">(text accurately positioned)</p>
 </div>
 
-Place text over image with `CSS` file support with css support.
+Place text over image with `CSS` file support with css support. The `znhoo.css` style file is already added to `_include/head.html`.
 <link rel="stylesheet" href="{{ site.baseurl }}public/css/znhoo.css">
 <div class="txtimg">
   <img src="{{site.baseurl}}assets/hknight.jpg">
