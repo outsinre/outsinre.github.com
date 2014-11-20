@@ -24,24 +24,31 @@ Windows 8.1 英文系统，非Unicode语言设置为Simplified Chinese。在Emac
 
 ;; to set UTF-8 language environment
 (set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8-unix)
-(set-terminal-coding-system 'utf-8-unix)
-(set-keyboard-coding-system 'utf-8-unix)
-(setq-default buffer-file-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
 
 ;; priority based on reverse order, so the last one is used first
-(prefer-coding-system 'chinese-gbk)
-(prefer-coding-system 'gb2312)
-(prefer-coding-system 'cp936)
 (prefer-coding-system 'gb18030)
-(prefer-coding-system 'utf-16)
 (prefer-coding-system 'utf-8)
-(prefer-coding-system 'utf-8-dos)
-(prefer-coding-system 'utf-8-unix)
 
 {% endhighlight %}
 
 Refer to [2009-07-09](http://masutaka.net/chalow/2009-07-09-1.html) and [windows下Emacs中文乱码解决办法](http://blog.csdn.net/sanwu2010/article/details/23994977)
+
+## Default CWD on Windows
+
+`CWD` denotes *current working directory*.
+
+When starting Emacs through Windows shortcut, and using `C-x C-f` to open a file, you find that the default directory is `C\windows\system32`.
+
+To change the default directory is:
+
+1. Either edit the Emacs shortcut, in the `start in` field, fill in your default working directory.
+2. Or add a line in your `init.el` file like `(setq default-directory "/path/to/documents/directory/")`.
+
+The firt method is better, since you should keep your `init.el` file consistent for future use.
 
 # Linux
 

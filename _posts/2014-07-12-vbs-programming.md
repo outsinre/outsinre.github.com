@@ -1,6 +1,6 @@
 ---
 layout: post
-title: VBS programing
+title: VBS Programing Tutorial
 ---
 
 <div class="message">

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: What is VBS?
+title: VBS Comprehension
 ---
 
 VBScript是Visual Basic Script的简称，即 Visual Basic 描述语言，有时也被缩写为VBS。VBScript是微软开发的一种脚本语言，可以看作是VB语言的简化版，与VBA的关系也非常密切。它具有原语言容易学习的特性。目前这种语言广泛应用于网页和ASP程序制作，同时还可以直接作为一个可执行程序。用于调试简单的VB语句非常方便。
