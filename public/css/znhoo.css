@@ -1,5 +1,5 @@
 /* text alignment */
-.container, .page,
+.container, .page, .pagination,
 .post{
   text-align: justify;
 }
@@ -9,8 +9,8 @@
 
 .txtimg{
   position: relative;
-  /* overflow: hidden; this line is commented since the lanyon.css has also this line. */
-  /* border-radius: 5px; this line is also included in poole.css */
+  overflow: hidden; /* lanyon.css has also this line. */
+  border-radius: 5px; /* this line is also included in poole.css */
 }
 
 
