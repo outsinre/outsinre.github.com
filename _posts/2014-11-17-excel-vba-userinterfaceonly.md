@@ -7,6 +7,10 @@ If you run macros on a protected worksheet which attempt to make changes in the 
 
 >Run-time error '1004': Application-defined or object-defined error
 
+# Goal
+
+Only allow VBA codes to modify or update the worksheets contents. No user input is allowed any more.
+
 # Unprotect & Protect
 One option is to unprotect the worksheet, run the code / macro, and then protect it again, as shown below:
 
