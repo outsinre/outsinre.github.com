@@ -11,7 +11,7 @@ relative_permalinks: true
 # Setup
 title:               ZNHOO
 tagline:             'Whatever you are, be a good one!'
-description:         'I am ZNHOO. Make yourself at home. Contact me at twitter <a href="https://twitter.com/znhoo" target="_blank">@znhoo</a>.'
+description:         'I am ZNHOO. Make yourself at home. Contact me at <a href="https://twitter.com/znhoo" target="_blank">@znhoo</a>.'
 
 # if user pages, then use "/"; if project page, use "/project-name". Note the slash issue. If you include trailing slash, then should omit duplicated slash when accessing files.
 baseurl:             /
