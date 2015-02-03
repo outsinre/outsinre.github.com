@@ -15,4 +15,4 @@ This is the details on installing TeXLive 2014 under Windows 8.1.
 	If several users in this machine. How to distinguish the different user data under `texmfhome` in `E:\texmf`?
 5. Before the real installation, read the first three chapters of [official documentation](http://tug.org/texlive/doc/texlive-en/texlive-en.html).
 6. The while installation process might need one and a half hour. JUST WAIT!
-7. Once finished, follow chapter 3.4 [3.4 Post-install actions](http://tug.org/texlive/doc/texlive-en/texlive-en.html#x1-300003.4).
+7. Once finished, read chapter [3.4 Post-install actions](http://tug.org/texlive/doc/texlive-en/texlive-en.html#x1-300003.4) and chapter [6 Notes on Windows](http://tug.org/texlive/doc/texlive-en/texlive-en.html#x1-470006). If necessary, you can also read [TeX Live on Windows](http://tug.org/texlive/windows.html).
