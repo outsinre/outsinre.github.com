@@ -13,7 +13,13 @@ title: Jekyll Poole Lanyon Blog Building
 
 **1** Install git command  
 `$ sudo apt-get install git`  
-`$ git config --global ...` For configuration commands refer to official website.  
+`$ git config --global ...` For configuration commands refer to official website on "Set up Git".
+
+Mainly two commands:
+
+1. `git config --global user.name "YOUR NAME"`
+2. `git config --global user.email "YOUR EMAIL"`. You can hide your email address by [Keeping your email address private](https://help.github.com/articles/keeping-your-email-address-private/).
+
 **2** Create user pages  
 Create a empty repository called `username.github.com` on Github web without `README` file.  
 **3** Ubuntu Command lines  
@@ -30,14 +36,19 @@ What you see it not yours, all the contents are from *Lanyon*. We need to modify
 **5** `Jekyll`  
 For installation, refer to [Install Jekyll 2 on Ubuntu 14.04](http://michaelchelen.net/81fa/install-jekyll-2-ubuntu-14-04/) and [Official site](http://jekyllrb.com/docs/installation/).
 
-* `sudo apt-get install ruby ruby-dev make`
-* `sudo gem install jekyll --no-rdoc --no-ri`
-* `sudo apt-get install nodejs` {% raw %} <span style="color:blue">There is a current issue that causes Jekyll to require a JavaScript runtime even if it will not be used. Installing nodejs helps solve the issue</span> {% endraw %}
-* `jekyll -v`
+1. `sudo apt-get install ruby ruby-dev`.
+
+    `ruby-dev` must be installed otherwise see [Error Installing Jekyll - Native Extension Build](http://stackoverflow.com/questions/10725767/error-installing-jekyll-native-extension-build).
+
+    The reference links require installing of `rubygems`, which is not necessary now. The `rubygems` package now is a purly virtual package and part of the real package `ruby`. See [can not install rubygems1.9.1 on Maverick Meerkat rc](http://ubuntuforums.org/showthread.php?t=1586035&s=4192711d774022d15589452169ca70a1). You can test it by command `dpkg -L ruby`. It shows `gem` is already installed by the `ruby` package.
+
+2. `sudo gem install jekyll`. This might take a while.
+3. `sudo apt-get install nodejs` {% raw %} <span style="color:blue">There is an issue that causes Jekyll to require a JavaScript runtime even if it will not be used. Installing nodejs helps solve the issue</span> {% endraw %}
+4. `jekyll -v`
 
 Jekyll comes with a built-in development server that will allow you to preview what the generated site will look like in your browser locally by `http://localhost:4000`. You can try now:
 
-* Run `$ jekyll server` in `username.github.com` directory
+* Run `$ jekyll server/serve/s` in `username.github.com` directory
 * Open browser enter `localhost:4000`.
 
 There you go! You can see a local copy of the repository. What you need to do now is to modify the contents locally for personal use.  
