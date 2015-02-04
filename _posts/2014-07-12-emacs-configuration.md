@@ -66,6 +66,4 @@ Reference: [How to switch back text encoding to UTF-8 with emacs?](http://superu
 
 Ubuntu 14.04系统默是UTF-8编码，没有问题，但是一直无法用Ibus、Sougou、等外置输入法输入中文。今天发现解决方法是**terminal**下：
 	`emacs -nw`
-这表示terminal模式运行emacs.
-
-但是这个方法有个问题，terminal模式下无法`C-y`粘贴clipboard里面的内容；还有就是`M-f`这个快捷键和terminal冲突。
+这表示terminal模式运行emacs. 但是这个方法有个问题，terminal模式下无法`C-y`粘贴clipboard里面的内容；还有就是`M`开头的快捷键经常和terminal冲突。
