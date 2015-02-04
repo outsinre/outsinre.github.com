@@ -19,7 +19,7 @@ Basics
 Configuration
 ===
 
-1. Environment variables for Unix. Add the following three lines to the end of ~/.profile.
+1. Environment variables for Unix. Add the following three lines to the end of `~/.profile`
 
 	PATH=/usr/local/texlive/2014/bin/x86_64-linux:$PATH; export PATH
 	MANPATH=/usr/local/texlive/2014/texmf-dist/doc/man:$MANPATH; export MANPATH
@@ -31,7 +31,7 @@ Configuration
 	1. Copy "/usr/local/texlive/2014/texmf-var/fonts/conf/texlive-fontconfig.conf" to "~/.config/fontconfig/font.conf".
 	2. Run "fc-cache -fv".
 
-	"texlive-fontconfig.conf" file specifies the TeXLive fonts locations. Copy this file to home foler as per-user fonts configuration. The official site assumes "to ~/.fonts.conf" as the destination folder, which is depricated now! Details please refer to post [Per user fonts.conf file](http://askubuntu.com/questions/202389/per-user-fonts-conf-file "user home fonts.conf file"). We can find in this post the new single user font configuration file location is `$XDG_CONFIG_HOME/fontconfig/fonts.conf`.
+	"texlive-fontconfig.conf" file specifies the TeXLive fonts locations. Copy this file to home foler as per-user fonts configuration. The official site assumes "to ~/.fonts.conf" as the destination folder, which is depricated now! Details please refer to post [Per user fonts.conf file](http://askubuntu.com/questions/202389/per-user-fonts-conf-file "user home fonts.conf file"). We can find in this post the new single user font configuration file location is `$XDG_CONFIG_HOME/fontconfig/fonts.conf`. For more details, please read the man page by command `man fonts.conf`.
 
 Test the Installation
 ---
@@ -52,6 +52,12 @@ Install Windows Chinese Fonts
  2. Change "SIMKAI.TTF" to "KaiTi", and "SIMFANG.TTF" to "FangSong". This method helps find Chinese fonts through the "fontconfig' tool in Ubuntu.
  3. Change "SIMKAI.TTF" to "simkai.ttf" and "SIMFANG.TTF" to "simfang.ttf". Add line `OSFONTDIR = ~/.local/share/fonts//;/usr/share/fonts//;/usr/local/share/fonts//` to file "/usr/local/texlive/2014/texmf.cnf". This finds the fonts by fonts file name directly without the help of system "fontconfig" tool. So we need to add a line for `OSFONTDIR` in file "texmf.cnf". Since Ubuntu is case sensitive, so the file names "ctex-xecjk-winfonts.def" should be exactly the same as those in ".local/share/fonts/winfonts".
  4. For the second method, there is no need to install the fonts, we can put the fonts file anywhere as long as we define variable `OSFONTDIR` correctly. Details refer to [ubuntu 10.04 Tex Live 2010 + XeTex + ctex中文配置](http://blog.csdn.net/lostaway/article/details/6177486), [有关类 Unix 系统下 ctex 宏包的字体问题 ](https://code.google.com/p/ctex-kit/wiki/UnixFonts), and [Ubuntu 下安装并配置 TeXLive](http://kayzhang.com/install-texlive-under-ubuntu/).
+
+
+Install Adobe Fonts
+===
+
+You may read from several links that `xelatex` make use of Adobe Fonts as well. That is right though the default is Windows fonts. We can also install Adobe Fonts with exactly the same method as that of Windows Fonts. Copy Adobe Fonts from Windows System or from the Internet.
 
 References
 ===
