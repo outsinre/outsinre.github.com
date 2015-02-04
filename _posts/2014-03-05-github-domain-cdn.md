@@ -97,7 +97,7 @@ Can I use my top domain for acceleration? Yes, but not easy! First, your DNS pro
 Till now, both subdomain and top domain support CDN!
 </div>
 
-For more detailed Top domain DNS CNAME discussion refer to [顶级域名不能设置DNS CNAME记录](http://localhost:4000/2014/11/06/%E9%A1%B6%E7%BA%A7%E5%9F%9F%E5%90%8D%E4%B8%BA%E4%BD%95%E4%B8%8D%E8%83%BD%E8%AE%BEDNS%20CNAME%E8%AE%B0%E5%BD%95/).
+For more detailed Top domain DNS CNAME discussion refer to [顶级域名不能设置DNS CNAME记录](http://www.fangxiang.tk/2014/03/06/%E9%A1%B6%E7%BA%A7%E5%9F%9F%E5%90%8D%E4%B8%BA%E4%BD%95%E4%B8%8D%E8%83%BD%E8%AE%BEDNS%20CNAME%E8%AE%B0%E5%BD%95/).
 
 *Reference*
 
