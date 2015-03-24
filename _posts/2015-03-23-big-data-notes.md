@@ -3,8 +3,8 @@ layout: post
 title: Big Data Notes
 ---
 接触big data时间不长，但是随着现在big data的兴起, 越来越多的人投入这个领域. 加上以前是做分布式系统开发的, 所以很自然地就进入了领域，一路弄下来，庆幸的是统计没白学, 这个领域我的感觉，就是cs的应用统计学，这块占了80％,剩下20％是分布式算法.
----
 
+---
 information retrieval 没啥高深的算法，基本数据结构就是inverted list, skip list。然后加上几个matching model，用的最多的估计还是vector space或者OKAPI 25。
 machine learning 实践中真正好使的都是最基本的算法吧。比较鬼扯的那些个灌水算法，加上一堆乱七
 八糟regularizer或者推convergence bound的，估计也没人care，因为实际上一碰上真
@@ -33,8 +33,8 @@ What's the shortest lie in computer science? "It works".
 What's the shortest truth in computer science? "It sucks".
 
 没有任何冒犯做research的人的意思，我也干这个，我就是想说，虽然不时会有一些比较牛逼的算法出现，（比如像SVM，就是work）。但残酷的现实就是，绝大部分的research work都没有什么significant contribution，除了发paper没啥用。这个估计读了phd的都有感受。所以灌完水拿了个phd. ，要去工业界，不用认为自己就牛逼得不得了，好像比没读phd的高几等。
----
 
+---
 coding:
 - JOIN: nested join, hash join, sort-merge join
 - Number: Fibonacci, prime，随机取文件某一行
@@ -67,6 +67,7 @@ trie　tree
 
 我感觉把我上面说的练熟，还是很大可能性遇到的，虽然不是很全面，但我觉得不应该
 把太多时间花在难题上，充实知识体系，符合职位要求更重要。
+
 ---
 请问有没有python实现的数据结构和算法课？
 
@@ -80,18 +81,22 @@ java大部分好技术都是java的 比如hadoop lucene weka 等等
 
 python面试如果你不是行家 很快就可以看出来 语言本身的小技巧挺多的 所以用不好
 python而用它面试属于丢人现眼了
+
 ---
 老赵，你现在转战这里了？ 我觉得python vs java 的话，能够上 java 还是上 java,
 python 在 hadoop world 是个怪胎. 所谓大家写的python  大部分都在后台被变成了
 jython or cython. 由于隔着这1层纱，很多 performance 的问题根本没法debug.  
 python 是入门用的, 几十行的function call 用python写还行。几百行，上千行的lib
 还是得用jvm 写才行。
+
 ---
 big data有两套生态啊，python的scipy和java的hadoop这些我用python就不用hadoop了，直接上scipy和numpy建模容易，虽然运行很慢，但是写起来来快，不适合生产，但是适合建模用hadoop我就不用python，直接上java我们是用python来快速modelling，然后对sample做test没问题之后，再由我等java编程师转译成java代码，测试无问题后下放生产基本上对python的使用是用完就扔掉，下次要用再写，基本上都不重用java则是大量重用代码，以造可复用的轮子为主要目的. scala用来写一些类库挺好，基本上除了java以外，其他所有语言都不宜写太多，都不适合搞软件工程其实我java代码也写得不多，一般超过200行就分类了
+
 ---
 千万不要被任何FP欺骗上当，function programming从来不是，现在不是，将来也不是编程的主流，相信我
 这一句就行了。老老实实用传统语言，有你吃香的喝辣的，FP就是没事找事。作为开发
 者，记得一句话: We are coming here to solve problem, not to create problem。
+
 ---
 我发表一下看法：
 过去二十年CS深受OO和互联网的影响。所有的数据和业务逻辑都被封装在大大小小的模
@@ -106,6 +111,7 @@ encapsulation。可以认为互联网每天成千上百个pb的数据里面，�
 是几十个tb，而其中能够分析也不过这当中的一个百分比。无论是tableau也好还是
 gnip也好还是sumologic也好，做的都是这些器，这些东西十几年前都做过了，只不过
 现在从pc软件变成了web service。
+
 ---
 靠谱
 
@@ -162,6 +168,7 @@ cloud也在努力使分布式变得更为简单，但是要做到无脑就用的
 真正的big data和分布式理论要超越这些具体的impl
 理论上用什么都可以做出来，用汇编都行，但是实践是另外一回事
 实际干活还是以堆轮子为首选，否则没办法维护
+
 ---
 jvm也是c写的，最终什么都是c，但是c和汇编都太底层了
 跟人的思维接不上，人毕竟是人，不可能完全用机器的思维方式去思考和书写语言
@@ -236,6 +243,7 @@ lars bak从strongtalk时代开始搞oop的优化，老鸟中的老鸟，巨牛�
 : 赵老师啊，问你个简单的问题。
 : 平行计算就是为了效率。既然这么讲求效率，为什么还用java作为平台语言，搞个
 : Hadoop？难道不是应该用汇编和C吗？比如用C去implement MPI不就挺好吗？
+
 ---
 c把跨平台，gc这些常见问题都给搞定了的话，那就是java了
 java本身就是c like的语言，跟c++,obj c什么一样，都是c家族
@@ -265,6 +273,7 @@ java最早设计出来就是把那些c/c++工程中常见的问题
 : 可能高出一个数量的使用度。问个外行话，能不能先在所有的unix和linux系统下先
 把C
 : 跨平台了？
+
 ---
 [Problem Solving with Algorithms and Data Structures](http://interactivepython.org/runestone/static/pythonds/index.html).
 [zhaoce](http://www.mitbbs.com/article_t1/DataSciences/6829_0_1.html).
