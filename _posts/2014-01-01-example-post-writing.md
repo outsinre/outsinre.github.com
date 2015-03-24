@@ -1,22 +1,28 @@
 ---
 layout: post
-title: Example Post Writing
+title: Markdown Post Example
 ---
-
 
 <div class="message">
   Howdy! This is an example blog post that shows several types of HTML content supported in this theme.
 </div>
 
-Use **`** to enclose a code snippet. `int main(void){ printf("hello, world!"); return 1; }`. Or you can use **tab** key:
+## Code Block
+
+Use **`** to enclose a code snippet.
+
+`int main(void){ printf("hello, world!"); return 1; }`
+
+Or you can use **tab** key:
 
     int main(void){ ...}
 
-Another way for code highlight is `pygments` by default (refer to Jekyll's offical site):  
+Another way for code highlight is `pygments` by default (refer to [Jekyll's](http://jekyllrb.com/) offical site):  
 {% raw %}
     {% hightlight ruby linenos %}
     {% endhight %}
 {% endraw %}
+
 You can replace `ruby` with any languages `pygments` supports (refer to [languages](http://pygments.org/languages/)).
 
 An example. Pay attention to add `linenos` to display code line numbers.
@@ -26,25 +32,23 @@ int main(void){
     return 1;
 }
 {% endhighlight %}
-How to write about Jekyll itself in Jkeyll?
 
-For example, I want to write a post about Jekyll itself. Then I may need to include some Liquid statement, what can I do?
+## How to write about Jekyll itself in Jkeyll?
 
-Refer to [Writing about Jekyll in Jekyll](http://blog.slaks.net/2013-06-09/writing-about-jekyll-in-jekyll/).
+I want to write a post about Jekyll itself. Then I may need to include some Liquid statement. Refer to [Writing about Jekyll in Jekyll](http://blog.slaks.net/2013-06-09/writing-about-jekyll-in-jekyll/).
 
 Basically:
 
- 1. put your Liquid statement between {% raw %} {% raw %} {% endraw %} and &#123;% endraw %}.
- 2. use `&#123;` to replace `{`. HTML recoginzes `&#123;` as `{`, while Liquid does not recognize it. This way is limited in that it only viable for html code.
+1. put your Liquid statement between {% raw %} {% raw %} {% endraw %} and &#123;% endraw %}.
+2. use `&#123;` to replace `{`. HTML recoginzes `&#123;` as `{`, while Liquid does not recognize it. This way is limited in that it only viable for html code.
 
-**Syntax**
+## Syntax
 
 1. [Markdown](http://daringfireball.net/projects/markdown/)
-
 2. [Textile](http://redcloth.org/textile)
 
 
->Above contents are newly inserted.
+>Contents above were inserted mannually.
 
 Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. *Aenean eu leo quam.* Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.
 
@@ -101,6 +105,7 @@ Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a p
 3. Maecenas sed diam eget risus varius blandit sit amet non magna.
 
 Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.
+`<dl>` as `description list element` enclosed a list of paris of terms and descriptions. Common uses for this element are to implement a glossary or to display metadata (a list of key-value pairs).
 
 <dl>
   <dt>HyperText Markup Language (HTML)</dt>
@@ -155,6 +160,6 @@ Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, conse
 
 Nullam id dolor id nibh ultricies vehicula ut id elit. Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo.
 
------
+***
 
 [The original Markdown tutorial.](http://daringfireball.net/projects/markdown/syntax "Markdown").
