@@ -9,7 +9,7 @@ title: Markdown Post Example
 
 ## Code Block
 
-Use **`** to enclose a code snippet.
+Use **<ins>`</ins>** to enclose a code snippet.
 
 `int main(void){ printf("hello, world!"); return 1; }`
 
