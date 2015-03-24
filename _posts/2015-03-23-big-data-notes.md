@@ -2,14 +2,15 @@
 layout: post
 title: Big Data Notes
 ---
-
 接触big data时间不长，但是随着现在big data的兴起, 越来越多的人投入这个领域. 加上以前是做分布式系统开发的, 所以很自然地就进入了领域，一路弄下来，庆幸的是统计没白学, 这个领域我的感觉，就是cs的应用统计学，这块占了80％,剩下20％是分布式算法.
 ---
+
 information retrieval 没啥高深的算法，基本数据结构就是inverted list, skip list。然后加上几个matching model，用的最多的估计还是vector space或者OKAPI 25。
 machine learning 实践中真正好使的都是最基本的算法吧。比较鬼扯的那些个灌水算法，加上一堆乱七
 八糟regularizer或者推convergence bound的，估计也没人care，因为实际上一碰上真
 实数据全不work。要么就是仅仅在小规模数据上work，碰上大数据就要算一光年或者要
 1TB内存...呵呵。
+
 ---
 本来我是带着娱乐的态度来回帖的，但是既然碰到了大牛，请educate我。
 
@@ -28,10 +29,12 @@ Most likely not. But you will gain the ability to tell whether something is
 really working or it is just "claimed working". Working algorithms are usually very very simple. 忽悠algorithms are usually intentionally made complex and not working. 我觉得如果连这个都没练出来，那几百篇paper是白读了。
 
 What's the shortest lie in computer science? "It works".
+
 What's the shortest truth in computer science? "It sucks".
 
 没有任何冒犯做research的人的意思，我也干这个，我就是想说，虽然不时会有一些比较牛逼的算法出现，（比如像SVM，就是work）。但残酷的现实就是，绝大部分的research work都没有什么significant contribution，除了发paper没啥用。这个估计读了phd的都有感受。所以灌完水拿了个phd. ，要去工业界，不用认为自己就牛逼得不得了，好像比没读phd的高几等。
 ---
+
 coding:
 - JOIN: nested join, hash join, sort-merge join
 - Number: Fibonacci, prime，随机取文件某一行
