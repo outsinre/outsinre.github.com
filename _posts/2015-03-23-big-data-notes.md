@@ -35,38 +35,36 @@ What's the shortest truth in computer science? "It sucks".
 没有任何冒犯做research的人的意思，我也干这个，我就是想说，虽然不时会有一些比较牛逼的算法出现，（比如像SVM，就是work）。但残酷的现实就是，绝大部分的research work都没有什么significant contribution，除了发paper没啥用。这个估计读了phd的都有感受。所以灌完水拿了个phd. ，要去工业界，不用认为自己就牛逼得不得了，好像比没读phd的高几等。
 
 ---
-coding:
-- JOIN: nested join, hash join, sort-merge join
-- Number: Fibonacci, prime，随机取文件某一行
-- String: strstr, wordcount
-- Tree: height, lca, balance tree
-- Heap: 查找最大的k个数
-- DP: 最大连续子串和
-- array: find a key in rotated array, 去除重复字符
-- linkedlist: 是否有环，插入结点，删除重复结点　
-- 递归回溯：变化很多，这方面需要大量练习
+coding:  
+- JOIN: nested join, hash join, sort-merge join  
+- Number: Fibonacci, prime，随机取文件某一行  
+- String: strstr, wordcount  
+- Tree: height, lca, balance tree  
+- Heap: 查找最大的k个数  
+- DP: 最大连续子串和  
+- array: find a key in rotated array, 去除重复字符  
+- linkedlist: 是否有环，插入结点，删除重复结点  
+- 递归回溯：变化很多，这方面需要大量练习  
 
-知识性：
-多线程，mutex/semaphore
-java GC
-C++ virtual, smart pointer
-regex使用
-数据库：知道btree, 索引
-search engine: 倒排表,拉链，稀疏索引，空间向量模型，tf*idf, 
-large scale data: hash, consistent hash, bloom filter, bitmap, 外排序，
-partition
-分布式：CAP理论，gossip，Paxos, GFS设计思想
-network: socket, tcp3次握手, asyschnoized io, epoll, select, 惊群
+知识性：  
+多线程，mutex/semaphore  
+java GC  
+C++ virtual, smart pointer  
+regex使用  
+数据库：知道btree, 索引  
+search engine: 倒排表,拉链，稀疏索引，空间向量模型，tf*idf,  
+large scale data: hash, consistent hash, bloom filter, bitmap, 外排序，partition  
+分布式：CAP理论，gossip，Paxos, GFS设计思想  
+network: socket, tcp3次握手, asyschnoized io, epoll, select, 惊群  
 
-设计型：
-queue/stack实现
-LRU
-trie　tree
-设计游戏
-四则运算求值
+设计型：  
+queue/stack实现  
+LRU  
+trie　tree  
+设计游戏  
+四则运算求值  
 
-我感觉把我上面说的练熟，还是很大可能性遇到的，虽然不是很全面，但我觉得不应该
-把太多时间花在难题上，充实知识体系，符合职位要求更重要。
+我感觉把我上面说的练熟，还是很大可能性遇到的，虽然不是很全面，但我觉得不应该把太多时间花在难题上，充实知识体系，符合职位要求更重要。
 
 ---
 请问有没有python实现的数据结构和算法课？
@@ -275,6 +273,6 @@ java最早设计出来就是把那些c/c++工程中常见的问题
 : 跨平台了？
 
 ---
-[Problem Solving with Algorithms and Data Structures](http://interactivepython.org/runestone/static/pythonds/index.html).
-[zhaoce](http://www.mitbbs.com/article_t1/DataSciences/6829_0_1.html).
-[Algorithmic](http://www.mitbbs.com/article/JobHunting/32600683_0.html).
+1. [Problem Solving with Algorithms and Data Structures](http://interactivepython.org/runestone/static/pythonds/index.html).
+2. [zhaoce](http://www.mitbbs.com/article_t1/DataSciences/6829_0_1.html).
+3. [Algorithmic](http://www.mitbbs.com/article/JobHunting/32600683_0.html).
