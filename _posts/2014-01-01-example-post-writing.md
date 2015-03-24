@@ -105,7 +105,7 @@ Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a p
 3. Maecenas sed diam eget risus varius blandit sit amet non magna.
 
 Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.
-`<dl>` as `description list element` enclosed a list of paris of terms and descriptions. Common uses for this element are to implement a glossary or to display metadata (a list of key-value pairs).
+`<dl>` as `description list element` encloses a list of paris of terms and descriptions. Common uses for this element are to implement a glossary or to display metadata (a list of key-value pairs).
 
 <dl>
   <dt>HyperText Markup Language (HTML)</dt>
