@@ -101,6 +101,7 @@ title: Gentoo Installation
     5. _#_ emerge genkernel
     6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: ls /boot/initramfs.
 28. Creating the fstab file. **The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template**.
+
 	>/dev/sda10   /boot        ext2    defaults,noatime     1 2
 	>/dev/sda12   /	           ext4    noatime              0 1
 	>/dev/sda7    none         swap	   sw                   0 0
@@ -128,6 +129,7 @@ title: Gentoo Installation
     3. Del the folder *boot* and *bootx64.efi* created in step 27.4. Then `mount /dev/sda2 /boot/efi`. `/dev/sda2` is the `EFI partition system`. Because Gentoo, Ubuntu, Windows share the EFI partition, so we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition.
     4. To install GRUB2 on an EFI capable system `grub2-install --target=x86_64-efi`.
 39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the following lines:
+
 	>menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
 	>	insmod fat
 	>	insmod part_gpt
