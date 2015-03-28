@@ -23,7 +23,7 @@ title: Gentoo Installation
     2. _#_ p
     3. _#_ unit MB
     3. _#_ rm 10
-	3. _#_ p
+    3. _#_ p
     4. _#_ mkpart primary 309921MB 310049MB, create a boot partition sda10 for Gentoo
     5. _#_ p
     6. _#_ name 10 'Gentoo boot partition'
@@ -41,12 +41,13 @@ title: Gentoo Installation
     1. _#_ mount /dev/sda12 /mnt/gentoo
     2. _#_ mkdir /mnt/gentoo/boot
     3. _#_ mount /dev/sda10 /mnt/gentoo/boot
+9. Setting the date and time using `date` command.
 10. Go to the Gentoo mountpoint where the root file system is mounted (most likely /mnt/gentoo): `cd /mnt/gentoo`.
 11. Downloading the stage tarball with Chrome application in LiveDVD. Go to [Installation media](https://www.gentoo.org/main/en/where.xml) and then to [amd64 multilib](http://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64/). You will find `stage3-amd64-20150319.tar.bz2`. Just download!
 12. Verify the tarball integrity and compare the output with the checksums provided by the .DIGESTS or .DIGESTS.asc file.
     1. _#_ sha512sum /home/gentoo/Download/stage3-amd64-20150319.tar.bz2
 13. Now unpack the downloaded stage onto the system. Attention: the current working directory is `/mnt/gentoo`.
-    1. _#_ tar xvjpf stage3-amd64-20150319.tar.bz2
+    1. _#_ tar xvjpf stage3-amd64-20150319.tar.bz2. Usually, the stage file is not in /mnt/gentoo directory. So you need to specify the path to stage. For instance, /home/download/stage3...
     2. Make sure that the same options `xvjpf` are used. The x stands for Extract, the v for Verbose to see what happens during the extraction process (optional), the j for Decompress with bzip2, the p for Preserve permissions and the f to denote that we want to extract a File, not standard input.
 14. Configuring compile options. To keep the settings, Portage reads in the /etc/portage/make.conf file, a configuration file for Portage.
     1. _#_ emacs /mnt/gentoo/etc/portage/make.conf
@@ -73,7 +74,7 @@ title: Gentoo Installation
 22. Choosing the right profile.
     1. _#_ eselect profile list
     2. _#_ eselect profile set 4, install the Gnome desktop profile.
-    3. In `/etc/portage/make.conf` add `-qt4 -kde` into `USE` variable. Actually this step is not necessary. When selecting to install Gnome desktop, KDE support is removed automatically.
+    3. This step is removed during installation. Actually this step is not necessary. When selecting to install Gnome desktop, KDE support is removed automatically. .In `/etc/portage/make.conf` add `-qt4 -kde` into `USE` variable. 
 23. Set the timezone.
     1. _#_ ls /usr/share/zoneinfo
     2. _#_ echo "Asia/Shanghai" > /etc/timezone
@@ -88,27 +89,53 @@ title: Gentoo Installation
     2. _#_ eselect locale set 4, set system-wdie locale to en_US.utf8.
     3. _#_ env-update && source /etc/profile
     4. _#_ export PS1="(chroot) $PS1"
+25. Install the kernel source.
+    1. _#_ emerge --ask sys-kernel/gentoo-sources
+    2. _#_ ls -l /usr/src/linux
 26. Configuring the Linux kernel - Manual configuration.
     1. _#_ emerge --ask sys-apps/pciutils
     2. _#_ cd /usr/src/linux
     3. _#_ make menuconfig
     4. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support` and `EFI mixed-mode support` under `Processor type and features`.
+26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e100e`, find their locations and activate them.
+    1. `i915 e100e snd_hda_intel iTCO_wdt ahci i2c-i801 iwlwifi sdhci_pci`: there are the dirvers that needs activated, especially for the network drivers.
+    2. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
+{% hightlight XML linenos %}
+Symbol:
+Type:
+Prompt:
+  Location:
+{% endhight %}
+    3. The reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
     2. _#_ make install
-    3. _#_ mkdir -p /boot/efi/boot
-    4. _#_ cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi
+    3. _deprecated #_ mkdir -p /boot/efi/boot
+    4. _deprecated #_ cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi
     5. _#_ emerge genkernel
-    6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: ls /boot/initramfs.
+    6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: ls /boot/initramfs*.
+27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
+    1. _#_ emerge --ask sys-kernel/linux-firmware
 28. Creating the fstab file. **The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template**.
-
-	>/dev/sda10   /boot        ext2    defaults,noatime     1 2
-	>/dev/sda12   /	           ext4    noatime              0 1
-	>/dev/sda7    none         swap	   sw                   0 0
+{% hightlight XML linenos %}
+>/dev/sda10   /boot        ext2    defaults,noatime     1 2
+>/dev/sda12   /	           ext4    noatime              0 1
+>/dev/sda7    none         swap	   sw                   0 0
+{% endhight %}
 29. Set hostname.
     1. _#_ nano -w /etc/conf.d/hostname
     2. set hostname="x220gentoo"
-30. **??** /etc/conf.d/net
+30. Configuring the network.
+    1. _#_ emerge --ask --noreplace net-misc/netifrc
+    2. _#_ ifconfig -a, to list the network interface name.
+    3. _#_ nano -w /etc/conf.d/net
+    4. add two lines: config_enp0s25="dhcp", config_wlp3s0="dhcp"
+31. Automatically start networking at boot.
+    1. _#_ cd /etc/init.d
+    2. _#_ ln -s net.lo net.enp0s25
+    3. _#_ rc-update add net.enp0s25 default
+    4. _#_ ln -s net.lo net.wlp3s0
+    5. _#_ rc-update add net.wlp3s0 default
 31. Set root password ro15ot
 32. Edit `/etc/conf.d/hwclock` to set the clock options.
     1. set `clock=local`, this is important when dual boot with Windows.
@@ -155,4 +182,4 @@ title: Gentoo Installation
     10. sda10 Gentoo boot
     11 sda11 Ubuntu home
     12. sda12 Gentoo home
-44. Network settings/ gnome doesnot work.
+44. Network / gnome not work.
