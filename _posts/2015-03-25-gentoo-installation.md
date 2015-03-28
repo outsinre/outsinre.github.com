@@ -156,14 +156,15 @@ Prompt:
     3. Del the folder *boot* and *bootx64.efi* created in step 27.4. Then `mount /dev/sda2 /boot/efi`. `/dev/sda2` is the `EFI partition system`. Because Gentoo, Ubuntu, Windows share the EFI partition, so we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition.
     4. To install GRUB2 on an EFI capable system `grub2-install --target=x86_64-efi`.
 39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the following lines:
-
-	>menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
-	>	insmod fat
-	>	insmod part_gpt
-	>	insmod chain
-	>	set root='hd0,gpt2'
-	>	chainloader (${root})/EFI/ubuntu/grubx64.efi
-	>}
+{% hightlight XML linenos %}
+menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
+	insmod fat
+	insmod part_gpt
+	insmod chain
+	set root='hd0,gpt2'
+	chainloader (${root})/EFI/ubuntu/grubx64.efi
+}
+{% endhight %}
     1. The traditional `chainloader +1` does work for UEFI boot.
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. Exit the chrooted environment `exit` and unmount all mounted partitions `umount -l /mnt/gentoo/dev{/shm,/pts,}` and `umount /mnt/gentoo{/boot,/sys,/proc,}`. Then type in that one magical command that initiates the final, true test: `reboot`.
