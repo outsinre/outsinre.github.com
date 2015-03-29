@@ -17,7 +17,7 @@ title: Gentoo Installation
 3. Boot with the USB stick into the default KDE desktop environment. There will be screen ask for user name `gentoo`'s password for loggin. Just wait for a while.
     1. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`.
     2. [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
-4. `sudo su -` switches to `root` account. The command prompt is _livecd ~ #_ which is not the same as the handbook one _root #_.
+4. `sudo su -` switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`.
 5. `fdisk /dev/sda` or `parted -a optimal /dev/sda` (default one) checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
     1. _#_ parted -a optimal /dev/sda
     2. _#_ p
