@@ -100,12 +100,12 @@ title: Gentoo Installation
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e100e`, find their locations and activate them.
     1. `i915 e100e snd_hda_intel iTCO_wdt ahci i2c-i801 iwlwifi sdhci_pci`: there are the dirvers that needs activated, especially for the network drivers.
     2. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
-{% hightlight XML linenos %}
+{% highlight XML linenos %}
 Symbol:
 Type:
 Prompt:
   Location:
-{% endhight %}
+{% endhighlight %}
     3. The reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
