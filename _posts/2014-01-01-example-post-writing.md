@@ -17,7 +17,8 @@ Or you can use **tab** key:
 
     int main(void){ ...}
 
-Another way for code highlight is `pygments` by default (refer to [Jekyll's](http://jekyllrb.com/) offical site):  
+Another way for code highlight is `pygments` by default (refer to [Jekyll's](http://jekyllrb.com/) offical site):
+
 {% raw %}
     {% hightlight ruby linenos %}
     {% endhight %}
@@ -32,6 +33,8 @@ int main(void){
     return 1;
 }
 {% endhighlight %}
+
+If you want to insert code in list, use _```_ to enclose the code block. The code block needn't any indent. But the _```_ needs an extra indent (4 spaces or 1 tab) plus the list's indents.
 
 ## How to write about Jekyll itself in Jkeyll?
 

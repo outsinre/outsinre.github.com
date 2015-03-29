@@ -96,17 +96,18 @@ title: Gentoo Installation
     1. _#_ emerge --ask sys-apps/pciutils
     2. _#_ cd /usr/src/linux
     3. _#_ make menuconfig
-    4. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support` and `EFI mixed-mode support` under `Processor type and features`.
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e100e`, find their locations and activate them.
-    1. `i915 e100e snd_hda_intel iTCO_wdt ahci i2c-i801 iwlwifi sdhci_pci`: there are the dirvers that needs activated, especially for the network drivers.
-    2. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
-{% highlight XML linenos %}
+    1. `i915 e100e snd_hda_intel iTCO_wdt ahci i2c-i801 iwlwifi sdhci_pci`: these are the dirvers that needs activated, especially for the network drivers.
+    3. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support` and `EFI mixed-mode support` under `Processor type and features`.
+    4. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
+
+		```
 Symbol:
 Type:
 Prompt:
   Location:
-{% endhighlight %}
-    3. The reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
+		```
+    2. The reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
     2. _#_ make install
@@ -116,12 +117,13 @@ Prompt:
     6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: ls /boot/initramfs*.
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
     1. _#_ emerge --ask sys-kernel/linux-firmware
-28. Creating the fstab file. **The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template**.
-{% highlight XML linenos %}
->/dev/sda10   /boot        ext2    defaults,noatime     1 2
->/dev/sda12   /	           ext4    noatime              0 1
->/dev/sda7    none         swap	   sw                   0 0
-{% endhighlight %}
+28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template.
+
+	```
+/dev/sda10   /boot        ext2    defaults,noatime     1 2
+/dev/sda12   /	           ext4    noatime              0 1
+/dev/sda7    none         swap	   sw                   0 0
+	```
 29. Set hostname.
     1. _#_ nano -w /etc/conf.d/hostname
     2. set hostname="x220gentoo"
@@ -155,8 +157,10 @@ Prompt:
     2. _#_ emerge --ask sys-boot/grub
     3. Del the folder *boot* and *bootx64.efi* created in step 27.4. Then `mount /dev/sda2 /boot/efi`. `/dev/sda2` is the `EFI partition system`. Because Gentoo, Ubuntu, Windows share the EFI partition, so we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition.
     4. To install GRUB2 on an EFI capable system `grub2-install --target=x86_64-efi`.
-39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the following lines:
-{% highlight XML linenos %}
+39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the code below.
+    1. The traditional `chainloader +1` does work for UEFI boot.
+
+		```
 menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
 	insmod fat
 	insmod part_gpt
@@ -164,8 +168,8 @@ menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
 	set root='hd0,gpt2'
 	chainloader (${root})/EFI/ubuntu/grubx64.efi
 }
-{% endhighlight %}
-    1. The traditional `chainloader +1` does work for UEFI boot.
+		```
+
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. Exit the chrooted environment `exit` and unmount all mounted partitions `umount -l /mnt/gentoo/dev{/shm,/pts,}` and `umount /mnt/gentoo{/boot,/sys,/proc,}`. Then type in that one magical command that initiates the final, true test: `reboot`.
     1. When rebooting, if the LiveDVD usb stick is still plugged onto the computer, the chainload to Ubuntu grub does not work. It show _error: disk hd0,gpt2 not found_. This is because the grub2 treats the USB stick as _hd0_ while the hard disk as _hd1_. You can unplug the USB, and CTRL+ALT+DEL. Another way is to edit the Ubuntu grub2 chainlaod menu from _hd0_ to _hd1_, then press F10 to boot.
@@ -183,4 +187,5 @@ menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
     10. sda10 Gentoo boot
     11 sda11 Ubuntu home
     12. sda12 Gentoo home
-44. Network / gnome not work.
+44. Notes:
+    1. gnome does not work.
