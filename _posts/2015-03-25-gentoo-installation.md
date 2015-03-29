@@ -117,11 +117,11 @@ Prompt:
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
     1. _#_ emerge --ask sys-kernel/linux-firmware
 28. Creating the fstab file. **The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template**.
-{% hightlight XML linenos %}
+{% highlight XML linenos %}
 >/dev/sda10   /boot        ext2    defaults,noatime     1 2
 >/dev/sda12   /	           ext4    noatime              0 1
 >/dev/sda7    none         swap	   sw                   0 0
-{% endhight %}
+{% endhighlight %}
 29. Set hostname.
     1. _#_ nano -w /etc/conf.d/hostname
     2. set hostname="x220gentoo"
@@ -156,7 +156,7 @@ Prompt:
     3. Del the folder *boot* and *bootx64.efi* created in step 27.4. Then `mount /dev/sda2 /boot/efi`. `/dev/sda2` is the `EFI partition system`. Because Gentoo, Ubuntu, Windows share the EFI partition, so we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition.
     4. To install GRUB2 on an EFI capable system `grub2-install --target=x86_64-efi`.
 39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the following lines:
-{% hightlight XML linenos %}
+{% highlight XML linenos %}
 menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
 	insmod fat
 	insmod part_gpt
@@ -164,7 +164,7 @@ menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
 	set root='hd0,gpt2'
 	chainloader (${root})/EFI/ubuntu/grubx64.efi
 }
-{% endhight %}
+{% endhighlight %}
     1. The traditional `chainloader +1` does work for UEFI boot.
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. Exit the chrooted environment `exit` and unmount all mounted partitions `umount -l /mnt/gentoo/dev{/shm,/pts,}` and `umount /mnt/gentoo{/boot,/sys,/proc,}`. Then type in that one magical command that initiates the final, true test: `reboot`.
