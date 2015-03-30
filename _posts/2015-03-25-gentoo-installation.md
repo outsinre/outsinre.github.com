@@ -73,8 +73,14 @@ title: Gentoo Installation
 21. Installing a portage snapshot: _#_ `emerge-webrsync`.
 22. Choosing the right profile.
     1. _#_ eselect profile list
-    2. _#_ eselect profile set 4, install the Gnome desktop profile.
-    3. This step is removed during installation. Actually this step is not necessary. When selecting to install Gnome desktop, KDE support is removed automatically. .In `/etc/portage/make.conf` add `-qt4 -kde` into `USE` variable. 
+    2. _#_ eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
+    3. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags for profile selected above.
+    4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags needs excluded. Use `emerge --info | grep XXX` to test each flag whether `/etc/portage/make.conf` needs updated. At last, I add `-qt4` and `thunar` to USE flag in make.conf file.
+
+        ```
+USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thunar udev X"
+        ```
+
 23. Set the timezone.
     1. _#_ ls /usr/share/zoneinfo
     2. _#_ echo "Asia/Shanghai" > /etc/timezone
@@ -83,7 +89,7 @@ title: Gentoo Installation
     1. _#_ nano -w /etc/locale.gen
     2. Choose en-US ISO-8859-1, en_US.UTF-8 UTF-8, zh_CN.UTF-8 UTF-8 and zh_TW.UTF-8 UTF-8.
     3. _#_ locale-gen
-    4. It will remind: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
+    4. If reminds: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
 25. Set the system-wide locale.
     1. _#_ eselect locale list
     2. _#_ eselect locale set 4, set system-wdie locale to en_US.utf8.
@@ -97,7 +103,8 @@ title: Gentoo Installation
     2. _#_ cd /usr/src/linux
     3. _#_ make menuconfig
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e100e`, find their locations and activate them.
-    1. `i915 e100e snd_hda_intel iTCO_wdt ahci i2c-i801 iwlwifi sdhci_pci`: these are the dirvers that needs activated, especially for the network drivers.
+    1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`: these are the dirvers that needs activated, especially for the network drivers. When search "snd-hda-intel", replace the _hypen_: **-** with _dash_: **_**.
+    2. When `sdhci_pci`, you get something like `... on PCI bus`, but you cannot find the item since its parent item `Secure Digital Host Controller Interface Support` is turned off by default. So turn it on first.
     3. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support` and `EFI mixed-mode support` under `Processor type and features`.
     4. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
 
@@ -107,7 +114,9 @@ Type:
 Prompt:
   Location:
 		```
-    2. The reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
+    5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable corresponding kernel model support. However, according to this reference, nothing needs updated for kernel configuration.
+    6. Remove several `AMD` items under `Processor type and features`.
+    7. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
     2. _#_ make install
@@ -131,7 +140,13 @@ Prompt:
     1. _#_ emerge --ask --noreplace net-misc/netifrc
     2. _#_ ifconfig -a, to list the network interface name.
     3. _#_ nano -w /etc/conf.d/net
-    4. add two lines: config_enp0s25="dhcp", config_wlp3s0="dhcp"
+    4. add two lines:
+
+        ```
+config_enp0s25="dhcp"
+config_wlp3s0="dhcp"
+        ```
+
 31. Automatically start networking at boot.
     1. _#_ cd /etc/init.d
     2. _#_ ln -s net.lo net.enp0s25
@@ -171,8 +186,70 @@ menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
 		```
 
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
-41. Exit the chrooted environment `exit` and unmount all mounted partitions `umount -l /mnt/gentoo/dev{/shm,/pts,}` and `umount /mnt/gentoo{/boot,/sys,/proc,}`. Then type in that one magical command that initiates the final, true test: `reboot`.
+41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
+41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
+
+    ```
+umount -l /mnt/gentoo/dev{/shm,/pts,}
+umount /mnt/gentoo{/boot,/sys,/proc,}
+    ```
+You may reminded that some device is busy. Just let it go. Then type in that one magical command that initiates the final, true test: `reboot`.
     1. When rebooting, if the LiveDVD usb stick is still plugged onto the computer, the chainload to Ubuntu grub does not work. It show _error: disk hd0,gpt2 not found_. This is because the grub2 treats the USB stick as _hd0_ while the hard disk as _hd1_. You can unplug the USB, and CTRL+ALT+DEL. Another way is to edit the Ubuntu grub2 chainlaod menu from _hd0_ to _hd1_, then press F10 to boot.
+    2. The very first thing after rebooting is to create a regular user account:
+
+        ```
+useradd -g users -G wheel video -m zachary
+passwd zachary
+        ```
+
+42. From now on, a basic gentoo system is installed. You can login with `root` account. Probably, the new system cannot connect to the Wifi network (lack in network manager). You can `chroot` again into the gentoo system when installing new package:
+    1. Boot with LiveDVD
+    2. _#_ swapon /dev/sda7
+    3. _#_ mount /dev/sda12 /mnt/gentoo
+    4. _#_ mount /dev/sda10 /mnt/gentoo/boot
+    5. _#_ cp -L /etc/resolv.conf /mnt/gentoo/etc
+    6. _#_ mount -t proc proc /mnt/gentoo/proc
+    7. _#_ mount --rbind /sys /mnt/gentoo/sys
+    8. _#_ mount --make-rslave /mnt/gentoo/sys 
+    9. _#_ mount --rbind /dev /mnt/gentoo/dev 
+    10. _#_ mount --make-rslave /mnt/gentoo/dev
+    11. _#_ chroot /mnt/gentoo /bin/bash
+    12. _#_ source /etc/profile
+    13. _#_ export PS1="(chroot) $PS1"
+    14. Now you can install `xorg` and `xfce` for gentoo system with the help of LiveDVD KDE wifi connection.
+43. Xorg installaion.
+    1. Refer to [Xorg/Configuration](https://wiki.gentoo.org/wiki/Xorg/Configuration).
+    2. For the kernel support part, already done in previous step.
+    3. Add the following lines into `/etc/portage/make.conf`:
+
+        ```
+## (For mouse, keyboard, and Synaptics touchpad support)
+INPUT_DEVICES="evdev synaptics"
+## (For intel cards)
+VIDEO_CARDS="intel"
+        ```
+    4. _#_ emerge --ask --verbose --pretend x11-base/xorg-drivers, check the dependency.
+    5. _#_ echo "x11-base/xorg-server udev" >> /etc/portage/package.use/xorg-server. Actually this step is unnecessary since `udev` is enabled by default when selecting the system profile in previous step.
+    6. _#_ emerge --ask x11-base/xorg-server
+    7. _#_ env-update
+    8. _#_ source /etc/profile
+    9. _#_ export PS1="(chroot) $PS1"
+    10. The official wiki suggests installing `x11-wm/twm` and `x11-terms/xterm` to test `xorg` installation. However, we are currently chrooting, startx is already running supporting the LiveDVD KDE environment. Hence, we cannot test by issuing command `startx` in chroot environment. It's only possible when reboot into the genuine gentoo system. So skip this step.
+    11. For this command: echo XSESSION="Xfce4" > /etc/env.d/90xsession, we have not installed `xfce` yet. So leave it for later on.
+44. Xfce installation & Configuration.
+    1. Refer to [Xfce](https://wiki.gentoo.org/wiki/Xfce) for installation and [Xfce/HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO) for configuration.
+    2. _#_ eselect profile list, you will find `…/desktop` is the default profile (not `…/gnome` or `…/kde`).
+    3. [optional] _#_ echo 'app-text/poppler -qt4' >> /etc/portage/package.use/poppler, since `-qt4` is already set globally in previous step when installing the basic gentoo system.
+    4. [optional] _#_ echo 'dev-util/cmake -qt4' >> /etc/portage/package.use/cmake
+    3. _#_ echo 'gnome-base/gvfs -http' >> /etc/portage/package.use/gvfs
+    4. _#_ echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
+    5. **Attention** _#_ emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
+    6. _#_ emerge --ask x11-terms/xfce4-terminal
+    7. Installation finished. Now reboot and loggin with the regular account to configure xfce.
+    8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
+    9. _$_ echo "exec startxfce4 --with-ck-launch" > ~/.xinitrc
+    10. _$_ rc-update add consolekit default
+    11. You'd better logout and then login again to test xfce: _$_ startx. 
 42. `/dev/sda10` is the boot partition for Gentoo. But by default, it's not auto-mounted for security reason. Similarly, the /dev/sda2 is the EFI System Partition. It's also not automatic mounted to `/boot/efi` as well at startup.
 43. Partitions:
     1. sda1 Windows recovery partition
@@ -187,5 +264,6 @@ menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
     10. sda10 Gentoo boot
     11 sda11 Ubuntu home
     12. sda12 Gentoo home
-44. Notes:
-    1. gnome does not work.
+44. Work to do:
+    1. wpa_supplicant
+    2. wicd
