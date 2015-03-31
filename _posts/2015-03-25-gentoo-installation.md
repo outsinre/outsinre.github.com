@@ -235,7 +235,7 @@ VIDEO_CARDS="intel"
     8. _#_ source /etc/profile
     9. _#_ export PS1="(chroot) $PS1"
     10. The official wiki suggests installing `x11-wm/twm` and `x11-terms/xterm` to test `xorg` installation. However, we are currently chrooting, startx is already running supporting the LiveDVD KDE environment. Hence, we cannot test by issuing command `startx` in chroot environment. It's only possible when reboot into the genuine gentoo system. So skip this step.
-    11. For this command: echo XSESSION="Xfce4" > /etc/env.d/90xsession, we have not installed `xfce` yet. So leave it for later on.
+    11. For this command: echo XSESSION="Xfce4" > /etc/env.d/90xsession, we have not installed `xfce` yet. So leave it for the next step.
 44. Xfce installation & Configuration.
     1. Refer to [Xfce](https://wiki.gentoo.org/wiki/Xfce) for installation and [Xfce/HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO) for configuration.
     2. _#_ eselect profile list, you will find `…/desktop` is the default profile (not `…/gnome` or `…/kde`).
@@ -249,7 +249,17 @@ VIDEO_CARDS="intel"
     8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
     9. _$_ echo "exec startxfce4 --with-ck-launch" > ~/.xinitrc
     10. _$_ rc-update add consolekit default
-    11. You'd better logout and then login again to test xfce: _$_ startx. 
+	11. _#_ echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
+    12. You'd better logout and then login again to test xfce: _$_ startx.
+45. When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
+    1. _#_ nano - /etc/udev/rules.d/99-hide-disks.rules
+	2. put the following code:
+	
+	    ```
+KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
+        ```
+	  `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
+	3. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).
 42. `/dev/sda10` is the boot partition for Gentoo. But by default, it's not auto-mounted for security reason. Similarly, the /dev/sda2 is the EFI System Partition. It's also not automatic mounted to `/boot/efi` as well at startup.
 43. Partitions:
     1. sda1 Windows recovery partition
@@ -266,4 +276,4 @@ VIDEO_CARDS="intel"
     12. sda12 Gentoo home
 44. Work to do:
     1. wpa_supplicant
-    2. wicd
+    2. 
