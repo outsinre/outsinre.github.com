@@ -116,7 +116,7 @@ Prompt:
 		```
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable corresponding kernel model support. However, according to this reference, nothing needs updated for kernel configuration.
     6. Remove several `AMD` items under `Processor type and features`.
-	7. Enable NTFS support to mount windows partition on demand. Refer to [NTFS wiki]()https://wiki.gentoo.org/wiki/NTFS).
+	7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS).
     7. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
