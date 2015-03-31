@@ -116,7 +116,7 @@ Prompt:
 		```
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable corresponding kernel model support. However, according to this reference, nothing needs updated for kernel configuration.
     6. Remove several `AMD` items under `Processor type and features`.
-	7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS).
+	7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package after installation.
     7. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
@@ -165,6 +165,7 @@ config_wlp3s0="dhcp"
     1. _#_ emerge --ask sys-process/cronie
     2. _#_ rc-update add cronie default
 35. File indexing: emerge --ask sys-apps/mlocate
+36. NTFS: emerge --ask sys-fs/ntfs3g
 36. Remote access: rc-update add sshd default
 37. Although optional, the majority of users will find that they need a DHCP client to get on their network. Please install a DHCP client. If this is forgotten, then the system might not be able to get on the network, and thus cannot install a DHCP client afterwards as well.
     1. emerge --ask net-misc/dhcpcd
