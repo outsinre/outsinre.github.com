@@ -145,7 +145,7 @@ Prompt:
 	3. _#_ rc-update add dhcpcd default
 	4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
 	5. _#_ emerge --ask net-wireless/wpa_supplicant
-	6. wpa_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
+	6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa\_supplicant.conf` file:
 
 		```
 # This command is to show the default configuration:
