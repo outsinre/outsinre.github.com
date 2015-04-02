@@ -117,7 +117,7 @@ Prompt:
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable corresponding kernel model support. However, according to this reference, nothing needs updated for kernel configuration.
     6. Remove several `AMD` items under `Processor type and features`.
 	7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package in step 42.
-	8. For `iwlwifi`, remember to enable debug support: IWLWIFI\_DEBUG, IWLWIFI_DEBUGFS, and IWLWIFI\_DEVICE_TRACING.
+	8. For `iwlwifi`, remember to enable debug support: IWLWIFI\_DEBUG, IWLWIFI\_DEBUGFS, and IWLWIFI\_DEVICE_TRACING.
 	9. Turn on `CONFIG_PACKET` to support wireless tool `wpa_supplicant` which will be installed later on.
 	10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
@@ -301,5 +301,4 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     11 sda11 Ubuntu home
     12. sda12 Gentoo home
 44. Work to do:
-    1. wpa_supplicant
-    2. 
+    1. firefox browser
