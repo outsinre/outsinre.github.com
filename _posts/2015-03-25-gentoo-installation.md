@@ -117,9 +117,10 @@ Prompt:
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable corresponding kernel model support. However, according to this reference, nothing needs updated for kernel configuration.
     6. Remove several `AMD` items under `Processor type and features`.
 	7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package in step 42.
-	8. For `iwlwifi`, remember to enable debug support: IWLWIFI_DEBUG, IWLWIFI_DEBUGFS, and IWLWIFI_DEVICE_TRACING.
+	8. For `iwlwifi`, remember to enable debug support: IWLWIFI\_DEBUG, IWLWIFI_DEBUGFS, and IWLWIFI\_DEVICE_TRACING.
 	9. Turn on `CONFIG_PACKET` to support wireless tool `wpa_supplicant` which will be installed later on.
-    7. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
+	10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
+    11. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
     2. _#_ make install
@@ -145,7 +146,7 @@ Prompt:
 	3. _#_ rc-update add dhcpcd default
 	4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
 	5. _#_ emerge --ask net-wireless/wpa_supplicant
-	6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa\_supplicant.conf` file:
+	6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
 
 		```
 # This command is to show the default configuration:
@@ -178,7 +179,7 @@ network={
 	8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
 	https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
 	9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
-	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf).
+	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 31. Set root password: _#_ passwd
 32. Edit `/etc/conf.d/hwclock` to set the clock options.
     1. set `clock=local`, this is important when dual boot with Windows.
