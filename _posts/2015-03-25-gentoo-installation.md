@@ -148,27 +148,27 @@ Prompt:
 	6. wpa_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
 
 		```
-\# This command is to show the default configuration:
-\# bzcat /usr/share/doc/wpa_supplicant-2.2-r1/wpa_supplicant.conf.bz2 | less
-\# or http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
-\# Except eap and phase2 arguments, the rest are default values.
-\# This command is to test the wpa_supplicant configuration:
-\# wpa\_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa\_supplicant/wpa\_supplicant.conf -d
-ctrl\_interface=DIR=/var/run/wpa\_supplicant
-ctrl\_interface\_group=0
-eapol\_version=1
-ap\_scan=1
-fast\_reauth=1
+# This command is to show the default configuration:
+# bzcat /usr/share/doc/wpa_supplicant-2.2-r1/wpa_supplicant.conf.bz2 | less
+# or http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
+# Except eap and phase2 arguments, the rest are default values.
+# This command is to test the wpa_supplicant configuration:
+# wpa_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa_supplicant/wpa_supplicant.conf -d
+ctrl_interface=DIR=/var/run/wpa_supplicant
+ctrl_interface_group=0
+eapol_version=1
+ap_scan=1
+fast_reauth=1
 network={
 	ssid="sMobileNet"
 	proto=WPA RSN
-	key\_mgmt=WPA-EAP
+	key_mgmt=WPA-EAP
 	pairwise=CCMP TKIP
 	group=CCMP TKIP 
 	eap=PEAP
 	identity="XXXXXX"
 	password="YYYYYY"
-	ca\_cert="/etc/ssl/certs/Thawte\_Premium\_Server\_CA.pem"
+	ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
 	phase1="peaplabel=0"
 	phase2="auth=MSCHAPV2"
 }
