@@ -116,7 +116,9 @@ Prompt:
 		```
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable corresponding kernel model support. However, according to this reference, nothing needs updated for kernel configuration.
     6. Remove several `AMD` items under `Processor type and features`.
-	7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package after installation.
+	7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package in step 42.
+	8. For `iwlwifi`, remember to enable debug support: IWLWIFI_DEBUG, IWLWIFI_DEBUGFS, and IWLWIFI_DEVICE_TRACING.
+	9. Turn on `CONFIG_PACKET` to support wireless tool `wpa_supplicant` which will be installed later on.
     7. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make && make modules_install
@@ -138,23 +140,49 @@ Prompt:
     1. _#_ nano -w /etc/conf.d/hostname
     2. set hostname="x220gentoo"
 30. Configuring the network.
-    1. _#_ emerge --ask --noreplace net-misc/netifrc
-    2. _#_ ifconfig -a, to list the network interface name.
-    3. _#_ nano -w /etc/conf.d/net
-    4. add two lines:
+	1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
+	2. _#_ emerge --ask net-misc/dhcpcd
+	3. _#_ rc-update add dhcpcd default
+	4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
+	5. _#_ emerge --ask net-wireless/wpa_supplicant
+	6. wpa_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
 
-        ```
-config_enp0s25="dhcp"
-config_wlp3s0="dhcp"
-        ```
+		```
+# This command is to show the default configuration:
+# bzcat /usr/share/doc/wpa_supplicant-2.2-r1/wpa_supplicant.conf.bz2 | less
+# or http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
 
-31. Automatically start networking at boot.
-    1. _#_ cd /etc/init.d
-    2. _#_ ln -s net.lo net.enp0s25
-    3. _#_ rc-update add net.enp0s25 default
-    4. _#_ ln -s net.lo net.wlp3s0
-    5. _#_ rc-update add net.wlp3s0 default
-31. Set root password ro15ot
+# Except eap and phase2 arguments, the rest are default values.
+
+# This command is to test the wpa_supplicant configuration:
+# wpa_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa_supplicant/wpa_supplicant.conf -d
+
+ctrl_interface=DIR=/var/run/wpa_supplicant
+ctrl_interface_group=0
+eapol_version=1
+ap_scan=1
+fast_reauth=1
+
+network={
+	ssid="sMobileNet"
+	proto=WPA RSN
+	key_mgmt=WPA-EAP
+	pairwise=CCMP TKIP
+	group=CCMP TKIP 
+	eap=PEAP
+	identity="XXXXXX"
+	password="YYYYYY"
+	ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
+	phase1="peaplabel=0"
+	phase2="auth=MSCHAPV2"
+}
+		```
+	7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `wpa_supplicant`. No need to create so called `/etc/conf.d/net` file as the handbook.
+	8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
+	https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
+	9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
+	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf).
+31. Set root password: _#_ passwd
 32. Edit `/etc/conf.d/hwclock` to set the clock options.
     1. set `clock=local`, this is important when dual boot with Windows.
 33. System logger.
@@ -167,12 +195,10 @@ config_wlp3s0="dhcp"
 35. File indexing: emerge --ask sys-apps/mlocate
 36. NTFS: emerge --ask sys-fs/ntfs3g
 36. Remote access: rc-update add sshd default
-37. Although optional, the majority of users will find that they need a DHCP client to get on their network. Please install a DHCP client. If this is forgotten, then the system might not be able to get on the network, and thus cannot install a DHCP client afterwards as well.
-    1. emerge --ask net-misc/dhcpcd
 38. Configuring the bootloader. Refer to [GRUB2 Quick Start](https://wiki.gentoo.org/wiki/GRUB2_Quick_Start).
     1. Add `GRUB_PLATFORMS="efi-64"` to `/etc/portage/make.conf`. This step must occur before installing the grub package. Otherwise it would show `error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist`.
     2. _#_ emerge --ask sys-boot/grub
-    3. Del the folder *boot* and *bootx64.efi* created in step 27.4. Then `mount /dev/sda2 /boot/efi`. `/dev/sda2` is the `EFI partition system`. Because Gentoo, Ubuntu, Windows share the EFI partition, so we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition.
+    3. Delete the folder *boot* and  file *bootx64.efi* created in step 27.[3,4], while keep the `/boot/efi` directory. Then `mount /dev/sda2 /boot/efi`. `/dev/sda2` is the `EFI partition system`. Because Gentoo, Ubuntu, Windows share the EFI partition, so we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition. **This step is really important!**
     4. To install GRUB2 on an EFI capable system `grub2-install --target=x86_64-efi`.
 39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the code below.
     1. The traditional `chainloader +1` does work for UEFI boot.
