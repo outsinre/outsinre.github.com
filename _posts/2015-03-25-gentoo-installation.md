@@ -151,18 +151,14 @@ Prompt:
 \# This command is to show the default configuration:
 \# bzcat /usr/share/doc/wpa_supplicant-2.2-r1/wpa_supplicant.conf.bz2 | less
 \# or http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
-
 \# Except eap and phase2 arguments, the rest are default values.
-
 \# This command is to test the wpa_supplicant configuration:
 \# wpa\_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa\_supplicant/wpa\_supplicant.conf -d
-
 ctrl\_interface=DIR=/var/run/wpa\_supplicant
 ctrl\_interface\_group=0
 eapol\_version=1
 ap\_scan=1
 fast\_reauth=1
-
 network={
 	ssid="sMobileNet"
 	proto=WPA RSN
