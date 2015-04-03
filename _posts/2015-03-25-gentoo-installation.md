@@ -318,3 +318,6 @@ export XMODIFIERS=@im=fcitx
 			
 		3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
 	3. mousepad editor.
+	4. emacs
+	    1.  emerge -av app-editors/emacs, default USE flags are pretty good. NO extra flags needed.
+	    2. Don't install "app-editors/emacs-vcs" as mentioned on official emacs wiki.
