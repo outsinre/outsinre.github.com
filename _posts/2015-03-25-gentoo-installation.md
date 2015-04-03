@@ -277,6 +277,7 @@ VIDEO_CARDS="intel"
     10. _$_ rc-update add consolekit default
 	11. _#_ echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
     12. You'd better logout and then login again to test xfce: _$_ startx.
+	13. **Attention**: Use _startx_ command to launch xfce desktop. No graphical loggin configured.
 45. When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
     1. _#_ nano - /etc/udev/rules.d/99-hide-disks.rules
 	2. put the following code:
@@ -300,5 +301,19 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     10. sda10 Gentoo boot
     11 sda11 Ubuntu home
     12. sda12 Gentoo home
-44. Work to do:
-    1. firefox browser
+44. Applications:
+    1. opera broswer. Refer to [Additional_Applications](https://wiki.gentoo.org/wiki/Xfce/HOWTO#Additional_Applications).
+		1. echo "www-client/opera gtk -kde" >> /etc/portage/package.use/opera
+		2. emerge --ask opera
+	2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
+		1. USE="gtk gtk3 qt4" emerge -av fcitx
+		2. add the following lines to _~/.xinitrc_:
+			```
+eval `dbus-launch --sh-syntax --exit-with-session`
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+			```
+		3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
+	3. mousepad
+	4.
