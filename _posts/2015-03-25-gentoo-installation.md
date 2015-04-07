@@ -82,6 +82,7 @@ title: Gentoo Installation
     2. _#_ eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
 23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected. Xfce will be installed as desktop.
     4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags:
+
         ```
 USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thunar udev X"
         ```
@@ -116,7 +117,6 @@ Type:
 Prompt:
   Location:
         ```
-
     1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`: these are the dirvers that needs activated. When search "snd-hda-intel", replace the _hypen_: **-** with _dash_: **_**.
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the file `gentoo-livecd-default-kernel-config-reference` copied in previous step to help clear items.
     3. Graphics: i915 known as `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
@@ -129,7 +129,6 @@ Prompt:
 Codec Conexant CX20590
 Codec Intel CougarPoint HDMI
             ```
-
         3. So select the two correspoinding codecs as modules: `Build HDMI/DisplayPort HD-audio codec support, SND_HDA_CODEC_HDMI`, and `Conexant HD-audio support, SND_HDA_CODEC_CONEXANT`.
         4. `Enable generic HD-audio codec parser, SND_HDA_GENERIC` must be selected (default).
         4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
@@ -200,7 +199,6 @@ network={
 	phase2="auth=MSCHAPV2"
 }
 		```
-
 	7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in plaintext by anyone using the computer:
 		1. _#_ chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
 		2. Replace the `identity` and `password` entries with your own Wifi information.
@@ -241,7 +239,6 @@ menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
 	chainloader (${root})/EFI/ubuntu/grubx64.efi
 }
 		```
-
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
@@ -259,7 +256,6 @@ You may reminded that some device is busy. Just let it go. Then type in that one
 useradd -g users -G wheel,audio,video -m zachary
 passwd zachary
         ```
-
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
         1. emerge --sync
         1. emerge -av portage
@@ -328,11 +324,11 @@ VIDEO_CARDS="intel"
 45. When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
     1. _#_ nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
-	
-	    ```
+
+        ```
 KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         ```
-	  `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
+`XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
     3. Similarly, since the root and home partition is formatted in previous step, you should go into Ubuntu system to hide these two partitions.
     4. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).
 42. `/dev/sda10` is the boot partition for Gentoo. But by default, it's not auto-mounted for security reason. Similarly, the /dev/sda2 is the EFI System Partition. It's also not automatic mounted to `/boot/efi` as well at startup.
@@ -349,7 +345,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     10. sda10 Gentoo boot
     11 sda11 Ubuntu home
     12. sda12 Gentoo home
-43. Re-compiling current kernel when you need to modify some kernel configurations.
+43. [OPTIONAL] Re-compiling current kernel when you need to modify some kernel configurations.
     1. _#_ mount /dev/sda10 /boot
     1. _#_ mount /dev/sda2 /boot/efi
     1. _#_ cd /usr/src/linux
@@ -364,23 +360,21 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     6. _#_ genkernel initramfs, re-install `initramfs`.
     7. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
     8. _#_ reboot
-44. Applications:
-    1. Localization setting: Install Chinese fonts is the very first step!!
-        1. _#_ emerge wqy-zenhei （文泉驿正黑）
-        2. _#_ emerge wqy-microhei （文泉驿微米黑）
-        2. _#_ emerge wqy-bitmapfont
-        3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese.
+44. Localization setting: Install Chinese fonts is the very first step!!
+    1. _#_ emerge wqy-zenhei （文泉驿正黑）
+    2. _#_ emerge wqy-microhei （文泉驿微米黑）
+    2. _#_ emerge wqy-bitmapfont
+    3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese.
 
-            ```
+        ```
 LANG="en_US.utf8"
 LC_CTYPE="zh_CN.gb18030"
-            ```
-
-        4. _#_ env-update && source /etc/profile
-    2. opera broswer. Refer to [Additional_Applications](https://wiki.gentoo.org/wiki/Xfce/HOWTO#Additional_Applications).
-        1. echo "www-client/opera gtk -kde" >> /etc/portage/package.use/opera
-        2. emerge --ask www-client/operaopera
-    3. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
+        ```
+    4. _#_ env-update && source /etc/profile
+45. Applications:
+    1. emerge -av firefox,
+        1. You might be reminded to add support `sqlite` for python rebuild.
+    2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. USE="gtk gtk3 qt4" emerge -av fcitx
         2. add the following lines to _~/.xinitrc_:
 		
@@ -390,7 +384,6 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
 			```
-			
 		3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
 	3. mousepad editor.
 	4. emacs
