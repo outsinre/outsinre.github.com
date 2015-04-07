@@ -82,7 +82,6 @@ title: Gentoo Installation
     2. _#_ eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
 23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected. Xfce will be installed as desktop.
     4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags:
-
         ```
 USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thunar udev X"
         ```
