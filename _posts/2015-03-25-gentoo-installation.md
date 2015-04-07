@@ -56,7 +56,7 @@ title: Gentoo Installation
     1. _#_ cp /usr/src/linux/.config ./gentoo-livecd-default-kernel-config-reference
 15. Configuring compile options. To keep the settings, Portage reads in the /etc/portage/make.conf file, a configuration file for Portage.
     1. _#_ emacs /mnt/gentoo/etc/portage/make.conf
-    2. CFLAGS and CXXFLAGS. Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). Command `grep -m1 -A3 "vendor_id" /proc/cpuinfo` will show the current CPU architecure information. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two _.gcc_ files.
+    2. `CFLAGS` and `CXXFLAGS`. Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). Command `grep -m1 -A3 "vendor_id" /proc/cpuinfo` will show the current CPU architecure information. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two _.gcc_ files.
         1. CFALGS="-march=corei7-avx -O2 -pipe"
         2. CXXFLAGS="${CFLAGS}"
     3. The `MAKEOPTS` variable defines how many parallel compilations should occur when installing a package. Usually this value is number of _cpu cores + 1_.
@@ -80,13 +80,12 @@ title: Gentoo Installation
 22. Choosing the right profile.
     1. _#_ eselect profile list
     2. _#_ eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
-23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected. Xfce will be the desktop environment.
+23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected. Xfce will be installed as desktop.
     4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags:
 
         ```
 USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thunar udev X"
         ```
-
 Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`.
 23. Set the timezone.
     1. _#_ ls /usr/share/zoneinfo
