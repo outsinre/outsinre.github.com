@@ -372,20 +372,20 @@ LC_CTYPE="zh_CN.gb18030"
         ```
     4. _#_ env-update && source /etc/profile
 45. Applications:
-    1. emerge -av firefox,
-        1. You might be reminded to add support `sqlite` for python rebuild.
+    1. Opera browser. Don't install firefox and it is bery big.
+        1. _#_ echo "www-client/opera gtk -kde" >> /etc/portage/package.use/opera
+        2. _#_ emerge -av opera
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. USE="gtk gtk3 qt4" emerge -av fcitx
         2. add the following lines to _~/.xinitrc_:
 		
-			```
+        ```
 eval `dbus-launch --sh-syntax --exit-with-session`
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
-			```
-		3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
-	3. mousepad editor.
-	4. emacs
-	    1.  emerge -av app-editors/emacs, default USE flags are pretty good. NO extra flags needed.
-	    2. Don't install "app-editors/emacs-vcs" as mentioned on official emacs wiki.
+        ```
+        3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
+    3. emacs
+        1.  emerge -av app-editors/emacs, default USE flags are pretty good. NO extra flags needed.
+        2. Don't install "app-editors/emacs-vcs" as mentioned on official emacs wiki.
