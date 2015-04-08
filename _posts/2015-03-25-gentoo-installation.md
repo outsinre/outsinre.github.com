@@ -389,7 +389,7 @@ LC_CTYPE="zh_CN.gb18030"
         ```
 eval `dbus-launch --sh-syntax --exit-with-session`
 export GTK_IM_MODULE=fcitx
-export QT_IM_MODULE=fcitx
+export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
         ```
         3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
