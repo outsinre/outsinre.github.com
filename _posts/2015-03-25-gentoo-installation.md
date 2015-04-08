@@ -93,7 +93,7 @@ Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` nee
     3. _#_ emerge --config sys-libs/timezone-data
 24. Configure locales that the system supports.
     1. _#_ cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
-    2. Uncomment en_US.UTF-8 UTF-8
+    2. Uncomment en_US.UTF-8 UTF-8 in /etc/locale.gen.
     3. _#_ locale-gen
     4. If reminds: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
 25. Set the system-wide locale.
@@ -107,8 +107,8 @@ Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` nee
 26. Configuring the Linux kernel - Manual configuration.
     1. _#_ emerge --ask sys-apps/pciutils
     2. _#_ cd /usr/src/linux
-    3. _#_ make menuconfig
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e1000e`, find their locations and activate them.
+    1. _#_ make menuconfig, if you have a backup of old gentoo kernel config file, then you can use the `load` option to load it.
     1. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
 
         ```
@@ -121,7 +121,7 @@ Prompt:
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the file `gentoo-livecd-default-kernel-config-reference` copied in previous step to help clear items.
     3. Graphics: i915 known as `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
     4. Ethernet: e1000e  known as `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
-    4. Audio: snd_hda_intel known as `Intel HD Audio, CONFIG_SND_HDA_INTEL` uses default  'Y'. 
+    4. Audio: snd\_hda_intel known as `Intel HD Audio, CONFIG_SND_HDA_INTEL` THE default  is 'Y', now set it as 'M'
         1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
         2. _#_ cat /proc/asound/card0/codec#* | grep Codec, the output is as follows. **ATENTION**: execute this command in LiveCD environment by opening a new terminal.
 
@@ -132,11 +132,12 @@ Codec Intel CougarPoint HDMI
         3. So select the two correspoinding codecs as modules: `Build HDMI/DisplayPort HD-audio codec support, SND_HDA_CODEC_HDMI`, and `Conexant HD-audio support, SND_HDA_CODEC_CONEXANT`.
         4. `Enable generic HD-audio codec parser, SND_HDA_GENERIC` must be selected (default).
         4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
+        5. Set `Pre-allocated buffer size for HD-audio driver` to 4096.
     5. watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
     6. SATA: ahci known as `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' for SATA disk device.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
     8. Wireless: `Intel Wireless WiFi Next Gen AGN - Wireless-N/Advanced-N/Ultimate-N (iwlwifi), CONFIG_IWLWIFI` set to 'M'. By the way, `wpa_supplicant` needs `nl80211` wifi driver. Actually relates to `cfg80211 - wireless configuration API, CONFIG_CFG80211` which is set to 'Y' default already.
-    2. MMC: sdhci_pci known as `SDHCI support on PCI bus, CONFIG_MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG_MMC_RICOH_MMC` as 'Y'.
+    2. MMC: sdhci\_pci known as `SDHCI support on PCI bus, CONFIG\_MMC\_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG\_MMC\_RICOH_MMC` as 'Y'.
     3. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB` and `EFI mixed-mode support, CONFIG_EFI_MIXED` under `Processor type and features`.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
     6. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: CONFIG_AGP_AMD64, CONFIG_X86_MCE_AMD, CONFIG_MICROCODE_AMD, AMD_NUMA, and CONFIG_AMD_IOMMU.
@@ -213,8 +214,8 @@ network={
     1. set `clock=local`, this is important when dual boot with Windows.
 33. System logger.
     1. _#_ emerge --ask app-admin/syslog-ng
-    2. _#_ emerge --ask app-admin/logrotate
-    3. _#_ rc-update add syslog-ng default
+    2. _#_ rc-update add syslog-ng default
+    3. _#_ emerge --ask app-admin/logrotate
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
     1. _#_ emerge --ask sys-process/cronie
     2. _#_ rc-update add cronie default
@@ -232,7 +233,7 @@ network={
     1. The traditional `chainloader +1` does work for UEFI boot.
 
 		```
-menuentry "UEFI GRUB2 UBUNTU 14.04 on /dev/sda2" {
+menuentry "UEFI GRUB2 UBUNTU on /dev/sda2" {
 	insmod fat
 	insmod part_gpt
 	insmod chain
