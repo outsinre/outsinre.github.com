@@ -374,12 +374,16 @@ LANG="en_US.utf8"
 LC_CTYPE="zh_CN.gb18030"
         ```
     4. _#_ env-update && source /etc/profile
+45. ALSA - sount.
+    1. _#_ emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
+    2. _#_ rc-update add alsasound boot
+    3. _#_ speaker-test -t wav -c 2, test the speaker.
 45. Applications:
     1. Opera browser. Don't install firefox and it is bery big.
         1. _#_ echo "www-client/opera gtk -kde" >> /etc/portage/package.use/opera
         2. _#_ emerge -av opera
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
-        1. USE="gtk gtk3 qt4" emerge -av fcitx
+        1. USE="gtk3" emerge -av fcitx
         2. add the following lines to _~/.xinitrc_:
 		
         ```
@@ -390,3 +394,6 @@ export XMODIFIERS=@im=fcitx
         ```
         3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
     3. _#_ emerge -av mplayer
+    4. emacs
+    5. adobe flash player
+    6. ...
