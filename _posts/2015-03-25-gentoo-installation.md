@@ -393,7 +393,10 @@ export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
         ```
         3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
+        4. _#_ emerge -av fcitx-sunpinyin
+        5. _#_ emerge -av fcitx-configtool
     3. _#_ emerge -av mplayer
     4. emacs
-    5. adobe flash player
+    5. _#_ emerge -av www-plugins/adobe-flash
+        1. Pay attention to update `package.license` file.
     6. ...
