@@ -50,17 +50,17 @@ title: Gentoo Installation
 12. Verify the tarball integrity and compare the output with the checksums provided by the .DIGESTS or .DIGESTS.asc file.
     1. _#_ sha512sum /home/gentoo/Download/stage3-amd64-20150319.tar.bz2
 13. Now unpack the downloaded stage onto the system. Attention: the current working directory is `/mnt/gentoo`.
-    1. _#_ tar xvjpf /mnt/cdrom/stage3-amd64-20150319.tar.bz2. Usually, the stage file is not in /mnt/gentoo directory. So you need to specify the path to stage. For instance, /mnt/cdrom/stage3...
+    1. _#_ tar xvjpf /mnt/cdrom/stage3-amd64-20150319.tar.bz2. Usually, the stage file is not in /mnt/gentoo directory. So you need to specify the path to stage. For instance, /home/gentoo/Download/stage3...
     2. Make sure that the same options `xvjpf` are used. The x stands for Extract, the v for Verbose to see what happens during the extraction process (optional), the j for Decompress with bzip2, the p for Preserve permissions and the f to denote that we want to extract a File, not standard input.
-14. Backup LiveCD's kernel configuration file for reference when configuring kernel options.
-    1. _#_ cp /usr/src/linux/.config ./gentoo-livecd-default-kernel-config-reference
 15. Configuring compile options. To keep the settings, Portage reads in the /etc/portage/make.conf file, a configuration file for Portage.
     1. _#_ emacs /mnt/gentoo/etc/portage/make.conf
     2. `CFLAGS` and `CXXFLAGS`. Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). Command `grep -m1 -A3 "vendor_id" /proc/cpuinfo` will show the current CPU architecure information. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two _.gcc_ files.
         1. CFALGS="-march=corei7-avx -O2 -pipe"
         2. CXXFLAGS="${CFLAGS}"
-    3. The `MAKEOPTS` variable defines how many parallel compilations should occur when installing a package. Usually this value is number of _cpu cores + 1_.
-        1. Add a line `MAKEOPTS="-j3"`
+    3. The `MAKEOPTS` variable defines how many parallel compilations should occur when installing a package. The recommended value is the number of logical processors in the CPU plus 1..
+        1. Add a line `MAKEOPTS="-j5"`
+        2. The boot screen will show you several penguins, that is the number of logical cores.
+        3. Refer to [MAKEOPTS](https://wiki.gentoo.org/wiki/MAKEOPTS).
 17. Selecting mirrors.
     1. _#_ mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
     2. _#_ mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the `rsync server` to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
@@ -77,6 +77,7 @@ title: Gentoo Installation
     3. _#_ export PS1="(chroot) $PS1", this create a new different command prompt for the new environment.
 21. Installing a portage snapshot:
     1. _#_ emerge-webrsync
+    2. `emerge-webrsync` might complain about a missing /usr/portage/ location. This is to be expected and nothing to worry about - the tool will create the location.
 22. Choosing the right profile.
     1. _#_ eselect profile list
     2. _#_ eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
@@ -108,7 +109,7 @@ Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` nee
     1. _#_ emerge --ask sys-apps/pciutils
     2. _#_ cd /usr/src/linux
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e1000e`, find their locations and activate them.
-    1. _#_ make menuconfig, if you have a backup of old gentoo kernel config file, then you can use the `load` option to load it.
+    1. _#_ make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config`. Or you can refer to the LiveCD's kernel config file.
     1. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
 
         ```
@@ -166,7 +167,7 @@ Codec Intel CougarPoint HDMI
 	```
 29. Set hostname.
     1. _#_ nano -w /etc/conf.d/hostname
-    2. set hostname="x220gentoo"
+    2. set hostname="tux"
 30. Configuring the network.
 	1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
 	2. _#_ emerge --ask net-misc/dhcpcd
@@ -388,6 +389,4 @@ export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
         ```
         3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
-    3. emacs
-        1.  emerge -av app-editors/emacs, default USE flags are pretty good. NO extra flags needed.
-        2. Don't install "app-editors/emacs-vcs" as mentioned on official emacs wiki.
+    3. _#_ emerge -av mplayer
