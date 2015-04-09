@@ -399,6 +399,18 @@ export XMODIFIERS=@im=fcitx
     4. emacs:
         1. _#_ echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
         2. _#_ emerge -av emacs
+        3. Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
+
+            ```
+    if use X; then
+        elog "You need to install some fonts for Emacs."
+        elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
+        elog "machine would satisfy basic Emacs requirements under X11."
+        elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
+        elog "for how to enable anti-aliased fonts."
+        elog
+    fi
+            ```
     5. _#_ emerge -av www-plugins/adobe-flash
         1. Pay attention to update `package.license` file.
     6. ...
