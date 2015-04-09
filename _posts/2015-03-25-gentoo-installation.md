@@ -396,7 +396,9 @@ export XMODIFIERS=@im=fcitx
         4. _#_ emerge -av fcitx-sunpinyin
         5. _#_ emerge -av fcitx-configtool
     3. _#_ emerge -av mplayer
-    4. emacs
+    4. emacs:
+        1. _#_ echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
+        2. _#_ emerge -av emacs
     5. _#_ emerge -av www-plugins/adobe-flash
         1. Pay attention to update `package.license` file.
     6. ...
