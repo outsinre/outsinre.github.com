@@ -122,7 +122,7 @@ Prompt:
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the file `gentoo-livecd-default-kernel-config-reference` copied in previous step to help clear items.
     3. Graphics: i915 known as `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
     4. Ethernet: e1000e  known as `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
-    4. Audio: snd\_hda_intel known as `Intel HD Audio, CONFIG_SND_HDA_INTEL` THE default  is 'Y', now set it as 'M'
+    4. Audio: snd\_hda_intel known as `Intel HD Audio, CONFIG_SND_HDA_INTEL` THE default  is 'Y', now set it as 'M'.
         1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
         2. _#_ cat /proc/asound/card0/codec#* | grep Codec, the output is as follows. **ATENTION**: execute this command in LiveCD environment by opening a new terminal.
 
@@ -132,6 +132,7 @@ Codec Intel CougarPoint HDMI
             ```
         3. So select the two correspoinding codecs as modules: `Build HDMI/DisplayPort HD-audio codec support, SND_HDA_CODEC_HDMI`, and `Conexant HD-audio support, SND_HDA_CODEC_CONEXANT`.
         4. `Enable generic HD-audio codec parser, SND_HDA_GENERIC` must be selected (default).
+        5. You may notice: those options are all set to 'M'! Of course, you can also set them all to 'Y'. Never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
         4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
         5. Set `Pre-allocated buffer size for HD-audio driver` to 4096.
     5. watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
