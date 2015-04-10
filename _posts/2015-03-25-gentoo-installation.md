@@ -375,7 +375,7 @@ LANG="en_US.utf8"
 LC_CTYPE="zh_CN.gb18030"
         ```
     4. _#_ env-update && source /etc/profile
-45. ALSA - sount.
+45. ALSA - sound.
     1. _#_ emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
     2. _#_ rc-update add alsasound boot
     3. _#_ speaker-test -t wav -c 2, test the speaker.
@@ -414,4 +414,33 @@ export XMODIFIERS=@im=fcitx
             ```
     5. _#_ emerge -av www-plugins/adobe-flash
         1. Pay attention to update `package.license` file.
-    6. ...
+46. Configuration consistently.
+    1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
+        1. **dbus should NOT launch before consolekit**. This is the key to solve problem.
+        2. currently the contents of `~/.xinitrc`:
+
+            ```
+eval `dbus-launch --sh-syntax --exit-with-session`
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=xim
+export XMODIFIERS=@im=fcitx
+
+exec startxfce4 --with-ck-launch
+
+            ```
+        3. You can find `dbus-launch` is at the beginning of the file while `--with-ck-launch` is at the end along with command `exec`. So organize the contents as foolows:
+
+            ```
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=xim
+export XMODIFIERS=@im=fcitx
+
+exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
+            ```
+        4. Refer to [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059) and [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
+    2. fstab for NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
+
+        ```
+/dev/sda8		/media/Data	ntfs-3g		noauto,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda9		/media/Misc	ntfs-3g		noauto,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+        ```
