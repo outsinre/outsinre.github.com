@@ -424,7 +424,6 @@ eval `dbus-launch --sh-syntax --exit-with-session`
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
-
 exec startxfce4 --with-ck-launch
 
             ```
@@ -434,7 +433,6 @@ exec startxfce4 --with-ck-launch
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
-
 exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
             ```
         4. Refer to [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059) and [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
