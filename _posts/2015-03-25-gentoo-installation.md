@@ -442,3 +442,4 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 /dev/sda8		/media/Data	ntfs-3g		noauto,uid=account-name,gid=users,dmask=022,fmask=133	0 0
 /dev/sda9		/media/Misc	ntfs-3g		noauto,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
+        1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
