@@ -415,6 +415,17 @@ export XMODIFIERS=@im=fcitx
             ```
     5. _#_ emerge -av www-plugins/adobe-flash
         1. Pay attention to update `package.license` file.
+    6. WPS office.
+        1. overlay support
+            1. echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
+            2. emerge -av layman
+            3. layman -f -a gentoo-zh
+        2. WPS 32-bit abi_x86_32 support. You should activate `abi_x86_32` use flag for packages on which WPS office depends.
+            1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually.
+            2. package.use/wps-office: many contents. check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild).
+            3. package.license/wps-office: app-office/wps-office WPS-EULA
+            4. package.accept_keywords/wps-office: =app-office/wps-office-9.1.0.4945_alpha16_p3 ~amd64
+            5. emerge -av wps-office
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit**. This is the key to solve problem.
@@ -445,3 +456,4 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
+    4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files in directory.
