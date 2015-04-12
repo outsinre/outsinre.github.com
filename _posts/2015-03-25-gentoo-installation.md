@@ -384,7 +384,8 @@ LC_CTYPE="zh_CN.gb18030"
         1. _#_ echo "www-client/opera gtk -kde" >> /etc/portage/package.use/opera
         2. _#_ emerge -av opera
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
-        1. USE="gtk3" emerge -av fcitx
+        1. _#_ echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
+        2. _#_ emerge -av fcitx
         2. add the following lines to _~/.xinitrc_:
 		
         ```
@@ -443,3 +444,4 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 /dev/sda9		/media/Misc	ntfs-3g		noauto,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
+    3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
