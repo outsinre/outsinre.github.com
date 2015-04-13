@@ -16,7 +16,7 @@ Fontconfig is a library designed to provide system-wide font configuration, cust
 6. _#_ mkfontscale \<path-to-font-directory\>
 7. _#_ mkfontdir \<path-to-font-directory\>, some references omit step 6 && 7 when installing fonts for single user at under home directory. However, when installing fonts system-wide, these two steps are necessary.
 
-> Install system-wide fonts are similar except that the fonts directory is `/usr/share/fonts/`.
+> Install system-wide fonts are similar except that the fonts directories are different like  `/usr/share/fonts/`.
 
 Refer to:
 
