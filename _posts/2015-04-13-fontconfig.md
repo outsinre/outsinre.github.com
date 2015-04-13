@@ -13,8 +13,8 @@ Fontconfig is a library designed to provide system-wide font configuration, cust
 4. Copy your fonts in step 1 to the newly created folder.
     1. Pay attention to font directory and files permission. Use `chmod` to set the correct permissions (i.e. at least 0444 for files and 0555 for directories). But don't worry about the permission issue since we are installing fonts for a single user. And the default permission for current user account is `rwx`. When installing globally for system, this is important.
 5. _#_ fc-cache -fv <path-to-font-directory>, since we are in the new font directory, the `path-to-font-directory` which is `.local/share/fonts/myFonts` can be eliminated.
-6. _#_ mkfontscale
-7. _#_ mkfontdir, some references omit step 6 && 7 when installing fonts for single user at under home directory. However, when installing fonts system-wide, these two steps are necessary.
+6. _#_ mkfontscale <path-to-font-directory>
+7. _#_ mkfontdir <path-to-font-directory>, some references omit step 6 && 7 when installing fonts for single user at under home directory. However, when installing fonts system-wide, these two steps are necessary.
 
 > Install system-wide fonts are similar except that the fonts directory is `/usr/share/fonts/`.
 
