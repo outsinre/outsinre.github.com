@@ -478,3 +478,10 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
     12. _#_ genkernel --install initramfs
     13. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
     14. _#_ reboot
+48. Remove old kernels
+    1. _#_ emerge -av app-admin/eclean-kernel
+    2. _#_ eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
+    3. _#_ eclean-kernel -n 4 --ask
+        1. Option `--ask` is very important, it will ask for your confirmation for each kernel to be removed by an interactive way. You can just remove the kernels you don't need. You can also adjust the number from `4` to something else to pop out the desired kernel for removal.
+        2. At last, I removed the kernel as  `3.18.11-gentoo.old`
+    4. `eclean-kernel` will update the grub menu automatically.
