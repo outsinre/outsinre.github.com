@@ -361,9 +361,10 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     5. _#_ make install
         1. This is add `.old` to original kernel and copy the new kernel to `/boot`.
         2. You mannually finish this by renaming and copying kernel files.
-    6. _#_ genkernel initramfs, re-install `initramfs`.
+    6. _#_ genkernel --install initramfs, re-install `initramfs`.
     7. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
     8. _#_ reboot
+    9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 44. Localization setting: Install Chinese fonts is the very first step!!
     1. _#_ emerge wqy-zenhei （文泉驿正黑）
     2. _#_ emerge wqy-microhei （文泉驿微米黑）
@@ -458,3 +459,21 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files under directory.
+47. Upgrade kernel to **unstable 4.0.0**
+    1. _#_ echo "~sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources, this step needs `eix` command support to find out which unstable package version is located in portage mirror.
+    2. _#_ emerge --sync
+    3. _#_ emerge -av gentoo-sources
+    4. _#_ eselect kernel list
+    5. _#_ eselect kernel set 2, this is update the `/usr/src/linx` symbol link pointing to the new 4.0.0 kernel.
+    5. _#_ mount /boot
+    5. _#_ mount /dev/sda2 /boot/efi
+    6. _#_ cd /usr/src/linux
+    7. _#_ cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
+    8. _#_ make silentoldconfig, choose all the new settings to default ones. It only shows new and different kernel options incurred in new kernel version.
+        1. _#_ You can also run `make olddefconfig` to convert the old kernel config to new one without too many questions to answer. Command `make oldconfig` is similar to `make silentoldconfig` excpet also asking you the same kernel options between two kernel versions.
+    9. _#_ make
+    10. _#_ make modules_install
+    11. _#_ make install
+    12. _#_ genkernel --install initramfs
+    13. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
+    14. _#_ reboot
