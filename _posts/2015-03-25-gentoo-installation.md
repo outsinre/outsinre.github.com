@@ -88,6 +88,7 @@ title: Gentoo Installation
 USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thunar udev X"
         ```
 Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`.
+    5. Check if `cjk` and `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
 23. Set the timezone.
     1. _#_ ls /usr/share/zoneinfo
     2. _#_ echo "Asia/Hong_Kong" > /etc/timezone
@@ -146,6 +147,8 @@ Codec Intel CougarPoint HDMI
     7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package.
     9. Turn on `CONFIG_PACKET` (default 'Y')  to support wireless tool `wpa_supplicant` which will be installed later on.
     9. Turn off `NET_VENDOR_NVIDIA` to 'N' since no `NVIDIA` card in x220 laptop.
+    10. Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to `gb18030` for displaying NTFS partition Chinese file names correctly.
+    10. Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'Y'.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
@@ -268,7 +271,8 @@ passwd zachary
         3. /usr/sbin/update-python
         2. emerge -avutDN --with-bdeps=y @world
         3. emerge -av --depclean
-        4. revdep-rebuild -av
+        4. [deprecated] revdep-rebuild -av, replaced by the next step.
+        5. [optional] emerge @preserved-rebuild, if prompted.
         5. dispatch-conf
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
