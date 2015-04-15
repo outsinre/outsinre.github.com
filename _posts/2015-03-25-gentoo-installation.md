@@ -454,10 +454,11 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
     2. fstab for NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
 
         ```
-/dev/sda8		/media/Data	ntfs-3g		noauto,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda9		/media/Misc	ntfs-3g		noauto,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda8		/media/Data	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda9		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
+        2. Should add `locale=zh_CN.gb18030`. Otherwise you might not copy or paste Chinese files. What was worse, the terminal cannot display Chinese file names. A common error is `Invalid or incomplete multibyte or wide character`. Refer to `man ntfs-3g` on `locale` option. Though `ntfs-3g` will determine the partition localization when mounting by reading the envrionment varialbe `locale`. However, in my current system, the `locale` is set to `en_US.utf8` while `LC_CTYPE=zh_CN.gb18030`. And `ntfs-3g` don't have a mount option related to `LC_CTYPE`.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files under directory.
 47. Upgrade kernel to **unstable 4.0.0**
