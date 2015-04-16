@@ -144,11 +144,11 @@ Codec Intel CougarPoint HDMI
     3. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB` and `EFI mixed-mode support, CONFIG_EFI_MIXED` under `Processor type and features`.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
     6. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: CONFIG_AGP_AMD64, CONFIG_X86_MCE_AMD, CONFIG_MICROCODE_AMD, AMD_NUMA, and CONFIG_AMD_IOMMU.
-    7. Enable `NTFS` support to mount windows partition on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package.
+    7. `NTFS` support: `CONFIG_NTFS_FS=m` and `CONFIG_FUSE_FS=m` to on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW is not set`.
     9. Turn on `CONFIG_PACKET` (default 'Y')  to support wireless tool `wpa_supplicant` which will be installed later on.
     9. Turn off `NET_VENDOR_NVIDIA` to 'N' since no `NVIDIA` card in x220 laptop.
-    10. Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to `gb18030` for displaying NTFS partition Chinese file names correctly.
-    10. Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'Y'.
+    10. Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to _empty value_ for displaying NTFS partition Chinese file names correctly.
+    10. Set `NLS_CODEPAGE_936` to 'Y'.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
@@ -381,6 +381,7 @@ LANG="en_US.utf8"
 LC_CTYPE="zh_CN.gb18030"
         ```
     4. _#_ env-update && source /etc/profile
+    5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53);
 45. ALSA - sound.
     1. _#_ emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
     2. _#_ rc-update add alsasound boot
@@ -462,7 +463,8 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 /dev/sda9		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
-        2. Should add `locale=zh_CN.gb18030`. Otherwise you might not copy or paste Chinese files. What was worse, the terminal cannot display Chinese file names. A common error is `Invalid or incomplete multibyte or wide character`. Refer to `man ntfs-3g` on `locale` option. Though `ntfs-3g` will determine the partition localization when mounting by reading the envrionment varialbe `locale`. However, in my current system, the `locale` is set to `en_US.utf8` while `LC_CTYPE=zh_CN.gb18030`. And `ntfs-3g` don't have a mount option related to `LC_CTYPE`.
+        2. Should add `locale=zh_CN.gb18030`. Otherwise you might not copy or paste Chinese filenames. These files are usually downloaded from the Internet or created in another `zh_CN` environment. What was worse, the terminal cannot display these file names. A common error is `Invalid or incomplete multibyte or wide character`. Refer to `man ntfs-3g` on `locale` option. Though `ntfs-3g` will determine the partition localization when mounting by reading the envrionment varialbe `locale`. However, in my current system, the `locale` is set to `en_US.utf8`. Although the current `LC_CTYPE=zh_CN.gb18030` but `ntfs-3g` don't have a mount option related to `LC_CTYPE`.
+        3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So the final solution is to: create new Chinese filenames directly in NTFS partition (by Thunar) or even creating in virtual termimal then copying.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files under directory.
 47. Upgrade kernel to **unstable 4.0.0**
