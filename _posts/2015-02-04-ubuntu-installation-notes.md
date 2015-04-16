@@ -5,6 +5,7 @@ title: Ubuntu 14.04 Installation Notes
 
 1. sources.list apt
 2. /etc/fstab, refer to Gentoo's installation notes.
+    1. [MountingWindowsPartitions](https://help.ubuntu.com/community/MountingWindowsPartitions)
 3. clear dash history (settings)
 4. Chinese language support & sogou input
 5. Chrome / flashplugin
