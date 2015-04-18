@@ -178,7 +178,7 @@ Codec Intel CougarPoint HDMI
 	3. _#_ rc-update add dhcpcd default
 	4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
 	5. _#_ emerge --ask net-wireless/wpa_supplicant
-	6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
+	6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa\_supplicant/wpa_supplicant.conf` file:
 
 		```
 # This command is to show the default configuration:
@@ -254,8 +254,8 @@ menuentry "Microsoft Windows x86_64 UEFI-GPT" {
 }
 		```
     2. The next thing is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
-        1. _#_ grub2-probe --target=hints_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
-        2. _#_ grub2-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
+        1. _#_ grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
+        2. _#_ grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
         3. Now replace the parameters with them real values in above `menuentry`.
         4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
@@ -469,9 +469,9 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 
         ```
 /dev/sda4		/mnt/Win81	ntfs-3g		noauto,ro	0 0
-/dev/sda5		/media/Data	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda6		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda7		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda5		/media/Data	ntfs-3g		noauto,locale=zh_CN.gb2312,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda6		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb2312,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda7		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb2312,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
         2. Should add `locale=zh_CN.gb18030`. Otherwise you might not copy or paste Chinese filenames. These files are usually downloaded from the Internet or created in another `zh_CN` environment. What was worse, the terminal cannot display these file names. A common error is `Invalid or incomplete multibyte or wide character`. Refer to `man ntfs-3g` on `locale` option. Though `ntfs-3g` will determine the partition localization when mounting by reading the envrionment varialbe `locale`. However, in my current system, the `locale` is set to `en_US.utf8`. Although the current `LC_CTYPE=zh_CN.gb18030` but `ntfs-3g` don't have a mount option related to `LC_CTYPE`.
@@ -479,6 +479,7 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
         4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files under directory.
+    5. When it comes to Chinese support, you'd best choose `gb2312` instead of `gb18030` since the former one has wider application support.
 47. Upgrade kernel to **unstable 4.0.0**
     1. _#_ echo "~sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources, this step needs `eix` command support to find out which unstable package version is located in portage mirror.
     2. _#_ emerge --sync
