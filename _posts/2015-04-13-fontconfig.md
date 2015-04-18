@@ -28,6 +28,7 @@ Fontconfig is a library designed to provide system-wide font configuration, cust
 8. _#_ mkdir /etc/X11/xorg.conf.d/, there is an example copy of `xorg.conf` at /usr/share/doc/xorg-server-1.16.4/xorg.conf.example.bz2. But we only need the `Files section`.
 9. _#_ cd /etc/X11/xorg.conf.d/
 10. _#_ touch /etc/X11/xorg.conf.d/10-fonts-xorg.conf, the file contents are like:
+
     ```
 Section "Files"
 # Multiple FontPath entries are allowed (which are concatenated together),
