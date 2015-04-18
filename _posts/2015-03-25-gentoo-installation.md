@@ -435,9 +435,11 @@ export XMODIFIERS=@im=fcitx
         1. overlay support
             1. echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
             2. emerge -av layman
+            2. echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
             3. layman -f -a gentoo-zh
+            4. layman -S
         2. WPS 32-bit `abi_x86_32` support. You should activate abi\_x86_32 use flag for packages on which WPS office depends.
-            1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually.
+            1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually. You can also cange `pv` to `-av`.
             2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
             3. package.license/wps-office: app-office/wps-office WPS-EULA
             4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945_alpha16_p3 ~amd64
