@@ -257,6 +257,7 @@ menuentry "Microsoft Windows x86_64 UEFI-GPT" {
         1. _#_ grub2-probe --target=hints_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
         2. _#_ grub2-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
         3. Now replace the parameters with them real values in above `menuentry`.
+        4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
