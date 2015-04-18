@@ -40,10 +40,12 @@ title: Gentoo Installation
     2. _#_ mkfs.ext4 /dev/sda12
 8. From step 5 we know the Ubuntu swap partition is `/dev/sda7`. So we need to activate it:
     1. _#_ swapon /dev/sda7
+    2. If you need to create a new swap partition, use command `mkswap /dev/sdaXY` to format the partition.
 9. Mount the ewnly created partitions into the LiveDVD USB stick. Make sure the `gentoo` directory exists in /mnt/gentoo, otherwise create one.
     1. _#_ mount /dev/sda12 /mnt/gentoo
     2. _#_ mkdir /mnt/gentoo/boot
     3. _#_ mount /dev/sda10 /mnt/gentoo/boot
+    4. If there is a separate home partition: `mkdir /mnt/gentoo/home` and `mount /dev/sdaXY /mnt/gentoo/home`.
 9. Setting the date and time using `date` command.
 10. Go to the Gentoo mountpoint where the root file system is mounted (most likely /mnt/gentoo): `cd /mnt/gentoo`.
 11. Downloading the stage tarball with Chrome application in LiveDVD. Go to [Installation media](https://www.gentoo.org/main/en/where.xml) and then to [amd64 multilib](http://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64/). You will find `stage3-amd64-20150319.tar.bz2`. Just download!
@@ -89,10 +91,6 @@ USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thuna
         ```
 Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`.
     5. Check if `cjk` and `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
-23. Set the timezone.
-    1. _#_ ls /usr/share/zoneinfo
-    2. _#_ echo "Asia/Hong_Kong" > /etc/timezone
-    3. _#_ emerge --config sys-libs/timezone-data
 24. Configure locales that the system supports.
     1. _#_ cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
     2. Uncomment en_US.UTF-8 UTF-8 in /etc/locale.gen.
@@ -123,7 +121,7 @@ Prompt:
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the file `gentoo-livecd-default-kernel-config-reference` copied in previous step to help clear items.
     3. Graphics: i915 known as `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
     4. Ethernet: e1000e  known as `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
-    4. Audio: snd\_hda_intel known as `Intel HD Audio, CONFIG_SND_HDA_INTEL` THE default  is 'Y', now set it as 'M'.
+    4. Audio: snd\_hda_intel known as `Intel HD Audio, CONFIG_SND_HDA_INTEL` THE default  is 'Y', now **MUST** set it as 'M'.
         1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
         2. _#_ cat /proc/asound/card0/codec#* | grep Codec, the output is as follows. **ATENTION**: execute this command in LiveCD environment by opening a new terminal.
 
@@ -147,8 +145,9 @@ Codec Intel CougarPoint HDMI
     7. `NTFS` support: `CONFIG_NTFS_FS=m` and `CONFIG_FUSE_FS=m` to on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW is not set`.
     9. Turn on `CONFIG_PACKET` (default 'Y')  to support wireless tool `wpa_supplicant` which will be installed later on.
     9. Turn off `NET_VENDOR_NVIDIA` to 'N' since no `NVIDIA` card in x220 laptop.
-    10. Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to _empty value_ for displaying NTFS partition Chinese file names correctly.
-    10. Set `NLS_CODEPAGE_936` to 'Y'.
+    10. Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to `gb2312` for displaying NTFS partition Chinese file names correctly.
+    10. Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'M'.
+    10. You may found that when there is some problems related to kernel options, you can see them to 'M' instead of 'Y' which might be a potential solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
@@ -218,6 +217,11 @@ network={
 31. Set root password: _#_ passwd
 32. Edit `/etc/conf.d/hwclock` to set the clock options.
     1. set `clock=local`, this is important when dual boot with Windows.
+23. Set the timezone. I think this step should occur after `hwclock` thing. Otherwise the system time is usually ahead of locale time by 8 hours, thus resulting in portage tree timestamp issues. If possible, I recommend to leave this step after system reboot.
+    1. _#_ ls /usr/share/zoneinfo
+    2. _#_ echo "Asia/Hong_Kong" > /etc/timezone
+    3. _#_ emerge --config sys-libs/timezone-data
+    4. Check with `date` command.
 33. System logger.
     1. _#_ emerge --ask app-admin/syslog-ng
     2. _#_ rc-update add syslog-ng default
@@ -230,23 +234,29 @@ network={
 36. Remote access: rc-update add sshd default
 38. Configuring the bootloader. Refer to [GRUB2 Quick Start](https://wiki.gentoo.org/wiki/GRUB2_Quick_Start).
     1. Add `GRUB_PLATFORMS="efi-64"` to `/etc/portage/make.conf`. This step must occur before installing the grub package. Otherwise it would show `error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist`.
-    2. _#_ emerge --ask sys-boot/grub
+    2. _#_ emerge --ask sys-boot/grub:2
+    3. _#_ emerge -av sys-boot/os-prober
     3. Mount the EFI partition /dev/sda2 to /boot/efi directory. Because Gentoo, Ubuntu, Windows share the EFI partition, we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition. **This step is really important!**.
         1. _#_ mkdir /boot/efi
         2. _#_ mount /dev/sda2 /boot/efi
-    4. To install GRUB2 on an EFI capable system `grub2-install --target=x86_64-efi`.
+    4. To install GRUB2 to EFI system `grub2-install --target=x86_64-efi`.
 39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the code below.
     1. The traditional `chainloader +1` does work for UEFI boot.
 
 		```
-menuentry "UEFI GRUB2 UBUNTU on /dev/sda2" {
-	insmod fat
-	insmod part_gpt
-	insmod chain
-	set root='hd0,gpt2'
-	chainloader (${root})/EFI/ubuntu/grubx64.efi
+menuentry "Microsoft Windows x86_64 UEFI-GPT" {
+    insmod part_gpt
+    insmod fat
+    insmod search_fs_uuid
+    insmod chain
+    search --fs-uuid --no-floppy --set=root $hints_string $fs_uuid
+    chainloader /efi/Microsoft/Boot/bootmgfw.efi
 }
 		```
+    2. The next thing is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
+        1. _#_ grub2-probe --target=hints_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
+        2. _#_ grub2-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
+        3. Now replace the parameters with them real values in above `menuentry`.
 40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
@@ -273,7 +283,7 @@ passwd zachary
         3. emerge -av --depclean
         4. [deprecated] revdep-rebuild -av, replaced by the next step.
         5. [optional] emerge @preserved-rebuild, if prompted.
-        5. dispatch-conf
+        5. dispatch-conf, usually if needed, you just need to input `u`.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
     1. Boot with LiveDVD
@@ -346,14 +356,13 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. sda2 EFI partition
     3. sda3 windows reserved
     4. sda4 windows C
-    5. sda5 Ubuntu boot
-    6. sda6 Ubuntu root
-    7. sda7 swap for Ubuntu and Gentoo
-    8. sda8 Windows D
-    9. sda9 windows E
+    5. sda5 Data
+    6. sda6 Misc
+    7. sda7 WLShare
+    8. sda8 Gentoo boot
+    9. sda9 Gentoo swap
     10. sda10 Gentoo boot
-    11 sda11 Ubuntu home
-    12. sda12 Gentoo home
+    11 sda11 Gentoo home
 43. [OPTIONAL] Re-compiling current kernel when you need to modify some kernel configurations.
     1. _#_ mount /dev/sda10 /boot
     1. _#_ mount /dev/sda2 /boot/efi
