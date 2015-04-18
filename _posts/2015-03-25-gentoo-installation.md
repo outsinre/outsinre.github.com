@@ -329,7 +329,7 @@ VIDEO_CARDS="intel"
     4. _#_ echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
     5. **Attention** _#_ emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
     6. _#_ emerge --ask x11-terms/xfce4-terminal
-    11. _#_ echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
+    11. [optional] _#_ echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
         1. Remember to run `env-update && source /etc/profile` to update environment.
     7. Installation finished. Now reboot and loggin with the regular account to configure xfce.
     8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
