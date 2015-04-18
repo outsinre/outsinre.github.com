@@ -341,7 +341,7 @@ VIDEO_CARDS="intel"
         1.  _#_  rm -r ~/.cache/sessions
         2.  _#_ rm -r ~/.config/xfce*
         3.  _#_  rm -r ~/.config/Thunar
-45. When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
+45. [Optional, replaced by method in fstab] When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
     1. _#_ nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
 
@@ -381,14 +381,13 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     8. _#_ reboot
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 44. Localization setting: Install Chinese fonts is the very first step!!
-    1. _#_ emerge wqy-zenhei （文泉驿正黑）
-    2. _#_ emerge wqy-microhei （文泉驿微米黑）
-    2. _#_ emerge wqy-bitmapfont
+    2. _#_ emerge emerge arphicfonts wqy-bitmapfont corefonts ttf-bitstream-vera 
     3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese.
 
         ```
 LANG="en_US.utf8"
-LC_CTYPE="zh_CN.gb18030"
+LC_CTYPE="zh_CN.gb2312
+LC_COLLATE="C"
         ```
     4. _#_ env-update && source /etc/profile
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53);
@@ -469,12 +468,15 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
     2. fstab for NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
 
         ```
-/dev/sda8		/media/Data	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda9		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda4		/mnt/Win81	ntfs-3g		noauto,ro	0 0
+/dev/sda5		/media/Data	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda6		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda7		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
         2. Should add `locale=zh_CN.gb18030`. Otherwise you might not copy or paste Chinese filenames. These files are usually downloaded from the Internet or created in another `zh_CN` environment. What was worse, the terminal cannot display these file names. A common error is `Invalid or incomplete multibyte or wide character`. Refer to `man ntfs-3g` on `locale` option. Though `ntfs-3g` will determine the partition localization when mounting by reading the envrionment varialbe `locale`. However, in my current system, the `locale` is set to `en_US.utf8`. Although the current `LC_CTYPE=zh_CN.gb18030` but `ntfs-3g` don't have a mount option related to `LC_CTYPE`.
         3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So the final solution is to: creating new Chinese filenames in virtual terminal.
+        4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files under directory.
 47. Upgrade kernel to **unstable 4.0.0**
