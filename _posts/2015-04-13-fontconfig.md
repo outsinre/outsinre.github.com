@@ -16,7 +16,40 @@ Fontconfig is a library designed to provide system-wide font configuration, cust
 6. _#_ mkfontscale \<path-to-font-directory\>
 7. _#_ mkfontdir \<path-to-font-directory\>, some references omit step 6 && 7 when installing fonts for single user at under home directory. However, when installing fonts system-wide, these two steps are necessary.
 
-> Install system-wide fonts are similar except that the fonts directories are different like  `/usr/share/fonts/`.
+# System-wide
+1. Install system-wide fonts are similar except that the fonts directories are different like  `/usr/share/fonts/`.
+2. _#_ mkdir /usr/share/fonts/winfonts
+3. _#_ chmod 755 /usr/share/fonts/winfonts
+4. _#_ cd /usr/share/fonts/winfonts
+4. Copy all the fonts fileto directory `winfonts`
+5. _#_ chmod 644 *
+6. _#_ fc-cache && mkfontscale && mkfontdir
+7. For Xserver to load fonts directly (as opposed to the use of a font server) the directory for your newly added font must be added with a `FontPath` entry. This entry is located in the `Files section` of your Xorg configuration file.
+8. _#_ mkdir /etc/X11/xorg.conf.d/, there is an example copy of `xorg.conf` at /usr/share/doc/xorg-server-1.16.4/xorg.conf.example.bz2. But we only need the `Files section`.
+9. _#_ cd /etc/X11/xorg.conf.d/
+10. _#_ touch /etc/X11/xorg.conf.d/10-fonts-xorg.conf, the file contents are like:
+    ```
+Section "Files"
+# Multiple FontPath entries are allowed (which are concatenated together),
+# as well as specifying multiple comma-separated entries in one FontPath
+# command (or a combination of both methods).
+# The default path is shown here.
+#    FontPath	/usr/share/fonts/misc/,/usr/share/fonts/TTF/,/usr/share/fonts/OTF/,/usr/share/fonts/Type1/,/usr/share/fonts/100dpi/,/usr/share/fonts/75dpi/
+    FontPath    "/usr/share/fonts/100dpi"
+    FontPath    "/usr/share/fonts/75dpi"
+    FontPath    "/usr/share/fonts/winfonts"
+    FontPath    "/usr/share/fonts/arphicfonts"
+    FontPath    "/usr/share/fonts/dejavu"
+    FontPath    "/usr/share/fonts/ttf-bitstream-vera"
+    FontPath    "/usr/share/fonts/urw-fonts"
+    FontPath    "/usr/share/fonts/wqy-bitmapfont"
+    FontPath    "/usr/share/fonts/corefonts"
+    FontPath    "/usr/share/fonts/cyrillic"
+    FontPath    "/usr/share/fonts/encodings"
+    FontPath    "/usr/share/fonts/misc"
+    FontPath    "/usr/share/fonts/util"
+EndSection
+    ```
 
 Refer to:
 
