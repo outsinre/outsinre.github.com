@@ -146,6 +146,7 @@ Codec Intel CougarPoint HDMI
     9. Turn on `CONFIG_PACKET` (default 'Y')  to support wireless tool `wpa_supplicant` which will be installed later on.
     9. Turn off `NET_VENDOR_NVIDIA` to 'N' since no `NVIDIA` card in x220 laptop.
     10. Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to `gb2312` for displaying NTFS partition Chinese file names correctly.
+        1. Don't use `gb18030`. It seems that kernel does not recognize `gb18030`.
     10. Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'M'.
     10. You may found that when there is some problems related to kernel options, you can see them to 'M' instead of 'Y' which might be a potential solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
@@ -382,11 +383,11 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 44. Localization setting: Install Chinese fonts is the very first step!!
     2. _#_ emerge emerge arphicfonts wqy-bitmapfont corefonts ttf-bitstream-vera 
-    3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese.
+    3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `gb18030` first otherwise many Chinese filenames not displaying correctly.
 
         ```
 LANG="en_US.utf8"
-LC_CTYPE="zh_CN.gb2312
+LC_CTYPE="zh_CN.gb18030
 LC_COLLATE="C"
         ```
     4. _#_ env-update && source /etc/profile
@@ -448,6 +449,11 @@ export XMODIFIERS=@im=fcitx
     7. _#_ emerge --ask xfce4-volumed xfce4-mixer
     8. _#_ emerge -av mupdf
         1. The other application may draw in a lot of GTK or QT dependencies consuming many disk space.
+    9. _#_ emerge -av dev-vcs/git
+        1. _$_ git config --global user.name "Jim Green"
+	2. _$_ git config --global user.email "username@users.noreply.github.com"
+	3. _$_ git config --global core.editor emacs
+	4. _$_ git clone xxx
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit**. This is the key to solve problem.
@@ -474,9 +480,9 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 
         ```
 /dev/sda4		/mnt/Win81	ntfs-3g		noauto,ro	0 0
-/dev/sda5		/media/Data	ntfs-3g		noauto,locale=zh_CN.gb2312,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda6		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb2312,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda7		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb2312,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda5		/media/Data	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda6		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda7		/media/Misc	ntfs-3g		noauto,locale=zh_CN.gb18030,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
         2. Should add `locale=zh_CN.gb18030`. Otherwise you might not copy or paste Chinese filenames. These files are usually downloaded from the Internet or created in another `zh_CN` environment. What was worse, the terminal cannot display these file names. A common error is `Invalid or incomplete multibyte or wide character`. Refer to `man ntfs-3g` on `locale` option. Though `ntfs-3g` will determine the partition localization when mounting by reading the envrionment varialbe `locale`. However, in my current system, the `locale` is set to `en_US.utf8`. Although the current `LC_CTYPE=zh_CN.gb18030` but `ntfs-3g` don't have a mount option related to `LC_CTYPE`.
@@ -484,7 +490,7 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
         4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files under directory.
-    5. When it comes to Chinese support, you'd best choose `gb2312` instead of `gb18030` since the former one has wider application support.
+    5. When it comes to Chinese support, you'd switch between choose `gb18030` and  `gb2312` to check the result.
 47. Upgrade kernel to **unstable 4.0.0**
     1. _#_ echo "~sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources, this step needs `eix` command support to find out which unstable package version is located in portage mirror.
     2. _#_ emerge --sync
