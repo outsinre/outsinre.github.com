@@ -445,7 +445,7 @@ export XMODIFIERS=@im=fcitx
             4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945_alpha16_p3 ~amd64
             5. emerge -av wps-office
 	    6. **fonts support** refer to [Fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/)
-    7. _#_ emerge --ask xfce4-volumed, xfce4-mixer
+    7. _#_ emerge --ask xfce4-volumed xfce4-mixer
     8. _#_ emerge -av mupdf
         1. The other application may draw in a lot of GTK or QT dependencies consuming many disk space.
 46. Configuration consistently.
