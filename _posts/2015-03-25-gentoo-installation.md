@@ -455,6 +455,14 @@ export XMODIFIERS=@im=fcitx
         3. _$_ git config --global core.editor emacs
         4. _#_ emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
         5. _$_ git clone xxx
+    10. _#_ emerge -av wgetpaste
+    11. _#_ emerge -av net-misc/dropbox xfce4-extra/thunar-dropbox
+        1. Xfc4 and Dropbox does not get along well. There is no application menu for Dropbox.
+        2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
+        3. _$_ dropbox start, Gentoo and Windows share the Dropbox location in /media/Misc/Dropbox. When firstly run this command, you need to configure dropbox as default setting (Dropbox folder in /home/zachary/Dropbox). But then exit dropbox immediately. And remove /home/zachary/Dropbox.
+            1. _$_ rmdir /home/zachary/Dropbox
+            2. _$_ ln -s /media/Misc/Dropbox /home/zachary/Dropbox
+        4. _$_ dropbox &, run dropbox in the backgroud.
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit**. This is the key to solve problem.
@@ -486,12 +494,12 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 /dev/sda7		/media/Misc	ntfs-3g		noauto,nls=936,locale=zh_CN.UTF8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
-	2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
+        2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
         3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So you can; creating new Chinese filenames in virtual terminal.
         4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
-	5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF8` is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems.
+        5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF8` is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
-    4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files under directory.
+    4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
 47. Upgrade kernel to **unstable 4.0.0**
     1. _#_ echo "~sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources, this step needs `eix` command support to find out which unstable package version is located in portage mirror.
     2. _#_ emerge --sync
