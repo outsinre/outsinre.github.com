@@ -497,7 +497,7 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
         2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
         3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So you can; creating new Chinese filenames in virtual terminal.
         4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
-        5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF8` is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems.
+        5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF8` is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems. If set to `zh_CN.GB18030` or `zh_CN.GB2312`, the Chinese folder names cannot be displayed in Thunar's address bar.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
 47. Upgrade kernel to **unstable 4.0.0**
