@@ -91,16 +91,27 @@ USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thuna
         ```
 Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`.
     5. Check if `cjk` and `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
-24. Configure locales that the system supports.
+24. Localization
     1. _#_ cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
     2. Uncomment en_US.UTF-8 UTF-8 in /etc/locale.gen.
     3. _#_ locale-gen
     4. If reminds: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
-25. Set the system-wide locale.
+    5. _#_ locale -a, to see what locales are generated.
     1. _#_ eselect locale list
-    2. _#_ eselect locale set 2, set system-wdie locale to en_US.utf8.
-    3. _#_ env-update && source /etc/profile
-    4. _#_ export PS1="(chroot) $PS1"
+    2. _#_ eselect locale set 3, set system-wdie locale to `en_US.utf8`.
+    2. The following steps can also be done after entering the new Gentoo system.
+    2. _#_ emerge -av arphicfonts wqy-bitmapfont corefonts ttf-bitstream-vera
+    3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
+
+        ```
+LANG="en_US.UTF-8"
+LC_CTYPE="zh_CN.UTF-8
+LC_COLLATE="C"
+        ```
+    4. _#_ env-update && source /etc/profile
+    5. _#_ export PS1="(chroot) $PS1"
+    5. Use `xx_YY.UTF-8` or `xx_YY.utf8`. Don't use `xx_YY.UTF8`.
+    5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
     1. _#_ emerge --ask sys-kernel/gentoo-sources
     2. _#_ ls -l /usr/src/linux
@@ -381,17 +392,6 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     7. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
     8. _#_ reboot
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
-44. Localization setting: Install Chinese fonts is the very first step!!
-    2. _#_ emerge emerge arphicfonts wqy-bitmapfont corefonts ttf-bitstream-vera 
-    3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF8` first otherwise many Chinese filenames not displaying correctly.
-
-        ```
-LANG="en_US.UTF8"
-LC_CTYPE="zh_CN.UTF8
-LC_COLLATE="C"
-        ```
-    4. _#_ env-update && source /etc/profile
-    5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53);
 45. ALSA - sound.
     1. _#_ emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
     2. _#_ rc-update add alsasound boot
@@ -489,15 +489,16 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 
         ```
 /dev/sda4		/mnt/Win81	ntfs-3g		noauto,ro	0 0
-/dev/sda5		/media/Data	ntfs-3g		noauto,nls=936,locale=zh_CN.UTF8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda6		/media/Misc	ntfs-3g		noauto,nls=936,locale=zh_CN.UTF8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda7		/media/Misc	ntfs-3g		noauto,nls=936,locale=zh_CN.UTF8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda5		/media/Data	ntfs-3g		noauto,nls=utf8,locale=zh_CN.utf8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda6		/media/Misc	ntfs-3g		noauto,nls=utf8,locale=zh_CN.utf8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda7		/media/Misc	ntfs-3g		noauto,nls=utf8,locale=zh_CN.utf8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
         2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
         3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So you can; creating new Chinese filenames in virtual terminal.
         4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
-        5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF8` is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems. If set to `zh_CN.GB18030` or `zh_CN.GB2312`, the Chinese folder names cannot be displayed in Thunar's address bar.
+        5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF-8` (or `zh_CN.utf8`) is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems. If set to `zh_CN.GB18030` or `zh_CN.GB2312`, the Chinese folder names cannot be displayed in Thunar's address bar.
+	6. Refer to [Mounting a Local Microsoft Windows Partition on Linux Systems](http://docs.oracle.com/cd/E19253-01/819-0918/localization-13).
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
 47. Upgrade kernel to **unstable 4.0.0**
