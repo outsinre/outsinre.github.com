@@ -463,6 +463,27 @@ export XMODIFIERS=@im=fcitx
             1. _$_ rmdir /home/zachary/Dropbox
             2. _$_ ln -s /media/Misc/Dropbox /home/zachary/Dropbox
         4. _$_ dropbox &, run dropbox in the backgroud.
+    12. _#_ emerge --ask app-portage/gentoolkit
+    13. _#_ emerge --ask app-portage/eix
+        1. _#_ emacs -nw /etc/eix-sync.conf:
+
+            ```
+*
+            ```
+        2. _$_ eix-sync
+    14. Archive
+        1. _#_ emerge -av file-roller
+        2. _#_ emerge -av thunar-archive-plugin
+            1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
+            2. _#_ cd /usr/libexec/thunar-archive-plugin/
+            3. _#_ ln -s file-roller.tap org.gnome.FileRoller.tap
+            4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
+        3. _#_ echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
+            1. 使用 “natspec” USE Flag重新编译unzip（zip文件中没有保存压缩时使用的编码，故需将unzip打上编码探测的补丁）
+        4. _#_ emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
+        5. _#_ emerge -av p7zip, three commands `7z`, `7za` and `7zr` can be used to extract files.
+            1. If `p7zip` is installed, `file-roller` takes `7z` or `7za` to handle `zip` file which cannot handle Chinese filenames.
+             2. Solution: rename `/usr/bin/7z` and `/usr/bin/7za` to something else. 若需要安装p7zip，则安装完成后，移除或重命名/usr/bin下除7zr外7z*文件（fileroller在7z或者7za存在的情况下会优先使用。而7z和7za解压zip文件会出现文件名乱码，暂不知如何解决。故删除7z和7za，仅保留7zr以支持7z格式的压缩和解压。)
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit**. This is the key to solve problem.
