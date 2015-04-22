@@ -483,7 +483,8 @@ export XMODIFIERS=@im=fcitx
         4. _#_ emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
         5. _#_ emerge -av p7zip, three commands `7z`, `7za` and `7zr` can be used to extract files.
             1. If `p7zip` is installed, `file-roller` takes `7z` or `7za` to handle `zip` file which cannot handle Chinese filenames.
-             2. Solution: rename `/usr/bin/7z` and `/usr/bin/7za` to something else. 若需要安装p7zip，则安装完成后，移除或重命名/usr/bin下除7zr外7z*文件（fileroller在7z或者7za存在的情况下会优先使用。而7z和7za解压zip文件会出现文件名乱码，暂不知如何解决。故删除7z和7za，仅保留7zr以支持7z格式的压缩和解压。)
+            2. Solution: rename `/usr/bin/7z` and `/usr/bin/7za` to something else. 若需要安装p7zip，则安装完成后，移除或重命名/usr/bin下除7zr外7z*文件（fileroller在7z或者7za存在的情况下会优先使用。而7z和7za解压zip文件会出现文件名乱码，暂不知如何解决。故删除7z和7za，仅保留7zr以支持7z格式的压缩和解压。)
+        6. Use `7z` format instead of `zip` since `7z` support unicode compression especially for filenames.
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit**. This is the key to solve problem.
