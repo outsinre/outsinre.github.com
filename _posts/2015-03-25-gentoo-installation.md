@@ -93,7 +93,7 @@ Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` nee
     5. Check if `cjk` and `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
 24. Localization
     1. _#_ cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
-    2. Uncomment en_US.UTF-8 UTF-8 in /etc/locale.gen.
+    2. Uncomment `en_US.UTF-8 UTF-8` in /etc/locale.gen.
     3. _#_ locale-gen
     4. If reminds: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
     5. _#_ locale -a, to see what locales are generated.
@@ -109,7 +109,7 @@ LC_CTYPE="zh_CN.UTF-8
 LC_COLLATE="C"
         ```
     4. _#_ env-update && source /etc/profile
-    5. _#_ export PS1="(chroot) $PS1"
+    5. _#_ export PS1="(chroot) $PS1", use this command to reminds you are in `chroot` environment.
     5. Use `xx_YY.UTF-8` or `xx_YY.utf8`. Don't use `xx_YY.UTF8`.
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
