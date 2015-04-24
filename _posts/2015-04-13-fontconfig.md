@@ -7,7 +7,7 @@ Fontconfig is a library designed to provide system-wide font configuration, cust
 
 # Fontconfig notes
 
-Fontconfig depends on `configuration file` and `font files`.
+Fontconfig depends on `configuration files` and `font files`.
 
 These are the locations for configuration files:
 
@@ -20,6 +20,8 @@ $XDG_CONFIG_HOME/fontconfig/fonts.conf
 ~/.fonts.conf.d
 ~/.fonts.conf
 ```
+Actually, there is another system-wide configuration file `/etc/fonts/local.conf`. Please check `/etc/fonts/conf.d/51-local.conf` to check details.
+
 And the font files directory:
 
 ```
@@ -99,616 +101,120 @@ Refer to:
 1. _#_ echo "media-libs/freetype adobe-cff infinality" > /etc/portage/package.use/freetype
 2. _#_ emerge -av media-libs/freetype, reinstall freetype to take advantage of `adobe-cff` and `infinality`. 这个命令会自动依赖安装`fontconfig-infinality`和`eselect-infinality`包，如果没有请手动安装。
 2. _#_ eselect fontconfig list, you will find a new option `52-infinality.conf` in the list.
-    1. `fontconfig-infinality` will draw in its own settings which will interfere with the other fontconfig configuration.
-    2. So don't enable the new `52-infinality.conf` option in `eselect fontconfig list`.
+    1. _#_ eselect fontconfig enable 52-infinality.conf
+    2. `fontconfig-infinality` will draw in its own settings which will interfere with the other fontconfig configuration; so need to disable other fontconfig options except `52-infinality.conf`.
+    3. _#_ eselect fontconfig disable xx yy zz ...
+        1. I choose to __keep__ another two options `50-user.conf` (for per-user config files), `51-local.conf` (for system-wide config files). This is a little different from the `Gentoo fontconfig wiki`.
 3. _#_ eselect lcdfilter list
 4. _#_ eselect lcdfilter set 14, set to `windows-7`.
-5. Check `50-user.conf` (for per-user config files), `51-local.conf` (for system-wide config files), `10-sub-pixel-rgb.conf`, and `11-lcdfilter-default.conf` are enabled in `eselect fontconfig list`.
-6. Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` or `/etc/fonts/local.conf` (NOT `/etc/fonts/fonts.conf`). The procedure is rather complicated, but here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf):
+5. _#_ eselect infinality list
+6. _#_ eselect infinality set to `win7
+    1. Make sure `lcdfilter` and `infinality` choose the same category.
+7. Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` (50-user.conf) or `/etc/fonts/local.conf` (51-local.conf). Here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf):
 
 {% highlight xml linenos %}
-<?xml version="1.0"?>
-<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-<!-- ~/.font.conf file for user customizations -->
+<?xml version='1.0'?>
+<!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
 <fontconfig>
-<!--
-    Breaf:
-    Search keyword "editable" to change configuation.
 
-    Section:
-    1. Fonts family configuration
-    2. Fonts substitution
-    3. Global configuration
-    4. English fonts configuration
-    5. CJK fonts configuration
 
-    Installed fonts:
-    微软雅黑, Microsoft YaHei
-    宋体, SimSun
-    新宋体, NSimSun
-    楷体，KaiTi
-    WenQuanYi Bitmap Song
-    文泉驿正黑,文泉罅正黑,WenQuanYi Zen Hei
-    Arial
-    Arial Black
-    Verdana
-    Comic Sans MS
-    Georgia
-    Times New Roman
-    Times
-    Courier New
-    Andale Mono
-    Impact
-    Trebuchet MS
-    Webdings
-    ... use `fc-list | grep xxx` to check the full list
--->
+	<!-- ******************************************************************  -->
+	<!-- *************************** ALIASES ******************************  -->
+	<!-- ******************************************************************  -->
 
-<!--
-*******************************************************************************
-    1. Fonts family configuration [Begin]
-*******************************************************************************
--->
-    <alias>
-        <family>serif</family>
-        <prefer>
-            <!-- @@@ editable -->
-            <family>Times New Roman</family>
-            <family>SimSun</family>
-            <family>WenQuanYi Bitmap Song</family>
-        </prefer>
-    </alias>
-    <alias>
-        <family>sans-serif</family>
-        <prefer>
-            <!-- @@@ editable -->
-            <family>Verdana</family> 
-            <family>SimSun</family>
-            <family>KaiTi</family>
-            <family>Microsoft YaHei</family>
-        </prefer>
-    </alias>
-    <alias>
-        <family>monospace</family>
-        <prefer>
-            <!-- @@@ editable -->
-            <family>Courier New</family>
-            <family>DejaVu Sans Mono</family>  
-            <family>NSimSun</family>
-        </prefer>
-    </alias>
-<!--
-*******************************************************************************
-    1. Fonts family configuration [End]
-*******************************************************************************
--->
+	<!-- Default fonts - Linux Appearance -->
+	<alias>
+		<family>sans-serif</family>
+		<prefer>
+			<family>Georgia</family>
+			<family>DejaVu Sans</family>
+			<family>SimSun</family>
+			<family>Microsoft YaHei</family>
+		</prefer>
+	</alias>
+	<alias>
+		<family>serif</family>
+		<prefer>
+			<family>Times New Roman</family>
+			<family>DejaVu Serif</family>
+			<family>SimSun</family>
+			<family>WenQuanYi Bitmap Song</family>
+		</prefer>
+	</alias>
+	<alias>
+		<family>monospace</family>
+		<prefer>
+			<family>Courier New</family>
+			<family>DejaVu Sans Mono</family>
+			<family>NSimSun</family>
+		</prefer>
+	</alias>
+
+
+	<!-- ******************************************************************  -->
+	<!-- ********************** Font Substitution ***********************  -->
+	<!-- ******************************************************************  -->
 
 <!--
-*******************************************************************************
-    2. Fonts substitution [Begin]
-*******************************************************************************
+	fonts alias substitution
 -->
-<!--
-    fonts alias substitution
--->
-    <match target="pattern">
-        <test name="family">
-            <string>宋体</string>
-        </test>
-        <edit name="family" mode="assign">
-            <string>SimSun</string>
-        </edit>
-    </match>
-    <match target="pattern">
-        <test name="family">
-            <string>新宋体</string>
-        </test>
-        <edit name="family" mode="assign">
-            <string>NSimSun</string>
-        </edit>
-    </match>
-    <match target="pattern">
-        <test name="family">
-            <string>微软雅黑</string>
-        </test>
-        <edit name="family" mode="assign">
-            <string>Microsoft YaHei</string>
-        </edit>
-    </match>
-    <match target="pattern">
-        <test name="family">
-            <string>文泉驿正黑</string>
-        </test>
-        <edit name="family" mode="assign">
-            <string>WenQuanYi Zen Hei</string>
-        </edit>
-    </match>
-    <match target="pattern">
-        <test name="family">
-            <string>楷体</string>
-        </test>
-        <edit name="family" mode="assign">
-            <string>KaiTi</string>
-        </edit>
-    </match>
-<!--
-    Not-installed fonts substitution
--->
-    <match target="pattern" >
-        <test name="family" >
-            <string>PMingLiU</string>
-        </test>
-        <test name="family" >
-            <string>MingLiU</string>
-        </test>
-        <test name="family" >
-            <string>FangSong_GB2312</string>
-        </test>
-        <test name="family" >
-            <string>KaiTi_GB2312</string>
-        </test>
-        <test name="family" >
-            <string>AR PL ShanHeiSun Uni</string>
-        </test>
-        <test name="family" >
-            <string>AR PL ZenKai Uni</string>
-        </test>
-        <test name="family" >
-            <string>ＭＳ 明朝</string>
-        </test>
-        <test name="family" >
-            <string>ＭＳ ゴシック</string>
-        </test>
-        <test name="family" >
-            <string>Kochi Mincho</string>
-        </test>
-        <test name="family" >
-            <string>Kochi Gothic</string>
-        </test>
-        <test name="family" >
-            <string>Baekmuk Batang</string>
-        </test>
-        <test name="family" >
-            <string>Baekmuk Dotum</string>
-        </test>
-        <test name="family" >
-            <string>Baekmuk Gulim</string>
-        </test>
-        <test name="family" >
-            <string>Baekmuk Headline</string>
-        </test>
-        <test name="family" >
-            <string>PT Sans</string>
-        </test>
-        <edit name="family" mode="assign" >
-            <string>san-serif</string>
-        </edit>
-    </match>
-<!--
-    english portion substitution
--->
-    <match target="pattern" >
-        <test name="family" >
-            <string>SimSun</string>
-        </test>
-        <edit name="family" mode="prepend" binding="strong" >
-            <!-- @@@ editable -->
-            <string>Georgia</string>
-        </edit>
-    </match>
-    <match target="pattern" >
-        <test name="family" >
-            <string>NSimSun</string>
-        </test>
-        <edit name="family" mode="prepend" binding="strong" >
-            <!-- @@@ editable -->
-            <string>Courier New</string>
-        </edit>
-    </match>
-    <match target="pattern" >
-        <test name="family" >
-            <string>Courier</string>
-        </test>
-        <edit name="family" mode="prepend" binding="strong" >
-            <!-- @@@ editable -->
-            <string>Courier New</string>
-        </edit>
-    </match>
-<!--
-*******************************************************************************
-    2. Fonts substitution [End]
-*******************************************************************************
--->
-
-<!--
-*******************************************************************************
-    3. Global configuration [Begin]
-*******************************************************************************
--->
-<!--
-    target dots per inch, change dpi to 96
--->
-    <match target="pattern" >
-        <edit name="dpi" mode="assign" >
-            <double>96</double>
-
-        </edit>
-    </match>
-<!--
-    default Fonts setting
-    here autohint = ture / hinting = false is for free fonts in your system
-    we will use autohint = false / hinting = true for MS core fonts in the following section
--->
-    <match target="font" >
-        <edit name="antialias" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="autohint" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="hinting" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="hintstyle" mode="assign" >
-            <const>hintfull</const>
-        </edit>
-    </match>
-
-<!--
-    font size settings:
-    set the apposite font size,so it is easy to be read
--->
-    <match target="pattern" >
-        <test name="pixelsize" compare="more_eq" >
-            <double>8</double>
-        </test>
-        <test name="pixelsize" compare="less_eq" >
-            <double>12</double>
-        </test>
-        <edit name="pixelsize" mode="assign" >
-            <double>12</double>
-        </edit>
-    </match>
-<!--
-    synthetic emboldening for fonts that do not have bold face available
--->
-    <match target="font">
-        <!-- check to see if the font is just regular -->
-        <test name="weight" compare="less_eq">
-            <int>100</int>
-        </test>
-        <!-- check to see if the pattern requests bold -->
-        <test target="pattern" name="weight" compare="more_eq">
-            <int>180</int>
-        </test>
-        <!-- set the embolden flag -->
-        <edit name="embolden" mode="assign">
-            <bool>true</bool>
-        </edit>
-    </match>
-<!--
-*******************************************************************************
-    3. Global configuration [End]
-*******************************************************************************
--->
-<!--
-*******************************************************************************
-    4. English fonts configuration [Begin]
-*******************************************************************************
--->
-
-<!--
-    default : smoothed and hinted
--->
-    <match target="font" >
-        <test name="foundry" qual="any" >
-            <string>monotype</string>
-        </test>
-        <test name="foundry" qual="any" >
-            <string>microsoft</string>
-        </test>
-        <edit name="antialias" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="autohint" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="hinting" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="hintstyle" mode="assign" >
-            <const>hintfull</const>
-        </edit>
-    </match>
-<!--
-    for point size less equal than 6 : only smoothed
--->
-    <match target="font" >
-        <test name="foundry" qual="any" >
-            <string>monotype</string>
-        </test>
-        <test name="foundry" qual="any" >
-            <string>microsoft</string>
-        </test>
-        <test name="size" compare="less_eq" >
-            <double>6</double>
-        </test>
-        <edit name="antialias" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="autohint" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="hinting" mode="assign" >
-            <bool>false</bool>
-        </edit>
-    </match>
-<!--
-    Arial Regular
--->
-    <match target="font" >
-        <test name="family" >
-            <string>Arial</string>
-        </test>
-        <test name="weight" compare="eq">
-            <const>regular</const>
-        </test>
-        <test name="slant" compare="eq" >
-            <const>roman</const>
-        </test>
-        <test name="size" compare="more_eq" >
-            <double>7</double>
-        </test>
-        <test name="size" compare="less_eq" >
-            <double>13</double>
-        </test>
-        <edit name="antialias" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="autohint" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="hinting" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="hintstyle" mode="assign" >
-            <const>hintfull</const>
-        </edit>
-    </match>
-<!--
-    Times New Roman Bold Italic
--->
-    <match target="font" >
-        <test name="family" >
-            <string>Times New Roman</string>
-        </test>
-        <test name="weight" compare="eq">
-            <const>bold</const>
-        </test>
-        <test name="slant" compare="eq" >
-            <const>italic</const>
-        </test>
-        <test name="size" compare="more_eq" >
-            <double>7</double>
-        </test>
-        <test name="size" compare="less_eq" >
-            <double>13</double>
-        </test>
-        <edit name="antialias" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="autohint" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="hinting" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="hintstyle" mode="assign" >
-            <const>hintfull</const>
-        </edit>
-    </match>
-<!--
-    Courier New:
-    both enable autohint and hinting looks very well.
--->
-   <match target="font" >
-      <test name="family" >
-         <string>Courier New</string>
-      </test>
-      <edit name="antialias" mode="assign" >
-         <bool>true</bool>
-      </edit>
-      <edit name="autohint" mode="assign" >
-         <bool>true</bool>
-      </edit>
-      <edit name="hinting" mode="assign" >
-         <bool>true</bool>
-      </edit>
-      <edit name="hintstyle" mode="assign" >
-         <const>hintfull</const>
-      </edit>
-   </match>
-<!--
-    Courier New font size
--->
-   <match target="font" >
-      <test name="family" >
-         <string>Courier New</string>
-      </test>
-      <test name="pixelsize" compare="less_eq" >
-         <double>14.7</double>
-      </test>
-      <edit name="pixelsize" mode="assign" >
-         <double>14.7</double>
-      </edit>
-   </match>
-<!--
-*******************************************************************************
-    4. English fonts configuration [End]
-*******************************************************************************
--->
-<!--
-*******************************************************************************
-    5. CJK fonts configuration [Begin]
-*******************************************************************************
--->
-
-<!--
-    the dual-width Asian fonts (spacing=dual) are not rendered correctly,
-    apparently FreeType forces all widths to match. Trying to disable the
-    width forcing code by setting globaladvance=false alone doesnot  help.
-    as a brute force workaround, also set spacing=proportional, i.e. handle
-    them as proportional fonts:
--->
-    <match target="font" >
-        <test target="pattern" name="lang" compare="contains" >
-            <string>zh</string>
-        </test>
-        <test target="pattern" name="lang" compare="contains" >
-            <string>ja</string>
-        </test>
-        <test target="pattern" name="lang" compare="contains" >
-            <string>ko</string>
-        </test>
-        <test name="spacing" compare="eq">
-            <const>dual</const>
-        </test>
-        <edit name="spacing" mode="assign" >
-            <const>proportional</const>
-        </edit>
-        <edit name="globaladvance" mode="assign" >
-            <bool>false</bool>
-        </edit>
-    </match>
-<!--
-    adjusting
--->
-    <match target="font" >
-        <test qual="any" name="family" compare="eq" >
-            <string>Microsoft YaHei</string>
-        </test>
-        <test qual="any" name="family" compare="eq" >
-            <string>SimSun</string>
-        </test>
-        <test qual="any" name="family" compare="eq" >
-            <string>NSimSun</string>
-        </test>
-        <test qual="any" name="family" compare="eq" >
-            <string>WenQuanYi Bitmap Song</string>
-        </test>
-        <test qual="any" name="family" compare="eq" >
-            <string>WenQuanYi Zen Hei</string>
-        </test>
-        <test qual="any" name="family" compare="eq" >
-            <string>KaiTi</string>
-        </test>
-        <edit name="rgba" mode="assign">
-            <const>none</const>
-        </edit>
-        <edit name="antialias" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="autohint" mode="assign" >
-            <bool>false</bool>
-        </edit>
-        <edit name="hinting" mode="assign" >
-            <bool>true</bool>
-        </edit>
-        <edit name="hintstyle" mode="assign" >
-            <const>hintfull</const>
-        </edit>
-        <edit name="embeddedbitmap" mode="assign" >
-            <bool>true</bool>
-        </edit>
-	<edit name="lcdfilter" mode="assign">
-	    <const>lcdlight</const>
+	<match target="pattern">
+	<test name="family">
+		<string>宋体</string>
+	</test>
+	<edit name="family" mode="assign">
+		<string>SimSun</string>
 	</edit>
-    </match>
-<!--
-    enable embedded bitmap fonts
-    non-bitmap:
-       Microsoft YaHei: msyh.ttf 15043584 bytes
-       SimHei: simhei.ttf 10044356 bytes
+	</match>
+	<match target="pattern">
+	<test name="family">
+		<string>新宋体</string>
+	</test>
+	<edit name="family" mode="assign">
+		<string>NSimSun</string>
+	</edit>
+	</match>
 
-    with bitmap:
-       SimSun/NSimSun: simsun.ttf 10500792 bytes
-       WenQuanYi Zen Hei: wqy-zenhei.ttf 12844372 bytes
-    checked by Linux tool: fontforge
--->
-    <match target="font" >
-        <test qual="any" name="family" compare="eq" >
-            <string>SimSun</string>
-        </test>
-        <test qual="any" name="family" compare="eq" >
-            <string>NSimSun</string>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>12</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>13</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>14</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>15</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>16</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>18</double>
-        </test>
-        <edit name="antialias" mode="assign" >
-            <bool>false</bool>
-        </edit>
-    </match>
-    <match target="font" >
-        <test qual="any" name="family" compare="eq" >
-            <string>WenQuanYi Bitmap Song</string>
-        </test>
-        <test name="pixelsize" compare="more_eq" >
-            <double>9</double>
-        </test>
-        <test name="pixelsize" compare="less_eq" >
-            <double>12</double>
-        </test>
-        <edit name="antialias" mode="assign" >
-            <bool>false</bool>
-        </edit>
-    </match>
-    <match target="font" >
-        <test qual="any" name="family" compare="eq" >
-            <string>WenQuanYi Zen Hei</string>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>12</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>13</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>15</double>
-        </test>
-        <test name="pixelsize" compare="eq" >
-            <double>16</double>
-        </test>
-        <edit name="antialias" mode="assign" >
-            <bool>false</bool>
-        </edit>
-    </match>
 <!--
-*******************************************************************************
-    5. CJK fonts configuration [End]
-*******************************************************************************
+	english portion substitution
 -->
+	<match target="pattern" >
+	<test name="family" >
+		<string>SimSun</string>
+	</test>
+	<edit name="family" mode="prepend" binding="strong" >
+		<!-- @@@ editable -->
+		<string>Georgia</string>
+	</edit>
+	</match>
+	<match target="pattern" >
+	<test name="family" >
+		<string>NSimSun</string>
+	</test>
+	<edit name="family" mode="prepend" binding="strong" >
+		<!-- @@@ editable -->
+		<string>Courier New</string>
+	</edit>
+	</match>
+	<match target="pattern" >
+	<test name="family" >
+		<string>Courier</string>
+	</test>
+	<edit name="family" mode="prepend" binding="strong" >
+		<!-- @@@ editable -->
+		<string>Courier New</string>
+	</edit>
+	</match>
+
 </fontconfig>
 {% endhighlight %}
-7. Refer to [Gentoo字体设置]({{site.baseurl}}assets/Gentoo字体设置.markdown) for the basic procedures.
-8. Reference:
+8. Notes:
+    1. Use `fc-list | head` to check if any errors occur. This is important. During the setting, I found an error about `infinality` configuration files.
+9. Refer to [Gentoo字体设置]({{site.baseurl}}assets/Gentoo字体设置.markdown) for the basic procedures.
+10. Reference:
     1. [Gentoo Linux on T43 (7) 中文字体](http://ted.is-programmer.com/categories/1547/posts)
     2. [字体配置local.conf详解[带Win效果和AA效果]](https://www.freebsdchina.org/forum/viewtopic.php?t=34824&start=0&postdays=0&postorder=asc&highlight=)
     3. [gentoo 下字体美化该如何设置](https://groups.google.com/forum/#!topic/gentoo-china/gzW8mg9OIhg)
     4. [在Gentoo上配置Infinality](https://gist.github.com/kidlj/f30e82c2c6f064990596)
+    5. [Gentoo Fontconfig](https://wiki.gentoo.org/wiki/Fontconfig).
     
