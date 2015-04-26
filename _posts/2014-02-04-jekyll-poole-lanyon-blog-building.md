@@ -130,6 +130,12 @@ If you replace:
 {% endraw %}`
 with `/`, it is fine with user github page. But if the blog is migrated to project github page, then it does not work. You have to change `/` to `/project-name/` in your post. If you have many such posts, it is a big trouble. However, `site.baseurl` works fine. The only place you need to change is the `_config.yml` file.
 
+**fonts** setting.
+Firstly, Open `layman.css` and search for `font-family`, I removed all the fonts related to `PT` like `PT Sans` or `PT Serif`. Then commented out the line:
+{% raw %}
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+{% endraw %}
+from `head.html`.
 ## Setup
 
 Some fun facts about the setup of Poole project include:
