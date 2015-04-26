@@ -132,9 +132,9 @@ with `/`, it is fine with user github page. But if the blog is migrated to proje
 
 **fonts** setting.
 Firstly, Open `layman.css` and search for `font-family`, I removed all the fonts related to `PT` like `PT Sans` or `PT Serif`. Then commented out the line:
-{% raw %}
+{% highlight html linenos %}
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
-{% endraw %}
+{% endhighlight %}
 from `head.html`.
 ## Setup
 
