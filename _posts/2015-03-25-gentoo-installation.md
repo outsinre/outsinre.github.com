@@ -528,6 +528,34 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
 	6. Refer to [Mounting a Local Microsoft Windows Partition on Linux Systems](http://docs.oracle.com/cd/E19253-01/819-0918/localization-13).
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
+    5. New portage plug-in sync system. This new sync system requires `emerge -av \>=sys-apps/portage-2.2.16` and `emerge -av \>=app-portage/layman-2.3.0`.
+        1. After a world update, my `portage` has updated to version `2.2.18`. Commands related to `emerge` reminds:
+
+            ```
+!!! SYNC setting found in make.conf.
+    This setting is Deprecated and no longer used.  Please ensure your 'sync-type' and 'sync-uri' are set correctly in /etc/portage/repos.conf/gentoo.conf
+            ```
+        2. Refer to [Portage/Sync](https://wiki.gentoo.org/wiki/Project:Portage/Sync)
+        3. _#_ mkdir /etc/portage/repos.conf
+        4. _#_ cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
+            1. This default setting is enough for the official portage sync. The argument `sync-uri` can be changed to someone near your local region. For instalce, it can be replaced by the one in your original `/etc/portage/make.conf`: `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
+        5. _#_ rm /var/lib/layman/make.conf
+        6. _#_ Edit `etc/portage/make.conf` and commnet out the lines `source /var/lib/layman/make.conf` and `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
+        7. Primary control of all sync operations has been moved from emerge to emaint. `emerge --sync` now just calls the emaint sync module with the `--auto` option. The `--auto` option performs a sync on only those repositories with the auto-sync setting not set to `no` or `false`. If it is absent, then it will default to `yes` and "emerge --sync" will sync the repository. This means the original is just a wrapper of `emain sync` with default argument `--auto`.
+        8. Note: `eix-sync` can update both overlays and portage while the new sync system will add overlays to `/etc/portage/repos.conf/layman` as well. So when `eix-sync` is called, the new procedure is likely: `layman -S; emerge --sync`. But the new `emerge --sync` will also update overlays in `/etc/portage/repos.conf/layman.conf`.
+
+            ```
+NOTE: As a result of the default auto-sync = True/Yes setting, commands 
+ like "eix-sync", "esync -l", "emerge --sync && layman -S" will cause 
+ many repositories to be synced multiple times in a row. Please edit 
+ your configs or scripts to adjust for the new operation.
+            ```
+        9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out overlays in that file.
+        10. Choose one of the follwing command for daily operation:
+            1. _#_ emaint sync -a
+            2. _#_ emerge --sync
+            3. _#_ eix-sync
+        11. [sys-apps/portage-2.2.16 发布，支持多种同步方式](http://www.gentoo-cn.info/article/new-portage-plug-in-sync-system/); [Gentoo的portage已支持直接更新第三方源（overlay）](http://phpcj.org/portage-emerge-overlay-on-gentoo/).
 47. Upgrade kernel to **unstable 4.0.0**
     1. _#_ echo "~sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources, this step needs `eix` command support to find out which unstable package version is located in portage mirror.
     2. _#_ emerge --sync
