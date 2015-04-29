@@ -539,9 +539,12 @@ exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
         3. _#_ mkdir /etc/portage/repos.conf
         4. _#_ cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
             1. This default setting is enough for the official portage sync. The argument `sync-uri` can be changed to someone near your local region. For instalce, it can be replaced by the one in your original `/etc/portage/make.conf`: `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
-        5. _#_ rm /var/lib/layman/make.conf
-        6. _#_ Edit `etc/portage/make.conf` and commnet out the lines `source /var/lib/layman/make.conf` and `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
-        7. Primary control of all sync operations has been moved from emerge to emaint. `emerge --sync` now just calls the emaint sync module with the `--auto` option. The `--auto` option performs a sync on only those repositories with the auto-sync setting not set to `no` or `false`. If it is absent, then it will default to `yes` and "emerge --sync" will sync the repository. This means the original is just a wrapper of `emain sync` with default argument `--auto`.
+        5. Install new >=layman-2.3.0 supporting the new portage plug-in sync system.
+            1. Add `sync-plugin-portage` USE flag to `/etc/package.use/layman` file.
+            2. _#_ emerge -avt \>=app-portage/layman-2.3.0, the new layman package will create `/etc/portage/repos.conf/layman.conf` automatically.
+            3. _#_ rm /var/lib/layman/make.conf, delete is the old-style layman config file.
+        6. Edit `etc/portage/make.conf` and commnet out the lines `source /var/lib/layman/make.conf` and `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
+        7. Primary control of all sync operations has been moved from `emerge` to `emaint`. `emerge --sync` now just calls the `emaint sync` module with the `--auto` option. The `--auto` option performs a sync on only those repositories with the auto-sync setting not set to `no` or `false`. If it is absent, then it will default to `yes` and "emerge --sync" will sync the repository. This means the original `emerge --sync` is just a wrapper of `emaint sync` with default argument `--auto` or `-a`.
         8. Note: `eix-sync` can update both overlays and portage while the new sync system will add overlays to `/etc/portage/repos.conf/layman` as well. So when `eix-sync` is called, the new procedure is likely: `layman -S; emerge --sync`. But the new `emerge --sync` will also update overlays in `/etc/portage/repos.conf/layman.conf`.
 
             ```
