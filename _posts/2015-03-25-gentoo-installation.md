@@ -403,7 +403,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. _#_ echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
         2. _#_ emerge -av fcitx
-        2. add the following lines to _~/.xinitrc_:
+        2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 		
         ```
 eval `dbus-launch --sh-syntax --exit-with-session`
@@ -411,7 +411,8 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
         ```
-        3. **IMPORTANT**: these four lines should be put AHEAD of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
+But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
+        3. **IMPORTANT**: these four lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
         4. _#_ emerge -av fcitx-sunpinyin
         5. _#_ emerge -av fcitx-configtool
     3. _#_ emerge -av mplayer
@@ -492,7 +493,7 @@ export XMODIFIERS=@im=fcitx
         1. __this plugin cannot be added to panel currently__, cannot be used.
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
-        1. **dbus should NOT launch before consolekit**. This is the key to solve problem.
+        1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem.
         2. currently the contents of `~/.xinitrc`:
 
             ```
@@ -503,13 +504,13 @@ export XMODIFIERS=@im=fcitx
 exec startxfce4 --with-ck-launch
 
             ```
-        3. You can find `dbus-launch` is at the beginning of the file while `--with-ck-launch` is at the end along with command `exec`. So organize the contents as foolows:
+        3. You can find `dbus-launch` is at the beginning of the file while `--with-ck-launch` is at the end along with command `exec`. So just remove the first line on dbus part:
 
             ```
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
-exec startxfce4 --with-ck-launch dbus-launch --sh-syntax --exit-with-session
+exec startxfce4 --with-ck-launch
             ```
         4. Refer to [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059) and [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
     2. fstab for NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
