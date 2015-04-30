@@ -493,7 +493,7 @@ But this will conflicts with `--with-ck-launch`. The solution is to remove the f
         1. __this plugin cannot be added to panel currently__, cannot be used.
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
-        1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem.
+        1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem. In 4.10, start Xfce with `startxfce4 --with-ck-launch`. This will start xfce4-session with ck-launch-session. In 4.10, **Xfce4-sesion will take care of the dbus-session launch**.
         2. currently the contents of `~/.xinitrc`:
 
             ```
@@ -512,7 +512,7 @@ export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
 exec startxfce4 --with-ck-launch
             ```
-        4. Refer to [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059) and [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
+        4. Refer to [ConsoleKit](http://docs.xfce.org/xfce/xfce4-session/advanced); [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059); [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
     2. fstab for NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
 
         ```
