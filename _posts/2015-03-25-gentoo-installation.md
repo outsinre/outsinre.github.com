@@ -445,6 +445,8 @@ But this will conflicts with `--with-ck-launch`. The solution is to remove the f
             2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
             3. package.license/wps-office: app-office/wps-office WPS-EULA
             4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945_alpha16_p3 ~amd64
+
+                >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
             5. emerge -av wps-office
 	    6. **fonts support** refer to [Fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/)
     7. _#_ emerge --ask xfce4-volumed xfce4-mixer
