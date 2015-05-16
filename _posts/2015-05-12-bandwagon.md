@@ -20,6 +20,7 @@ My choice is [$9.99 USD annually](https://bandwagonhost.com/cart.php?a=confprodu
 Pay attention to the pricing link which is an _inviting_ link. If you buy VPS through [bandwagonhost.com](https://bandwagonhost.comm), you might not locate the _$9.99 USD annually_ pricing package.
 
 You need to wait for a few minutes for VPS system initialization. The default VPS system is `CentOS6 x86`.
+
 1. [bandwagonhost](https://bandwagonhost.com/clientarea.php): the web portal login. The most important page is `Services -> My Services`.
     1. You can also click on `KiviVM Control Panel` to get to the 2nd step.
 2. [KiviVM Control Panel](https://kiwivm.it7.net): VPS management page. Briefly go through the management panel.
@@ -31,10 +32,10 @@ At the bottom of `KiviVM Control Panel` lies `KiviVM Extras` from which you find
 
 Of course, you can also install ss server manually. Among the others, there mainly four versions of ss server: Python version, C libev version, Go version, and C++ with Qt version. Take the Python version as an example:
 
-    ```
+```
 yum install python-setuptools && easy_install pip
 pip install shadowsocks
-    ```
+```
 
 ## ss client
 There are many clients available, my current windows 8.1 client is [shadowsocks-csharp](https://github.com/shadowsocks/shadowsocks-csharp).
