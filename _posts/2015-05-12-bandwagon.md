@@ -42,6 +42,23 @@ root       822   708  0 07:03 pts/0    00:00:00 grep ssserver
     3. `-d` means run as a daemon in the background.
     4. `--workers 2` will generate two processes belong to user `nobody`
     5. This automatic method does not run `ssserver` with a configuration file, but with bare command line arguments.
+    6. ss server was set to run at boot. Let's check:
+        ```
+[root@localhost ~]# ls /etc/rc.local -al
+lrwxrwxrwx 1 root root 13 May 16 00:48 /etc/rc.local -> rc.d/rc.local
+
+[root@localhost ~]# cat /etc/rc.d/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+touch /var/lock/subsys/local
+
+/usr/bin/ssserver -p `cat /root/.kiwivm-shadowsocks-port` -k `cat /root/.kiwivm-shadowsocks-password` -m `cat /root/.kiwivm-shadowsocks-encryption` --user nobody --workers 2 -d start
+        ```
+Pay attention to the command line arguments are stored in `/root/.kiwivm-shadowsocks-*` files.
 2. Of course, you can also install ss server manually. Among the others, there mainly four versions of ss server: Python version, C libev version, Go version, and C++ with Qt version. Take the Python version as an example:
 
     ```
@@ -118,7 +135,7 @@ pac可以自己修改，添加任意网站。当然也可以用网上网友维�
 
 # Notes
 1. SwichSharp is no longer needed.
-2. If VPS CentOS restarted, then make sure to run `ssserver` again as a daemon.
+2. If VPS CentOS restarted, then make sure to run `ssserver` again as a daemon if you don't set it run on boot.
 
 # Issues remained
 3. VPN
