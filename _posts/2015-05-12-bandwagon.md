@@ -44,7 +44,7 @@ root       822   708  0 07:03 pts/0    00:00:00 grep ssserver
     5. This automatic method does not run `ssserver` with a configuration file, but with bare command line arguments.
     6. ss server was set to run at boot. Let's check:
 
-{% highlight linenos %}
+{% highlight Bash shell scripts linenos %}
     [root@localhost ~]# ls /etc/rc.local -al
     lrwxrwxrwx 1 root root 13 May 16 00:48 /etc/rc.local -    > rc.d/rc.local
     
