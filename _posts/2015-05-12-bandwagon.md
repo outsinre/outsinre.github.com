@@ -47,13 +47,11 @@ root       822   708  0 07:03 pts/0    00:00:00 grep ssserver
 >lrwxrwxrwx 1 root root 13 May 16 00:48 /etc/rc.local -> rc.d/rc.local
 >
 >[root@localhost ~]# cat /etc/rc.d/rc.local
->{% raw %}
->#!/bin/sh
->#
-># This script will be executed *after* all the other init scripts.
-># You can put your own initialization stuff in here if you don't
-># want to do the full Sys V style init stuff.
->{% endraw %}
+>\#!/bin/sh
+>\#
+>\# This script will be executed *after* all the other init scripts.
+>\# You can put your own initialization stuff in here if you don't
+>\# want to do the full Sys V style init stuff.
 >
 >touch /var/lock/subsys/local
 >
