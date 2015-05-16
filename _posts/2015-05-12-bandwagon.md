@@ -19,12 +19,12 @@ My choice is [$9.99 USD annually](https://bandwagonhost.com/cart.php?a=confprodu
 
 Pay attention to the pricing link which is an _inviting_ link. If you buy VPS through [bandwagonhost.com](https://bandwagonhost.comm), you might not locate the _$9.99 USD annually_ pricing package.
 
-You need to wait for a few minutes for VPS system initialization. The default VPS system is `Centos6 x86`. Your root password is not sent through email any more.
+You need to wait for a few minutes for VPS system initialization. The default VPS system is `CentOS6 x86`.
 1. [bandwagonhost](https://bandwagonhost.com/clientarea.php): the web portal login. The most important page is `Services -> My Services`.
     1. You can also click on `KiviVM Control Panel` to get to the 2nd step.
 2. [KiviVM Control Panel](https://kiwivm.it7.net): VPS management page. Briefly go through the management panel.
     1. The first tool I avail of is `two-factor authentication` thus another temporary code is required for each login into KiviVM.
-    2. Since root password is not send through email, reset root password by `root password modification`. You can now SSH into your VPS Centos with clients like `Putty` and `MobaXterm`.
+    2. Since CentOS6 x86 root password is not send through email any more, reset root password by `root password modification`. You can now SSH into your VPS Centos with clients like `Putty` and `MobaXterm`.
 
 ## ss server
 At the bottom of `KiviVM Control Panel` lies `KiviVM Extras` from which you find `Shadowsocks Server`. What a relief! You no longer are bothered installing ss server manually. The default is Shadowsocks Python version. After installing finished, click `Go back`. Instructions on setting ss client for Windows system is illustrated.
@@ -39,12 +39,14 @@ pip install shadowsocks
 ## ss client
 There are many clients available, my current windows 8.1 client is [shadowsocks-csharp](https://github.com/shadowsocks/shadowsocks-csharp).
 
+Fill the encryption method, server port, password, and proxy port for client. The default proxy mode is `PAC` not `Global`.
+
 # VPS credentials
 1. [Official web portal client area](https://bandwagonhost.com/clientarea.php)
 2. KiviVM Control Panel two-factor authentication:
     1. [KiviVM password](https://kiwivm.it7.net)
     2. Temporary code from `Google Authenticator`.
-3. CentOS6 x86 root password
+3. CentOS6 x86 root password: ssh into CentOS for OS-specific management.
 4. ss server password for ss client connectoin on `Shadowsocks Server` of KiviVM control panel.
 
 # References
