@@ -51,7 +51,12 @@ Fill the encryption method, server port, password, and proxy port for client. Th
 4. ss server password for ss client connectoin on `Shadowsocks Server` of KiviVM control panel.
 
 # References
-1. [server](http://shadowsocks.org/en/download/servers.html)
-2. [shadowsocks](https://github.com/shadowsocks/shadowsocks)
+1. [shadowsocks.org](http://shadowsocks.org)
+2. [shadowsocks github](https://github.com/shadowsocks/shadowsocks)
 3. [shadowsocks搭建教程](http://shadowsocks.blogspot.com/2015/01/shadowsocks.html)
 4. [ShadowSocks教程:Bandwagonhost搬瓦工一键安装Shadowsocks新手小白教程](http://shadowsocks.info/shadowsocks-bandwagonhost/)
+
+# Issues remained
+1. PAC VS Global
+2. Multiple users
+3. VPN
