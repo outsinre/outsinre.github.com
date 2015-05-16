@@ -48,10 +48,10 @@ root       822   708  0 07:03 pts/0    00:00:00 grep ssserver
 yum install python-setuptools && easy_install pip
 pip install shadowsocks
     ```
-After installation, also run `/usr/bin/python /usr/bin/ssserver -p 443 -k PASSWORD -m aes-256-cfb --user nobody --workers 2 -d start` as the step 1.
-    1. `ssserver` can also run with `-c` parameter to specify a configuration file rather than command parameters.
-    2. `ssserver -c /path/to/shadowsocks.json -d start` for example.
-	3. A simple configuration file:
+    1. `/usr/bin/python /usr/bin/ssserver -p 443 -k PASSWORD -m aes-256-cfb --user nobody --workers 2 -d start` as step 1.
+    2. `ssserver` can also run with `-c` parameter to specify a configuration file rather than command parameters.
+    3. `ssserver -c /path/to/shadowsocks.json -d start` for example.
+	4. A simple configuration file `/etc/shadowsocks.json`:
 
         ```
 {
@@ -67,6 +67,7 @@ After installation, also run `/usr/bin/python /usr/bin/ssserver -p 443 -k PASSWO
 }
         ```
     4. Support multiple users:
+	
         ```
 {
 “server”:”0.0.0.0″,
@@ -90,7 +91,7 @@ After installation, also run `/usr/bin/python /usr/bin/ssserver -p 443 -k PASSWO
 ## ss client
 There are many clients available, my current windows 8.1 client is [shadowsocks-csharp](https://github.com/shadowsocks/shadowsocks-csharp).
 
-Fill the encryption method, server port, password, and proxy port for client. The default proxy mode is `PAC` (Proxy auto-config) not `Global`.
+Fill in the `encryption method`, `server port`, `password`, and `proxy port` for client. The default proxy mode is `PAC` (Proxy auto-config) not `Global`.
 
 ### PAC VS Global
 pac是只对被墙的使用ss，全局就是无论什么网站都用ss。
