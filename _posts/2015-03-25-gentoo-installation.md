@@ -2,12 +2,12 @@
 layout: post
 title: Gentoo Installation
 ---
-> This is the procedures of Gentoo UEFI installation along with Windows 8.1 and Ubuntu 14.04.
+> Gentoo installation along with Windows 8.1 and Ubuntu 14.04 with UEFI booting.
 
-1. The official [handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64) is important but really out of date.
-2. Download the `LiveDVD` as *livedvd-amd64-multilib-20140826.iso* instead of the so called `Minimal installation CD` as *install-amd64-minimal-20150319.iso*.
+1. The official [handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64) is important but some items really out of date. If possible, refer to the corresponding ArchWiki part which is pretty excellent and detailed.
+2. Download the `LiveDVD` like *livedvd-amd64-multilib-20140826.iso* instead of the so called `Minimal installation CD` like *install-amd64-minimal-20150319.iso*.
     1. The minimal CD cannot generates UEFI bootable USB stick.
-    2. The LiveDVD support KDE desktop environment among others. Specially the internet connection setting is much easier during the installation.
+    2. The LiveDVD support KDE desktop environment. Specially Wifi internet connection setting is much easier during the installation. You can also surf the internet while installing.
 2. Use `Rufus` to create an UEFI USB stick. Similar tools are:
     1. UNetbootin;
     2. Universal USB Installer;
@@ -15,12 +15,13 @@ title: Gentoo Installation
     4. Just copy the ISO contents into a FAT32 format USB stick; 
     5. Ubuntu disk creater.
 3. Boot with the USB stick into the default KDE desktop environment. There will be screen ask for user name `gentoo`'s password for loggin. Just wait for a while. It will automatically log into the system.
-    1. The very first thing is to connect to WIFI or Ethernet through GUI.
+    1. The very first thing is to connect to WIFI or Ethernet through networkmanager.
     2. Use shortcut `F12` to Open/Retract Yakuake terminal in KDE destop.
-    3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. During the installation this is overlooked since it does influence the installation process.
+    3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
-4. _#_ sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`.
-5. _#_ fdisk /dev/sda or _#_ parted -a optimal /dev/sda (default one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+4. _#_ sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
+5. _#_ fdisk /dev/sda or parted -a optimal /dev/sda (default one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+    1. __NOTE__: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
     1. _#_ parted -a optimal /dev/sda
     2. _#_ p
     3. _#_ unit MB
@@ -34,23 +35,24 @@ title: Gentoo Installation
     9. _#_ name 12 'Gentoo root partition'
     10. _#_ p
     11. The annoying thing is that the partition `Type` is `Basic data partition` when checking with `fdisk /dev/sda`. We can change it by Disk GUI application in Ubuntu.
-6. `/dev/sda10` will be the boot partition while `/dev/sda12` the root partition. We don't need to create `swap` or `efi` partition since we already created it when installing Ubuntu or Windows. Just share these two partitions.
+6. New `/dev/sda10` will be the boot partition while `/dev/sda12` the root partition. We don't need to create `swap` or `efi` partition since we already created it when installing Ubuntu or Windows. Just share these two partitions. If possible, you can also create a separate home partition.
 7. Up to now, only the boot and root partition is prepared. We share swap and EFI partitions with Ubuntu and Windows. Now format the new partition. It's better to format boot partition as `ext2`.
     1. _#_ mkfs.ext2 /dev/sda10
     2. _#_ mkfs.ext4 /dev/sda12
+    3. [optional] _#_ mkfs.ext4 /dev/sdaxy, sdaxy is for home partition.
 8. From step 5 we know the Ubuntu swap partition is `/dev/sda7`. So we need to activate it:
-    1. _#_ swapon /dev/sda7
-    2. If you need to create a new swap partition, use command `mkswap /dev/sdaXY` to format the partition.
+    1. If you need to create a new swap partition, use command `mkswap /dev/sdaXY` to format the partition.
+    2. _#_ swapon /dev/sda7
 9. Mount the ewnly created partitions into the LiveDVD USB stick. Make sure the `gentoo` directory exists in /mnt/gentoo, otherwise create one.
     1. _#_ mount /dev/sda12 /mnt/gentoo
     2. _#_ mkdir /mnt/gentoo/boot
     3. _#_ mount /dev/sda10 /mnt/gentoo/boot
-    4. If there is a separate home partition: `mkdir /mnt/gentoo/home` and `mount /dev/sdaXY /mnt/gentoo/home`.
+    4. [optional] _#_ `mkdir /mnt/gentoo/home; mount /dev/sdaXY /mnt/gentoo/home`.
 9. Setting the date and time using `date` command.
 10. Go to the Gentoo mountpoint where the root file system is mounted (most likely /mnt/gentoo): `cd /mnt/gentoo`.
 11. Downloading the stage tarball with Chrome application in LiveDVD. Go to [Installation media](https://www.gentoo.org/main/en/where.xml) and then to [amd64 multilib](http://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64/). You will find `stage3-amd64-20150319.tar.bz2`. Just download!
-12. Verify the tarball integrity and compare the output with the checksums provided by the .DIGESTS or .DIGESTS.asc file.
-    1. _#_ sha512sum /home/gentoo/Download/stage3-amd64-20150319.tar.bz2
+    1. Verify the tarball integrity and compare the output with the checksums provided by the .DIGESTS or .DIGESTS.asc file.
+    2. _#_ sha512sum /home/gentoo/Download/stage3-amd64-20150319.tar.bz2
 13. Now unpack the downloaded stage onto the system. Attention: the current working directory is `/mnt/gentoo`.
     1. _#_ tar xvjpf /mnt/cdrom/stage3-amd64-20150319.tar.bz2. Usually, the stage file is not in /mnt/gentoo directory. So you need to specify the path to stage. For instance, /home/gentoo/Download/stage3...
     2. Make sure that the same options `xvjpf` are used. The x stands for Extract, the v for Verbose to see what happens during the extraction process (optional), the j for Decompress with bzip2, the p for Preserve permissions and the f to denote that we want to extract a File, not standard input.
@@ -66,6 +68,7 @@ title: Gentoo Installation
 17. Selecting mirrors.
     1. _#_ mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
     2. _#_ mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the `rsync server` to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
+        1. The rotation link setting is changed to `/etc/portage/repos.conf/gentoo.conf` for `portageq --version` >= 2.2.16. But don't worry since we can modify it when chrooting into the new Gentoo system. For now, remain this setting in `/etc/portage/make.conf` since the LiveCD environment uses the old version of portage.
 18. _#_ cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (/mnt/gentoo) environment. `/etc/resolv.conf` contains the name servers for the network. DON'T forget the `-L` parameter when copying.
 19. Mounting the necessary filesystems.
     1. _#_ mount -t proc proc /mnt/gentoo/proc
@@ -73,13 +76,11 @@ title: Gentoo Installation
     3. _#_ mount --make-rslave /mnt/gentoo/sys
     4. _#_ mount --rbind /dev /mnt/gentoo/dev
     5. _#_ mount --make-rslave /mnt/gentoo/dev
-20. Entering the new environment.
-    1. _#_ chroot /mnt/gentoo /bin/bash
+    1. _#_ **chroot /mnt/gentoo /bin/bash**, chrooting into the new environment.
     2. _#_ source /etc/profile
     3. _#_ export PS1="(chroot) $PS1", this create a new different command prompt for the new environment.
 21. Installing a portage snapshot:
-    1. _#_ emerge-webrsync
-    2. `emerge-webrsync` might complain about a missing /usr/portage/ location. This is to be expected and nothing to worry about - the tool will create the location.
+    1. _#_ emerge-webrsync, it might complain about a missing `/usr/portage/` location. This is to be expected and nothing to worry about - the tool will create the location.
 22. Choosing the right profile.
     1. _#_ eselect profile list
     2. _#_ eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
@@ -105,7 +106,7 @@ Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` nee
 
         ```
 LANG="en_US.UTF-8"
-LC_CTYPE="zh_CN.UTF-8
+LC_CTYPE="zh_CN.UTF-8"
 LC_COLLATE="C"
         ```
     4. _#_ env-update && source /etc/profile
@@ -113,9 +114,11 @@ LC_COLLATE="C"
     5. Use `xx_YY.UTF-8` or `xx_YY.utf8`. Don't use `xx_YY.UTF8`.
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
+    1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to **unstable 4.0.0**_.
     1. _#_ emerge --ask sys-kernel/gentoo-sources
     2. _#_ ls -l /usr/src/linux
 26. Configuring the Linux kernel - Manual configuration.
+    1. If you have a backup of kernel `.config` file, then this and the next step can be skipped. Refer to _Upgrade kernel to **unstable 4.0.0**_ below.
     1. _#_ emerge --ask sys-apps/pciutils
     2. _#_ cd /usr/src/linux
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e1000e`, find their locations and activate them.
@@ -170,11 +173,11 @@ Codec Intel CougarPoint HDMI
     3. _deprecated #_ mkdir -p /boot/efi/boot
     4. _deprecated #_ cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi
     5. _#_ emerge -av genkernel
-    6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: ls /boot/initramfs*.
+    6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: _#_ ls /boot/initramfs*.
 27. Kernel modules loading. Refer to handbook.
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
     1. _#_ emerge --ask sys-kernel/linux-firmware
-28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template.
+28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template. Use backup fstab file is possible.
 
 	```
 /dev/sda10   /boot        ext2    defaults,noatime     1 2
@@ -225,15 +228,9 @@ network={
 	8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
 	https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
 	9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
+    10. For Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
 	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 31. Set root password: _#_ passwd
-32. Edit `/etc/conf.d/hwclock` to set the clock options.
-    1. set `clock=local`, this is important when dual boot with Windows.
-23. Set the timezone. I think this step should occur after `hwclock` thing. Otherwise the system time is usually ahead of locale time by 8 hours, thus resulting in portage tree timestamp issues. If possible, I recommend to leave this step after system reboot.
-    1. _#_ ls /usr/share/zoneinfo
-    2. _#_ echo "Asia/Hong_Kong" > /etc/timezone
-    3. _#_ emerge --config sys-libs/timezone-data
-    4. Check with `date` command.
 33. System logger.
     1. _#_ emerge --ask app-admin/syslog-ng
     2. _#_ rc-update add syslog-ng default
@@ -243,10 +240,10 @@ network={
     2. _#_ rc-update add cronie default
 35. File indexing: emerge --ask sys-apps/mlocate
 36. NTFS: emerge --ask sys-fs/ntfs3g
-36. Remote access: rc-update add sshd default
+36. [optional] Remote access: rc-update add sshd default
 38. Configuring the bootloader. Refer to [GRUB2 Quick Start](https://wiki.gentoo.org/wiki/GRUB2_Quick_Start).
     1. Add `GRUB_PLATFORMS="efi-64"` to `/etc/portage/make.conf`. This step must occur before installing the grub package. Otherwise it would show `error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist`.
-    2. _#_ emerge --ask sys-boot/grub:2
+    2. _#_ emerge --ask sys-boot/grub:2, currently it is version 2.
     3. _#_ emerge -av sys-boot/os-prober
     3. Mount the EFI partition /dev/sda2 to /boot/efi directory. Because Gentoo, Ubuntu, Windows share the EFI partition, we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition. **This step is really important!**.
         1. _#_ mkdir /boot/efi
@@ -256,7 +253,7 @@ network={
     1. The traditional `chainloader +1` does work for UEFI boot.
 
 		```
-menuentry "Microsoft Windows x86_64 UEFI-GPT" {
+menuentry "Microsoft Windows 8.1 x86_64" {
     insmod part_gpt
     insmod fat
     insmod search_fs_uuid
@@ -265,21 +262,30 @@ menuentry "Microsoft Windows x86_64 UEFI-GPT" {
     chainloader /efi/Microsoft/Boot/bootmgfw.efi
 }
 		```
-    2. The next thing is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
+    2. The next is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
         1. _#_ grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
         2. _#_ grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
         3. Now replace the parameters with them real values in above `menuentry`.
         4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
-40. To generate the final GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
+40. Generate GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
+32. Edit `/etc/conf.d/hwclock` to set the clock options.
+    1. set `clock=local`, this is important when dual boot with Windows.
+23. Set the timezone.
+    1. I think this step should occur after `hwclock` thing. Otherwise the system time is usually ahead of locale time by 8 hours, thus resulting in portage tree time stamp issues. If possible, I recommend to leave the above two steps immediately before system reboot.
+    1. _#_ ls /usr/share/zoneinfo
+    2. _#_ echo "Asia/Hong_Kong" > /etc/timezone
+    3. _#_ emerge --config sys-libs/timezone-data
+    4. Check with `date` command.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
 
     ```
 umount -l /mnt/gentoo/dev{/shm,/pts,}
 umount /mnt/gentoo/boot/efi
 umount /mnt/gentoo/boot
+umount /mnt/gentoo
     ```
-You may reminded that some device is busy. Just let it go. Then type in that one magical command that initiates the final, true test: `reboot` with your root account.
+You may reminded that `/mnt/gentoo` is busy, then you need to exit the current terminal, and opening a new one terminal will work. Just let it go. Then type in that one magical command that initiates the final, true test: `reboot` with your root account.
     1. When rebooting, if the LiveDVD usb stick is still plugged onto the computer, the chainload to Ubuntu grub does not work. It show _error: disk hd0,gpt2 not found_. This is because the grub2 treats the USB stick as _hd0_ while the hard disk as _hd1_. You can unplug the USB, and CTRL+ALT+DEL. Another way is to edit the Ubuntu grub2 chainlaod menu from _hd0_ to _hd1_, then press F10 to boot.
     2. The very first thing after rebooting is to create a regular user account:
 
@@ -288,10 +294,7 @@ useradd -g users -G wheel,audio,video -m zachary
 passwd zachary
         ```
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
-        1. emerge --sync
-        1. emerge -av portage
-        2. emerge -av python
-        3. /usr/sbin/update-python
+        1. emerge --sync, changed to `emains sync` for new portageq --version >=2.2.16.
         2. emerge -avutDN --with-bdeps=y @world
         3. emerge -av --depclean
         4. [deprecated] revdep-rebuild -av, replaced by the next step.
@@ -327,8 +330,7 @@ VIDEO_CARDS="intel"
     4. _#_ emerge --ask --verbose --pretend x11-base/xorg-drivers, check the dependency.
     5. _#_ echo "x11-base/xorg-server udev" >> /etc/portage/package.use/xorg-server. Actually this step is unnecessary since `udev` is enabled by default when selecting the system profile in previous step.
     6. _#_ emerge --ask x11-base/xorg-server
-    7. _#_ env-update
-    8. _#_ source /etc/profile
+    7. _#_ env-update && source /etc/profile
     9. _#_ export PS1="(chroot) $PS1"
     10. The official wiki suggests installing `x11-wm/twm` and `x11-terms/xterm` to test `xorg` installation. However, we are currently chrooting, startx is already running supporting the LiveDVD KDE environment. Hence, we cannot test by issuing command `startx` in chroot environment. It's only possible when reboot into the genuine gentoo system. So skip this step.
     11. For this command: echo XSESSION="Xfce4" > /etc/env.d/90xsession, we have not installed `xfce` yet. So leave it for the next step.
@@ -353,7 +355,7 @@ VIDEO_CARDS="intel"
         1.  _#_  rm -r ~/.cache/sessions
         2.  _#_ rm -r ~/.config/xfce*
         3.  _#_  rm -r ~/.config/Thunar
-45. [Optional, replaced by method in fstab] When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
+45. [deprecated, replaced by method in fstab] When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
     1. _#_ nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
 
@@ -375,7 +377,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     8. sda8 Gentoo boot
     9. sda9 Gentoo swap
     10. sda10 Gentoo boot
-    11 sda11 Gentoo home
+    11. sda11 Gentoo home
 43. [OPTIONAL] Re-compiling current kernel when you need to modify some kernel configurations.
     1. _#_ mount /dev/sda10 /boot
     1. _#_ mount /dev/sda2 /boot/efi
@@ -488,10 +490,10 @@ But this will conflicts with `--with-ck-launch`. The solution is to remove the f
             1. If `p7zip` is installed, `file-roller` takes `7z` or `7za` to handle `zip` file which cannot handle Chinese filenames.
             2. Solution: rename `/usr/bin/7z` and `/usr/bin/7za` to something else. 若需要安装p7zip，则安装完成后，移除或重命名/usr/bin下除7zr外7z*文件（fileroller在7z或者7za存在的情况下会优先使用。而7z和7za解压zip文件会出现文件名乱码，暂不知如何解决。故删除7z和7za，仅保留7zr以支持7z格式的压缩和解压。)
         6. Use `7z` format instead of `zip` since `7z` support unicode compression especially for filenames.
-    15. _#_ emerge -av xfce4-verve-plugin
+    15. [deprecated, use Alt+F2 app finder instead] _#_ emerge -av xfce4-verve-plugin
         1. Add this plugin to panel.
         2. Under `Settings Editor` --> `xfce4-kerboard-shortcuts` --> `commands` --> `custom`, set a shortcut for this plugin: `Super + R`.
-    16. _#_ emerge -av xfce4-wavelan-plugin
+    16. [deprecated, does not work at all]_#_ emerge -av xfce4-wavelan-plugin
         1. __this plugin cannot be added to panel currently__, cannot be used.
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
