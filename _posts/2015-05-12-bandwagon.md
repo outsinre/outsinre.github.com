@@ -98,11 +98,22 @@ pip install shadowsocks
 3. Refer to [shadowsocks 2.6.8](https://pypi.python.org/pypi/shadowsocks); [VPS之自建shadowsocks服务器（Centos及Ubuntu方法）](http://www.vtestvps.tk/?p=18)
 
 ## ss client
-There are many clients available, my current windows 8.1 client is [shadowsocks-csharp](https://github.com/shadowsocks/shadowsocks-csharp).
+###Windows
+There are many clients available, my current windows 8.1 client is [shadowsocks-csharp](https://github.com/shadowsocks/shadowsocks-csharp). Fill in the `encryption method`, `server port`, `password`, and `proxy port` for client. The default proxy mode is `PAC` (Proxy auto-config) not `Global`.
+###Linux
+Basically, different shadowsocks on Linux system share serve and client - YES, the same package. For example, my `banwagonhost` uses Python shadowsocks, while Gentoo uses the same package. After installation, the package will install both server side and client side. Usually server side command is `ssserver` or `ss-server`, while client side command is `sslocal` or `ss-local`.
 
-Fill in the `encryption method`, `server port`, `password`, and `proxy port` for client. The default proxy mode is `PAC` (Proxy auto-config) not `Global`.
+>_#_ emerge -av shadowsocks
 
-### PAC VS Global
+Run `sslocal -h` to show the detailed help message.
+>_#_ sslocal -s xx.xx.xx.xx -p yyyy -b 127.0.0.1 -l zzzz -k PASSWORD -m aes-256-cfb -d start
+
+Up to now, connected to my VPS server! But one step further - __foxy proxy__ for Firefox. After installing, `Add New Proxy` and `Add New Pattern Subscriptioin -> Go`.
+
+>https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt
+
+Refer to this link for usage: [shadowsocks-go](https://github.com/shadowsocks/shadowsocks-go). Though this is shadowsocks-go version, but the principle is the similar.
+### PAC VS Global on WIndows
 pac是只对被墙的使用ss，全局就是无论什么网站都用ss。
 
 pac可以自己修改，添加任意网站。当然也可以用网上网友维护的文件，最有名的是就是GFWlist列表。windows下右键点击ss client，出现一个菜单"Update PAC from GFWlist" 。
