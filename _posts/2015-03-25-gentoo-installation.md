@@ -465,8 +465,8 @@ export XMODIFIERS=@im=fcitx
         4. _#_ emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
         5. _$_ git clone xxx
     10. _#_ emerge -av wgetpaste
-    11. _#_ emerge -av net-misc/dropbox xfce4-extra/thunar-dropbox
-        1. Xfc4 and Dropbox does not get along well. There is no application menu for Dropbox.
+    11. _#_ emerge -av net-misc/dropbox xfce-extra/thunar-dropbox
+        1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
         2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
         3. _$_ dropbox start, Gentoo and Windows share the Dropbox location in /media/Misc/Dropbox. When firstly run this command, you need to configure dropbox as default setting (Dropbox folder in /home/zachary/Dropbox). But then exit dropbox immediately. And remove /home/zachary/Dropbox.
             1. _$_ rmdir /home/zachary/Dropbox
@@ -483,6 +483,7 @@ export XMODIFIERS=@im=fcitx
     14. Archive
         1. _#_ emerge -av file-roller
         2. _#_ emerge -av thunar-archive-plugin
+            1. [steps below deprecated]
             1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
             2. _#_ cd /usr/libexec/thunar-archive-plugin/
             3. _#_ ln -s file-roller.tap org.gnome.FileRoller.tap
