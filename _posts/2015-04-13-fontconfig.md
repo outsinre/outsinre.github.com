@@ -43,9 +43,9 @@ Refer to the official document [XDG Base Directory Specification](http://standar
 1. Get your fonts file like `*.ttf` and `*.otf`:
 
     ```
-MTEXTRA.TTF   msyhbd.ttc  simsun.ttc  tahomabd.ttf
-WINGDNG2.TTF  msyhl.ttc   symbol.ttf  webdings.ttf
-WINGDNG3.TTF  msyh.ttc     simkai.ttf  tahoma.ttf  wingding.ttf
+MTEXTRA.TTF   fonts.dir    msyhbd.ttc   simhei.ttf  symbol.ttf    webdings.ttf
+WINGDNG2.TTF  fonts.scale  msyhl.ttc    simkai.ttf  tahoma.ttf    wingding.ttf
+WINGDNG3.TTF  msyh.ttc     simfang.ttf  simsun.ttc  tahomabd.ttf
     ```
     Some of the fonts are for `wps-office` and others are for Chinese fonts.
 2. _#_ mkdir -p .local/share/fonts/myFonts, create a subdirectory under `.local/share/fonts` to hold your fonts.

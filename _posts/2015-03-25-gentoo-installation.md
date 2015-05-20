@@ -20,7 +20,7 @@ title: Gentoo Installation
     3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. _#_ sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
-5. _#_ fdisk /dev/sda or parted -a optimal /dev/sda (default one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+5. _#_ fdisk /dev/sda or parted -a optimal /dev/sda (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
     1. __NOTE__: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
     1. _#_ parted -a optimal /dev/sda
     2. _#_ p
@@ -184,9 +184,10 @@ Codec Intel CougarPoint HDMI
 /dev/sda12   /	           ext4    noatime              0 1
 /dev/sda7    none         swap	   sw                   0 0
 	```
+This needs modified in the steps later on.
 29. Set hostname.
     1. _#_ nano -w /etc/conf.d/hostname
-    2. set hostname="tux"
+    2. set hostname="zhtux"
 30. Configuring the network.
 	1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
 	2. _#_ emerge --ask net-misc/dhcpcd
@@ -221,14 +222,15 @@ network={
 	phase2="auth=MSCHAPV2"
 }
 		```
-	7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in plaintext by anyone using the computer:
-		1. _#_ chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
-		2. Replace the `identity` and `password` entries with your own Wifi information.
-	7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `wpa_supplicant`. No need to create so called `/etc/conf.d/net` file as the handbook.
-	8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
+    7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in plaintext by anyone using the computer:
+        1. _#_ chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
+        2. Replace the `identity` and `password` entries with your own Wifi information.
+    7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `wpa_supplicant`. No need to create so called `/etc/conf.d/net` file as the handbook.
+    8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
 	https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
-	9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
-    10. For Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
+    9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
+    10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](http://fangxiang.tk/2015/05/11/gentoo-downgrade-package/)
+    10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
 	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 31. Set root password: _#_ passwd
 33. System logger.
@@ -280,6 +282,7 @@ menuentry "Microsoft Windows 8.1 x86_64" {
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
 
     ```
+exit
 umount -l /mnt/gentoo/dev{/shm,/pts,}
 umount /mnt/gentoo/boot/efi
 umount /mnt/gentoo/boot
@@ -294,12 +297,12 @@ useradd -g users -G wheel,audio,video -m zachary
 passwd zachary
         ```
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
-        1. emerge --sync, changed to `emains sync` for new portageq --version >=2.2.16.
-        2. emerge -avutDN --with-bdeps=y @world
-        3. emerge -av --depclean
-        4. [deprecated] revdep-rebuild -av, replaced by the next step.
-        5. [optional] emerge @preserved-rebuild, if prompted.
-        5. dispatch-conf, usually if needed, you just need to input `u`.
+        1. _#_ emerge --sync, changed to `emains sync` for new portageq --version >=2.2.16.
+        2. _#_ emerge -avutDN --with-bdeps=y @world
+        3. _#_ emerge -av --depclean
+        4. _#_ [deprecated] revdep-rebuild -av, replaced by the next step.
+        5. _#_ [optional] emerge @preserved-rebuild, if prompted.
+        5. _#_ dispatch-conf, usually if needed, you just need to input `u`.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
     1. Boot with LiveDVD
@@ -350,7 +353,8 @@ VIDEO_CARDS="intel"
     9. _$_ echo "exec startxfce4 --with-ck-launch" > ~/.xinitrc
     10. _#_ rc-update add consolekit default
     12. You'd better logout and then login again to test xfce: _$_ startx.
-    13. **Attention**: Use _startx_ command to launch xfce desktop. No graphical loggin configured.
+
+        > **Attention**: Use _startx_ command to launch xfce desktop. No graphical loggin configured.
     14. If you have a messed desktop setting, you can executing the following commands to have a default setting:\
         1.  _#_  rm -r ~/.cache/sessions
         2.  _#_ rm -r ~/.config/xfce*
@@ -365,7 +369,6 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
     3. Similarly, since the root and home partition is formatted in previous step, you should go into Ubuntu system to hide these two partitions.
     4. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).
-42. `/dev/sda10` is the boot partition for Gentoo. But by default, it's not auto-mounted for security reason. Similarly, the /dev/sda2 is the EFI System Partition. It's also not automatic mounted to `/boot/efi` as well at startup.
 43. Partitions:
     1. sda1 Windows recovery partition
     2. sda2 EFI partition
@@ -399,21 +402,21 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. _#_ rc-update add alsasound boot
     3. _#_ speaker-test -t wav -c 2, test the speaker.
 45. Applications:
-    1. Opera browser. Don't install firefox and it is bery big.
-        1. _#_ echo "www-client/opera gtk -kde" >> /etc/portage/package.use/opera
-        2. _#_ emerge -av opera
+    1. Web browser: Firefox. It will take a while installing.
+
+        > Adblock Edge, ChatZilla
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. _#_ echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
         2. _#_ emerge -av fcitx
         2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 		
-        ```
+            ```
 eval `dbus-launch --sh-syntax --exit-with-session`
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
-        ```
-But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
+            ```
+        But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
         3. **IMPORTANT**: these four lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
         4. _#_ emerge -av fcitx-sunpinyin
         5. _#_ emerge -av fcitx-configtool
@@ -434,19 +437,20 @@ But this will conflicts with `--with-ck-launch`. The solution is to remove the f
     fi
             ```
     5. _#_ emerge -av www-plugins/adobe-flash
-        1. Pay attention to update `package.license` file.
+        1. Pay attention to update `package.license` file when needed.
     6. WPS office.
         1. overlay support
-            1. echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
-            2. emerge -av layman
-            2. echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
-            3. layman -f -a gentoo-zh
-            4. layman -S
+            1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
+            1. _#_ echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
+            2. _#_ emerge -av layman
+            2. _#_ echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
+            3. _#_ layman -f -a gentoo-zh
+            4. _#_ layman -S
         2. WPS 32-bit `abi_x86_32` support. You should activate abi\_x86_32 use flag for packages on which WPS office depends.
             1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually. You can also cange `pv` to `-av`.
             2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
             3. package.license/wps-office: app-office/wps-office WPS-EULA
-            4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945_alpha16_p3 ~amd64
+            4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945\_alpha16_p3 ~amd64
 
                 >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
             5. emerge -av wps-office
@@ -470,7 +474,7 @@ But this will conflicts with `--with-ck-launch`. The solution is to remove the f
         4. _$_ dropbox &, run dropbox in the backgroud.
     12. _#_ emerge --ask app-portage/gentoolkit
     13. _#_ emerge --ask app-portage/eix
-        1. _#_ emacs -nw /etc/eix-sync.conf:
+        1. _#_ emacs -nw /etc/eix-sync.conf: this is deprecated for the new poratge > 2.2.16.
 
             ```
 *
@@ -517,20 +521,29 @@ export XMODIFIERS=@im=fcitx
 exec startxfce4 --with-ck-launch
             ```
         4. Refer to [ConsoleKit](http://docs.xfce.org/xfce/xfce4-session/advanced); [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059); [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
-    2. fstab for NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
+    2. fstab including NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
 
         ```
-/dev/sda4		/mnt/Win81	ntfs-3g		noauto,ro	0 0
-/dev/sda5		/media/Data	ntfs-3g		noauto,nls=utf8,locale=zh_CN.utf8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda6		/media/Misc	ntfs-3g		noauto,nls=utf8,locale=zh_CN.utf8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
-/dev/sda7		/media/Misc	ntfs-3g		noauto,nls=utf8,locale=zh_CN.utf8,uid=account-name,gid=users,dmask=022,fmask=133	0 0
+/dev/sda8 /boot ext2 noauto,noatime 1 2
+/dev/sda2 /boot/efi vfat noauto,noatime 1 0
+/dev/sda10 / ext4 noatime,errors=remount-ro 0 1
+/dev/sda9 none swap sw 0 0
+/dev/sda11 /home ext4 defaults 0 0
+#/dev/cdrom /mnt/cdrom auto noauto,ro 0 0
+#/dev/fd0 /mnt/floppy auto noauto 0 0
+/dev/sda1 /mnt/Recovery ntfs-3g noauto,ro 0 0
+/dev/sda4 /mnt/Win81 ntfs-3g noauto,ro 0 0
+/dev/sda5 /media/Data ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
+/dev/sda6 /media/Misc ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
+/dev/sda7 /media/WLShare ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
         2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
         3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So you can; creating new Chinese filenames in virtual terminal.
         4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
         5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF-8` (or `zh_CN.utf8`) is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems. If set to `zh_CN.GB18030` or `zh_CN.GB2312`, the Chinese folder names cannot be displayed in Thunar's address bar.
-	6. Refer to [Mounting a Local Microsoft Windows Partition on Linux Systems](http://docs.oracle.com/cd/E19253-01/819-0918/localization-13).
+        6. Refer to [Mounting a Local Microsoft Windows Partition on Linux Systems](http://docs.oracle.com/cd/E19253-01/819-0918/localization-13).
+        7. By default, /boot not auto-mounted for security reason. Similarly, the EFI System Partition is not auto-mounted to `/boot/efi` as well at startup.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
     5. New portage plug-in sync system. This new sync system requires `emerge -av \>=sys-apps/portage-2.2.16` and `emerge -av \>=app-portage/layman-2.3.0`.
@@ -558,7 +571,7 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
  many repositories to be synced multiple times in a row. Please edit 
  your configs or scripts to adjust for the new operation.
             ```
-        9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out overlays in that file.
+            9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out overlays in that file.
         10. Choose one of the follwing command for daily operation:
             1. _#_ emaint sync -a
             2. _#_ emerge --sync

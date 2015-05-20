@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Gentoo Downgrade Package && wpa_supplicant
+title: Downgrade Package && wpa_supplicant && local overlay
 ---
 
 > Once for a while after an update, you system might bump into problem due to a new package version or to an unstable package. Thus the trouble-making packages should be downgraded to its old working version.
