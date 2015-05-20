@@ -21,9 +21,11 @@ Through the discussion there, I found several solutions:
 
 1. Downgrade wpa_supplicant to 2.3 (<2.4) with the help of local overlay.
 2. Ask the university to update its FreeRadius server from to 2.2.6 to 2.2.7.
-3. Disable TLS v1.2 with phase1="tls\_disable\_tlsv1\_2=1" in `/etc/wpa_supplicant/wpa_supplicant.conf` for `HUST_WIRELESS_AUTO`.
+3. Disable TLS v1.2 with phase1="tls\_disable\_tlsv1\_2=1" in `/etc/wpa_supplicant/wpa_supplicant.conf` for `HUST_WIRELESS_AUTO`. That said, this does result in older TLS version being used and that is not really a good long term
+solution.
+4. Set `key_mgmt_offload=0` to the wpa_supplicant configuration file (at global level, i.e., not within a network block).
 
-Obviously, the 3rd method simple and ebbbffective. But I would like to try the 1st method since I want to try the process of creating a local overlay.
+Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd method.  But I would like to try the 1st instead since I want to try the process of creating a local overlay. I did not test the 4th option.
 
 1. Search wpa_supplicant version information:
 
@@ -70,4 +72,36 @@ Obviously, the 3rd method simple and ebbbffective. But I would like to try the 1
         1. Now based the emerge error message, we go to step 1, and download the missing files.
         2. We can also read through the ebuild files to locate what supporting files needed.
         3. The top of the page in step 1 reminds that we can use `cvs` command to locate the files.
-        4. [IMPORTANT] Each time we change files in local overlay, we need to repeat steps starting from 6.
+        4. [IMPORTANT] Repeat steps starting from 6.
+
+---
+Wpa_supplicant debug:
+
+1. Run wpa_supplicant in debug mode:
+
+    > _#_ killall -TERM wpa_supplicant
+
+    > _#_ /etc/init.d/dhcpcd stop
+
+    > _#_ wpa\_supplicant -Dnl80211 -iwlp3s0 -C/var/run/wpa\_supplicant/ -c/etc/wpa\_supplicant/wpa_supplicant.conf -dd
+
+    For this step, you can also run `wpa_cli` command interactively.
+2. Retart wpa_supplicant if need reconnection:
+
+    > _#_ killall -TERM wpa_supplicant
+
+    > _#_ /etc/init.d/dhcpcd restart
+3. Enable log: refer to wiki.
+
+---
+Reference:
+
+1. https://wireless.wiki.kernel.org/en/users/documentation/wpa_supplicant
+2. https://www.marc.info/?t=143013943600001&r=1&w=4
+3. http://lists.shmoo.com/pipermail/hostap/2015-April/032685.html
+4. https://www.marc.info/?l=hostap&m=143077239911058&w=4
+
+    >phase1="tls\_disable\_tlsv1_2=1"
+5. http://blog.csdn.net/zhuyingqingfen/article/details/7830624
+6. https://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/wpa_supplicant/
+7. https://wiki.gentoo.org/wiki/Overlay/Local_overlay
