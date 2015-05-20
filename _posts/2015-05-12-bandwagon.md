@@ -108,6 +108,19 @@ Basically, different shadowsocks on Linux system share serve and client - YES, t
 Run `sslocal -h` to show the detailed help message.
 >_#_ sslocal -s xx.xx.xx.xx -p yyyy -b 127.0.0.1 -l zzzz -k PASSWORD -m aes-256-cfb -d start
 
+If each time to input this command, then it is tedious, so need to write a script `shadowsocks-sslocal.sh`. If you'd like, add it to boot:
+
+```
+#!/bin/bash
+
+/usr/bin/python /usr/bin/sslocal -s xx.xx.xx.xx -p yyyy -b 127.0.0.1 -l zzzz -k PASSWORD -m aes-256-cfb --log-file /var/log/shadowsocks-ssloal.log -d start
+```
+Move this script to `/usr/local/sbin/`. Details refer to [bin sbin  difference](http://askubuntu.com/q/308045). Change access mode to `755` and added to `root:root`.
+
+So each time, if need get out of GFW:
+
+>_#_ /usr/local/sbin/shawdowsocks-sslocal.sh
+
 Up to now, connected to my VPS server! But one step further - __foxy proxy__ for Firefox. After installing, `Add New Proxy` and `Add New Pattern Subscriptioin -> Go`.
 
 >https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt
