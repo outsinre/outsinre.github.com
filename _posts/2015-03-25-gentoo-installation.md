@@ -352,7 +352,7 @@ VIDEO_CARDS="intel"
     8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
     9. _$_ echo "exec startxfce4 --with-ck-launch" > ~/.xinitrc
         1. At first try, the `logout`, `shutdown` buttons are greyed out. Since those buttons are related to `consolekit`, check the `consolekit` and `dbus` wiki.
-        2. Make sure `consolekit` is added to default run level. `consolekit` depends on `dbus`, so `dbus` no need added to default run level. We can check with `/etc/init.d/dbus status` to make sure it's started on boot.
+        2. Make sure `consolekit` is added to default run level. `consolekit` depends on `dbus`, so `dbus` no need added to default run level. Run `rc-status` with normal user account, you will see dbus is under `Dynamic Runlevel`
         3. After a system update, the issue is solved automatically.
     10. _#_ rc-update add consolekit default
     12. You'd better logout and then login again to test xfce: _$_ startx.
