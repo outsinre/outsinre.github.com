@@ -298,7 +298,7 @@ passwd zachary
         ```
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
         1. _#_ emerge --sync, changed to `emains sync` for new portageq --version >=2.2.16.
-        2. _#_ emerge -avutDN --with-bdeps=y @world
+        2. _#_ emerge -avtuDN --with-bdeps=y @world
         3. _#_ emerge -av --depclean
         4. _#_ [deprecated] revdep-rebuild -av, replaced by the next step.
         5. _#_ [optional] emerge @preserved-rebuild, if prompted.
@@ -558,6 +558,8 @@ exec startxfce4 --with-ck-launch
         7. By default, /boot not auto-mounted for security reason. Similarly, the EFI System Partition is not auto-mounted to `/boot/efi` as well at startup.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
+
+        > `> = < ~` operators are used for per-package configuration in these files/directories. Use `=` at best if allowed.
     5. New portage plug-in sync system. This new sync system requires `emerge -av \>=sys-apps/portage-2.2.16` and `emerge -av \>=app-portage/layman-2.3.0`.
         1. After a world update, my `portage` has updated to version `2.2.18`. Commands related to `emerge` reminds:
 

@@ -55,18 +55,21 @@ Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd met
     1. Go through [/net-wireless/wpa_supplicant](https://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/wpa_supplicant/)
     2. You cannot find `wpa_supplicant-2.3*.ebuild` since version 2.3 is out of portage tree: dead.
     3. Click on `Show 78 dead files` from which you will find old ebuild files: wpa_supplicant-2.3.ebuild, wpa_supplicant-2.3-r1.ebuild, and wpa_supplicant-2.3-r2.ebuild. Here I choose `wpa_supplicant-2.3-r2.ebuild`. Download this file from `Links to HEAD: (view) (download) (annotate)`. Then click on `Hide 78 dead files`.
-    4. _#_ mkdir -p /usr/local/portage/net-wireless/wpa\_supplicant; cd /usr/local/portage/net-wireless/wpa_supplicant
+    4. _#_ mkdir -p /usr/local/portage/net-wireless/wpa\_supplicant
+    4. _#_ cd /usr/local/portage/net-wireless/wpa_supplicant
     5. _#_ cp /path/to/downloaded/wpa\_supplicant-2.3-r2.ebuild /usr/local/portage/net-wireless/wpa_supplicant/
         1. Some points out that we also need copy the `metadata.xml` file. This file does not change along different versions. If emerge complains lacking this file, copy it from step 1 link or from `/usr/portage/net-wireless/wpa_supplicant/`.
-    6. _#_ chown -R portage:portage /usr/local/portage
-        1. This is important each time you create or copied new files to local overlay to make those files belong to portage:portage.
-    7. _#_ repoman manifest
+    6. _#_ repoman manifest (pay attention to: the current directory)
         1. Generate the `Manifest` file each time you change files in this overlay.
+    7. _#_ chown -R portage:portage /usr/local/portage
+        1. This is important each time you create or copied new files to local overlay to make those files belong to portage:portage.
     8. _#_ emerge -av1 wpa_supplicant
         1. This will not install wpa\_supplicant 2.3-r2 since it complains lacking files. If you go back to step 1, you will find a folder `/net-wireless/wpa_supplicant/files`. Items under this directory is supporting files like patches. emerge won't get this file for you automatically since you are installing from local overlay, you need to get those support files by yourself.
         2. On the other hand, emerge will download the source files for wpa_supplicant-2.3-r2. It is specified in the ebuild file:
 
             >_#_ grep "SRC\_URI=" /usr/local/portage/net-wireless/wpa\_supplicant/wpa_supplicant-2.3-r2.ebuild
+
+            But the downloaded source file is kept under `/usr/portage/distfiles/` where offical portage `gentoo` and layman overlay `gentoo-zh` stores source files.
         3. The 3rd emerge optiono is number one, not character L. This means for one time installation.
     9. _#_ mkdir files
         1. Now based the emerge error message, we go to step 1, and download the missing files.
