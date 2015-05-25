@@ -11,35 +11,35 @@ by contrast,
 
 There is very reason to believe that ...
 
-fare: progress; get on ½øÕ¹; ¹ıÈÕ×Ó: How did you fare (ie What were your experiences) while you were abroad? ÄãÔÚ¹úÍâÊ±ºÃÂğ£¨¸ĞÊÜÈçºÎ£©?
+fare: progress; get on è¿›å±•; è¿‡æ—¥å­: How did you fare (ie What were your experiences) while you were abroad? ä½ åœ¨å›½å¤–æ—¶å¥½å—ï¼ˆæ„Ÿå—å¦‚ä½•ï¼‰?
 
-beneficiary: n, person who receives sth, esp one who receives money, property, etc when sb dies ÊÜÒæÕß; ÊÜ»İÕß; £¨ÓÈÖ¸£©³ĞÊÜÒÅ²úÕß.
+beneficiary: n, person who receives sth, esp one who receives money, property, etc when sb dies å—ç›Šè€…; å—æƒ è€…; ï¼ˆå°¤æŒ‡ï¼‰æ‰¿å—é—äº§è€….
 
-nominal: existing, etc in name only; not real or actual ÃûÒåÉÏµÄ; ²»Êµ¼ÊµÄ; ²»ÕæÊµµÄ: the nominal ruler of the country ÃûÒåÉÏµÄ¹ú¼ÒÍ³ÖÎÕß; (of a sum of money, etc) very small, but paid because some payment is necessary £¨Ö¸Ò»±ÊÇ®µÈ£©ºÜÉÙµÄ, ÏóáçĞÔµÄ
+nominal: existing, etc in name only; not real or actual åä¹‰ä¸Šçš„; ä¸å®é™…çš„; ä¸çœŸå®çš„: the nominal ruler of the country åä¹‰ä¸Šçš„å›½å®¶ç»Ÿæ²»è€…; (of a sum of money, etc) very small, but paid because some payment is necessary ï¼ˆæŒ‡ä¸€ç¬”é’±ç­‰ï¼‰å¾ˆå°‘çš„, è±¡å¾µæ€§çš„
 
-foregoing:  listed, mentioned, or occurring before <the foregoing statement can be proven>; preceding; just mentioned ÔÚÇ°µÄ; ¸ÕÌáµ½µÄ; ÉÏÊöµÄ: the foregoing analysis, description, discussion, etc ÒÔÉÏ·ÖÎö©p ÃèÊö©p ÂÛÊöµÈ
+foregoing:  listed, mentioned, or occurring before <the foregoing statement can be proven>; preceding; just mentioned åœ¨å‰çš„; åˆšæåˆ°çš„; ä¸Šè¿°çš„: the foregoing analysis, description, discussion, etc ä»¥ä¸Šåˆ†æï¹‘ æè¿°ï¹‘ è®ºè¿°ç­‰
 
-    the foregoing: n [sing or pl v] (fml ÎÄ) what has just been mentioned ¸ÕÌá¼°µÄÊÂÎï: The foregoing have all been included in the proposals. ÒÔÉÏ¸÷µã¾ù°üÀ¨ÔÚ½¨ÒéÖĞ.
+    the foregoing: n [sing or pl v] (fml æ–‡) what has just been mentioned åˆšæåŠçš„äº‹ç‰©: The foregoing have all been included in the proposals. ä»¥ä¸Šå„ç‚¹å‡åŒ…æ‹¬åœ¨å»ºè®®ä¸­.
 
 replete with ...
 
 in the aftermath of ...
 
-touch on/upon sth mention or deal with (a subject) briefly Ìá¼°»òÉæ¼°£¨Ä³ÎÊÌâ£©: The matter was hardly touched on. ÄÇ¼şÊÂ¼¸ºõÃ»Éæ¼°µ½.
+touch on/upon sth mention or deal with (a subject) briefly æåŠæˆ–æ¶‰åŠï¼ˆæŸé—®é¢˜ï¼‰: The matter was hardly touched on. é‚£ä»¶äº‹å‡ ä¹æ²¡æ¶‰åŠåˆ°.
 
-seethe: (of liquids) bubble and froth as if boiling £¨Ö¸ÒºÌå£©ÆğÅİ, Ã°Åİ£¨ËÆ·ĞÌÚ£©: They fell into the seething waters of the rapids. ËûÃÇµø½øÁË·­ÌÚµÄ¼±Á÷ÖĞ. 
+seethe: (of liquids) bubble and froth as if boiling ï¼ˆæŒ‡æ¶²ä½“ï¼‰èµ·æ³¡, å†’æ³¡ï¼ˆä¼¼æ²¸è…¾ï¼‰: They fell into the seething waters of the rapids. ä»–ä»¬è·Œè¿›äº†ç¿»è…¾çš„æ€¥æµä¸­. 
 
-    be seething with <ÈË> [ÒòÉúÆøµÈ¶ø] ´ó·¢À×öª[with]; [Òò²»Æ½¡¢²»ÂúµÈ¶ø] ¾Ù¹úÉ§¶¯,ÈºÇé»©È»[with]
+    be seething with <äºº> [å› ç”Ÿæ°”ç­‰è€Œ] å¤§å‘é›·éœ†[with]; [å› ä¸å¹³ã€ä¸æ»¡ç­‰è€Œ] ä¸¾å›½éªšåŠ¨,ç¾¤æƒ…å“—ç„¶[with]
 
-It is tempting to see/note ... ÃÔÈËµÄ,ÒıÈËµÄ,ÓÕÈËµÄ; ÒıÈËĞÄ¶¯ [Ê³Óû] µÄ
+It is tempting to see/note ... è¿·äººçš„,å¼•äººçš„,è¯±äººçš„; å¼•äººå¿ƒåŠ¨ [é£Ÿæ¬²] çš„
 
-stun: [Tn] daze or shock (sb), eg with sth unexpected Ê¹£¨Ä³ÈË£©Ä¿µÉ¿Ú´ô»ò¸Ğµ½Õğ¾ª: I was stunned by the news of his death. ÎÒµÃÖªËûµÄËÀÑ¶Ê®·ÖÕğ¾ª
+stun: [Tn] daze or shock (sb), eg with sth unexpected ä½¿ï¼ˆæŸäººï¼‰ç›®çªå£å‘†æˆ–æ„Ÿåˆ°éœ‡æƒŠ: I was stunned by the news of his death. æˆ‘å¾—çŸ¥ä»–çš„æ­»è®¯ååˆ†éœ‡æƒŠ
 
-    stunning: surprising or shocking ÁîÈË¾ªÆæµÄ; ÁîÈËÕğ¾ªµÄ: a stunning revelation ¾ªÈËµÄĞÂ·¢ÏÖ
+    stunning: surprising or shocking ä»¤äººæƒŠå¥‡çš„; ä»¤äººéœ‡æƒŠçš„: a stunning revelation æƒŠäººçš„æ–°å‘ç°
 	
 far from negligible
 
-hike: n, rise in prices, costs, etc £¨¼Û¸ñ©p ¼ÛÖµµÈµÄ£©Ìá¸ß, Ôö¼Ó: The union demands a 7% wage hike. ¹¤»áÒªÇóÌá¸ß¹¤×Ê7%
+hike: n, rise in prices, costs, etc ï¼ˆä»·æ ¼ï¹‘ ä»·å€¼ç­‰çš„ï¼‰æé«˜, å¢åŠ : The union demands a 7% wage hike. å·¥ä¼šè¦æ±‚æé«˜å·¥èµ„7%
 
 have not failed to attract attention
 
