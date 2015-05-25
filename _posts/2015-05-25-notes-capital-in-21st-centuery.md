@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Notes from Capital in 21st Century
+title: Capital in 21st Century Pickups
 ---
 
 It's indispensable to make use of complementary sources as well.
