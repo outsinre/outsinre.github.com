@@ -511,6 +511,11 @@ export XMODIFIERS=@im=fcitx
         2. Under `Settings Editor` --> `xfce4-kerboard-shortcuts` --> `commands` --> `custom`, set a shortcut for this plugin: `Super + R`.
     16. [deprecated, does not work at all]_#_ emerge -av xfce4-wavelan-plugin
         1. __this plugin cannot be added to panel currently__, cannot be used.
+    17. kwplayer - Linx version of 酷我音乐
+        1. _#_ emerge -av kwplayer
+        2. Now play MV but not MP3 songs. After detailed search, I found that mplayer used `mad` to decode MP3. So:
+        3. _#_ emerge -av gst-plugins-mad
+        4. Bingo! This is due to the author did not test this package under Gentoo. So he did not incur the `gst-plugins-mad` dependcy specially for Gentoo. We need to install by ourself.
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem. In 4.10, start Xfce with `startxfce4 --with-ck-launch`. This will start xfce4-session with ck-launch-session. In 4.10, **Xfce4-sesion will take care of the dbus-session launch**.
