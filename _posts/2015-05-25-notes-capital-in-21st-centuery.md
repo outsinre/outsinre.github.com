@@ -44,3 +44,47 @@ hike: n, rise in prices, costs, etc （价格﹑ 价值等的）提高, 增加: 
 have not failed to attract attention
 
 phenomenon -> pl, phenomena
+
+from the turn of twentieth century until now
+
+dreadful: causing great fear or suffering; shocking 产生极大恐惧或痛苦的; 使人震惊的: a dreadful accident, disease, nightmare 可怕的事故﹑ 疾病﹑ 恶梦
+
+rentier: 靠利息、养老金、地租、股息等生活的人
+
+heady:  having a quick effect on the senses; very exciting 迅速作用於感官的; 兴奋的: a heady perfume 气味扑鼻的香水；(of a person) excited and acting rashly （指人）激动得忘乎所以的: be heady with success 因成功而得意忘形
+
+tax heaven 避税天堂
+
+euphoria:[U] intense feeling of happiness and pleasant excitement 愉快和兴奋的感觉: She was still in a state of euphoria hours after her victory. 她获胜後几小时仍喜气洋洋
+
+    stock market euphoria
+
+reach unprecedented height/level/degree
+
+incessant: adj not stopping; continual 不停的; 连续的; 不断的: a week of almost incessant rain 雨差不多没有停过的一个星期 * an incessant stream of visitors 络绎不绝的参观人流
+
+remunerate: [Tn, Tn.pr] ~ sb (for sth) (fml 文) pay or reward sb for work or services 酬报某人（为其工作或服务）
+
+    remuneration:  [U] (fml or rhet 文或修辞) payment; reward 酬金; 报酬
+	
+oscillate: ~ (between sth and sth) (fml fig 文, 比喻) keep moving backwards and forwards between extremes of feeling, behaviour, opinion, etc; waver （感情﹑ 行为﹑ 想法等）波动, 动摇, 犹豫: He oscillates between political extremes. 他的政治观点在两个极端之间摇摆不定；[I, Tn] (cause sth to) move repeatedly and regularly from one position to another and back again （使某物）摆动: A pendulum oscillates. 摆锤能摆动
+
+vacillate:  [I, Ipr] ~ (between sth and sth) (fml usu derog 文, 通常作贬义) keep changing one's mind; move backwards and forwards between two emotions （思想）动摇不定; 犹豫; （在两种情绪之间）变化不定: She vacillated between hope and fear.她时而抱有希望, 时而心存恐惧
+
+plummet：[I, Ipr, Ip] fall steeply or rapidly 大坡度或快速落下: House prices have plummeted in this area. 此地房价大跌. * Pieces of rock plummeted down the mountainside to the ground below. 岩石一块块顺着山的陡坡滚落到地面.
+
+scrupulous: ~ (in sth/doing sth) careful not to do wrong; absolutely honest 审慎的; 极诚实的: scrupulous in all her business dealings （她）对所有交易都十分老实
+
+    unsrupulous: without moral principles 无道德原则的; 不讲道德的: unscrupulousmethods, behaviour 不道德的方法﹑ 行为
+	
+incontestable: adj that cannot be disputed or disagreed with 无可争辩的; 不能不同意的: an incontestable fact 无可争辩的事实
+
+trade deficit; trade surplus
+
+dispel:  [Tn] drive (sth) away; cause to vanish 驱走（某事物）; 使消失: dispel sb's doubts/fears/worries 消除某人的疑虑[恐惧/烦恼] * The company is trying to dispel rumours about a take-over. 公司力图澄清有关控制权转移的流言
+
+temporal: of worldly affairs, ie not spiritual; secular 世俗的（即非宗教的）; 现世的；物质世界的或与之有关的；世俗的 the temporal possessions of the Church教堂拥有的世俗的财产；Of, relating to, or limited by time时间的：时间的、与时间有关的或受时间限制的
+
+supplant: (fml 文) take the place of (sb/sth); replace 取代（某人[某事物]）; 代替: Oil has supplanted coffee as our main export. 我们的主要出口货已由原来的咖啡改为石油了. * The party leader has been supplanted by his rival. 那位党的领导人已被其对手取而代之. * She has been supplanted by another in his affections, ie He now loves sb else. 他爱上了另一个女人, 不再爱她了.
+
+advent: the ~ of sth/sb the approach or arrival of (an important person, event, etc) （重要人物﹑ 事件等的）来临, 到来: With the advent of the new chairman, the company began to prosper. 随着新主席的到来, 公司也开始有了起色
