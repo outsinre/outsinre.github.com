@@ -88,3 +88,19 @@ temporal: of worldly affairs, ie not spiritual; secular 世俗的（即非宗教
 supplant: (fml 文) take the place of (sb/sth); replace 取代（某人[某事物]）; 代替: Oil has supplanted coffee as our main export. 我们的主要出口货已由原来的咖啡改为石油了. * The party leader has been supplanted by his rival. 那位党的领导人已被其对手取而代之. * She has been supplanted by another in his affections, ie He now loves sb else. 他爱上了另一个女人, 不再爱她了.
 
 advent: the ~ of sth/sb the approach or arrival of (an important person, event, etc) （重要人物﹑ 事件等的）来临, 到来: With the advent of the new chairman, the company began to prosper. 随着新主席的到来, 公司也开始有了起色
+
+blunt: (of a person, remark, etc) frank and straightforward; not trying to be polite or tactful （指人﹑ 言语等）坦诚的, 直率的, 不客气的, 欠圆通的: a blunt refusal 不客气的拒绝 * Let me be quite blunt (with you) your work is appalling. （对你）直说吧--你的工作太差劲.
+
+rest on: ~ on sb/sth depend or rely on sb/sth 依靠或依赖某人[某事物]; (of a look, etc) be directed steadily at sb/sth （指目光等）停留在某人[某物]上
+
+relegate:  [esp passive 尤用於被动语态: Tn, Tn.pr] ~ sb/sth (to sth) 1 dismiss sb/sth to a lower or less important rank, task or state 使某人[某事物]降级﹑ 降职或降低地位: I have been relegated to the role of a mere assistant.
+
+meritocracy: (a) [U] system of government by people of high achievement 英才管理（制度）. (b) [CGp] such people in a society （社会的）英才, 精英, 贤能.
+
+leave aside the fact that ...; leave aside, too, the fact that ...
+
+instrumental: [pred 作表语] ~ in doing sth being the means of bringing sth about 作为促成某事物之手段; 有帮助; 起作用: Our artistic director was instrumental in persuading the orchestra to come and play for us. 我们的艺术指导大费唇舌请来管弦乐队为我们演出.
+
+peculiar: odd or strange 奇怪的; 奇异的; 罕有的: a peculiar taste, smell, noise, etc 怪异的口味﹑ 气味﹑ 噪音等；used or practised only by sb/sth 专用的; 特有的: customs peculiar to the 18th century 18世纪特有的风俗习惯
+
+envisage: v [Tn, Tf, Tw, Tg, Tsg] picture (an event, action, etc) in the mind as a future possibility; imagine 展望; 想像: Nobody can envisage the consequences of total nuclear war. 没有人能想像出全面核子战争的後果. * I can't envisage the plan('s) working. 我无法设想计划能否行得通.
