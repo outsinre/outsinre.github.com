@@ -104,3 +104,6 @@ instrumental: [pred 作表语] ~ in doing sth being the means of bringing sth ab
 peculiar: odd or strange 奇怪的; 奇异的; 罕有的: a peculiar taste, smell, noise, etc 怪异的口味﹑ 气味﹑ 噪音等；used or practised only by sb/sth 专用的; 特有的: customs peculiar to the 18th century 18世纪特有的风俗习惯
 
 envisage: v [Tn, Tf, Tw, Tg, Tsg] picture (an event, action, etc) in the mind as a future possibility; imagine 展望; 想像: Nobody can envisage the consequences of total nuclear war. 没有人能想像出全面核子战争的後果. * I can't envisage the plan('s) working. 我无法设想计划能否行得通.
+
+buy this argument
+
