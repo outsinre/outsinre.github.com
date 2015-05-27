@@ -23,7 +23,7 @@ foregoing:  listed, mentioned, or occurring before <the foregoing statement can 
 
 replete with ...
 
-in the aftermath of ...
+in the aftermath of ...; its immediate aftermath
 
 touch on/upon sth mention or deal with (a subject) briefly 提及或涉及（某问题）: The matter was hardly touched on. 那件事几乎没涉及到.
 
@@ -107,3 +107,33 @@ envisage: v [Tn, Tf, Tw, Tg, Tsg] picture (an event, action, etc) in the mind as
 
 buy this argument
 
+Anglo Saxon model 又称“新美国模式”
+
+obscure the fact that ...
+
+continental Europe 欧洲大陆，或称大陆的欧洲部分，主要排除英国
+
+stupendous: adj amazingly large, impressive, good, etc 极大的; 极感人的; 极好的: a stupendous mistake, achievement 极大的错误﹑ 成就 * The opera was quite stupendous! 这部歌剧很精彩!
+
+Denmark 丹麦
+
+Nordic countries: 北欧国家
+
+tumult: n, disturbance or confusion, esp of a large mass of people 混乱; （尤指大群人的）骚乱: The demonstration broke up in tumult. 示威集会在纷乱中解散了；disturbed or agitated state of mind; turmoil （思想上的）波动, 烦乱: Her mind was/Her thoughts were in a tumult. 她心烦意乱
+
+at/on sb`s heels; on the heels of sth following closely after sb/sth 紧跟在某人[某事物]後面: The thief ran off with an angry crowd at his heels. 那小偷在前面跑, 一群愤怒的人在後面紧追
+
+plunge: ~ (sth) into sth; ~ (sth) in:
+
+    (cause sth to) fall into sth suddenly and with force （使某物）突然而猛力投入﹑ 穿入﹑ 进入等: plunge (one's hand) into cold water （把手）一下子伸进冷水中 
+    (cause sth to) enter a specified state or condition （使某事物）进入或陷入某状态: The country (was) plunged into civil war after the death of the President. 总统死後全国陷入了内战. 
+
+armament: [C often pl 常作复数] weapons, esp the guns on a tank, an aircraft, etc 武器; （尤指坦克﹑ 飞机等配备的）大炮；武装力量; 军事力量
+
+inpassing: incidentally; in the course of doing something else; by the way;顺便提及
+
+lacuna: (pl. lacunae) section missing from a book, an argument, etc; gap （书籍﹑ 论据等中的）脱漏, 阙文, 缺漏, 空白: a lacuna in the manuscript 原稿中的脱漏
+
+amiss: adj, wrong(ly); inappropriate(ly) 错误; 不恰当: Something seems to be amiss can I help? 好像有点儿不对头--要我帮忙吗?
+
+nadir: (fig 比喻) lowest point; time of greatest depression, despair, etc 最低点; 最压抑﹑ 消沉等的时刻: This failure was the nadir of her career. 这次失败是她事业上的低谷.
