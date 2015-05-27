@@ -137,3 +137,60 @@ lacuna: (pl. lacunae) section missing from a book, an argument, etc; gap （书�
 amiss: adj, wrong(ly); inappropriate(ly) 错误; 不恰当: Something seems to be amiss can I help? 好像有点儿不对头--要我帮忙吗?
 
 nadir: (fig 比喻) lowest point; time of greatest depression, despair, etc 最低点; 最压抑﹑ 消沉等的时刻: This failure was the nadir of her career. 这次失败是她事业上的低谷.
+
+come by: obtain；acquire获得；得到 How did you come by that beautiful landscape painting？你是怎样弄到那张漂亮的风景画的？
+
+meager: Deficient in quantity, fullness, or extent; scanty 不足的，缺乏的：在数量、程度或范围上缺乏的；不足的
+
+deteriorate: ~ (into sth) become worse in quality or condition 变坏; 变质; 恶化: Leather can deteriorate in damp conditions. 皮革受潮可变质. * The discussion deteriorated into a bitter quarrel. 这场讨论演变成了激烈的争吵
+
+disaffection, alienation, estrangement 疏远,疏离,不和
+
+all the more to an even greater degree更；格外；更加；越加
+
+    all the more so 更加如此
+	all the more reason to do/for (doing) sth 更有理由。。。
+	He loved his wife and children，but he loved his country all the more．他爱妻子儿女，但是他更爱祖国
+	I know you find the subject difficult， but that is all the more reason why yod should work hard at it．我知道你感到这门学科困难，但这就是你更加应该努力钻研它的理由
+	
+rudiment: [C] imperfect beginning of sth that is not yet fully developed 初级形态: working on the rudiments of a new idea 研究一种新思想的萌芽；part or organ that is incompletely developed 未充分发展的部分; 发育不成熟的器官
+
+    >rudimentary adj.
+	
+complacent:  adj ~ (about sb/sth) (usu derog 通常作贬义) calmly satisfied with oneself, one's work, etc 自满的; 自鸣得意的: a complacent smile, manner, tone of voice 自满的微笑﹑ 姿态﹑ 声调 * We must not be complacent about our achievements; there is still a lot to be done. 我们绝不能满足於自己的成绩, 还有很多事情要做. 
+
+top decile; top centile/percentile; top thousandth;
+
+illiterate: 不会读或不会写的; 不识字的；缺乏教育的; 教育程度很低的
+
+    illiteracy: [U] state of being illiterate 文盲; 缺乏教育; 无知
+	
+apartheid: 种族隔离(南非共和国之白人对黑人所采取之种族歧视政策)
+
+extravagant: (of ideas, speech or behaviour) going beyond what is reasonable, usual or necessary （指想法﹑ 言行）放肆的, 越轨的, 过度的: extravagant praise, behaviour, claims 过分的赞扬﹑ 放肆的行为﹑ 过高的要求 * pay extravagant compliments 过分夸奖；(in the habit of) using or spending too much; (of actions) showing this tendency （惯於）奢侈的, 挥霍的; （指行为）放纵的: an extravagant man 挥霍无度的人
+
+compensation: (美)报酬,薪水,工资,俸给 (salary)；补偿,赔偿,弥补,偿还,抵偿
+
+till: (银行、商店等的) 放现款用的抽屉; 放贵重物品用的抽屉 have one's fingers/hands in the till 从自己的工作部门偷钱，监守自盗
+
+apt: suitable; appropriate 适当的; 恰当的: an apt quotation/metaphor 恰当的引语/比喻
+
+    [pred 作表语] ~ to do sth likely or having a tendency to do sth 易於做某事物; 有做某事物的倾向: apt to be forgetful, careless, quick-tempered, etc 健忘﹑ 总是粗心大意﹑ 动不动就发脾气 * My pen is rather apt to leak. 我的钢笔爱漏墨水.
+
+[not X] any more than [Y]：Y和X一样**不** ...
+
+per se: by or of itself; intrinsically 本身; 本质上: The drug is not harmful per se, but is dangerous when taken with alcohol. 该药本身并无害处, 但与酒类同服则有危险.
+
+disparate: so different in kind or degree that they cannot be compared 迥然不同的; 无法比较的: The five experiments gave quite disparate results. 这五次试验所获得的结果迥然不同
+
+mete:  mete sth out (to sb) (fml 文) give or administer (punishment, rewards, etc) 给予, 加以（惩罚﹑ 奖励等）,分给[人],给与: The judge meted out severe penalties. 法官对犯人予以严惩. * Justice was meted out to the offenders. 犯人均已绳之以法
+
+propensity: n ~ (for/to/towards sth); ~ (for doing/to do sth) (fml 文) inclination or tendency 倾向; 习性: a propensity to exaggerate/towards exaggeration 浮夸的倾向 * a propensity for getting into debt 借债的习性.
+
+mischief:  [U] behaviour (esp of children) that is annoying or does slight damage, but is not malicious (used esp as in the expressions shown) 恶作剧, 捣蛋, 顽皮, 淘气（尤用於以下示例）: act out of mischief 调皮的举动
+
+confiscate: [Tn] take possession of (sb's property) by authority, without payment or compensation 没收（某人的财产）; 充公: The headmaster confiscated Tommy's pea-shooter. 校长没收了汤米的射豆枪. * If you are caught smuggling goods into the country, they will probably be confiscated. 假若查出你向该国走私货物, 你的货物准得没收. 
+
+windfall: an unexpected, unearned, or sudden gain or advantage 意外的收获
+
+think tank: 智库，智囊团 A group or an institution organized for intensive research and solving of problems, especially in the areas of technology, social or political strategy, or armament. 智囊：尤指为集中研究并解决在技术、社会或政策及军事领域中的问题而组织起来的群体或机构
