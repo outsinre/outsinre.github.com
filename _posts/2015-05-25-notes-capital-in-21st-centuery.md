@@ -85,6 +85,8 @@ dispel:  [Tn] drive (sth) away; cause to vanish 驱走（某事物）; 使消失
 
 temporal: of worldly affairs, ie not spiritual; secular 世俗的（即非宗教的）; 现世的；物质世界的或与之有关的；世俗的 the temporal possessions of the Church教堂拥有的世俗的财产；Of, relating to, or limited by time时间的：时间的、与时间有关的或受时间限制的
 
+    tempral evolution
+
 supplant: (fml 文) take the place of (sb/sth); replace 取代（某人[某事物]）; 代替: Oil has supplanted coffee as our main export. 我们的主要出口货已由原来的咖啡改为石油了. * The party leader has been supplanted by his rival. 那位党的领导人已被其对手取而代之. * She has been supplanted by another in his affections, ie He now loves sb else. 他爱上了另一个女人, 不再爱她了.
 
 advent: the ~ of sth/sb the approach or arrival of (an important person, event, etc) （重要人物﹑ 事件等的）来临, 到来: With the advent of the new chairman, the company began to prosper. 随着新主席的到来, 公司也开始有了起色
@@ -93,7 +95,7 @@ blunt: (of a person, remark, etc) frank and straightforward; not trying to be po
 
 rest on: ~ on sb/sth depend or rely on sb/sth 依靠或依赖某人[某事物]; (of a look, etc) be directed steadily at sb/sth （指目光等）停留在某人[某物]上
 
-relegate:  [esp passive 尤用於被动语态: Tn, Tn.pr] ~ sb/sth (to sth) 1 dismiss sb/sth to a lower or less important rank, task or state 使某人[某事物]降级﹑ 降职或降低地位: I have been relegated to the role of a mere assistant.
+relegate:  [esp passive 尤用於被动语态: Tn, Tn.pr] ~ sb/sth (to sth) dismiss sb/sth to a lower or less important rank, task or state 使某人[某事物]降级﹑ 降职或降低地位: I have been relegated to the role of a mere assistant.
 
 meritocracy: (a) [U] system of government by people of high achievement 英才管理（制度）. (b) [CGp] such people in a society （社会的）英才, 精英, 贤能.
 
@@ -277,6 +279,52 @@ dun: [Tn] persistently demand payment of a debt from (sb) （不断地向某人�
 
 budge；(cause sth to) move slightly （使某物）稍微移动, 动一动: My car's stuck in the mud, and it won't budge/I can't budge it. 我的汽车陷入泥中, 一动也不动[我无法使它移动]. 
 
+agrarian: adj [usu attrib 通常作定语] (of the cultivation or ownership) of land （指耕种或所有权）土地的: agrarian laws, problems, reforms 土地法﹑ 问题﹑ 改革
+
+the Middle Ages; antiquity(usually before the Middle Ages)
+
+state of affairs: If you refer to a particular state of affairs, you mean the general situation and circumstances connected with someone or something. e.g. This state of affairs cannot continue for too long, if parliament is to recover. 
+
+in the wake of: as a result of；right after；following由于；紧随
+
+    There were many troubles in the wake of the war．战后许多麻烦接踵而来。
+    There were heavy losses of property in the wake of the flood．由于洪水使得财产受到重大损失。
+    Traders came in the wake of the conquering armies．商人随着征服的军队而来。
+    The students followed in the wake of the teacher．学生们跟在老师的后面。
+	
+The overall trajectory is fairly similar
+
+minuscule: adj very small; tiny 极小的; 微小的
+
+caveat: (fml 文) warning; proviso 警告; 限制性条款: I recommend the deal, but with certain caveats. 我介绍这笔交易, 但有几项要提请注意. 
+
+supplement VS complement: Supplement would refer to extra/additional information **in this context**对被补充对象的一种加强，两者属于同一个context. Complement refers to an item that completes or goes well **with another item**，两者输入不同的context，或者说是两个不同性质的东西，但是两者可以在一起相互作用，产生的更好的结果.
+
+be accustomed to the fact that ...
+
+dynamism: (in a person) quality of being dynamic （人的）精力, 活力, 干劲
+
+decry: (pt, pp decried) [Tn, Cn.n/a] ~ sb/sth (as sth) speak critically of sb/sth to make him/it seem less valuable, useful, etc; disparage sb/sth 诋毁某人[某事物]以贬低其价值: He decried her efforts (as a waste of time). 他贬低她所作的努力（认为是浪费时间）.
+
+sanctuary: 圣域,避难所
+
+ineluctable: not to be avoided, changed, or resisted : INEVITABLE 不可避免的; 难免的 <an ineluctable fate> 
+
+ground:  [I, Ipr, Tn, Tn.pr] ~ (sth) (in/on sth) (of a ship) touch the sea bottom; cause (a ship) to do this （指船）触海底, 搁浅; 使（船）触海底﹑ 搁浅: Our ship grounded in shallow water/on a sandbank. 我们的船在浅水中[在沙滩上]搁浅
+
+in a sense: in a way；in one respect在某种意义上
+
+nostalgia:  [U] sentimental longing for things that are past 对往事的怀恋; 怀旧
+
+nostalgia:  [U] sentimental longing for things that are past 对往事的怀恋; 怀旧
+
+heyday: [sing] time of greatest success, prosperity, power, etc 最成功﹑ 最繁荣﹑ 最强盛等的时期: She was a great singer in her heyday. 她在自己的黄金时代是个了不起的歌唱家. * Steam railways had their heyday in the 19th century. 19世纪是蒸汽机车的全盛时期.
+
+    one's heyday, heyday of
+
+curb: [Tn] prevent (sth) from getting out of control; restrain 防止（某事物）失控; 约束: curb one's anger, feelings, etc 抑制怒火﹑ 感情等 * curb spending, waste, etc 限制开支﹑ 浪费等. [n] strap or chain passing under a horse's jaw, used to restrain the horse 马勒, 马嚼子（横放在马嘴里的皮带或铁链, 用以驾御马匹）. 
+
+supremacy: 至尊,至上,无上; 最高位
 
 
 
