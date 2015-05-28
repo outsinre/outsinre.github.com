@@ -194,3 +194,97 @@ confiscate: [Tn] take possession of (sb's property) by authority, without paymen
 windfall: an unexpected, unearned, or sudden gain or advantage 意外的收获
 
 think tank: 智库，智囊团 A group or an institution organized for intensive research and solving of problems, especially in the areas of technology, social or political strategy, or armament. 智囊：尤指为集中研究并解决在技术、社会或政策及军事领域中的问题而组织起来的群体或机构
+
+worrisome: causing worry; troublesome 令人忧虑的; 令人烦恼的
+
+The top decile of the wealth hierarchy own a clear majority of what there is to own.
+
+candid: adj not hiding one's thoughts; frank and honest 率直的; 坦白而诚实的: a candid opinion, statement, person 直言﹑ 直说﹑ 直性人 * Let me be quite candid with you: your work is not good enough. 不瞒你说, 你的工作不怎麽好
+
+    to be candid,
+	candidly,
+
+probate: [U] official process of proving that a will is correct 遗嘱检验; 遗嘱认证: apply for/take out probate 申请检验遗嘱 * grant probate 通过对遗嘱的认证；[C] copy of a will with an official certificate that it is correct 经认证的遗嘱
+
+    [attrib 作定语] a probate court 遗嘱检验法庭
+
+observatory: A structure overlooking an extensive view 观察台，了望台，望楼：俯瞰广阔景象的建筑；A building, a place, or an institution designed and equipped for making observations of astronomical, meteorological, or other natural phenomena 观测所，气象台，天文台：一座建筑或一个机构，用以观测天文的、气象学的或其它自然现象
+
+coffer: 1 (C) (放置金钱等贵重物品的) 箱柜,银柜；2 [~s] (银行等的) 金库; 财源 (funds)；the ~s of the State 国库 ；3 (C)‘建筑’ (格子、天花板、拱门等的) 饰板,镶板,藻井
+
+regime: (a) method or system of government 统治方式或制度; 政体; 政权: a socialist, fascist, etc regime 社会主义﹑ 法西斯等制度. (b) prevailing method or system of administration (eg in a business) 盛行的管理方式或制度（如商业中的）: changes made under the present regime 现行管理方法带来的变化 * the old regime versus the new 新管理制度对旧管理制度
+
+regiment: 军队中的团； ~ of sth/sb (fig 比喻) large number of things or people 大量的物或人: a whole regiment of volunteers 大批志愿者
+
+colonel: 上校（美国陆军、空军或海军陆战队中校之上准将之下的军衔）
+
+bequest: act of bequeathing 遗赠: the bequest of one's paintings to a gallery 把绘画遗赠给美术馆；thing bequeathed; legacy 遗产; 遗物: leave a bequest of 2000 each to one's grandchildren 留给孙儿每人一笔2000英镑的遗产
+
+cadastre:an official register of the quantity, value, and ownership of real estate used in apportioning taxes
+
+conveyance: [U] (fml 文) conveying 运送; 传送; 传达; 转让: the conveyance of goods by rail 铁路货运
+
+    (law 律) (a) [U] conveying property 转让财产: an expert in conveyance 承办产权转让事务的专家. (b) [C] document that conveys property 产权转让证书: draw up a conveyance 拟就产权转让证书.
+
+draw reasonable conclusions
+
+kin: [pl v] (dated or fml 旧或文) one's family and relatives 家人和亲戚: All his kin were at the wedding. 他的家人和亲戚都参加了婚礼. * He's my kin, ie related to me. 他是我的亲戚. * We are near kin, ie closely related. 我们是近亲；
+
+    synonym：kindred
+    no kin to sb: not related to sb 与某人无亲属关系
+	kith and kin: 亲友（亲戚和朋友）
+	kinship:亲戚血缘关系
+
+metamorphose: [I, Ipr, Tn, Tn.pr] ~ (sb/sth) (into sth) (fml 文) (cause sb/sth to) change in form or nature （使某人[某物]）变形, 变质: A larva metamorphoses into a chrysalis and then into a butterfly. 幼虫变为蛹, 然後再变成蝴蝶. * The magician metamorphosed the frog into a prince. 魔术师把青蛙变成了王子
+
+    metamorphosis/metamorphoses: change of form or nature, eg by natural growth or development 变形; 变态; 变质 the social metamorphosis that has occurred in China 中国发生的社会变化
+	
+rhetoric:  修辞; 修辞艺术; 修辞学: impassioned rhetoric 富有表现力的修辞
+
+    (derog 贬) elaborate language which is intended to impress but is often insincere, meaningless or exaggerated 华丽的词藻（常含华而不实之意）; 虚夸的言辞: the empty rhetoric of politicians 政客们的花言巧语
+	
+reassure: ~ sb (about sth) remove sb's fears or doubts; make sb confident again 消除某人的恐惧或疑虑; 恢复某人的信心; 使某人放心；
+
+    reassuring: adj that reassures 使人消除恐惧或疑虑的; 使人放心的: a reassuring glance, word, pat on the back 使人恢复信心的目光﹑ 话﹑ 轻拍一下背部
+	
+reassuring rhetoric
+
+cohort；number of people banded together 一群人，一帮人； each of the ten units forming a legion 步兵大队（军团的十分之一）
+
+aristocracy: [CGp] highest social class; the nobility 贵族阶级; 贵族: members of the aristocracy 贵族成员；[C] most able or gifted members of any class （任何阶级或阶层的）最优秀的人物: an aristocracy of talent 人杰
+
+    aristocratic: adj 贵族的；有贵族气派的; 贵族化的; 装贵族派头的
+
+suffrage：n [U] right to vote in political elections （政治性选举的）选举权, 投票权: universal suffrage, ie the right of all adults to vote 普选权（成年人均有的投票权） * Women had to fight for their suffrage. 妇女须为享有选举权而斗争
+
+inexorable：adj continuing unstoppably; relentless 不可阻挡的; 坚持不懈的; 无情的: inexorable demands, pressures, etc 无可变更的要求﹑ 无情的压力 * the inexorable march of progress 势不可挡的进展 * the inexorable decline of wealth share
+
+procure: [Tn, Dn.n, Dn.pr] ~ sth (for sb) (fml 文) obtain sth, esp with care or effort; acquire 取得某事物（尤指费心或费力）; 获得: The book is out of print and difficult to procure. 那书已绝版, 很难弄到手； [I, Tn, Dn.pr] ~ sb (for sb) (derog 贬) find (prostitutes) for clients 为宿娼者介绍（娼妓）; 拉皮条: He was accused of procuring women for his business associates. 他被指控为其生意合伙人招妓
+
+interim：n. (idm 习语) in the interim, the time between one event, process, or period and another 在其间; 在其时；adj. serving during an intermediate interval of time 暂时的; 临时的 interim arrangements, measures, proposals, etc 临时的安排﹑ 措施﹑ 建议等
+
+heir: 继承人
+
+renounce：[Tn] agree to give up ownership or possession of (sth), esp formally 同意放弃（某事物）的所有权或占有权（尤指正式地）: renounce a claim, title, right, privilege 宣布放弃要求﹑ 头衔﹑ 权利﹑ 特权；[Tn] refuse to associate with or acknowledge (esp sth/sb with a claim to one's care, affection, etc) 拒绝与（某事物[某人]）发生联系; 与（某事物[某人]）断绝关系: renounce a friendship 绝交 * He renounced his son (as an unworthy heir). 他与儿子断绝了父子关系（认为他不配作继承人）.
+
+    renounce inheritance
+
+abject:  (of conditions) wretched; hopeless （指境况）凄惨的, 绝望的: living in abject poverty/misery 过着极穷困[悲惨]的生活
+
+    in abject poverty
+	
+dun: [Tn] persistently demand payment of a debt from (sb) （不断地向某人）讨债; 催讨债款
+
+budge；(cause sth to) move slightly （使某物）稍微移动, 动一动: My car's stuck in the mud, and it won't budge/I can't budge it. 我的汽车陷入泥中, 一动也不动[我无法使它移动]. 
+
+
+
+
+
+
+
+
+
+
+
+
