@@ -123,6 +123,8 @@ Nordic countries: 北欧国家
 
 tumult: n, disturbance or confusion, esp of a large mass of people 混乱; （尤指大群人的）骚乱: The demonstration broke up in tumult. 示威集会在纷乱中解散了；disturbed or agitated state of mind; turmoil （思想上的）波动, 烦乱: Her mind was/Her thoughts were in a tumult. 她心烦意乱
 
+    tumultuous/chaos/chaotic
+
 at/on sb`s heels; on the heels of sth following closely after sb/sth 紧跟在某人[某事物]後面: The thief ran off with an angry crowd at his heels. 那小偷在前面跑, 一群愤怒的人在後面紧追
 
 plunge: ~ (sth) into sth; ~ (sth) in:
@@ -292,6 +294,8 @@ in the wake of: as a result of；right after；following由于；紧随
     Traders came in the wake of the conquering armies．商人随着征服的军队而来。
     The students followed in the wake of the teacher．学生们跟在老师的后面。
 	
+for the sake of: for the purpose of; because of 为了；因为 *We must be patient for the sake of peace．为了和平，我们必须有耐心。
+	
 The overall trajectory is fairly similar
 
 minuscule: adj very small; tiny 极小的; 微小的
@@ -325,6 +329,77 @@ heyday: [sing] time of greatest success, prosperity, power, etc 最成功﹑ 最
 curb: [Tn] prevent (sth) from getting out of control; restrain 防止（某事物）失控; 约束: curb one's anger, feelings, etc 抑制怒火﹑ 感情等 * curb spending, waste, etc 限制开支﹑ 浪费等. [n] strap or chain passing under a horse's jaw, used to restrain the horse 马勒, 马嚼子（横放在马嘴里的皮带或铁链, 用以驾御马匹）. 
 
 supremacy: 至尊,至上,无上; 最高位
+
+controvert: [Tn] (fml 文) deny the truth of (sth); argue about 否定（某事物）; 争论; 反驳: a fact that cannot be controverted 无可置辩的事实
+
+    controversy: a discussion marked especially by the expression of opposing views (有关意见分歧大的问题等长期性的,尤其以文字发表的) 争论,论战,争吵
+	incontrovertible: adj so obvious and certain that it cannot be disputed or denied 无可辩驳的; 不容否认的: incontrovertible evidence 确凿无疑的证据
+	It is an incontrovertible history reality that ...
+	
+subsist:  [I, Ipr] ~ (on sth) (fml 文) (continue to) stay alive, esp with little food or money; exist （继续）存活, 活下去; （尤指藉微少的食物或金钱）维持生活; 生存: How do they manage to subsist (on such a low wage)? 他们（区区这点工资）怎样餬口? * He subsisted mainly on vegetables and fruit. 他主要依靠蔬菜和水果维持生命.
+
+    subsistence: [U] (means of) subsisting 存活; 生存; 生计; 维生之道 * [attrib 作定语] subsistence farming, ie farming that produces only enough crops for the farmer and his family to live on, leaving no surplus which could besold 自给农业（收成仅供自家食用, 无剩余出售者） * a subsistence wage, ie one that is only just enough to enable a worker to live 勉强餬口的工资
+	
+projection: [C] estimate of future situations or trends, etc based on a study of present ones 对未来形势的估计; 预测; 推断: sales projections for the next financial year 对下一财政年度销售情况的预测.
+
+foreordain: [usu passive 通常用於被动语态: Tn, Tf] (fml 文) (of God or fate) arrange or determine (sth) before it actually happens （指上帝或命运）注定: It was foreordained that the company would suffer a spectacular collapse. 这个公司注定要彻底垮台.
+
+ordain: [Tn, Cn.n] make (sb) a priest or minister 任命（某人）为司铎﹑ 神父或牧师: He was ordained priest last year. 去年授予他司铎一职； [Tn, Tf] (fml 文) (of God, law, authority, fate, etc) order or command; decide in advance （指上帝﹑ 法律﹑ 权威﹑ 命运等）命令, 规定, 注定: Fate had ordained that he should die in poverty. 命中注定他得死於贫困
+
+    NOTE ON USAGE 用法: When talking about giving orders, decree and dictate can be used of individuals in positions of authority. 谈到发命令, decree和dictate均可指下达者为掌权的个人. Decree usually suggests the public announcement of a decision made by a ruler or government without consulting others *decree通常指统治者或政府不与别人商议而公开宣布的决定: The dictator decreed that his birthday would be a public holiday. 该独裁者发布命令, 将其生日定为公众假期. Dictate indicates people using their power over others *dictate用以指人用权力支配他人: Her skills were in such demand that she could dictate her own salary. 她因其技术奇货可居, 故可以主宰自己的薪金待遇. Ordain and prescribe suggest a more impersonal authority such as the law. *ordain和prescribe多用以指如法律等非个人的权力. Ordain is formal and can be used of God *ordain含庄重色彩, 可用以指上帝: Is it ordained in heaven that women should work in the home? 女人就该在家里干活儿, 这是上天的旨意吗? Prescribe is used of the law *prescribe用於法律方面: Regulations prescribe certain standards for building materials. 有规章规定建筑材料的某些标准.
+	
+net: adj, ~ (of sth) remaining when nothing more is to be taken away 净的; 纯的: a net price, ie one from which a discount has been deducted 实价 * net profit, ie one that remains when working expenses have been deducted 纯利 * net weight, ie that of the contents only, excluding the weight of the wrappings, the container, etc 净重 * What do you earn, net of tax (ie after tax has been paid)? 你完税後净得多少?
+
+    [attrib 作定语] (of an effect, etc) final, after all the major factors have been considered （指结果等）最後的, 最终的: The net result of the long police investigation is that the identity of the killer is still a complete mystery. 警方经长时间调查, 结果凶手的身分仍全然不知
+	
+concatenation: ~ (of sth) (fml 文) series of things or events linked together 一系列互相关联的事物: an unfortunate concatenation of mishaps 接连的不幸.
+
+dubious: [esp pred 尤作表语] ~ (about sth/doing sth) not certain and slightly suspicious about sth; doubtful 半信半疑; 可疑: I remain dubious about her motives. 我对她的动机仍存疑念. 
+
+recapitulate:  (also infml 口语作 recap) v [I, Tn, Tw] state again or summarize the main points of (a discussion, etc) 重述或概括（讨论等）的要点: Let me just recapitulate (on) what we've agreed so far. 让我仅扼要重述一下到目前为止我们已取得的一致意见.
+
+    口语中一般用recap
+	
+proposition: [n] ~ (that...)statement that expresses a judgement or an opinion; assertion 观点; 见解; 主张: The proposition is so clear that it needs no explanation. 观点十分明确, 无须解释；[Tn] propose sexual intercourse to (a woman), esp in a direct and offensive way 向（女方）提出性交要求（尤指直言而放肆）; 求欢: She was propositioned several times in the course of the evening. 整个晚上有人几次向她提出非分要求
+
+    propose
+
+tautology: (a) [U] saying the same thing more than once in different ways withoutmaking one's meaning clearer or more forceful; needlessrepetition 无谓的重复; 赘述. (b) [C] instance of this 重复的话; 赘言
+
+    tautological adj 不必要的反复使用,同字 [同义字] 之重复,重复的,赘述的,赘言的
+	
+jargon:  [U] (often derog 常作贬义) technical or specialized words used by a particular group of people and difficult for others to understand 术语; 行话; 切口: scientific jargon 科学术语 * She uses so much jargon I can never understand her explanations. 她用的术语太多, 我怎麽也听不懂她的讲解
+
+placate: [Tn] make (sb) less angry; soothe or pacify 安慰, 抚慰（某人）; 使（某人）平静﹑ 息怒
+
+    placatory: <言行等>安抚的,怀柔的,安慰的,抚慰的,和解的: placatory remarks 安抚的话
+	implacable: adj, incapable of being placated, that cannot be changed or satisfied 不能变动的; 无法平息或安抚的: implacable hatred, fury, opposition 无法消解的仇恨﹑ 愤怒﹑ 对立 * an implacable enemy, rival, etc 势不两立的敌人﹑ 竞争对手等
+	
+amass: [Tn] gather together or collect (sth), esp in large quantities （尤指大量地）积累, 积聚, 收集（某事物）: amass a fortune 积累财富 * They amassed enough evidence to convict him on six charges. 他们搜集了足够的证据, 宣判他有六条罪状
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
