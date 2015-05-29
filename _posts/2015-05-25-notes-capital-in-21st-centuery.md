@@ -377,10 +377,43 @@ placate: [Tn] make (sb) less angry; soothe or pacify 安慰, 抚慰（某人）;
 	
 amass: [Tn] gather together or collect (sth), esp in large quantities （尤指大量地）积累, 积聚, 收集（某事物）: amass a fortune 积累财富 * They amassed enough evidence to convict him on six charges. 他们搜集了足够的证据, 宣判他有六条罪状
 
+confluence: (fml 文) coming together, esp of large numbers of people 汇合, 汇集（尤指大群的人）.
 
+    confluent: adj, 
+	
+distinct: adj easily heard, seen, felt or understood; definite 清楚的; 清晰的; 明显的; 明白的; 明确的: The footprints are quite distinct; they must be fresh. 足迹清晰易辨, 一定是不久前留下来的. 
 
+distinctive: adj ~ (of sth) that distinguishes sth by making it different from others 特别的; 有特色的: a distinctive appearance, style, smell 特殊的外表﹑ 风格﹑ 气味 * 
 
+    这个单词突出有特点，有别于其它的优点，peculiar，characteristic。
+	与distinct，是完全不同的意思，apparent obvious evident manifest definite。
+	
+vertigo：[U] feeling of losing one's balance, caused esp by looking down from a great height; dizziness 眩晕; （尤指）高处俯视性眩晕; 头晕: suffer from (an attack of) vertigo 感到（一阵）眩晕
 
+    vertiginous: adj
+	dizziness
+	
+primogeniture: [U] fact of being a first-born child 长嗣身分；(also right of primogeniture) (law 律) system of inheritance by which an eldest son receives his parents' property 长子继承权
+
+diminish: [I Tn](cause sth to) become smaller or less; decrease 变小; 变少; 使（某事物）变小; 使（某事物）变少; 缩小; 减少; 降低: His strength has diminished over the years. 经过这许多年月, 他的体力不如从前了.
+
+entail: [Tn] make (sth) necessary; involve 使（某事物）必要; 牵涉；必然伴有,需要，使必需, 使蒙受, 使承担: This job entails a lot of hard work. 这项工作需要十分努力. * That will entail an early start tomorrow morning. 那就需要明晨很早动身；[esp passive 尤用於被动语态: Tn, Tn.pr] ~ sth (on sb) (law 律) leave (land) to a line of heirs in such a way that none of them can give it away or sell it 限定（地产）继承人: The house and estate are entailed on the eldest daughter. 这所房子和地产限定由长女继承. * He would have sold the property long ago had it not been entailed. 这些财产若非限定继承的话, 他早就卖掉了
+
+    entail:[n] [U] practice of entailing land （地产的）限定继承 [C] entailed property 限定继承的财产
+
+misfortune: [U] bad luck 不幸; 厄运: suffer great misfortune 遭到极大不幸； [C] instance of this; unfortunate condition, accident or event 不幸事故; 灾难; 灾祸
+
+spinster: (a) (law or fml 律或文) unmarried woman 未婚女子. (b) (often derog 常作贬义) woman who remains single after the usual age for marrying 老处女
+
+    bachelor: 单身汉
+
+whim: [n] sudden desire or idea, esp an unusual or unreasonable one; caprice 一时的兴致; 突然的念头; （尤指）突发奇想, 异想天开; 心血来潮: It's only a passing whim, ie one that will soon be forgotten. 这只不过是一闪之念. * They seem ready to indulge (ie satisfy) his every whim. 他们简直惯着他随心所欲.	
+
+detriment: n (idm 习语) to the detriment of sb/sth; without detriment to sb/sth harming/not harming sb/sth 对某人[某事物]有害 [无害]; 有损於[无损於]某人[某事物]: He works long hours, to the detriment of his health. 他长时间地工作, 有损健康. * This tax cannot be introduced without detriment to the economy. 这一税制一旦施行, 必然会危害国民经济.
+
+    detrimental: adj
+
+Civil Code 民法
 
 
 
