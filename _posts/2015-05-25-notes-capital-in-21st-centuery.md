@@ -2,6 +2,7 @@
 layout: post
 title: Capital in 21st Century Pickups
 ---
+>In fact, nothing can be further from truth.
 
 It's indispensable to make use of complementary sources as well.
 
@@ -99,6 +100,12 @@ relegate:  [esp passive 尤用於被动语态: Tn, Tn.pr] ~ sb/sth (to sth) dism
 
 meritocracy: (a) [U] system of government by people of high achievement 英才管理（制度）. (b) [CGp] such people in a society （社会的）英才, 精英, 贤能.
 
+    meritocratic: adj
+
+aristocracy: [CGp] highest social class; the nobility 贵族阶级; 贵族: members of the aristocracy 贵族成员；[C] most able or gifted members of any class （任何阶级或阶层的）最优秀的人物: an aristocracy of talent 人杰
+
+    aristocratic: adj 贵族的；有贵族气派的; 贵族化的; 装贵族派头的
+
 leave aside the fact that ...; leave aside, too, the fact that ...
 
 instrumental: [pred 作表语] ~ in doing sth being the means of bringing sth about 作为促成某事物之手段; 有帮助; 起作用: Our artistic director was instrumental in persuading the orchestra to come and play for us. 我们的艺术指导大费唇舌请来管弦乐队为我们演出.
@@ -195,6 +202,8 @@ mischief:  [U] behaviour (esp of children) that is annoying or does slight damag
 
 confiscate: [Tn] take possession of (sb's property) by authority, without payment or compensation 没收（某人的财产）; 充公: The headmaster confiscated Tommy's pea-shooter. 校长没收了汤米的射豆枪. * If you are caught smuggling goods into the country, they will probably be confiscated. 假若查出你向该国走私货物, 你的货物准得没收. 
 
+levy:  [Tn, Tn.pr] ~ sth (on sb) collect (a payment, etc) by authority or force; impose sth 徵收, 徵集（款额等）; 强加某事物: a departure tax levied on all travellers 向所有旅客徵收的离境税
+
 windfall: an unexpected, unearned, or sudden gain or advantage 意外的收获
 
 think tank: 智库，智囊团 A group or an institution organized for intensive research and solving of problems, especially in the areas of technology, social or political strategy, or armament. 智囊：尤指为集中研究并解决在技术、社会或政策及军事领域中的问题而组织起来的群体或机构
@@ -222,7 +231,9 @@ regiment: 军队中的团； ~ of sth/sb (fig 比喻) large number of things or 
 
 colonel: 上校（美国陆军、空军或海军陆战队中校之上准将之下的军衔）
 
-bequest: act of bequeathing 遗赠: the bequest of one's paintings to a gallery 把绘画遗赠给美术馆；thing bequeathed; legacy 遗产; 遗物: leave a bequest of 2000 each to one's grandchildren 留给孙儿每人一笔2000英镑的遗产
+bequest: [n]act of bequeathing 遗赠: the bequest of one's paintings to a gallery 把绘画遗赠给美术馆；thing bequeathed; legacy 遗产; 遗物: leave a bequest of 2000 each to one's grandchildren 留给孙儿每人一笔2000英镑的遗产
+
+bequeath: (fml 文) [Tn, Dn.n, Dn.pr] ~ sth (to sb) 1 arrange, by making a will, to give (property, money etc) (to sb) when one dies 将（财物等）遗赠（给某人）: He bequeathed 1000 (to charity). 他遗赠（给慈善事业）1000英镑. * She has bequeathed me her jewellery. 她把珠宝遗赠给我了
 
 cadastre:an official register of the quantity, value, and ownership of real estate used in apportioning taxes
 
@@ -254,10 +265,6 @@ reassure: ~ sb (about sth) remove sb's fears or doubts; make sb confident again 
 reassuring rhetoric
 
 cohort；number of people banded together 一群人，一帮人； each of the ten units forming a legion 步兵大队（军团的十分之一）
-
-aristocracy: [CGp] highest social class; the nobility 贵族阶级; 贵族: members of the aristocracy 贵族成员；[C] most able or gifted members of any class （任何阶级或阶层的）最优秀的人物: an aristocracy of talent 人杰
-
-    aristocratic: adj 贵族的；有贵族气派的; 贵族化的; 装贵族派头的
 
 suffrage：n [U] right to vote in political elections （政治性选举的）选举权, 投票权: universal suffrage, ie the right of all adults to vote 普选权（成年人均有的投票权） * Women had to fight for their suffrage. 妇女须为享有选举权而斗争
 
@@ -315,6 +322,8 @@ sanctuary: 圣域,避难所
 ineluctable: not to be avoided, changed, or resisted : INEVITABLE 不可避免的; 难免的 <an ineluctable fate> 
 
 ground:  [I, Ipr, Tn, Tn.pr] ~ (sth) (in/on sth) (of a ship) touch the sea bottom; cause (a ship) to do this （指船）触海底, 搁浅; 使（船）触海底﹑ 搁浅: Our ship grounded in shallow water/on a sandbank. 我们的船在浅水中[在沙滩上]搁浅
+
+ground: [C esp pl 尤作复数] ~ (for sth/doing sth/to do sth) reason(s) or justification for saying, doing or believing sth 说﹑ 做或相信某事的原因或理由: You have no grounds for complaint/for complaining. 你没有抱怨的理由. * If you continue to behave like this you will give them/provide them with grounds for dismissing you. 你照这样下去就让他们找到辞退你的理由了. * Desertion is a ground (ie legally sufficient reason) for divorce. 被配偶遗弃是离婚的充足理由. * They had no grounds to arrest him. 他们没有理由逮捕他. 
 
 in a sense: in a way；in one respect在某种意义上
 
@@ -415,17 +424,80 @@ detriment: n (idm 习语) to the detriment of sb/sth; without detriment to sb/st
 
 Civil Code 民法
 
+equal --> equality: 等同性, 同等, 平等, 相等, 等式 --> equilibrium: A condition in which all acting influences are canceled by others, resulting in a stable, balanced, or unchanging system.See Synonyms at balance 平衡，均衡：一种所有动作的影响都互相抵消，整个系统处于平稳的、均势的、不变的状态
+
+egalitarian: [n, adj] n, adj (person) showing or holding a belief in equal rights, benefits and opportunities for everybody 平等主义的; 平等主义者: an egalitarian attitude to voting 对投票持平等主义的态度. 
+
+    inegalitarain: adj Marked by or accepting of social, economic, or political inequality. 不平等的：具有或接受社会的、经济的或政治不平等性的
+	
+splendor: Magnificent appearance or display; grandeur 华丽，壮丽：辉煌华丽的表面或陈设；壮观
+
+zeal:  [U] (fml 文) ~ (for sth) (usu intense) energy or enthusiasm; keenness （通常为高度的）热忱, 热情; 热心: show zeal for a cause 表现出对一事业的热忱 * work with great zeal 热情洋溢地工作 * revolutionary,religious zeal 革命的﹑ 宗教的热诚
+
+butler: [n] chief male servant of a house, usu in charge of the wine-cellar 男管家（通常负责管理酒窖）,大管家,家务中的仆役长
+
+pussy: 小猫咪; 女性的阴部;
+
+kitten: young cat 小猫.
+
+compatriot：[n] person who was born in, or is a citizen of, the same country as another; fellow-countryman 同胞; 同国人
+
+fascist: [U] extreme right-wing dictatorial political system or views, esp (Fascism) as originally seen in Italy between 1922 and 1943 法西斯主义
+
+    fscist: [C][常 F~]法西斯主义者,法西斯党员
+
+capitalize: (phr v) capitalize on sth, use sth to one's own advantage; profit from sth 利用某事物; 从某事物中获利: capitalize on the mistakes made by a rival firm 从对方公司的错误中获益
+
+hail: [Cn.n/a] ~ sb/sth as sth enthusiastically acknowledge sb/sth as sth 热情地承认某人[某事物]为...: crowds hailing him as king, as a hero 拥他为王﹑ 赞他为英雄的群众 * (fig 比喻) The book was hailed as a masterpiece/as masterly. 这本书被誉为杰作.
+
+thereabouts:  (also US thereabout) adv ((usu after or 通常用於or之後) near that number, quantity, time, etc 近於（某数目﹑ 数量﹑ 时间等）; 大约; 左右: I'll be home at 8 o'clock or thereabouts. 我8点钟回家, 8点左右吧；somewhere near there 在附近的某地: The factory is in Leeds or somewhere thereabouts. 那工厂在利兹, 也许在利兹附近
+
+wary: adj (-ier, -iest) ~ (of sb/sth) looking out for possible danger or difficulty; cautious （对可能发生的危险或困难）留意的, 小心的, 警惕的: keep a wary eye on sb 密切注意某人 * She was wary of strangers. 她很警惕陌生人. * be wary of giving offence 唯恐冒犯他人
+
+poles apart/asunder: completely different相差甚远 *They were in agreement on most world issues，but they were poles apart about the war．他们对于多数世界大事意见是一致的，但对于战争的看法却截然相反。 *Their opinions are poles asunder．他们的意见截然相反。 *The two brothers are poles apart in character．这兄弟二人性格迥异。
+
+In fact, nothing can be further from truth.
+
+outset: at/from the outset (of sth) at/from the beginning (of sth) 开端; 开始: At the outset of her career she was full of optimism but not now. 她事业伊始十分乐观, 但现在已今非昔比了. * From the outset it was clear that he was guilty. 一开始就很清楚: 他有罪
+
+verge: [n] (idm 习语) on/to the verge of sth, at or close to the point where sth new begins or takes place 在某事即将发生之际; 接近出现某事物之点: on the verge of war, success, bankruptcy 在接近战争爆发﹑ 成功﹑ 破产之际 * Her misery brought her to the verge of tears. 她难过得快要哭了
+
+    on/to the verge of sth
+
+default: [U] (esp law 尤用於法律) failure to do sth, esp to pay a debt or appear in court 不做某事; （尤指）不还债, 不出庭，不履行债务，‘法律’不出庭,不到案
+
+    go into default 变成不履行债务
+	(idm 习语) by default：because the other party, team, etc does not appear 因对方﹑ 他队等未出场: win a case/a game by default 因对方未出席[未出场]而赢得诉讼[比赛]. 
+	in default of sth/sb (fml 文): because or in case sth/sb is absent 因某物[某人]未在场; 在无某物[某人]时: He was acquitted in default of strong evidence of his guilt. 因无确凿证据而判他无罪. * The committee will not meet in default of a chairman. 没有主席委员会就不开会.
+
+on the verge of default 赖账的边缘
+
+prodigious: adj very great in size, amount or degree, so as to cause amazement or admiration; enormous （在体积﹑ 数量或程度上）大得令人惊叹; 巨大的: a prodigious achievement 巨大的成就 * It cost a prodigious amount (of money). 这用了一笔巨款
+
+    prodigiously: adv
+
+emblem: [n] object that represents sth; symbol 象徵; 标志; 标记: The dove is an emblem of peace. 鸽子是和平的象徵. * The ring was important to her as an emblem of their love. 这枚戒指是他们爱情的象徵, 对她至为重要. * The thistle is the emblem of Scotland. 蓟是苏格兰的标志.
+
+    emblematic: adj [usu pred 通常作表语] ~ (of sth) (fml 文) serving as an emblem; symbolic 用作象徵; 作为标志
+	
+solidarity: [U] unity and agreement resulting from shared interests, feelings, actions, sympathies, etc 团结; 一致: national solidarity in the face of danger 危难当头举国团结一致 * `We must show solidarity with the strikers,' declared the student leaders. 学生领袖声称: ‘我们要申明与罢工工人团结一致.’
+
+    solidarity tax: 团结税
+	
+concentration of wealth
+
+spearhead: 及物动词 to be the leader of (a movement, for example): 率先：做…的先锋（如运动）：
+
+discern: [Tn] see (sth) clearly (with the senses or the mind), esp with an effort 看出, 识别, 辨认（某事物）（尤指需费力）: In the gloom I could only just discern the outline of a building. 在黑暗中我只能依稀分辨出一座建筑物的轮廓来. * One can faintly discern the flavour of lemon. 可以隐约觉得有一点柠檬味. * discern sb's true intentions 弄清某人的真实意图
+
+upshot: [sing] the ~ (of sth) the final result or outcome 最後结果; 结局；结果,结局,结论: The upshot of it all was that he resigned. 结果他辞职了
+
+rejoice: [I, Ipr, It] ~ (at/over sth) (fml 文) feel or show great joy 极欢喜; 极高兴; rejoice over a victory 为胜利而欣喜 * rejoice at sb's success 为某人的成功而高兴 * I rejoice to hear that you are well again. 得知你身体康复, 甚为欣慰. * We rejoiced that the war was over. 我们为战争结束而欢欣鼓舞.
+
+    rejoice in：(joc 谑) have or glory in (a title, etc) 有（某种称号等）; 以（有某种称号等）为荣: She rejoices in the name of Cassandra Postlethwaite. 她为有卡桑德拉?波斯尔思韦特这样的名字而引以为荣.
 
 
-
-
-
-
-
-
-
-
-
+	
 
 
 
