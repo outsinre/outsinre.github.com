@@ -16,7 +16,7 @@ Add a file by `href`. <br />
 <br />
 
 Add an image by markup.
-![Test]({{site.baseurl}}assets/plane.jpg)   
+![Test]({{site.baseurl}}assets/plane.jpg "Optional title")   
 
 One way around this is to size images in relative units, rather than absolute pixel dimensions. The most common relative solution is to set the max-width of the image at 100%. Specifying only the `width` of images may cause a doubling or tripling of the cycles that many browsers must process to layout the new, resized page. While each of these cycles typically take less than a millisecond, they stack up, especially if there are multiple scalable elements on the page. Addressing `height` in the same declaration can reduce this issue.
 <img src="{{site.baseurl}}assets/hknight.jpg" alt="Hong Kong Night" style="max-width:100%;height:auto;">
