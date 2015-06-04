@@ -471,18 +471,19 @@ export XMODIFIERS=@im=fcitx
     11. _#_ emerge -av net-misc/dropbox xfce-extra/thunar-dropbox
         1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
         2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
-            1. I think this can be overcome by setting the dropbox language to `english`.
+            1. This can be overcome by setting the dropbox language to `english`.
         3. _$_ dropbox start, Gentoo and Windows share the Dropbox location in /media/Misc/Dropbox. When firstly run this command, you need to configure dropbox as default setting (Dropbox folder in /home/zachary/Dropbox). But then exit dropbox immediately. And remove /home/zachary/Dropbox.
             1. _$_ rmdir /home/zachary/Dropbox
             2. _$_ ln -s /media/Misc/Dropbox /home/zachary/Dropbox
         4. _$_ dropbox &, run dropbox in the backgroud.
-        5. We can create a ~/bin/dropbox.sh script:
+        5. We can create a ~/bin/dropbox.sh or /usr/local/bin/dropbox.sh script:
 
             >\#!/bin/bash
             >
-            >/usr/bin/dropbox &
+            >/opt/bin/dropbox &
 
-            So each time just run `~/bin/dropbox.sh`.
+            Remember to `chmod +x ~/bin/dropbox.sh`, just run `~/bin/dropbox.sh`.
+        6. If blocked by GFW, set the corresponding proxy address and port.
     12. _#_ emerge --ask app-portage/gentoolkit
     13. _#_ emerge --ask app-portage/eix
         1. _#_ emacs -nw /etc/eix-sync.conf: this is deprecated for the new poratge > 2.2.16.
