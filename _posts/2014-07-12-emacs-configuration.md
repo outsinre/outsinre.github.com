@@ -2,6 +2,12 @@
 layout: post
 title: Emacs configuration
 ---
+# frame VS window
+Emacs中两个概念容易混淆，即frame和window。
+
+frame就是我们通常所说的“窗口”，譬如，在系统菜单点击Emacs，那么eamcs就会运行，那个就称为frame，其实就是an emacs process/an emacs instance。
+
+window是frame里的小窗口。譬如，可以把frame分成多个window，每一个window编辑不同的文件（buffer）。
 
 # WINDOWS
 
@@ -71,10 +77,115 @@ Ubuntu 14.04系统默是UTF-8编码，没有问题，但是一直无法用Ibus�
 	`emacs -nw`
 这表示terminal模式运行emacs. 但是这个方法有个问题，terminal模式下无法`C-y`粘贴clipboard里面的内容，要用terminal自己的粘贴快捷键；还有就是`M`开头的快捷键经常和terminal冲突。
 
-最后发现问题了，要把locale中的设置成中文:
+最后发现问题了，要把locale中的`LC_CTYPE`设置成中文:
 
 `sudo update-locale LC_CTYPE=zh_CN.UTF-8`,然后reboot即可。
 
 ## Gentoo下emacs
 
-中文输入的问题，可以参考Gentoo Installation. 特别注意font-adobe-75dpi和font-adobe-100dpi字体的安装。
+中文输入的问题，可以参考Gentoo Installation.
+
+另外注意一定要安装font-adobe-75dpi和font-adobe-100dpi字体。
+
+在~/.bashrc中加入下面行，把emacs设置为默认编辑器。
+
+>EDITOR=/usr/bin/emacs
+
+# Emacs启动太慢
+
+emacs 由于要加载太多东西，所以一般要2～3秒，太慢，是emacs一大诟病。不过我们可以利用emacs的C/S模式，先让emacs运行在server mode，然后再用客户端emacsclient连接服务器端。
+
+## emacs 23之前的版本：
+
+可以在启动emacs的时候，顺便选择开启server-start。一种方法是在init.el里面设定加入：`(server-start)` or `(server-mode)`。另一种是直接在emacs里面输入命令：`M-x server-start/server-mode`。
+
+## emacs 23开始的版本
+
+emacs 23之前的那种方法有个缺点：所开启的server mode只属于当期的emacs frame，如果这个emacs关闭来，那么server就关闭来，再开启eamcs时，又要重新加载server mode。
+
+不过eamcs 23引入来`emacs --daemon`，对，就是daemon。这样，既然是daemon，那么server mode可以常驻系统中，与某个emacs frame无关。关闭当前的emacs frame，server服务并没有停止。
+
+## eamcsclient
+
+解决来server mode问题之后，运行客户端`emacsclient`，连接server，对文件进行处理。eamcsclient有几个关键参数：
+
+1. -t
+
+    -t表示在terminal中打开字符界面的frame
+2. -c
+
+    -c表示创建create一个X11界面的frame，也就是通常所说的GUI
+3. -a
+
+    -a, --alternate-editor,表示如果server mode没有开启，那么选择一个替代编辑器，譬如vim，gedit等。
+
+    通常我们设置成空：""。如 `-a ""` 或 `--alternate-editor=""`。设置成空表示，如果server mode没有加载，那么就emacsclient会先加载它。
+
+### 终端下运行
+
+```
+_$_ emacs --daemon
+_$_ emacsclient -t -a "" [file name]
+_$_ emacsclient -c -a "" [file name]
+```
+
+如果每次都这样运行，输入的命令太长来，不方便。可以作如下改进：
+
+1. emacs --daemon可以加入default runlevel，开机启动。不过我不认为这样是个好主意，毕竟不是每次开机都铁定运行emacs，而且还影响开机速度。我们要的是按需启动emacs server。
+2. 给这几个命令取别名、或创建脚本，简化命令的长度。脚本文件放在~/bin目录下：
+
+    ```
+# ~/bin/ect
+#! /bin/bash
+emacsclient -t -a "" "$@"
+    ```
+
+    ```
+# ~/bin/ecx
+#! /bin/bash
+emacsclient -c -a "" "$@"
+    ```
+
+    脚本里加来`-a`参数，这样就不用每次都先运行`emacs --daemon`。
+
+    `"$@"`，表示接受命令行的所有参数。
+    
+    下面把~/bin加入到PATH中，编辑~/.bashrc，加入以下内容：
+
+    >PATH="${PATH}:$HOME/bin:"
+
+    下面运行：
+    >_$_ source .bashrc
+
+    >_$_ ect/ecx [path/to/filename]
+3. 省略略掉脚本中-a参数，在~/.bashrc中加入：
+
+    >export ALTERNATE_EDITOR=""
+4. 修改默认编辑器。前面在~/.bashrc中设置了`EDITOR=emacs`，现在择改成ect：
+
+    >EDITOR=~/bin/ect
+5. 上面的方法主要是针对当前用户,但是Linux系统是**multi-user**的,所以最好设置成system-wide:
+
+    **脚本放到/usr/local/bin目录下；ALTERNATE_EDITR && EDITOR要设置在/etc/env.d/目录下**
+
+### 桌面下运行
+
+上面的步骤是针对命令行来的,对于Gentoo下的XFCE桌面环境,该如何办启动emacsclient?
+
+修改/usr/share/applications/emacsclient.desktop文件. Gentoo安装emacs时,默认创建了emacsclient.desktop文件,但是在XFCE菜单里没有出现.
+
+我们参考emacs.desktop文件,需要修改: NoDisplay和Exec. 然后添加Categories参数:
+
+>NoDisplay=false
+>
+>Exec=/usr/bin/emacsclient -c -a "" %F
+>
+>Categories=Development;TextEditor;
+
+虽然在.bashrc中设置了`ALTERNATE_EDITOR=""`,但不可以省略`-a`参数,因为它只影响interactive shell,对X环境不起左右。但如果设置在/etc/env.d/目录下，则可以省略`-a`，因为那个目录是system-wide的。
+
+现在可以直接在系统菜单找到Emacsclient菜单, 而且右键可以正常使用`Open With "Emacsclient"`。
+
+### mousepad就显得有些多余了.
+
+由于emacs的启动速度问题解决了,mousepad就基本推出历史舞台了.
