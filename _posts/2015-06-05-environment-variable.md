@@ -17,7 +17,7 @@ PATH=~/opt/bin:$PATH
 PATH=$PATH:~/opt/bin
 export PATH=$PATH:~/opt/bin
     ```
-    'export` is a shell builtin for `bash`, `ksh` and `zsh`.  The first line omit the `export` keyword which is called `assignment`. We don't need `export` if the variable is already in the environment: any change of the value of the variable is reflected in the environment for modern shells. `PATH` is pretty much always in the environment; all Unix-like system sets it in the very beginning (usually in the very first process, in fact).
+    `export` is a shell builtin for `bash`, `ksh` and `zsh`.  The first line omit the `export` keyword which is called `assignment`. We don't need `export` if the variable is already in the environment: any change of the value of the variable is reflected in the environment for modern shells. `PATH` is pretty much always in the environment; all Unix-like system sets it in the very beginning (usually in the very first process, in fact).
 
     But if the variable is not in the environment, you must add `export`. For example, some environment variable is for specific program newly installed. You could test by command:
 
@@ -54,7 +54,7 @@ PATH="$PATH:~/bin"
 
     >Interactive shell: /etc/bash/bashrc -> ~/.bashrc
 
-References: [1], [2], [3]
+References: [1], [2], [3].
 
 [1]:http://unix.stackexchange.com/a/26059
 [2]:http://superuser.com/a/183980
