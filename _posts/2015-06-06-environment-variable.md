@@ -53,7 +53,8 @@ PATH="$PATH:~/bin"
 
     >Interactive shell: /etc/bash/bashrc -> ~/.bashrc
 
-References: [1], [2], [3].
+References: [1], [2] and [3].
+
 
 [1]:http://unix.stackexchange.com/a/26059
 [2]:http://superuser.com/a/183980
