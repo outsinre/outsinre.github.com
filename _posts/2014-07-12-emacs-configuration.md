@@ -103,7 +103,7 @@ emacs 由于要加载太多东西，所以一般要2～3秒，太慢，是emacs�
 
 emacs 23之前的那种方法有个缺点：所开启的server mode只属于当期的emacs frame，如果这个emacs关闭来，那么server就关闭来，再开启eamcs时，又要重新加载server mode。
 
-不过eamcs 23引入来`emacs --daemon`，对，就是daemon。这样，既然是daemon，那么server mode可以常驻系统中，与某个emacs frame无关。关闭当前的emacs frame，server服务并没有停止。
+不过eamcs 23引入`emacs --daemon`，那么server mode可以常驻系统中，与某个emacs frame无关。关闭当前的emacs frame，server服务并没有停止。
 
 ## eamcsclient
 
@@ -121,6 +121,8 @@ emacs 23之前的那种方法有个缺点：所开启的server mode只属于当�
 
     通常我们设置成空：""。如 `-a ""` 或 `--alternate-editor=""`。设置成空表示，如果server mode没有加载，那么就emacsclient会先加载它。
 
+    但是如果每次运行emacsclient命令时，都带上`-a`很麻烦。更好的办法是设置系统变量`ALTERNATE_EDITOR=""`,下面会涉及到。
+
 ### 终端下运行
 
 ```
@@ -129,45 +131,44 @@ _$_ emacsclient -t -a "" [file name]
 _$_ emacsclient -c -a "" [file name]
 ```
 
-如果每次都这样运行，输入的命令太长来，不方便。可以作如下改进：
+如果每次都这样运行，输入的命令太长来，作如下改进：
 
 1. emacs --daemon可以加入default runlevel，开机启动。不过我不认为这样是个好主意，毕竟不是每次开机都铁定运行emacs，而且还影响开机速度。我们要的是按需启动emacs server。
-2. 给这几个命令取别名、或创建脚本，简化命令的长度。脚本文件放在~/bin目录下：
+2. 给这几个命令取别名、或创建脚本，简化命令的长度。脚本文件放在`/usr/local/bin`下：
 
     ```
-# ~/bin/ect
+# /usr/local/bin/ect
 #! /bin/bash
 emacsclient -t -a "" "$@"
     ```
 
     ```
-# ~/bin/ecx
+# /usr/local/bin/ecx
 #! /bin/bash
 emacsclient -c -a "" "$@"
     ```
 
-    脚本里加来`-a`参数，这样就不用每次都先运行`emacs --daemon`。
-
-    `"$@"`，表示接受命令行的所有参数。
+    `"$@"`，表示接受命令行的所有参数,主要就是要编辑的文件名。
     
-    下面把~/bin加入到PATH中，编辑~/.bashrc，加入以下内容：
-
-    >PATH="${PATH}:$HOME/bin:"
-
-    下面运行：
-    >_$_ source .bashrc
-
+    默认情况下，`/usr/local/bin`加入到了`PATH`中，测试：
+    >_$_ which ecx/ect
+    
     >_$_ ect/ecx [path/to/filename]
-3. 省略略掉脚本中-a参数，在~/.bashrc中加入：
+    
+3. 为了省略脚本中`-a`参数,在`/etc/env.d/`下创建文件99local，用于存放system-wide environment variable，内容如下：
 
     >export ALTERNATE_EDITOR=""
-4. 修改默认编辑器。前面在~/.bashrc中设置了`EDITOR=emacs`，现在择改成ect：
+4. 修改默认编辑器为ect。在`/usr/local/bin/99local`添加：
 
-    >EDITOR=~/bin/ect
-5. 上面的方法主要是针对当前用户,但是Linux系统是**multi-user**的,所以最好设置成system-wide:
+    >EDITOR=/usr/local/bin/ect
+5. _#_ env-update && source /etc/profile
 
-    **脚本放到/usr/local/bin目录下；ALTERNATE_EDITR && EDITOR要设置在/etc/env.d/目录下**
-
+    更新系统环境变量。
+6. 上面的步骤是为system-wide设置的，也可以单独为用户自己设置private owned scripts：
+    1. 脚本放在`~/bin`下面
+    2. `~/bin`加入到用户的`PATH`中
+    3. `ALTERNATE_EDITOR`和`EDITOR`也必须设置。
+    
 ### 桌面下运行
 
 上面的步骤是针对命令行来的,对于Gentoo下的XFCE桌面环境,该如何办启动emacsclient?
@@ -182,9 +183,9 @@ emacsclient -c -a "" "$@"
 >
 >Categories=Development;TextEditor;
 
-虽然在.bashrc中设置了`ALTERNATE_EDITOR=""`,但不可以省略`-a`参数,因为它只影响interactive shell,对X环境不起左右。但如果设置在/etc/env.d/目录下，则可以省略`-a`，因为那个目录是system-wide的。
-
 现在可以直接在系统菜单找到Emacsclient菜单, 而且右键可以正常使用`Open With "Emacsclient"`。
+
+如果在前面的99local里设置了`ALTERNATE_EDITOR`，这里面的`-a`参数也可以省略掉，
 
 ### mousepad就显得有些多余了.
 
