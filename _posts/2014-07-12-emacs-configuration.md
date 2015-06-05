@@ -81,7 +81,7 @@ Ubuntu 14.04系统默是UTF-8编码，没有问题，但是一直无法用Ibus�
 
 `sudo update-locale LC_CTYPE=zh_CN.UTF-8`,然后reboot即可。
 
-## Gentoo下emacs
+# Gentoo下emacs
 
 中文输入的问题，可以参考Gentoo Installation.
 
@@ -91,21 +91,23 @@ Ubuntu 14.04系统默是UTF-8编码，没有问题，但是一直无法用Ibus�
 
 >EDITOR=/usr/bin/emacs
 
-# Emacs启动太慢
+## Emacs启动太慢
 
-emacs 由于要加载太多东西，所以一般要2～3秒，太慢，是emacs一大诟病。不过我们可以利用emacs的C/S模式，先让emacs运行在server mode，然后再用客户端emacsclient连接服务器端。
+>Emacs = Emacs Makes A Computer Slow.
 
-## emacs 23之前的版本：
+emacs 由于要加载好多脚本，特别是.emacs 或 init.el里的内容很多时，太慢，是emacs一大诟病。不过我们可以利用emacs的C/S模式，先让emacs运行在server mode，脚本的加载让server来完成。然后再用客户端emacsclient连接server。
+
+### emacs 23之前的版本：
 
 可以在启动emacs的时候，顺便选择开启server-start。一种方法是在init.el里面设定加入：`(server-start)` or `(server-mode)`。另一种是直接在emacs里面输入命令：`M-x server-start/server-mode`。
 
-## emacs 23开始的版本
+### emacs 23开始的版本
 
 emacs 23之前的那种方法有个缺点：所开启的server mode只属于当期的emacs frame，如果这个emacs关闭来，那么server就关闭来，再开启eamcs时，又要重新加载server mode。
 
 不过eamcs 23引入`emacs --daemon`，那么server mode可以常驻系统中，与某个emacs frame无关。关闭当前的emacs frame，server服务并没有停止。
 
-## eamcsclient
+### eamcsclient
 
 解决来server mode问题之后，运行客户端`emacsclient`，连接server，对文件进行处理。eamcsclient有几个关键参数：
 
@@ -134,7 +136,7 @@ _$_ emacsclient -c -a "" [file name]
 如果每次都这样运行，输入的命令太长来，作如下改进：
 
 1. emacs --daemon可以加入default runlevel，开机启动。不过我不认为这样是个好主意，毕竟不是每次开机都铁定运行emacs，而且还影响开机速度。我们要的是按需启动emacs server。
-2. 给这几个命令取别名、或创建脚本，简化命令的长度。脚本文件放在`/usr/local/bin`下：
+2. 给这几个命令**取别名**、或**创建脚本**，简化命令的长度。脚本文件放在`/usr/local/bin`下：
 
     ```
 # /usr/local/bin/ect
