@@ -47,8 +47,8 @@ PATH="$PATH:~/bin"
 8. You may see here and there recommendations to either put environment variable definitions in `~/.bashrc` or always launch login shells in terminals. Both are bad ideas. The most common problem with either of these ideas is that your environment variables will only be set in programs launched via the terminal, not in programs started directly with an icon or desktop menu or keyboard shortcut.
 
     But in Gentoo, the official Wiki recommends per-user setting in `~/.bashrc` which is sourced by `~/.bash_profile`.
-9. `~/.bash_profile` is executed for login shells, while `~/.bashrc` is executed for interactive non-login shells. When you login (eg: type username and password) via console, either physically sitting at the machine when booting, or remotely via ssh: .bash_profile is executed to configure things before the initial command prompt. But, if you've already logged into your machine and open a new terminal window (xterm) inside Gnome or KDE, then .bashrc is executed before the window command prompt. .bashrc is also run when you start a new bash instance by typing /bin/bash in a terminal.
-10. Execution line:
+9. `~/.bash_profile` is executed for login shells, while `~/.bashrc` is executed for interactive non-login shells. When you login (eg: type username and password) via console, either physically sitting at the machine when booting, or remotely via ssh: .bash_profile is executed to configure things before the initial command prompt. But, if you've already logged into your machine and open a new terminal window (xterm) inside Gnome or KDE, then .bashrc is executed before the window command prompt. `~/.bashrc` is also run when you start a new bash instance by typing /bin/bash in a terminal.
+10. Execution order:
 
     >Login shell: /etc/profile -> /etc/env.d/* -> /etc/bash/bashrc -> /etc/profile.d/*.sh -> ~/.bash_profile -> ~/.bashrc
 
