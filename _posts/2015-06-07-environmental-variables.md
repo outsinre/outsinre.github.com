@@ -6,14 +6,14 @@ In Unix-like systems, we have to deal with environment variables such as PATH, M
 
 1. Order of directory
 
-    ```shell
+    ```bash
 PATH=$PATH:~/opt/bin
 PATH=~/opt/bin:$PATH
     ```
     The diffeence of the two lines is the order when searching for commands. The 2nd line make directory `~/opt/bin` searched before those ones in original `PATH`.
 2. `export` or not
 
-    ```shell
+    ```bash
 PATH=$PATH:~/opt/bin
 export PATH=$PATH:~/opt/bin
     ```
@@ -26,7 +26,7 @@ export PATH=$PATH:~/opt/bin
     **Use `export` if not sure**.
 3. `$HOME` or `~`
 
-    ```shell
+    ```bash
 export  PATH="$PATH:$HOME/bin"
 PATH="$PATH:$HOME/bin"
 PATH=$PATH:$HOME/bin
