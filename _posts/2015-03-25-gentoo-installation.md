@@ -300,7 +300,9 @@ passwd zachary
         1. _#_ emerge --sync, changed to `emains sync` for new portageq --version >=2.2.16.
         2. _#_ emerge -avtuDN --with-bdeps=y @world
         3. _#_ emerge -av --depclean
-        4. _#_ [deprecated] revdep-rebuild -av, replaced by the next step.
+        4. _#_ [optional] revdep-rebuild -pv
+            1. _#_ revdep-rebuild -v
+            2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
         5. _#_ [optional] emerge @preserved-rebuild, if prompted.
         5. _#_ dispatch-conf, usually if needed, you just need to input `u`.
     4.  From now on, a basic new gentoo system is installed. 
