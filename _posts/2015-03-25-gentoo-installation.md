@@ -304,7 +304,19 @@ passwd zachary
             1. _#_ revdep-rebuild -v
             2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
         5. _#_ [optional] emerge @preserved-rebuild, if prompted.
-        5. _#_ dispatch-conf, usually if needed, you just need to input `u`.
+            1. _$_ emerge --info | grep FEATURES
+            2. In Gentoo profile, there might be `preserve-libs` enabled for `FEATURES`, which is usually the real case. This setting will cause `Portage` to preserve libraries when `soname`s change during upgrade or downgrade, only as necessary to satisfy shared library dependencies of installed consumers/packages. Preserved libraries are automatically removed when there are no remaining consumers, which occurs when consumer packages are rebuilt or uninstalled. Ideally, rebuilds are triggered automatically during updates, in order to satisfy slot-operator dependencies.
+            3. However, before emerge exits after installing updates, if there are remaining preserved libraries because slot-operator dependencies have not been used to trigger automatic rebuilds, then emerge will display a message like the following:
+
+                ```
+                !!! existing preserved libs:
+                >>> package: sys-libs/libfoo-1
+                 * - /lib/libfoo.so.1
+                 *      used by /usr/bin/bar (app-foo/bar-1)
+                Use emerge @preserved-rebuild to rebuild packages using these libraries
+                ```
+            4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
+        6. _#_ dispatch-conf, usually if needed, you just need to input `u`.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
     1. Boot with LiveDVD
