@@ -627,6 +627,31 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
             2. _#_ emerge --sync
             3. _#_ eix-sync
         11. [sys-apps/portage-2.2.16 发布，支持多种同步方式](http://www.gentoo-cn.info/article/new-portage-plug-in-sync-system/); [Gentoo的portage已支持直接更新第三方源（overlay）](http://phpcj.org/portage-emerge-overlay-on-gentoo/).
+    6. Touchpad configuration. After X and Xfce4 installation, parts of Touchpad does not work. The primary method of configuration for the touchpad is through an Xorg server configuration file. After installation of `x11-drivers/xf86-input-synaptics`, a default configuration file is located at `/usr/share/X11/xorg.conf.d/50-synaptics.conf`. Users can copy this file to `/etc/X11/xorg.conf.d/` and edit it to configure the various driver options available. 
+        1. _#_ emacs /etc/X11/xorg.conf.d/50-synaptics.conf
+
+            ```
+            Section "InputClass"
+                Identifier "touchpad"
+                Driver "synaptics"
+                MatchIsTouchpad "on"
+                    Option "TapButton1" "1"
+                    Option "TapButton2" "2"
+                    Option "TapButton3" "3"
+                    Option "VertEdgeScroll" "on"
+                    Option "VertTwoFingerScroll" "on"
+                    Option "HorizEdgeScroll" "on"
+                    Option "HorizTwoFingerScroll" "on"
+                    Option "CircularScrolling" "on"
+                    Option "CircScrollTrigger" "2"
+                    Option "EmulateTwoFingerMinZ" "40"
+                    Option "EmulateTwoFingerMinW" "8"
+                    Option "CoastingSpeed" "0"
+                    Option "FingerLow" "35"
+                    Option "FingerHigh" "40"
+            EndSection
+            ```
+        3. You can also set a temporary config at command line, which is not persisitent. Refer to command `synclient`.  
 47. Upgrade kernel to **unstable 4.0.0**
     1. _#_ echo "~sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources, this step needs `eix` command support to find out which unstable package version is located in portage mirror.
     2. _#_ emerge --sync
