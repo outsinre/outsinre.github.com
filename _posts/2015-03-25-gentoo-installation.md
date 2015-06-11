@@ -119,7 +119,8 @@ LC_COLLATE="C"
     2. _#_ ls -l /usr/src/linux
 26. Configuring the Linux kernel - Manual configuration.
     1. If you have a backup of kernel `.config` file, then this and the next step can be skipped. Refer to _Upgrade kernel to **unstable 4.0.0**_ below.
-    1. _#_ emerge --ask sys-apps/pciutils
+    1. _#_ emerge -av sys-apps/pciutils
+    1. _#_ emerge -av sys-apps/usbutils
     2. _#_ cd /usr/src/linux
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e1000e`, find their locations and activate them.
     1. _#_ make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config`. Or you can refer to the LiveCD's kernel config file.
@@ -148,6 +149,21 @@ Codec Intel CougarPoint HDMI
         5. You may notice: those options are all set to 'M'! Of course, you can also set them all to 'Y'. Never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
         4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
         5. Set `Pre-allocated buffer size for HD-audio driver` to 4096.
+    5. Video/webcamera
+        1. _#_ lsusb
+
+            ```
+Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 006: ID 04f2:b217 Chicony Electronics Co., Ltd Lenovo Integrated Camera (0.3MP)
+Bus 001 Device 005: ID 0a5c:217f Broadcom Corp. BCM2045B (BDC-2.1)
+Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
+Bus 001 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver
+Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+            ```
+            The 3rd item is the integrated webcamera which is a multimedia USB device.
+        2. Enable `MEDIA_SUPPORT` (Multimedia support), `MEDIA_CAMERA_SUPPORT` (Cameras/video grabbers support), `CONFIG_MEDIA_USB_SUPPORT` (Media USB Adapters), and `USB_VIDEO_CLASS` (USB Video Class (UVC). The 2nd and 4th items are the key to make webcamera to work.
     5. watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
     6. SATA: ahci known as `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' for SATA disk device.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
