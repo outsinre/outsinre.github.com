@@ -313,7 +313,8 @@ useradd -g users -G wheel,audio,video -m zachary
 passwd zachary
         ```
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
-        1. _#_ emerge --sync, changed to `emains sync` for new portageq --version >=2.2.16.
+        1. _#_ eix-sync
+            1. For new portageq --version >=2.2.16, use `emaint sync` instead of `emerge --sync`.
         2. _#_ emerge -avtuDN --with-bdeps=y @world
         3. _#_ emerge -av --depclean
         4. _#_ [optional] revdep-rebuild -pv
@@ -662,8 +663,12 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
             ```
         3. You can also set a temporary config at command line, which is not persisitent. Refer to command `synclient`.  
 47. Upgrade kernel to **unstable 4.0.0**
-    1. _#_ echo "~sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources, this step needs `eix` command support to find out which unstable package version is located in portage mirror.
-    2. _#_ emerge --sync
+
+    >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
+
+    1. _#_ echo "=sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources
+        1. `eix` helps find out which unstable package version is located in portage mirror.
+    2. _#_ eix-sync
     3. _#_ emerge -av gentoo-sources
     4. _#_ eselect kernel list
     5. _#_ eselect kernel set 2, this is update the `/usr/src/linx` symbol link pointing to the new 4.0.0 kernel.
@@ -671,14 +676,17 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
     5. _#_ mount /dev/sda2 /boot/efi
     6. _#_ cd /usr/src/linux
     7. _#_ cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
-    8. _#_ make silentoldconfig, choose all the new settings to default ones. It only shows new and different kernel options incurred in new kernel version.
-        1. _#_ You can also run `make olddefconfig` to convert the old kernel config to new one without too many questions to answer. Command `make oldconfig` is similar to `make silentoldconfig` excpet also asking you the same kernel options between two kernel versions.
+    8. _#_ make olddefconfig, to convert the old kernel config to new one without too many questions to answer.
+        1. _#_ make silentoldconfig, choose all the new settings to default ones. It only shows new and different kernel options incurred in new kernel version.
+        2. _#_ make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
     9. _#_ make
     10. _#_ make modules_install
     11. _#_ make install
-    12. _#_ genkernel --install initramfs
+    12. _#_ genkernel --install initramfs 
     13. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
-    14. _#_ reboot
+    14. _#_ emerge -av @module-rebuild
+        1. Any external kernel modules, such as `binary kernel modules`, need to be rebuilt for each new kernel.
+    15. _#_ reboot
 48. Remove old kernels
     1. _#_ emerge -av app-admin/eclean-kernel
     2. _#_ eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
