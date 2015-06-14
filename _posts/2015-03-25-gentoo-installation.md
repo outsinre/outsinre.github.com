@@ -320,6 +320,7 @@ passwd zachary
             1. For new portageq --version >=2.2.16, use `emaint sync` instead of `emerge --sync`.
         2. _#_ emerge -avtuDN --with-bdeps=y @world
         3. _#_ emerge -av --depclean
+            1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
         4. _#_ [optional] revdep-rebuild -pv
             1. _#_ revdep-rebuild -v
             2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
@@ -698,3 +699,7 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
         2. At last, I removed the kernel as  `3.18.11-gentoo.old`
     4. `eclean-kernel` will update the grub menu automatically.
     5. **special note**: the kernel is manually compiled by `make, make modules_install, make install, ...` following the basic procedures of official handbook. But `initramfs` is built by `genkernel` resulting in file names different from conventional format. You can `ls -l /boot` finding that `initramfs`'s file name format is different from that of `vmlinuz, System.map`. Tough the file name format won't cause problems since `grub2-mkconfig` is smart enough to generate the correct boot parameters. However, `eclean-kernel` will remind you removing `-genkernel-x86_64-4.0.0-gentoo: vmlinuz does not exist` which is an undesired action. Details refer to [Bug 464576](https://bugs.gentoo.org/464576)
+    6. After updating the system @world, we usually run `emerge -av --depclean` to removge unncessary package, which also remove the old gentoo-sources not associated with Grub. However this command only remove the kernel sources while leaving the built items alone such *.config, /lib64/modules/old-version*, etc.
+
+        So we can use `eclean-kernel` or manually remove those left-overs.
+
