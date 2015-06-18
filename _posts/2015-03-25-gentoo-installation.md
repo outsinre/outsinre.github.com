@@ -90,8 +90,8 @@ title: Gentoo Installation
         ```
 USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thunar udev X"
         ```
-Append these flags into `make.conf` file. Actually, only `-qt4` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`.
-    5. Check if `cjk` and `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
+Append these flags into `make.conf` file. Actually, only `-qt3 -qt4 -qt5` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`. I want to remove all QT things from system.
+    5. Check if `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
 24. Localization
     1. _#_ cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
     2. Uncomment `en_US.UTF-8 UTF-8` in /etc/locale.gen.
@@ -484,6 +484,12 @@ export XMODIFIERS=@im=fcitx
             2. _#_ echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
             3. _#_ layman -f -a gentoo-zh
             4. _#_ layman -S
+
+            >The previous version (<= 9.1.0.4953\_alpha18) located in `gentoo-zh` overlay relies on a bundle of customized and pre-built `QT` packages. Use command `qlist wps-office | grep -i qt` or `equery files wps-office | grep -i qt` to list the bundled `QT` libs in wps-office installation directory (/opt/kingsoft/wps-office/).  Since version `9.1.0.4953_alpha18-r1` wps-office was published through official Gentoo portage as well. The coming new versions no longer use those prebuilt `QT` libs. Instead, they will draw in *qtwebkit*, *qtscript*, *qttranslate*, *qtcore*, etc as system-wide packages.
+
+            >But I prefer a Gentoo system without `QT` things since most of my packages are `GTK`-based, especially the `xfce4` desktop environment. So I will not install or update to the new versions.
+
+            >Current method is to mask those higher version in `portage.mask/` directory: `>app-office/wps-office-9.1.0.4953_alpha18::gentoo`.
         2. WPS 32-bit `abi_x86_32` support. You should activate abi\_x86_32 use flag for packages on which WPS office depends.
             1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually. You can also cange `pv` to `-av`.
             2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
