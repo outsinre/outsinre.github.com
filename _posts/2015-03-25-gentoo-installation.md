@@ -115,6 +115,7 @@ LC_COLLATE="C"
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
     1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to **unstable 4.0.0**_.
+    1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to `e-sources-4.1.0 kernel`.
     1. _#_ emerge --ask sys-kernel/gentoo-sources
     2. _#_ ls -l /usr/src/linux
 26. Configuring the Linux kernel - Manual configuration.
@@ -169,9 +170,9 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
             The 3rd item is the integrated webcamera which is a multimedia USB device.
         2. Enable `MEDIA_SUPPORT` = `Multimedia support`, `MEDIA_CAMERA_SUPPORT` = `Cameras/video grabbers support`, `CONFIG_MEDIA_USB_SUPPORT` = `Media USB Adapters`, and `USB_VIDEO_CLASS` = `USB Video Class (UVC)`. The 2nd and 4th items are the key to make webcamera to work.
     5. `Processor type and features`
-        1. `Processor family (Core 2/newer Xeon)` select the 3rd item as `Core 2/newer Xeon, CONFIG_MCORE2`.
-        
-            _#_ lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item, otherwise the output would be `15`, please select the 5th item.
+        1. `Processor family (Intel Core 2nd Gen AVX)` select `Intel Core 2nd Gen AVX, CONFIG_MCOREI7AVX`. This optioin enables `-march=corei7-avx` which serves the same purpose as the `CFLAGS` value set in `make.conf` in previous step. We enable this option as failure fallback.
+
+            <s> _#_ lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
         2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
         3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
         4. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB`. Don't turn on `EFI mixed-mode support, EFI_MIXED`.
@@ -284,7 +285,7 @@ network={
         1. _#_ mkdir /boot/efi
         2. _#_ mount /dev/sda2 /boot/efi
     4. To install GRUB2 to EFI system `grub2-install --target=x86_64-efi`.
-39. Chainload into Ubuntu Grub2 `nano -w /etc/grub.d/40_custom`, add the code below.
+39. [deprecated, as long as the `/boot` and `/boot/efi` partitions are mounted, grub2-mkconfig will automatically detect the windows operating system in `/etc/grub.d/30_os_prober` through `sys-boot/os-prober`] Chainload Windows system `nano -w /etc/grub.d/40_custom`, add the code below.
     1. The traditional `chainloader +1` does work for UEFI boot.
 
 		```
@@ -436,10 +437,10 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     10. sda10 Gentoo boot
     11. sda11 Gentoo home
 43. [OPTIONAL] Re-compiling current kernel when you need to modify some kernel configurations.
-    1. _#_ mount /dev/sda10 /boot
-    1. _#_ mount /dev/sda2 /boot/efi
+    1. _#_ mount /boot
+    1. _#_ mount /boot/efi
     1. _#_ cd /usr/src/linux
-    2. _#_  make menuconfig
+    2. _#_ make menuconfig
         1. You don't need to copy and convert the old kernel config file as specified on [Kernel/Upgrade](https://wiki.gentoo.org/wiki/Kernel/Upgrade) since we just re-compile the current working kernel and share the kernel source. So we share the basic `.config` file in `/usr/src/linux/.config`.
         2. Just make some changes to the old config file.
     3. _#_ make
@@ -714,6 +715,39 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
     14. _#_ emerge -av @module-rebuild
         1. Any external kernel modules, such as `binary kernel modules`, need to be rebuilt for each new kernel.
     15. _#_ reboot
+47. e-sources-4.1.0 kernel
+
+    Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
+
+    To compile `e-sources`, the procedure is all the same as that for `gentoo-sources`. The only difference is to enable a few extra kernel options.
+
+    1. `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display.
+    2. [optional] `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` and `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS` set to `M`. These two options are not necessary for my x220. The following the `dmesg | grep -i thinkpad` output.
+
+        ```
+[    6.546625] thinkpad_acpi: ThinkPad ACPI Extras v0.25
+[    6.546635] thinkpad_acpi: http://ibm-acpi.sf.net/
+[    6.546640] thinkpad_acpi: ThinkPad BIOS 8DET69WW (1.39 ), EC unknown
+[    6.546646] thinkpad_acpi: Lenovo ThinkPad X220, model 4290NL7
+[    6.547728] thinkpad_acpi: detected a 16-level brightness capable ThinkPad
+[    6.547976] thinkpad_acpi: radio switch found; radios are enabled
+[    6.548180] thinkpad_acpi: possible tablet mode switch found; ThinkPad in laptop mode
+[    6.548508] thinkpad_acpi: This ThinkPad has standard ACPI backlight brightness control, supported by the ACPI video driver
+[    6.548515] thinkpad_acpi: Disabling thinkpad-acpi brightness events by default...
+[    6.551792] thinkpad_acpi: rfkill switch tpacpi_bluetooth_sw: radio is unblocked
+[    6.552671] thinkpad_acpi: Standard ACPI backlight interface available, not loading native one
+[    6.560165] input: ThinkPad Extra Buttons as /devices/platform/thinkpad_acpi/input/input10
+        ```
+    3. During the `make` process, it reminds warning:
+
+        ```
+drivers/tty/vt/vt.c: In function ‘vc_do_resize’:
+drivers/tty/vt/vt.c:890:18: warning: ‘old_rows’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  old_screen_size = old_rows * old_row_size;
+                  ^
+drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+        ```
+        We can look into the `/usr/src/e-sources/drivers/tty/vt/vt.c` at line 890, we do find that issue. Anyway currently the kernel works fine.
 48. Remove old kernels
     1. _#_ emerge -av app-admin/eclean-kernel
     2. _#_ eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
