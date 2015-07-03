@@ -123,35 +123,36 @@ LC_COLLATE="C"
     1. _#_ emerge -av sys-apps/usbutils
     2. _#_ cd /usr/src/linux
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e1000e`, find their locations and activate them.
+    1. _#_ make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config`.
 
-    [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/).
-
-    1. _#_ make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config`. Or you can refer to the LiveCD's kernel config file.
-    1. The search with `/` in `menuconfig` output is as follows. The `Prompt` part is usually which should be activated.
+        Or you can refer to the LiveCD's kernel config file.
+    1. Search with `/` in `menuconfig` is as follows. The `Prompt` part is the corresponding kernel option.
 
         ```
-Symbol:
-Type:
-Prompt:
-  Location:
+        Symbol:
+        Type:
+        Prompt:
+          Location:
         ```
-    1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`: these are the dirvers that needs activated. When search "snd-hda-intel", replace the _hypen_: **-** with _dash_: **_**.
-    2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the file `gentoo-livecd-default-kernel-config-reference` copied in previous step to help clear items.
-    3. Graphics: i915 known as `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
-    4. Ethernet: e1000e  known as `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
-    4. Audio: snd\_hda_intel known as `Intel HD Audio, CONFIG_SND_HDA_INTEL` THE default  is 'Y', now **MUST** set it as 'M'.
+    1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`: these are the dirvers that needs activated. When search "snd-hda-intel", replace the hypen: - with dash: _.
+    2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the LiveCD's kernel config file to help clarify kernel options.
+    3. Graphics: `i915` = `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
+    4. Ethernet: `e1000e` = `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
+    4. Audio: `snd_hda_intel` = `Intel HD Audio, CONFIG_SND_HDA_INTEL`. The default value is 'Y', now **MUST** set to 'M'. Choose the audioi codec:
         1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
-        2. _#_ cat /proc/asound/card0/codec#* | grep Codec, the output is as follows. **ATENTION**: execute this command in LiveCD environment by opening a new terminal.
+        2. _#_ cat /proc/asound/card0/codec#* | grep Codec, the output is as follows.
+
+             **ATENTION**: execute this command in LiveCD environment by opening a new terminal.
 
             ```
 Codec Conexant CX20590
 Codec Intel CougarPoint HDMI
             ```
-        3. So select the two correspoinding codecs as modules: `Build HDMI/DisplayPort HD-audio codec support, SND_HDA_CODEC_HDMI`, and `Conexant HD-audio support, SND_HDA_CODEC_CONEXANT`.
-        4. `Enable generic HD-audio codec parser, SND_HDA_GENERIC` must be selected (default).
-        5. You may notice: those options are all set to 'M'! Of course, you can also set them all to 'Y'. Never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
+        3. Then select those two codecs as modules 'M': `Build HDMI/DisplayPort HD-audio codec support, SND_HDA_CODEC_HDMI`, and `Conexant HD-audio support, SND_HDA_CODEC_CONEXANT`.
+        4. `Enable generic HD-audio codec parser, SND_HDA_GENERIC` must be selected (default) as well.
         4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
         5. Set `Pre-allocated buffer size for HD-audio driver` to 4096.
+        5. You notice these options are all set to 'M'! You can also set them all to 'Y'. But never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
     5. Video/webcamera
         1. _#_ lsusb
 
@@ -166,31 +167,44 @@ Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
 Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
             ```
             The 3rd item is the integrated webcamera which is a multimedia USB device.
-        2. Enable `MEDIA_SUPPORT` (Multimedia support), `MEDIA_CAMERA_SUPPORT` (Cameras/video grabbers support), `CONFIG_MEDIA_USB_SUPPORT` (Media USB Adapters), and `USB_VIDEO_CLASS` (USB Video Class (UVC). The 2nd and 4th items are the key to make webcamera to work.
-    5. watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
-    6. SATA: ahci known as `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' for SATA disk device.
+        2. Enable `MEDIA_SUPPORT` = `Multimedia support`, `MEDIA_CAMERA_SUPPORT` = `Cameras/video grabbers support`, `CONFIG_MEDIA_USB_SUPPORT` = `Media USB Adapters`, and `USB_VIDEO_CLASS` = `USB Video Class (UVC)`. The 2nd and 4th items are the key to make webcamera to work.
+    5. `Processor type and features`
+        1. `Processor family (Core 2/newer Xeon)` select the 3rd item as `Core 2/newer Xeon, CONFIG_MCORE2`.
+        
+            _#_ lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item, otherwise the output would be `15`, please select the 5th item.
+        2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
+        3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
+        4. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB`. Don't turn on `EFI mixed-mode support, EFI_MIXED`.
+    5. Set `X86_X32, x32 ABI for 64-bit mode` to 'Y'. This option is useful for WIndows 32 bit binaries (under Wine support) to take advantage of the system 64-bit registers.
+    5. Watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
+    6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
     8. Wireless: `Intel Wireless WiFi Next Gen AGN - Wireless-N/Advanced-N/Ultimate-N (iwlwifi), CONFIG_IWLWIFI` set to 'M'. By the way, `wpa_supplicant` needs `nl80211` wifi driver. Actually relates to `cfg80211 - wireless configuration API, CONFIG_CFG80211` which is set to 'Y' default already.
-    2. MMC: sdhci\_pci known as `SDHCI support on PCI bus, CONFIG\_MMC\_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG\_MMC\_RICOH_MMC` as 'Y'.
-    3. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB` and `EFI mixed-mode support, CONFIG_EFI_MIXED` under `Processor type and features`.
+    2. MMC: `sdhci_pci` = `SDHCI support on PCI bus, CONFIG_MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG_MMC_RICOH_MMC` as 'Y'.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
-    6. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: CONFIG_AGP_AMD64, CONFIG_X86_MCE_AMD, CONFIG_MICROCODE_AMD, AMD_NUMA, and CONFIG_AMD_IOMMU.
-    7. `NTFS` support: `CONFIG_NTFS_FS=m` and `CONFIG_FUSE_FS=m` to on demand. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW is not set`.
+    7. `NTFS` support: set `CONFIG_NTFS_FS` and `CONFIG_FUSE_FS` to 'M'. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package later on. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW`.
     9. Turn on `CONFIG_PACKET` (default 'Y')  to support wireless tool `wpa_supplicant` which will be installed later on.
     9. Turn off `NET_VENDOR_NVIDIA` to 'N' since no `NVIDIA` card in x220 laptop.
-    10. Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to `gb2312` for displaying NTFS partition Chinese file names correctly for `FAT` partition.
-        1. Don't use `gb18030`. It seems that kernel does not recognize `gb18030`.
-    10. Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'M'.
-    10. You may found that when there is some problems related to kernel options, you can see them to 'M' instead of 'Y' which might be a potential solution.
+    10. [Deprecated, use the default 437 and iso8859-1].
+
+        <s>Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to `gb2312` for displaying NTFS partition Chinese file names correctly for `FAT` partition.
+
+        Don't use `gb18030`. It seems that kernel does not recognize `gb18030`.
+
+        Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'M'.</s>
+
+        In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
+
+    10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
-    11. Reference links: [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
+    11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
     1. _#_ make
     2. _#_ make modules_install
     2. _#_ make install, this will copy the kernel image into /boot/ together with the System.map file and the kernel configuration file.
         1. Actually you can use a copy command instead.
-    3. _deprecated #_ mkdir -p /boot/efi/boot
-    4. _deprecated #_ cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi
+    3. [deprecated] <s>_#_ mkdir -p /boot/efi/boot</s>
+    4. [deprecated] <s>_#_ cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
     5. _#_ emerge -av genkernel
     6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: _#_ ls /boot/initramfs*.
 27. Kernel modules loading. Refer to handbook.
@@ -397,16 +411,18 @@ VIDEO_CARDS="intel"
         1.  _#_  rm -r ~/.cache/sessions
         2.  _#_ rm -r ~/.config/xfce*
         3.  _#_  rm -r ~/.config/Thunar
-45. [deprecated, replaced by method in fstab] When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
+45. [deprecated, replaced by method in fstab]
+
+    <s> When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
     1. _#_ nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
 
         ```
 KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         ```
-`XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
+        `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
     3. Similarly, since the root and home partition is formatted in previous step, you should go into Ubuntu system to hide these two partitions.
-    4. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).
+    4. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).</s>
 43. Partitions:
     1. sda1 Windows recovery partition
     2. sda2 EFI partition
@@ -527,32 +543,33 @@ export XMODIFIERS=@im=fcitx
         6. If blocked by GFW, set the corresponding proxy address and port.
     12. _#_ emerge --ask app-portage/gentoolkit
     13. _#_ emerge --ask app-portage/eix
-        1. _#_ emacs -nw /etc/eix-sync.conf: this is deprecated for the new poratge > 2.2.16.
+        1. [deprecated for new poratge > 2.2.16] <s>_#_ emacs -nw /etc/eix-sync.conf:</s>
 
             ```
-*
+            *
             ```
-        2. _$_ eix-sync
+        2. _#_ eix-sync
     14. Archive
         1. _#_ emerge -av file-roller
         2. _#_ emerge -av thunar-archive-plugin
-            1. [steps below deprecated]
+            1. [steps below might be deprecated depending on related package version]
             1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
             2. _#_ cd /usr/libexec/thunar-archive-plugin/
             3. _#_ ln -s file-roller.tap org.gnome.FileRoller.tap
             4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
         3. _#_ echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
             1. 使用 “natspec” USE Flag重新编译unzip（zip文件中没有保存压缩时使用的编码，故需将unzip打上编码探测的补丁）
-        4. _#_ emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
+        4. _#_ [optionl, 7zip can extract zip format] emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
         5. _#_ emerge -av p7zip, three commands `7z`, `7za` and `7zr` can be used to extract files.
             1. If `p7zip` is installed, `file-roller` takes `7z` or `7za` to handle `zip` file which cannot handle Chinese filenames.
             2. Solution: rename `/usr/bin/7z` and `/usr/bin/7za` to something else. 若需要安装p7zip，则安装完成后，移除或重命名/usr/bin下除7zr外7z*文件（fileroller在7z或者7za存在的情况下会优先使用。而7z和7za解压zip文件会出现文件名乱码，暂不知如何解决。故删除7z和7za，仅保留7zr以支持7z格式的压缩和解压。)
         6. Use `7z` format instead of `zip` since `7z` support unicode compression especially for filenames.
-    15. [deprecated, use Alt+F2 app finder instead] _#_ emerge -av xfce4-verve-plugin
+    15. [deprecated, use Alt+F2 app finder instead] <s>_#_ emerge -av xfce4-verve-plugin
         1. Add this plugin to panel.
-        2. Under `Settings Editor` --> `xfce4-kerboard-shortcuts` --> `commands` --> `custom`, set a shortcut for this plugin: `Super + R`.
-    16. [deprecated, does not work at all]_#_ emerge -av xfce4-wavelan-plugin
-        1. __this plugin cannot be added to panel currently__, cannot be used.
+        2. Under `Settings Editor` --> `xfce4-kerboard-shortcuts` --> `commands` --> `custom`, set a shortcut for this plugin: `Super + R`.</s>
+    16. [deprecated] <s>_#_ emerge -av xfce4-wavelan-plugin</s>
+
+        __this plugin cannot be added to panel currently__, cannot be used.
     17. kwplayer - Linx version of 酷我音乐
         1. _#_ emerge -av kwplayer
         2. Now play MV but not MP3 songs. After detailed search, I found that mplayer used `mad` to decode MP3. So:
@@ -603,7 +620,7 @@ exec startxfce4 --with-ck-launch
 /dev/sda4 /mnt/Win81 ntfs-3g noauto,ro 0 0
 /dev/sda5 /media/Data ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
 /dev/sda6 /media/Misc ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
-/dev/sda7 /media/WLShare ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
+/dev/sda7 /media/WLShare ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,users,dmask=022,fmask=133 0 0
         ```
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
         2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
