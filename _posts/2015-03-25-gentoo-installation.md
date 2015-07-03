@@ -578,7 +578,7 @@ export XMODIFIERS=@im=fcitx
         2. _#_ emerge -av gst-plugins-mad
  
             Bingo! This is due to the author did not test this package under Gentoo. So he did not incur the `gst-plugins-mad` dependcy specially for Gentoo. We need to install by ourself.
-        3. The default configuration and downloaded files are located under `~/.cache/kuwo/`. Change the `song` and `mv` directories to `~/Music/Songs` and `~/Music/MVs` through GUI preferences menu. We cannot change the lyrics `lrc` location.
+        3. The default configuration/log is located in `~/.config/kuwo/` and downloaded files are under `~/.cache/kuwo/`. Change the `song` and `mv` directories to `~/Music/Songs` and `~/Music/MVs` through GUI preferences menu. We cannot change the lyrics `lrc` location.
     18. ffmpeg
 
         `ffmpeg` is emerged by some other packages, one of which might be `mplayer`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
