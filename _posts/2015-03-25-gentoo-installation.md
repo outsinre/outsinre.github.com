@@ -154,7 +154,7 @@ Codec Intel CougarPoint HDMI
         4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
         5. Set `Pre-allocated buffer size for HD-audio driver` to 4096.
         5. You notice these options are all set to 'M'! You can also set them all to 'Y'. But never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
-    5. Video/webcamera
+    5. Webcamera
         1. _#_ lsusb
 
             ```
@@ -181,6 +181,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
     8. Wireless: `Intel Wireless WiFi Next Gen AGN - Wireless-N/Advanced-N/Ultimate-N (iwlwifi), CONFIG_IWLWIFI` set to 'M'. By the way, `wpa_supplicant` needs `nl80211` wifi driver. Actually relates to `cfg80211 - wireless configuration API, CONFIG_CFG80211` which is set to 'Y' default already.
+    9. Bluetooth: enable `CONFIG_BT, Bluetooth subsystem support` as 'M'. Enter and find `BT_RFCOMM, RFCOMM protocol support`. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `CONFIG_BT_HCIBTUSB, HCI USB driver` as 'M'. The sub-option `CONFIG_BT_HCIBTUSB_BCM turned on automatically` will be enabled as 'Y' by default. `BT_HIDP, HIDP protocol support` is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as 'N'. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Refer to *bluetooth - bluez obexfs*.
     2. MMC: `sdhci_pci` = `SDHCI support on PCI bus, CONFIG_MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG_MMC_RICOH_MMC` as 'Y'.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
     7. `NTFS` support: set `CONFIG_NTFS_FS` and `CONFIG_FUSE_FS` to 'M'. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package later on. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW`.
@@ -196,6 +197,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
         In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
 
+    10. Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` and `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS` set to `M`. These two options are not necessary for my x220. The following the `dmesg | grep -i thinkpad` output.
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
@@ -586,8 +588,55 @@ export XMODIFIERS=@im=fcitx
         In order to add support `v4l`, update `package.use/ffmpeg` for USE flags `v4l` and `libv4l`.
 
         ```
-_#_ emerge -av ffmpeg
+# emerge -av ffmpeg
         ```
+    19. bluetooth - bluez obexfs
+
+        In the kernel config step, we have enabled several relevant modules to support bluetooth devices. Up to now, if we don't use bluetooth at all, there is no need to emerge `bluez` or `obexfs`. We can just edit the corresponding configuration file to disable bluetooth devices:
+
+        >/sys/devices/platform/thinkpad\_acpi/bluetooth_enable
+
+        >/proc/acpi/ibm/bluetooth
+
+        1. _#_ emerge -av bluez, the current version is 5. The `hciconfig` command from bluez 5 package is bluetooth protocol stack command-line interface, i.e. :
+
+            >\# hciconfig -a
+
+            >\# hciconfig hci0 up
+        2. If `hciconfig` reminds error like:
+
+                Can't init device hci0: Operation not possible due to RF-kill.
+
+            We can use `net-wireless/rfkill` i.e.:
+
+            >\# rfkill list
+
+            >\# rfkill block 0
+
+            >\# rfkill unblock 0
+
+            `rfkill` not only supports bluetooth devices, but also other radio frequency ones. `rfkill` is a small userspace tool to query the state of the rfkill switches, buttons and subsystem interfaces. Some devices come with a hard switch that lets you kill different types of RF radios: 802.11 / Bluetooth / NFC / UWB / WAN / WIMAX / FM. Some times these buttons may kill more than one RF type. The Linux kernel rfkill subsystem exposes these hardware buttons and lets userspace query its status and set its status through a `/dev/rfkill`.
+        3. Up to now, we can turn on/off bluetooth device by `rfkill` or `hciconfig`. Next is to pair bluetooth device. Firstly, we need to launch the bluetooth service `/etc/init.d/bluetooth`. If bluetooth is a common service, we can add it to default runlevel. To pair with and connect to other bluetooth device like your cell phone, use another command `bluetoothctl` from bluez 5.
+
+            >\# rc-update add bluetooth default
+
+            >\# rc-service bluetooth start
+
+            >\$ bluetoothctl
+
+            Details on `bluetoothctl` pleae read the references.
+        4. `bluez` commands are only for bluetooth connection. Now we need to transfer file between cell phone and PC.
+
+            >\# emerge -av obexfs
+
+            >\# obexfs -b MAC\_address\_of_device /media/Obex
+
+            >\# fusermount -u /media/Obex
+
+            We can combine `fuse` and `obexfs` together:
+
+            >\# mount -t fuse "obexfs#-bMAC\_address\_of_device -B6" /media/Obex
+        5. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537); 
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem. In 4.10, start Xfce with `startxfce4 --with-ck-launch`. This will start xfce4-session with ck-launch-session. In 4.10, **Xfce4-sesion will take care of the dbus-session launch**.
@@ -722,25 +771,9 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
 
-    To compile `e-sources`, the procedure is all the same as that for `gentoo-sources`. The only difference is to enable a few extra kernel options.
+    To compile `e-sources`, the procedure is all the same as that for `gentoo-sources`. The only difference is to enable a few extra kernel options of `cjktty` patch.
 
-    1. `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display.
-    2. [optional] `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` and `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS` set to `M`. These two options are not necessary for my x220. The following the `dmesg | grep -i thinkpad` output.
-
-        ```
-[    6.546625] thinkpad_acpi: ThinkPad ACPI Extras v0.25
-[    6.546635] thinkpad_acpi: http://ibm-acpi.sf.net/
-[    6.546640] thinkpad_acpi: ThinkPad BIOS 8DET69WW (1.39 ), EC unknown
-[    6.546646] thinkpad_acpi: Lenovo ThinkPad X220, model 4290NL7
-[    6.547728] thinkpad_acpi: detected a 16-level brightness capable ThinkPad
-[    6.547976] thinkpad_acpi: radio switch found; radios are enabled
-[    6.548180] thinkpad_acpi: possible tablet mode switch found; ThinkPad in laptop mode
-[    6.548508] thinkpad_acpi: This ThinkPad has standard ACPI backlight brightness control, supported by the ACPI video driver
-[    6.548515] thinkpad_acpi: Disabling thinkpad-acpi brightness events by default...
-[    6.551792] thinkpad_acpi: rfkill switch tpacpi_bluetooth_sw: radio is unblocked
-[    6.552671] thinkpad_acpi: Standard ACPI backlight interface available, not loading native one
-[    6.560165] input: ThinkPad Extra Buttons as /devices/platform/thinkpad_acpi/input/input10
-        ```
+    `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display.
     3. During the `make` process, it reminds warning:
 
         ```
@@ -762,4 +795,7 @@ drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialize
     6. After updating the system @world, we usually run `emerge -av --depclean` to removge unncessary package, which also remove the old gentoo-sources not associated with Grub. However this command only remove the kernel sources while leaving the built items alone such *.config, /lib64/modules/old-version*, etc.
 
         So we can use `eclean-kernel` or manually remove those left-overs.
-
+49. Refs:
+    1. [Gentoo on a ThinkPad X200](http://vminko.org/gentoo_manuals/thinkpad_x200)
+    2. [thinkpad t440s gentoo](https://wiki.gentoo.org/wiki/Lenovo_ThinkPad_T440s)
+    3. [Installing Gentoo on a ThinkPad X220](http://www.thinkwiki.org/wiki/Installing_Gentoo_on_a_ThinkPad_X220)
