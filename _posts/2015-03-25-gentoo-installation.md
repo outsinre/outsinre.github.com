@@ -592,7 +592,7 @@ export XMODIFIERS=@im=fcitx
         ```
     19. bluetooth - bluez obexfs
 
-        **ios DOES NOT support OBEX**. So don't test this part with your iphone.
+        **Apple iOS does NOT support Obex protocol**. So don't test this part with your iphone.
 
         In the kernel config step, we have enabled several relevant modules to support bluetooth devices. Up to now, if we don't use bluetooth at all, there is no need to emerge `bluez` or `obexfs`. We can just edit the corresponding configuration file to disable bluetooth devices:
 
@@ -600,7 +600,7 @@ export XMODIFIERS=@im=fcitx
 
         >/proc/acpi/ibm/bluetooth
 
-        1. _#_ emerge -av bluez, the current version is 5. The `hciconfig` command from bluez 5 package is bluetooth protocol stack command-line interface, i.e. :
+        1. _#_ emerge -av bluez, the current version is 5. `bluez` package is bluetooth protocol stack for Linux with several useful tools like `hciconfig`, `bluetoothctl`, etc:
 
             >\# hciconfig -a
 
@@ -609,7 +609,7 @@ export XMODIFIERS=@im=fcitx
 
                 Can't init device hci0: Operation not possible due to RF-kill.
 
-            We can use `net-wireless/rfkill` i.e.:
+            >\# emerge -av net-wireless/rfkill
 
             >\# rfkill list
 
@@ -627,9 +627,9 @@ export XMODIFIERS=@im=fcitx
             >$ bluetoothctl
 
             Details on `bluetoothctl` pleae read the references.
-        4. `bluez` commands are only for bluetooth connection. Now we need to transfer file between cell phone and PC.
+        4. `bluez` commands are only for bluetooth connection. Now we need to transfer file between cell phone and PC by command lines:
 
-            >\# emerge -av obexfs
+            >\# emerge -av obexftp obexfs
 
             >\# obexfs -b MAC\_address\_of_device /media/Obex
 
@@ -638,7 +638,9 @@ export XMODIFIERS=@im=fcitx
             We can combine `fuse` and `obexfs` together:
 
             >\# mount -t fuse "obexfs#-bMAC\_address\_of_device -B6" /media/Obex
-        5. Both `bluez` and `obexfs` are command line tools. Not so efficient. We can choose GUI application instead like `blueman` based on GTK+.
+
+            `obexfs` depends on `obexftp`. How to use `obexftp` along refer to references.
+        5. `obexfs` and `obexftp` are command line tools. Not efficient. We can choose GUI applicatibbon instead like `blueman` based on GTK+.
         6. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537); 
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
