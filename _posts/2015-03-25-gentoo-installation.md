@@ -181,7 +181,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
     8. Wireless: `Intel Wireless WiFi Next Gen AGN - Wireless-N/Advanced-N/Ultimate-N (iwlwifi), CONFIG_IWLWIFI` set to 'M'. By the way, `wpa_supplicant` needs `nl80211` wifi driver. Actually relates to `cfg80211 - wireless configuration API, CONFIG_CFG80211` which is set to 'Y' default already.
-    9. Bluetooth: enable `CONFIG_BT, Bluetooth subsystem support` as 'M'. Enter and find `BT_RFCOMM, RFCOMM protocol support`. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `CONFIG_BT_HCIBTUSB, HCI USB driver` as 'M'. The sub-option `CONFIG_BT_HCIBTUSB_BCM turned on automatically` will be enabled as 'Y' by default. `BT_HIDP, HIDP protocol support` is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as 'N'. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Refer to *bluetooth - bluez obexfs*.
+    9. Bluetooth: enable `CONFIG_BT, Bluetooth subsystem support` as 'M'. Enter and find `BT_RFCOMM, RFCOMM protocol support`. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `CONFIG_BT_HCIBTUSB, HCI USB driver` as 'M'. The sub-option `CONFIG_BT_HCIBTUSB_BCM turned on automatically` will be enabled as 'Y' by default. `BT_HIDP, HIDP protocol support` is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as 'N'. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Read more from *bluetooth - bluez obexfs*.
     2. MMC: `sdhci_pci` = `SDHCI support on PCI bus, CONFIG_MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG_MMC_RICOH_MMC` as 'Y'.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
     7. `NTFS` support: set `CONFIG_NTFS_FS` and `CONFIG_FUSE_FS` to 'M'. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package later on. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW`.
@@ -591,6 +591,8 @@ export XMODIFIERS=@im=fcitx
 # emerge -av ffmpeg
         ```
     19. bluetooth - bluez obexfs
+
+        **ios DOES NOT support OBEX**. So don't test this part with your iphone.
 
         In the kernel config step, we have enabled several relevant modules to support bluetooth devices. Up to now, if we don't use bluetooth at all, there is no need to emerge `bluez` or `obexfs`. We can just edit the corresponding configuration file to disable bluetooth devices:
 
