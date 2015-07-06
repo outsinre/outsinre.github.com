@@ -19,45 +19,45 @@ title: Gentoo Installation
     2. Use shortcut `F12` to Open/Retract Yakuake terminal in KDE destop.
     3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
-4. _#_ sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
-5. _#_ fdisk /dev/sda or parted -a optimal /dev/sda (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
-    1. __NOTE__: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
-    1. _#_ parted -a optimal /dev/sda
-    2. _#_ p
-    3. _#_ unit MB
-    3. _#_ rm 10
-    3. _#_ p
-    4. _#_ mkpart primary 309921MB 310049MB, create a boot partition sda10 for Gentoo
-    5. _#_ p
-    6. _#_ name 10 'Gentoo boot partition'
-    7. _#_ mkpart primary 310049MB -1, create root partition sda12 for Gentoo
-    8. _#_ p
-    9. _#_ name 12 'Gentoo root partition'
-    10. _#_ p
+4. # sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
+5. # fdisk /dev/sda or parted -a optimal /dev/sda (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+    1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
+    1. # parted -a optimal /dev/sda
+    2. # p
+    3. # unit MB
+    3. # rm 10
+    3. # p
+    4. # mkpart primary 309921MB 310049MB, create a boot partition sda10 for Gentoo
+    5. # p
+    6. # name 10 'Gentoo boot partition'
+    7. # mkpart primary 310049MB -1, create root partition sda12 for Gentoo
+    8. # p
+    9. # name 12 'Gentoo root partition'
+    10. # p
     11. The annoying thing is that the partition `Type` is `Basic data partition` when checking with `fdisk /dev/sda`. We can change it by Disk GUI application in Ubuntu.
 6. New `/dev/sda10` will be the boot partition while `/dev/sda12` the root partition. We don't need to create `swap` or `efi` partition since we already created it when installing Ubuntu or Windows. Just share these two partitions. If possible, you can also create a separate home partition.
 7. Up to now, only the boot and root partition is prepared. We share swap and EFI partitions with Ubuntu and Windows. Now format the new partition. It's better to format boot partition as `ext2`.
-    1. _#_ mkfs.ext2 /dev/sda10
-    2. _#_ mkfs.ext4 /dev/sda12
-    3. [optional] _#_ mkfs.ext4 /dev/sdaxy, sdaxy is for home partition.
+    1. # mkfs.ext2 /dev/sda10
+    2. # mkfs.ext4 /dev/sda12
+    3. [optional] # mkfs.ext4 /dev/sdaxy, sdaxy is for home partition.
 8. From step 5 we know the Ubuntu swap partition is `/dev/sda7`. So we need to activate it:
     1. If you need to create a new swap partition, use command `mkswap /dev/sdaXY` to format the partition.
-    2. _#_ swapon /dev/sda7
+    2. # swapon /dev/sda7
 9. Mount the ewnly created partitions into the LiveDVD USB stick. Make sure the `gentoo` directory exists in /mnt/gentoo, otherwise create one.
-    1. _#_ mount /dev/sda12 /mnt/gentoo
-    2. _#_ mkdir /mnt/gentoo/boot
-    3. _#_ mount /dev/sda10 /mnt/gentoo/boot
-    4. [optional] _#_ `mkdir /mnt/gentoo/home; mount /dev/sdaXY /mnt/gentoo/home`.
+    1. # mount /dev/sda12 /mnt/gentoo
+    2. # mkdir /mnt/gentoo/boot
+    3. # mount /dev/sda10 /mnt/gentoo/boot
+    4. [optional] # `mkdir /mnt/gentoo/home; mount /dev/sdaXY /mnt/gentoo/home`.
 9. Setting the date and time using `date` command.
 10. Go to the Gentoo mountpoint where the root file system is mounted (most likely /mnt/gentoo): `cd /mnt/gentoo`.
 11. Downloading the stage tarball with Chrome application in LiveDVD. Go to [Installation media](https://www.gentoo.org/main/en/where.xml) and then to [amd64 multilib](http://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64/). You will find `stage3-amd64-20150319.tar.bz2`. Just download!
     1. Verify the tarball integrity and compare the output with the checksums provided by the .DIGESTS or .DIGESTS.asc file.
-    2. _#_ sha512sum /home/gentoo/Download/stage3-amd64-20150319.tar.bz2
+    2. # sha512sum /home/gentoo/Download/stage3-amd64-20150319.tar.bz2
 13. Now unpack the downloaded stage onto the system. Attention: the current working directory is `/mnt/gentoo`.
-    1. _#_ tar xvjpf /mnt/cdrom/stage3-amd64-20150319.tar.bz2. Usually, the stage file is not in /mnt/gentoo directory. So you need to specify the path to stage. For instance, /home/gentoo/Download/stage3...
+    1. # tar xvjpf /mnt/cdrom/stage3-amd64-20150319.tar.bz2. Usually, the stage file is not in /mnt/gentoo directory. So you need to specify the path to stage. For instance, /home/gentoo/Download/stage3...
     2. Make sure that the same options `xvjpf` are used. The x stands for Extract, the v for Verbose to see what happens during the extraction process (optional), the j for Decompress with bzip2, the p for Preserve permissions and the f to denote that we want to extract a File, not standard input.
 15. Configuring compile options. To keep the settings, Portage reads in the /etc/portage/make.conf file, a configuration file for Portage.
-    1. _#_ emacs /mnt/gentoo/etc/portage/make.conf
+    1. # emacs /mnt/gentoo/etc/portage/make.conf
     2. `CFLAGS` and `CXXFLAGS`. Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). Command `grep -m1 -A3 "vendor_id" /proc/cpuinfo` will show the current CPU architecure information. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two _.gcc_ files.
         1. CFALGS="-march=corei7-avx -O2 -pipe"
         2. CXXFLAGS="${CFLAGS}"
@@ -66,24 +66,24 @@ title: Gentoo Installation
         2. The boot screen will show you several penguins, that is the number of logical cores.
         3. Refer to [MAKEOPTS](https://wiki.gentoo.org/wiki/MAKEOPTS).
 17. Selecting mirrors.
-    1. _#_ mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
-    2. _#_ mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the `rsync server` to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
+    1. # mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
+    2. # mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the `rsync server` to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
         1. The rotation link setting is changed to `/etc/portage/repos.conf/gentoo.conf` for `portageq --version` >= 2.2.16. But don't worry since we can modify it when chrooting into the new Gentoo system. For now, remain this setting in `/etc/portage/make.conf` since the LiveCD environment uses the old version of portage.
-18. _#_ cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (/mnt/gentoo) environment. `/etc/resolv.conf` contains the name servers for the network. DON'T forget the `-L` parameter when copying.
+18. # cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (/mnt/gentoo) environment. `/etc/resolv.conf` contains the name servers for the network. DON'T forget the `-L` parameter when copying.
 19. Mounting the necessary filesystems.
-    1. _#_ mount -t proc proc /mnt/gentoo/proc
-    2. _#_ mount --rbind /sys /mnt/gentoo/sys
-    3. _#_ mount --make-rslave /mnt/gentoo/sys
-    4. _#_ mount --rbind /dev /mnt/gentoo/dev
-    5. _#_ mount --make-rslave /mnt/gentoo/dev
-    1. _#_ **chroot /mnt/gentoo /bin/bash**, chrooting into the new environment.
-    2. _#_ source /etc/profile
-    3. _#_ export PS1="(chroot) $PS1", this create a new different command prompt for the new environment.
+    1. # mount -t proc proc /mnt/gentoo/proc
+    2. # mount --rbind /sys /mnt/gentoo/sys
+    3. # mount --make-rslave /mnt/gentoo/sys
+    4. # mount --rbind /dev /mnt/gentoo/dev
+    5. # mount --make-rslave /mnt/gentoo/dev
+    1. # **chroot /mnt/gentoo /bin/bash**, chrooting into the new environment.
+    2. # source /etc/profile
+    3. # export PS1="(chroot) $PS1", this create a new different command prompt for the new environment.
 21. Installing a portage snapshot:
-    1. _#_ emerge-webrsync, it might complain about a missing `/usr/portage/` location. This is to be expected and nothing to worry about - the tool will create the location.
+    1. # emerge-webrsync, it might complain about a missing `/usr/portage/` location. This is to be expected and nothing to worry about - the tool will create the location.
 22. Choosing the right profile.
-    1. _#_ eselect profile list
-    2. _#_ eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
+    1. # eselect profile list
+    2. # eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
 23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected. Xfce will be installed as desktop.
     4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags:
 
@@ -93,38 +93,37 @@ USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thuna
 Append these flags into `make.conf` file. Actually, only `-qt3 -qt4 -qt5` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`. I want to remove all QT things from system.
     5. Check if `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
 24. Localization
-    1. _#_ cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
+    1. # cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
     2. Uncomment `en_US.UTF-8 UTF-8` in /etc/locale.gen.
-    3. _#_ locale-gen
-    4. If reminds: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
-    5. _#_ locale -a, to see what locales are generated.
-    1. _#_ eselect locale list
-    2. _#_ eselect locale set 3, set system-wdie locale to `en_US.utf8`.
+    3. # locale-gen, if reminds: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
+    5. # locale -a, to see what locales are generated.
+    1. # eselect locale list
+    2. # eselect locale set 3, set system-wdie locale to `en_US.utf8`.
     2. The following steps can also be done after entering the new Gentoo system.
-    2. _#_ emerge -av arphicfonts wqy-bitmapfont corefonts ttf-bitstream-vera
-    3. _#_ nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
+    2. # emerge -av arphicfonts wqy-bitmapfont corefonts ttf-bitstream-vera
+    3. \# nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
 
         ```
 LANG="en_US.UTF-8"
 LC_CTYPE="zh_CN.UTF-8"
 LC_COLLATE="C"
         ```
-    4. _#_ env-update && source /etc/profile
-    5. _#_ export PS1="(chroot) $PS1", use this command to reminds you are in `chroot` environment.
+    4. \# env-update && source /etc/profile
+    5. \# export PS1="(chroot) $PS1", use this command to reminds you are in `chroot` environment.
     5. Use `xx_YY.UTF-8` or `xx_YY.utf8`. Don't use `xx_YY.UTF8`.
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
     1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to **unstable 4.0.0**_.
     1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to `e-sources-4.1.0 kernel`.
-    1. _#_ emerge --ask sys-kernel/gentoo-sources
-    2. _#_ ls -l /usr/src/linux
+    1. # emerge --ask sys-kernel/gentoo-sources
+    2. # ls -l /usr/src/linux
 26. Configuring the Linux kernel - Manual configuration.
     1. If you have a backup of kernel `.config` file, then this and the next step can be skipped. Refer to _Upgrade kernel to **unstable 4.0.0**_ below.
-    1. _#_ emerge -av sys-apps/pciutils
-    1. _#_ emerge -av sys-apps/usbutils
-    2. _#_ cd /usr/src/linux
+    1. # emerge -av sys-apps/pciutils
+    1. # emerge -av sys-apps/usbutils
+    2. # cd /usr/src/linux
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e1000e`, find their locations and activate them.
-    1. _#_ make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config`.
+    1. \# make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config`.
 
         Or you can refer to the LiveCD's kernel config file.
     1. Search with `/` in `menuconfig` is as follows. The `Prompt` part is the corresponding kernel option.
@@ -141,7 +140,7 @@ LC_COLLATE="C"
     4. Ethernet: `e1000e` = `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
     4. Audio: `snd_hda_intel` = `Intel HD Audio, CONFIG_SND_HDA_INTEL`. The default value is 'Y', now **MUST** set to 'M'. Choose the audioi codec:
         1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
-        2. _#_ cat /proc/asound/card0/codec#* | grep Codec, the output is as follows.
+        2. \# cat /proc/asound/card0/codec#* | grep Codec, the output is as follows.
 
              **ATENTION**: execute this command in LiveCD environment by opening a new terminal.
 
@@ -155,7 +154,7 @@ Codec Intel CougarPoint HDMI
         5. Set `Pre-allocated buffer size for HD-audio driver` to 4096.
         5. You notice these options are all set to 'M'! You can also set them all to 'Y'. But never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
     5. Webcamera
-        1. _#_ lsusb
+        1. \# lsusb
 
             ```
 Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
@@ -172,7 +171,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     5. `Processor type and features`
         1. `Processor family (Intel Core 2nd Gen AVX)` select `Intel Core 2nd Gen AVX, CONFIG_MCOREI7AVX`. This optioin enables `-march=corei7-avx` which serves the same purpose as the `CFLAGS` value set in `make.conf` in previous step. We enable this option as failure fallback.
 
-            <s> _#_ lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
+            <s> # lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
         2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
         3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
         4. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB`. Don't turn on `EFI mixed-mode support, EFI_MIXED`.
@@ -202,17 +201,17 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
-    1. _#_ make
-    2. _#_ make modules_install
-    2. _#_ make install, this will copy the kernel image into /boot/ together with the System.map file and the kernel configuration file.
+    1. # make
+    2. # make modules_install
+    2. # make install, this will copy the kernel image into /boot/ together with the System.map file and the kernel configuration file.
         1. Actually you can use a copy command instead.
-    3. [deprecated] <s>_#_ mkdir -p /boot/efi/boot</s>
-    4. [deprecated] <s>_#_ cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
-    5. _#_ emerge -av genkernel
-    6. _#_ genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: _#_ ls /boot/initramfs*.
+    3. [deprecated] <s># mkdir -p /boot/efi/boot</s>
+    4. [deprecated] <s># cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
+    5. # emerge -av genkernel
+    6. # genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: # ls /boot/initramfs*.
 27. Kernel modules loading. Refer to handbook.
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
-    1. _#_ emerge --ask sys-kernel/linux-firmware
+    1. # emerge --ask sys-kernel/linux-firmware
 28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template. Use backup fstab file is possible.
 
 	```
@@ -222,14 +221,14 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 	```
 This needs modified in the steps later on.
 29. Set hostname.
-    1. _#_ nano -w /etc/conf.d/hostname
+    1. # nano -w /etc/conf.d/hostname
     2. set hostname="zhtux"
 30. Configuring the network.
 	1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
-	2. _#_ emerge --ask net-misc/dhcpcd
-	3. _#_ rc-update add dhcpcd default
+	2. # emerge --ask net-misc/dhcpcd
+	3. # rc-update add dhcpcd default
 	4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
-	5. _#_ emerge --ask net-wireless/wpa_supplicant
+	5. # emerge --ask net-wireless/wpa_supplicant
 	6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa\_supplicant/wpa_supplicant.conf` file:
 
 		```
@@ -259,7 +258,7 @@ network={
 }
 		```
     7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in plaintext by anyone using the computer:
-        1. _#_ chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
+        1. # chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
         2. Replace the `identity` and `password` entries with your own Wifi information.
     7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `wpa_supplicant`. No need to create so called `/etc/conf.d/net` file as the handbook.
     8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
@@ -268,24 +267,24 @@ network={
     10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](http://fangxiang.tk/2015/05/11/gentoo-downgrade-package/)
     10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
 	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
-31. Set root password: _#_ passwd
+31. Set root password: # passwd
 33. System logger.
-    1. _#_ emerge --ask app-admin/syslog-ng
-    2. _#_ rc-update add syslog-ng default
-    3. _#_ emerge --ask app-admin/logrotate
+    1. # emerge --ask app-admin/syslog-ng
+    2. # rc-update add syslog-ng default
+    3. # emerge --ask app-admin/logrotate
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
-    1. _#_ emerge --ask sys-process/cronie
-    2. _#_ rc-update add cronie default
+    1. # emerge --ask sys-process/cronie
+    2. # rc-update add cronie default
 35. File indexing: emerge --ask sys-apps/mlocate
 36. NTFS: emerge --ask sys-fs/ntfs3g
 36. [optional] Remote access: rc-update add sshd default
 38. Configuring the bootloader. Refer to [GRUB2 Quick Start](https://wiki.gentoo.org/wiki/GRUB2_Quick_Start).
     1. Add `GRUB_PLATFORMS="efi-64"` to `/etc/portage/make.conf`. This step must occur before installing the grub package. Otherwise it would show `error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist`.
-    2. _#_ emerge --ask sys-boot/grub:2, currently it is version 2.
-    3. _#_ emerge -av sys-boot/os-prober
+    2. # emerge --ask sys-boot/grub:2, currently it is version 2.
+    3. # emerge -av sys-boot/os-prober
     3. Mount the EFI partition /dev/sda2 to /boot/efi directory. Because Gentoo, Ubuntu, Windows share the EFI partition, we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition. **This step is really important!**.
-        1. _#_ mkdir /boot/efi
-        2. _#_ mount /dev/sda2 /boot/efi
+        1. # mkdir /boot/efi
+        2. # mount /dev/sda2 /boot/efi
     4. To install GRUB2 to EFI system `grub2-install --target=x86_64-efi`.
 39. [deprecated, as long as the `/boot` and `/boot/efi` partitions are mounted, grub2-mkconfig will automatically detect the windows operating system in `/etc/grub.d/30_os_prober` through `sys-boot/os-prober`] Chainload Windows system `nano -w /etc/grub.d/40_custom`, add the code below.
     1. The traditional `chainloader +1` does work for UEFI boot.
@@ -301,8 +300,8 @@ menuentry "Microsoft Windows 8.1 x86_64" {
 }
 		```
     2. The next is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
-        1. _#_ grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
-        2. _#_ grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
+        1. # grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
+        2. # grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
         3. Now replace the parameters with them real values in above `menuentry`.
         4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
 40. Generate GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
@@ -311,9 +310,9 @@ menuentry "Microsoft Windows 8.1 x86_64" {
     1. set `clock=local`, this is important when dual boot with Windows.
 23. Set the timezone.
     1. I think this step should occur after `hwclock` thing. Otherwise the system time is usually ahead of locale time by 8 hours, thus resulting in portage tree time stamp issues. If possible, I recommend to leave the above two steps immediately before system reboot.
-    1. _#_ ls /usr/share/zoneinfo
-    2. _#_ echo "Asia/Hong_Kong" > /etc/timezone
-    3. _#_ emerge --config sys-libs/timezone-data
+    1. # ls /usr/share/zoneinfo
+    2. # echo "Asia/Hong_Kong" > /etc/timezone
+    3. # emerge --config sys-libs/timezone-data
     4. Check with `date` command.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
 
@@ -333,15 +332,15 @@ useradd -g users -G wheel,audio,video -m zachary
 passwd zachary
         ```
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
-        1. _#_ eix-sync
+        1. # eix-sync
             1. For new portageq --version >=2.2.16, use `emaint sync` instead of `emerge --sync`.
-        2. _#_ emerge -avtuDN --with-bdeps=y @world
-        3. _#_ emerge -av --depclean
+        2. # emerge -avtuDN --with-bdeps=y @world
+        3. # emerge -av --depclean
             1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
-        4. _#_ [optional] revdep-rebuild -pv
-            1. _#_ revdep-rebuild -v
+        4. # [optional] revdep-rebuild -pv
+            1. # revdep-rebuild -v
             2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
-        5. _#_ [optional] emerge @preserved-rebuild, if prompted.
+        5. [optional] # emerge @preserved-rebuild, if prompted.
             1. _$_ emerge --info | grep FEATURES
             2. In Gentoo profile, there might be `preserve-libs` enabled for `FEATURES`, which is usually the real case. This setting will cause `Portage` to preserve libraries when `soname`s change during upgrade or downgrade, only as necessary to satisfy shared library dependencies of installed consumers/packages. Preserved libraries are automatically removed when there are no remaining consumers, which occurs when consumer packages are rebuilt or uninstalled. Ideally, rebuilds are triggered automatically during updates, in order to satisfy slot-operator dependencies.
             3. However, before emerge exits after installing updates, if there are remaining preserved libraries because slot-operator dependencies have not been used to trigger automatic rebuilds, then emerge will display a message like the following:
@@ -354,22 +353,22 @@ passwd zachary
                 Use emerge @preserved-rebuild to rebuild packages using these libraries
                 ```
             4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
-        6. _#_ dispatch-conf, usually if needed, you just need to input `u`.
+        6. \# dispatch-conf, usually if needed, you just need to input `u`.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
     1. Boot with LiveDVD
-    2. _#_ swapon /dev/sda7
-    3. _#_ mount /dev/sda12 /mnt/gentoo
-    4. _#_ mount /dev/sda10 /mnt/gentoo/boot
-    5. _#_ cp -L /etc/resolv.conf /mnt/gentoo/etc
-    6. _#_ mount -t proc proc /mnt/gentoo/proc
-    7. _#_ mount --rbind /sys /mnt/gentoo/sys
-    8. _#_ mount --make-rslave /mnt/gentoo/sys 
-    9. _#_ mount --rbind /dev /mnt/gentoo/dev 
-    10. _#_ mount --make-rslave /mnt/gentoo/dev
-    11. _#_ chroot /mnt/gentoo /bin/bash
-    12. _#_ source /etc/profile
-    13. _#_ export PS1="(chroot) $PS1"
+    2. # swapon /dev/sda7
+    3. # mount /dev/sda12 /mnt/gentoo
+    4. # mount /dev/sda10 /mnt/gentoo/boot
+    5. # cp -L /etc/resolv.conf /mnt/gentoo/etc
+    6. # mount -t proc proc /mnt/gentoo/proc
+    7. # mount --rbind /sys /mnt/gentoo/sys
+    8. # mount --make-rslave /mnt/gentoo/sys 
+    9. # mount --rbind /dev /mnt/gentoo/dev 
+    10. # mount --make-rslave /mnt/gentoo/dev
+    11. # chroot /mnt/gentoo /bin/bash
+    12. # source /etc/profile
+    13. # export PS1="(chroot) $PS1"
     14. Now you can install `xorg` and `xfce` for gentoo system with the help of LiveDVD KDE wifi connection.
 43. Xorg installaion.
     1. Refer to [Xorg/Configuration](https://wiki.gentoo.org/wiki/Xorg/Configuration).
@@ -382,23 +381,23 @@ INPUT_DEVICES="evdev synaptics"
 ## (For intel cards)
 VIDEO_CARDS="intel"
         ```
-    4. _#_ emerge --ask --verbose --pretend x11-base/xorg-drivers, check the dependency.
-    5. _#_ echo "x11-base/xorg-server udev" >> /etc/portage/package.use/xorg-server. Actually this step is unnecessary since `udev` is enabled by default when selecting the system profile in previous step.
-    6. _#_ emerge --ask x11-base/xorg-server
-    7. _#_ env-update && source /etc/profile
-    9. _#_ export PS1="(chroot) $PS1"
+    4. \# emerge --ask --verbose --pretend x11-base/xorg-drivers, check the dependency.
+    5. \# echo "x11-base/xorg-server udev" >> /etc/portage/package.use/xorg-server. Actually this step is unnecessary since `udev` is enabled by default when selecting the system profile in previous step.
+    6. \# emerge --ask x11-base/xorg-server
+    7. \# env-update && source /etc/profile
+    9. \# export PS1="(chroot) $PS1"
     10. The official wiki suggests installing `x11-wm/twm` and `x11-terms/xterm` to test `xorg` installation. However, we are currently chrooting, startx is already running supporting the LiveDVD KDE environment. Hence, we cannot test by issuing command `startx` in chroot environment. It's only possible when reboot into the genuine gentoo system. So skip this step.
     11. For this command: echo XSESSION="Xfce4" > /etc/env.d/90xsession, we have not installed `xfce` yet. So leave it for the next step.
 44. Xfce installation & Configuration.
     1. Refer to [Xfce](https://wiki.gentoo.org/wiki/Xfce) for installation and [Xfce/HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO) for configuration.
-    2. _#_ eselect profile list, you will find `…/desktop` is the default profile (not `…/gnome` or `…/kde`).
-    3. [optional] _#_ echo 'app-text/poppler -qt4' >> /etc/portage/package.use/poppler, since `-qt4` is already set globally in previous step when installing the basic gentoo system.
-    4. [optional] _#_ echo 'dev-util/cmake -qt4' >> /etc/portage/package.use/cmake
-    3. _#_ echo 'gnome-base/gvfs -http' >> /etc/portage/package.use/gvfs
-    4. _#_ echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
-    5. **Attention** _#_ emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
-    6. _#_ emerge --ask x11-terms/xfce4-terminal
-    11. [optional] _#_ echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
+    2. # eselect profile list, you will find `…/desktop` is the default profile (not `…/gnome` or `…/kde`).
+    3. [optional] # echo 'app-text/poppler -qt4' >> /etc/portage/package.use/poppler, since `-qt4` is already set globally in previous step when installing the basic gentoo system.
+    4. [optional] # echo 'dev-util/cmake -qt4' >> /etc/portage/package.use/cmake
+    3. # echo 'gnome-base/gvfs -http' >> /etc/portage/package.use/gvfs
+    4. # echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
+    5. **Attention** # emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
+    6. # emerge --ask x11-terms/xfce4-terminal
+    11. [optional] # echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
         1. Remember to run `env-update && source /etc/profile` to update environment.
     7. Installation finished. Now reboot and loggin with the regular account to configure xfce.
     8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
@@ -406,18 +405,18 @@ VIDEO_CARDS="intel"
         1. At first try, the `logout`, `shutdown` buttons are greyed out. Since those buttons are related to `consolekit`, check the `consolekit` and `dbus` wiki.
         2. Make sure `consolekit` is added to default run level. `consolekit` depends on `dbus`, so `dbus` no need added to default run level. Run `rc-status` with normal user account, you will see dbus is under `Dynamic Runlevel`
         3. After a system update, the issue is solved automatically.
-    10. _#_ rc-update add consolekit default
+    10. # rc-update add consolekit default
     12. You'd better logout and then login again to test xfce: _$_ startx.
 
         > **Attention**: Use _startx_ command to launch xfce desktop. No graphical loggin configured.
     14. If you have a messed desktop setting, you can executing the following commands to have a default setting:
-        1.  _#_  rm -r ~/.cache/sessions
-        2.  _#_ rm -r ~/.config/xfce*
-        3.  _#_  rm -r ~/.config/Thunar
+        1.  #  rm -r ~/.cache/sessions
+        2.  # rm -r ~/.config/xfce*
+        3.  #  rm -r ~/.config/Thunar
 45. [deprecated, replaced by method in fstab]
 
     <s> When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
-    1. _#_ nano -w /etc/udev/rules.d/99-hide-disks.rules
+    1. # nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
 
         ```
@@ -439,32 +438,32 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     10. sda10 Gentoo boot
     11. sda11 Gentoo home
 43. [OPTIONAL] Re-compiling current kernel when you need to modify some kernel configurations.
-    1. _#_ mount /boot
-    1. _#_ mount /boot/efi
-    1. _#_ cd /usr/src/linux
-    2. _#_ make menuconfig
+    1. # mount /boot
+    1. # mount /boot/efi
+    1. # cd /usr/src/linux
+    2. # make menuconfig
         1. You don't need to copy and convert the old kernel config file as specified on [Kernel/Upgrade](https://wiki.gentoo.org/wiki/Kernel/Upgrade) since we just re-compile the current working kernel and share the kernel source. So we share the basic `.config` file in `/usr/src/linux/.config`.
         2. Just make some changes to the old config file.
-    3. _#_ make
-    4. _#_ make modules_install
-    5. _#_ make install
+    3. # make
+    4. # make modules_install
+    5. # make install
         1. This is add `.old` to original kernel and copy the new kernel to `/boot`.
         2. You mannually finish this by renaming and copying kernel files.
-    6. _#_ genkernel --install initramfs, re-install `initramfs`.
-    7. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
-    8. _#_ reboot
+    6. # genkernel --install initramfs, re-install `initramfs`.
+    7. # grub2-mkconfig -o /boot/grub/grub.cfg
+    8. # reboot
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 45. ALSA - sound.
-    1. _#_ emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
-    2. _#_ rc-update add alsasound boot
-    3. _#_ speaker-test -t wav -c 2, test the speaker.
+    1. # emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
+    2. # rc-update add alsasound boot
+    3. # speaker-test -t wav -c 2, test the speaker.
 45. Applications:
     1. Web browser: Firefox. It will take a while installing.
 
         > Adblock Edge, ChatZilla
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
-        1. _#_ echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
-        2. _#_ emerge -av fcitx
+        1. # echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
+        2. # emerge -av fcitx
         2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 		
             ```
@@ -475,12 +474,12 @@ export XMODIFIERS=@im=fcitx
             ```
         But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
         3. **IMPORTANT**: these four lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
-        4. _#_ emerge -av fcitx-sunpinyin
-        5. _#_ emerge -av fcitx-configtool
-    3. _#_ emerge -av mplayer
+        4. \# emerge -av fcitx-sunpinyin
+        5. \# emerge -av fcitx-configtool
+    3. \# emerge -av mplayer
     4. emacs:
-        1. _#_ echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
-        2. _#_ emerge -av emacs
+        1. # echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
+        2. # emerge -av emacs
         3. Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
 
             ```
@@ -493,16 +492,16 @@ export XMODIFIERS=@im=fcitx
         elog
     fi
             ```
-    5. _#_ emerge -av www-plugins/adobe-flash
+    5. \# emerge -av www-plugins/adobe-flash
         1. Pay attention to update `package.license` file when needed.
     6. WPS office.
         1. overlay support
             1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
-            1. _#_ echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
-            2. _#_ emerge -av layman
-            2. _#_ echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
-            3. _#_ layman -f -a gentoo-zh
-            4. _#_ layman -S
+            1. # echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
+            2. # emerge -av layman
+            2. # echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
+            3. # layman -f -a gentoo-zh
+            4. # layman -S
 
             >The previous version (<= 9.1.0.4953\_alpha18) located in `gentoo-zh` overlay relies on a bundle of customized and pre-built `QT` packages. Use command `qlist wps-office | grep -i qt` or `equery files wps-office | grep -i qt` to list the bundled `QT` libs in wps-office installation directory (/opt/kingsoft/wps-office/).  Since version `9.1.0.4953_alpha18-r1` wps-office was published through official Gentoo portage as well. The coming new versions no longer use those prebuilt `QT` libs. Instead, they will draw in *qtwebkit*, *qtscript*, *qttranslate*, *qtcore*, etc as system-wide packages.
 
@@ -518,17 +517,17 @@ export XMODIFIERS=@im=fcitx
                 >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
             5. emerge -av wps-office
 	    6. **fonts support** refer to [Fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/)
-    7. _#_ emerge --ask xfce4-volumed xfce4-mixer
-    8. _#_ emerge -av mupdf
+    7. \# emerge --ask xfce4-volumed xfce4-mixer
+    8. \# emerge -av mupdf
         1. The other application may draw in a lot of GTK or QT dependencies consuming many disk space.
-    9. _#_ emerge -av dev-vcs/git
+    9. \# emerge -av dev-vcs/git
         1. _$_ git config --global user.name "Jim Green"
         2. _$_ git config --global user.email "username@users.noreply.github.com"
         3. _$_ git config --global core.editor emacs
-        4. _#_ emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
+        4. # emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
         5. _$_ git clone xxx
-    10. _#_ emerge -av wgetpaste
-    11. _#_ emerge -av net-misc/dropbox xfce-extra/thunar-dropbox
+    10. \# emerge -av wgetpaste
+    11. \# emerge -av net-misc/dropbox xfce-extra/thunar-dropbox
         1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
         2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
             1. This can be overcome by setting the dropbox language to `english`.
@@ -538,46 +537,46 @@ export XMODIFIERS=@im=fcitx
         4. _$_ dropbox &, run dropbox in the backgroud.
         5. We can create a ~/bin/dropbox.sh or /usr/local/bin/dropbox.sh script:
 
-            >\#!/bin/bash
+            >#!/bin/bash
             >
             >/opt/bin/dropbox &
 
             Remember to `chmod +x ~/bin/dropbox.sh`, just run `~/bin/dropbox.sh`.
         6. If blocked by GFW, set the corresponding proxy address and port.
-    12. _#_ emerge --ask app-portage/gentoolkit
-    13. _#_ emerge --ask app-portage/eix
-        1. [deprecated for new poratge > 2.2.16] <s>_#_ emacs -nw /etc/eix-sync.conf:</s>
+    12. \# emerge --ask app-portage/gentoolkit
+    13. \# emerge --ask app-portage/eix
+        1. [deprecated for new poratge > 2.2.16] <s># emacs -nw /etc/eix-sync.conf:</s>
 
             ```
             *
             ```
-        2. _#_ eix-sync
+        2. \# eix-sync
     14. Archive
-        1. _#_ emerge -av file-roller
-        2. _#_ emerge -av thunar-archive-plugin
+        1. # emerge -av file-roller
+        2. # emerge -av thunar-archive-plugin
             1. [steps below might be deprecated depending on related package version]
             1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
-            2. _#_ cd /usr/libexec/thunar-archive-plugin/
-            3. _#_ ln -s file-roller.tap org.gnome.FileRoller.tap
+            2. # cd /usr/libexec/thunar-archive-plugin/
+            3. # ln -s file-roller.tap org.gnome.FileRoller.tap
             4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
-        3. _#_ echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
+        3. # echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
             1. 使用 “natspec” USE Flag重新编译unzip（zip文件中没有保存压缩时使用的编码，故需将unzip打上编码探测的补丁）
-        4. _#_ [optionl, 7zip can extract zip format] emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
-        5. _#_ emerge -av p7zip, three commands `7z`, `7za` and `7zr` can be used to extract files.
+        4. # [optionl, 7zip can extract zip format] emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
+        5. # emerge -av p7zip, three commands `7z`, `7za` and `7zr` can be used to extract files.
             1. If `p7zip` is installed, `file-roller` takes `7z` or `7za` to handle `zip` file which cannot handle Chinese filenames.
             2. Solution: rename `/usr/bin/7z` and `/usr/bin/7za` to something else. 若需要安装p7zip，则安装完成后，移除或重命名/usr/bin下除7zr外7z*文件（fileroller在7z或者7za存在的情况下会优先使用。而7z和7za解压zip文件会出现文件名乱码，暂不知如何解决。故删除7z和7za，仅保留7zr以支持7z格式的压缩和解压。)
         6. Use `7z` format instead of `zip` since `7z` support unicode compression especially for filenames.
-    15. [deprecated, use Alt+F2 app finder instead] <s>_#_ emerge -av xfce4-verve-plugin
+    15. [deprecated, use Alt+F2 app finder instead] <s># emerge -av xfce4-verve-plugin
         1. Add this plugin to panel.
         2. Under `Settings Editor` --> `xfce4-kerboard-shortcuts` --> `commands` --> `custom`, set a shortcut for this plugin: `Super + R`.</s>
-    16. [deprecated] <s>_#_ emerge -av xfce4-wavelan-plugin</s>
+    16. [deprecated] <s># emerge -av xfce4-wavelan-plugin</s>
 
-        __this plugin cannot be added to panel currently__, cannot be used.
+        **this plugin cannot be added to panel currently**, cannot be used.
     17. kwplayer - Linx version of 酷我音乐
-        1. _#_ emerge -av kwplayer
+        1. \# emerge -av kwplayer
 
             Now play MV but not MP3 songs. After detailed search, I found that mplayer used `mad` to decode MP3. So:
-        2. _#_ emerge -av gst-plugins-mad
+        2. \# emerge -av gst-plugins-mad
  
             Bingo! This is due to the author did not test this package under Gentoo. So he did not incur the `gst-plugins-mad` dependcy specially for Gentoo. We need to install by ourself.
         3. The default configuration/log is located in `~/.config/kuwo/` and downloaded files are under `~/.cache/kuwo/`. Change the `song` and `mv` directories to `~/Music/Songs` and `~/Music/MVs` through GUI preferences menu. We cannot change the lyrics `lrc` location.
@@ -600,7 +599,7 @@ export XMODIFIERS=@im=fcitx
 
         >/proc/acpi/ibm/bluetooth
 
-        1. _#_ emerge -av bluez, the current version is 5. `bluez` package is bluetooth protocol stack for Linux with several useful tools like `hciconfig`, `bluetoothctl`, etc:
+        1. \# emerge -av bluez, the current version is 5. `bluez` package is bluetooth protocol stack for Linux with several useful tools like `hciconfig`, `bluetoothctl`, etc:
 
             >\# hciconfig -a
 
@@ -641,6 +640,7 @@ export XMODIFIERS=@im=fcitx
 
             `obexfs` depends on `obexftp`. How to use `obexftp` along refer to references.
         5. `obexfs` and `obexftp` are command line tools. Not efficient. We can choose GUI applicatibbon instead like `blueman` based on GTK+.
+        6. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist*.
         6. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537); 
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
@@ -699,13 +699,13 @@ exec startxfce4 --with-ck-launch
     This setting is Deprecated and no longer used.  Please ensure your 'sync-type' and 'sync-uri' are set correctly in /etc/portage/repos.conf/gentoo.conf
             ```
         2. Refer to [Portage/Sync](https://wiki.gentoo.org/wiki/Project:Portage/Sync)
-        3. _#_ mkdir /etc/portage/repos.conf
-        4. _#_ cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
+        3. \# mkdir /etc/portage/repos.conf
+        4. \# cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
             1. This default setting is enough for the official portage sync. The argument `sync-uri` can be changed to someone near your local region. For instalce, it can be replaced by the one in your original `/etc/portage/make.conf`: `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
         5. Install new >=layman-2.3.0 supporting the new portage plug-in sync system.
             1. Add `sync-plugin-portage` USE flag to `/etc/package.use/layman` file.
-            2. _#_ emerge -avt \>=app-portage/layman-2.3.0, the new layman package will create `/etc/portage/repos.conf/layman.conf` automatically.
-            3. _#_ rm /var/lib/layman/make.conf, delete is the old-style layman config file.
+            2. # emerge -avt \>=app-portage/layman-2.3.0, the new layman package will create `/etc/portage/repos.conf/layman.conf` automatically.
+            3. # rm /var/lib/layman/make.conf, delete is the old-style layman config file.
         6. Edit `etc/portage/make.conf` and commnet out the lines `source /var/lib/layman/make.conf` and `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
         7. Primary control of all sync operations has been moved from `emerge` to `emaint`. `emerge --sync` now just calls the `emaint sync` module with the `--auto` option. The `--auto` option performs a sync on only those repositories with the auto-sync setting not set to `no` or `false`. If it is absent, then it will default to `yes` and "emerge --sync" will sync the repository. This means the original `emerge --sync` is just a wrapper of `emaint sync` with default argument `--auto` or `-a`.
         8. Note: `eix-sync` can update both overlays and portage while the new sync system will add overlays to `/etc/portage/repos.conf/layman` as well. So when `eix-sync` is called, the new procedure is likely: `layman -S; emerge --sync`. But the new `emerge --sync` will also update overlays in `/etc/portage/repos.conf/layman.conf`.
@@ -718,12 +718,12 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
             ```
             9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out overlays in that file.
         10. Choose one of the follwing command for daily operation:
-            1. _#_ emaint sync -a
-            2. _#_ emerge --sync
-            3. _#_ eix-sync
+            1. # emaint sync -a
+            2. # emerge --sync
+            3. # eix-sync
         11. [sys-apps/portage-2.2.16 发布，支持多种同步方式](http://www.gentoo-cn.info/article/new-portage-plug-in-sync-system/); [Gentoo的portage已支持直接更新第三方源（overlay）](http://phpcj.org/portage-emerge-overlay-on-gentoo/).
     6. Touchpad configuration. After X and Xfce4 installation, parts of Touchpad does not work. The primary method of configuration for the touchpad is through an Xorg server configuration file. After installation of `x11-drivers/xf86-input-synaptics`, a default configuration file is located at `/usr/share/X11/xorg.conf.d/50-synaptics.conf`. Users can copy this file to `/etc/X11/xorg.conf.d/` and edit it to configure the various driver options available. 
-        1. _#_ emacs /etc/X11/xorg.conf.d/50-synaptics.conf
+        1. \# emacs /etc/X11/xorg.conf.d/50-synaptics.conf
 
             ```
             Section "InputClass"
@@ -754,44 +754,67 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
         If want to make this change permanent, then modify the the `/etc/default/grub` template and update `/boot/grub/grub.cfg`.
 
         ```bash
-        _#_ cp /etc/default/grub /etc/default/grub_backup
-        _#_ ect /etc/default/grub, find the kernel parameter GRUB_CMDLINE_LINUX_DEFAULT="". By default it is empty and commented out. Insert the following value:
+        # cp /etc/default/grub /etc/default/grub_backup
+        # ect /etc/default/grub, find the kernel parameter GRUB_CMDLINE_LINUX_DEFAULT="". By default it is empty and commented out. Insert the following value:
             acpi_osi=\"!Windows 2012\"
         or,
             acpi_osi='!Windows 2012'
         Get:
             GRUB_CMDLINE_LINUX_DEFAULT="acpi_osi=\"!Windows 2012\"".
-        _#_ mount /boot /boot/efi
-        _#_ grub2-mkconfig -o /boot/grub/grub.cfg
+        # mount /boot /boot/efi
+        # grub2-mkconfig -o /boot/grub/grub.cfg
         ```
         The brightness config value is located in `/sys/class/backlight/`.
 
         Refer to [Thinkpad T430 brightness keys broken after firmware upgrade](https://bbs.archlinux.org/viewtopic.php?id=157600); [Brightness Key Levels T430](https://bbs.archlinux.org/viewtopic.php?id=158775); [arch wiki backlight](https://wiki.archlinux.org/index.php/Backlight); [Backlight keys stopped working, unless acpi_osi="!Windows 2012"](https://bugzilla.kernel.org/show_bug.cgi?id=51231).
+    8. Module blacklist. Some modules are rarely used. It's better to deactivate it at boot to save time and memory. For example, to deactivate bluetooth-related modules.
+        1. _$_ lsmod, to locate what modules are for bluetooth:
+
+            ```
+            btusb
+              btbcm
+              btintel
+                bluetooth
+            ```
+            `modinfo | grep -i depends` help clarify the module dependencies.
+        2. So need to deactivate those 4 modules at boot.
+
+                # ect /etc/modprobe.d/bluetooth.conf:
+
+            ```
+            install btsub /bin/false
+            blacklist bluetooth
+            blacklist btbcm
+            blacklist btintel
+            ```
+        3. `blacklist` and `install` methods are slightly different: for blacklisted modules, they will be loaded if another non-blacklisted module depends on it, or if it is loaded manually. For example, *bluetooth* is blacklisted. There is a module *foo-module* (not blacklisted) depends on it, then *bluetooth* module will load when *foo-module* loads. However, to ensure the modules are never inserted, even if they are needed by other modules you load, use *install mod-name /bin/false*.
+        4. Don't forget to remove `bluetooth` service from startup if `/etc/init.d/bluetooth` are added to *boot* or *default* runlevel.
+        4. Refer to [changes to module blacklisting](https://www.archlinux.org/news/changes-to-module-blacklisting/); 
 47. Upgrade kernel to **unstable 4.0.0**
 
     >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
 
-    1. _#_ echo "=sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources
+    1. # echo "=sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources
         1. `eix` helps find out which unstable package version is located in portage mirror.
-    2. _#_ eix-sync
-    3. _#_ emerge -av gentoo-sources
-    4. _#_ eselect kernel list
-    5. _#_ eselect kernel set 2, this is update the `/usr/src/linx` symbol link pointing to the new 4.0.0 kernel.
-    5. _#_ mount /boot
-    5. _#_ mount /dev/sda2 /boot/efi
-    6. _#_ cd /usr/src/linux
-    7. _#_ cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
-    8. _#_ make olddefconfig, to convert the old kernel config to new one without too many questions to answer.
-        1. _#_ make silentoldconfig, choose all the new settings to default ones. It only shows new and different kernel options incurred in new kernel version.
-        2. _#_ make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
-    9. _#_ make
-    10. _#_ make modules_install
-    11. _#_ make install
-    12. _#_ genkernel --install initramfs 
-    13. _#_ grub2-mkconfig -o /boot/grub/grub.cfg
-    14. _#_ emerge -av @module-rebuild
+    2. # eix-sync
+    3. # emerge -av gentoo-sources
+    4. # eselect kernel list
+    5. # eselect kernel set 2, this is update the `/usr/src/linx` symbol link pointing to the new 4.0.0 kernel.
+    5. # mount /boot
+    5. # mount /dev/sda2 /boot/efi
+    6. # cd /usr/src/linux
+    7. # cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
+    8. # make olddefconfig, to convert the old kernel config to new one without too many questions to answer.
+        1. # make silentoldconfig, choose all the new settings to default ones. It only shows new and different kernel options incurred in new kernel version.
+        2. # make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
+    9. # make
+    10. # make modules_install
+    11. # make install
+    12. # genkernel --install initramfs 
+    13. # grub2-mkconfig -o /boot/grub/grub.cfg
+    14. # emerge -av @module-rebuild
         1. Any external kernel modules, such as `binary kernel modules`, need to be rebuilt for each new kernel.
-    15. _#_ reboot
+    15. # reboot
 47. e-sources-4.1.0 kernel
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
@@ -810,9 +833,9 @@ drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialize
         ```
         We can look into the `/usr/src/e-sources/drivers/tty/vt/vt.c` at line 890, we do find that issue. Anyway currently the kernel works fine.
 48. Remove old kernels
-    1. _#_ emerge -av app-admin/eclean-kernel
-    2. _#_ eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
-    3. _#_ eclean-kernel -n 4 --ask
+    1. # emerge -av app-admin/eclean-kernel
+    2. # eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
+    3. # eclean-kernel -n 4 --ask
         1. Option `--ask` is very important, it will ask for your confirmation for each kernel to be removed by an interactive way. You can just remove the kernels you don't need. You can also adjust the number from `4` to something else to pop out the desired kernel for removal.
         2. At last, I removed the kernel as  `3.18.11-gentoo.old`
     4. `eclean-kernel` will update the grub menu automatically.
