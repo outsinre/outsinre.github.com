@@ -747,6 +747,26 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
             EndSection
             ```
         3. You can also set a temporary config at command line, which is not persisitent. Refer to command `synclient`.  
+    7. Brightness key: Fn + Home/End.
+
+        The thinkpad brightness key does not work even though I enabled the revelant `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI`. The final solution is add a special kernel boot parameter **acpi_osi="!Windows 2012"**. This is to use the *standard ACPI* (advanced configuration and power management interfance) system instead of *thinkpad-acpi*.
+
+        If want to make this change permanent, then modify the the `/etc/default/grub` template and update `/boot/grub/grub.cfg`.
+
+        ```bash
+        _#_ cp /etc/default/grub /etc/default/grub_backup
+        _#_ ect /etc/default/grub, find the kernel parameter GRUB_CMDLINE_LINUX_DEFAULT="". By default it is empty and commented out. Insert the following value:
+            acpi_osi=\"!Windows 2012\"
+        or,
+            acpi_osi='!Windows 2012'
+        Get:
+            GRUB_CMDLINE_LINUX_DEFAULT="acpi_osi=\"!Windows 2012\"".
+        _#_ mount /boot /boot/efi
+        _#_ grub2-mkconfig -o /boot/grub/grub.cfg
+        ```
+        The brightness config value is located in `/sys/class/backlight/`.
+
+        Refer to [Thinkpad T430 brightness keys broken after firmware upgrade](https://bbs.archlinux.org/viewtopic.php?id=157600); [Brightness Key Levels T430](https://bbs.archlinux.org/viewtopic.php?id=158775); [arch wiki backlight](https://wiki.archlinux.org/index.php/Backlight); [Backlight keys stopped working, unless acpi_osi="!Windows 2012"](https://bugzilla.kernel.org/show_bug.cgi?id=51231).
 47. Upgrade kernel to **unstable 4.0.0**
 
     >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
