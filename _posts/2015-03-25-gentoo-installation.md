@@ -196,7 +196,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
         In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
 
-    10. Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` and `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS` set to `M`. These two options are not necessary for my x220. The following the `dmesg | grep -i thinkpad` output.
+    10. [optional, does offer extra useful function] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` and `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS` set to `M`. These two options are not necessary for my x220. The following the `dmesg | grep -i thinkpad` output.
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
@@ -640,7 +640,7 @@ export XMODIFIERS=@im=fcitx
 
             `obexfs` depends on `obexftp`. How to use `obexftp` along refer to references.
         5. `obexfs` and `obexftp` are command line tools. Not efficient. We can choose GUI applicatibbon instead like `blueman` based on GTK+.
-        6. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist*.
+        6. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist/install*.
         6. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537); 
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
@@ -767,7 +767,7 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
         The brightness config value is located in `/sys/class/backlight/`.
 
         Refer to [Thinkpad T430 brightness keys broken after firmware upgrade](https://bbs.archlinux.org/viewtopic.php?id=157600); [Brightness Key Levels T430](https://bbs.archlinux.org/viewtopic.php?id=158775); [arch wiki backlight](https://wiki.archlinux.org/index.php/Backlight); [Backlight keys stopped working, unless acpi_osi="!Windows 2012"](https://bugzilla.kernel.org/show_bug.cgi?id=51231).
-    8. Module blacklist. Some modules are rarely used. It's better to deactivate it at boot to save time and memory. For example, to deactivate bluetooth-related modules.
+    8. Module blacklist/install. Some modules are rarely used. It's better to deactivate it at boot to save time and memory. For example, to deactivate bluetooth-related modules.
         1. _$_ lsmod, to locate what modules are for bluetooth:
 
             ```
@@ -776,20 +776,59 @@ NOTE: As a result of the default auto-sync = True/Yes setting, commands
               btintel
                 bluetooth
             ```
-            `modinfo | grep -i depends` help clarify the module dependencies.
+            `modinfo | grep -i depends` help clarify the module dependencies. Here, modole `btusb` is the root module.
         2. So need to deactivate those 4 modules at boot.
 
                 # ect /etc/modprobe.d/bluetooth.conf:
 
             ```
-            install btsub /bin/false
-            blacklist bluetooth
-            blacklist btbcm
-            blacklist btintel
+# /etc/modprobe.d/bluetooth.conf
+# disable bluetooth modules at boot since most of the time, don't need it at all.
+# Don't forget to remove `/etc/init.d/bluetooth` from *boot* or *default* runlevel if ever added.
+blacklist btusb
+#install btbcm /bin/true
+#install btintel /bin/true
+#install bluetooth /bin/true
+blacklist btbcm
+blacklist btintel
+blacklist bluetooth
             ```
-        3. `blacklist` and `install` methods are slightly different: for blacklisted modules, they will be loaded if another non-blacklisted module depends on it, or if it is loaded manually. For example, *bluetooth* is blacklisted. There is a module *foo-module* (not blacklisted) depends on it, then *bluetooth* module will load when *foo-module* loads. However, to ensure the modules are never inserted, even if they are needed by other modules you load, use *install mod-name /bin/false*.
-        4. Don't forget to remove `bluetooth` service from startup if `/etc/init.d/bluetooth` are added to *boot* or *default* runlevel.
-        4. Refer to [changes to module blacklisting](https://www.archlinux.org/news/changes-to-module-blacklisting/); 
+        3. `blacklist mod-name` and `install mod-name /bin/true (or false)` methods are slightly different:
+
+            For blacklisted modules, they will be loaded if another non-blacklisted module depends on it, or if it is loaded manually. For example, *bluetooth* is blacklisted. And now we need to pair cell phone with PC by bluetooth protocol. So we need to manullay `modprobe btusb`. *bluetooth* module will load as a dependency. 
+
+            However, to ensure the modules (bluetooth service) are never inserted, even if they are needed by other modules you load or by manually modprobed, use `install` instead. To install a module as `true` or `false` does not make much difference. But `false` will remind you error message when you manually modprobe the module or a root module tries to load it. Refer to [Modprobe is better disabled by using /bin/true (not/bin/false](https://github.com/OpenSCAP/scap-security-guide/issues/539).
+
+            If you want to **totally disable** the a service, `blacklist` or `install` root module; `install` all dependency modules.
+ 
+            If you might need a service temporarily from time to time, `blacklist` root and all dependency modules.
+        5. Refer to [arch wiki blacklist](https://wiki.archlinux.org/index.php/Kernel_modules#Blacklisting); [changes to module blacklisting](https://www.archlinux.org/news/changes-to-module-blacklisting/).
+        6. Similarly, some other rarely used modules can also be deactivated from startup:
+
+            Webcamera modules:
+
+            ```
+# /etc/modprob.d/webcamear.conf
+# deactivate webcamera since rarely used.
+blacklist uvcvideo
+#install videobuf2_core /bin/false
+#install videobuf2_vmalloc /bin/false
+#install v4l2_common /bin/false
+#install videobuf2_memops /bin/false
+#install videodev /bin/false
+blacklist videobuf2_core
+blacklist videobuf2_vmalloc
+blacklist v4l2_common
+blacklist videobuf2_memops
+blacklist videodev
+            ```
+            thinkpad_acpi module:
+
+            ```
+# /etc/modprobe.d/thinkpad_acpi.conf
+# thinkpad_acpi module does offer any useful function support.
+blacklist thinkpad_acpi
+            ```
 47. Upgrade kernel to **unstable 4.0.0**
 
     >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
