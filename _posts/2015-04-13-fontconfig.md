@@ -48,13 +48,13 @@ WINGDNG2.TTF  fonts.scale  msyhl.ttc    simkai.ttf  tahoma.ttf    wingding.ttf
 WINGDNG3.TTF  msyh.ttc     simfang.ttf  simsun.ttc  tahomabd.ttf
     ```
     Some of the fonts are for `wps-office` and others are for Chinese fonts.
-2. _#_ mkdir -p .local/share/fonts/myFonts, create a subdirectory under `.local/share/fonts` to hold your fonts.
-3. _#_ cd .local/share/fonts/myFonts
+2. _$_ mkdir -p ~/.local/share/fonts/myFonts, create a subdirectory under `.local/share/fonts` to hold your fonts.
+3. _$_ cd ~/.local/share/fonts/myFonts
 4. Copy your downloaded fonts to `myFonts`.
     1. Pay attention to font directory and files permission. Use `chmod` to set the correct permissions (i.e. at least 0444 for files and 0555 for directories). But don't worry about the permission issue since we are installing fonts for a single user. And the default permission for current user account is `rwx`. When installing globally for system, this is important.
-5. _#_ fc-cache -fv \<path-to-font-directory\>, since we are in the new font directory, the `path-to-font-directory` which is `.local/share/fonts/myFonts` can be eliminated.
-6. _#_ mkfontscale \<path-to-font-directory\>
-7. _#_ mkfontdir \<path-to-font-directory\>
+5. _$_ fc-cache -fv \<path-to-font-directory\>, since we are in the new font directory, the `path-to-font-directory` which is `.local/share/fonts/myFonts` can be eliminated.
+6. _$_ mkfontscale \<path-to-font-directory\>
+7. _$_ mkfontdir \<path-to-font-directory\>
 
 # System-wide installation
 1. Install system-wide fonts are similar except that the fonts directories are different like  `/usr/share/fonts/`.
@@ -105,12 +105,13 @@ Refer to:
     2. `fontconfig-infinality` will draw in its own settings which will interfere with the other fontconfig configuration; so need to disable other fontconfig options except `52-infinality.conf`.
     3. _#_ eselect fontconfig disable xx yy zz ...
         1. I choose to __keep__ another two options `50-user.conf` (for per-user config files), `51-local.conf` (for system-wide config files). This is a little different from the `Gentoo fontconfig wiki`.
+    4. Refer to reference number 3, set `embeddedbitmap` in `/etc/fonts/infinality/infinality.conf` to `true`.
 3. _#_ eselect lcdfilter list
 4. _#_ eselect lcdfilter set 14, set to `windows-7`.
 5. _#_ eselect infinality list
 6. _#_ eselect infinality set to `win7
     1. Make sure `lcdfilter` and `infinality` choose the same category.
-7. Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` (50-user.conf) or `/etc/fonts/local.conf` (51-local.conf). Here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf):
+7. Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` (50-user.conf) or `/etc/fonts/local.conf` (51-local.conf). Here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf).
 8. Notes:
     1. Use `fc-list | head` to check if any errors occur. This is important. During the setting, I found an error about `infinality` configuration files.
 9. Refer to [Gentoo字体设置]({{site.baseurl}}assets/Gentoo字体设置.markdown) for the basic procedures.
