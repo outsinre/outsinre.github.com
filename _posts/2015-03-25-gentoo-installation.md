@@ -639,9 +639,23 @@ export XMODIFIERS=@im=fcitx
             >\# mount -t fuse "obexfs#-bMAC\_address\_of_device -B6" /media/Obex
 
             `obexfs` depends on `obexftp`. How to use `obexftp` along refer to references.
-        5. `obexfs` and `obexftp` are command line tools. Not efficient. We can choose GUI applicatibbon instead like `blueman` based on GTK+.
-        6. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist/install*.
-        6. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537); 
+        5. `obexfs`, `obexftp`, `bluetoothctl` are command line tools - not efficient. Use GUI applicatibbon instead like `blueman` based on GTK+. Remember to add USE flag `thunar` for blueman, which will add a right click menu *Send To -> Bluetooth Device*. Refer to [arch wiki blueman](https://wiki.archlinux.org/index.php/Blueman).
+            1. $ mkdir ~/Bluetooth
+            2. # ect /usr/local/bin/obex_thunar.sh
+                ```bash
+#!/bin/bash
+fusermount -u ~/Bluetooth
+obexfs -b $1 ~/Bluetooth
+thunar ~/Bluetooth
+                ```
+            3. # chmod +x /usr/local/bin/obex_thunar.sh
+            4. The last step is to change the line in Blueman tray icon > Local Services > Transfer > Advanced to `obex_thunar.sh %d`.
+        6. No matter blueman or bluetoothctl command is used, the basic procedure:
+            1. # rc-service bluetooth start, start bluetooth daemon.
+            2. # modprobe btusb, load bluetooth related modules.
+            3. $ bluetoothctl OR blueman-applet OR by Bluetooth manager from App menu as a normal user account.
+        7. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist/install*.
+        8. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537); 
 46. Configuration consistently.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem. In 4.10, start Xfce with `startxfce4 --with-ck-launch`. This will start xfce4-session with ck-launch-session. In 4.10, **Xfce4-sesion will take care of the dbus-session launch**.
