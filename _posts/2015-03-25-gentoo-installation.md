@@ -641,7 +641,7 @@ export XMODIFIERS=@im=fcitx
             `obexfs` depends on `obexftp`. How to use `obexftp` along refer to references.
         5. `obexfs`, `obexftp`, `bluetoothctl` are command line tools - not efficient. Use GUI applicatibbon instead like `blueman` based on GTK+. Remember to add USE flag `thunar` for blueman, which will add a right click menu *Send To -> Bluetooth Device*. Refer to [arch wiki blueman](https://wiki.archlinux.org/index.php/Blueman).
             1. $ mkdir $HOME/Bluetooth
-            2. # ect /usr/local/bin/obex_thunar.sh
+            2. \# ect /usr/local/bin/obex_thunar.sh
 
                 ```bash
 #!/bin/bash
@@ -649,7 +649,7 @@ fusermount -u $HOME/Bluetooth
 obexfs -b $1 $HOME/Bluetooth
 thunar $HOME/Bluetooth
                 ```
-            3. # chmod +x /usr/local/bin/obex_thunar.sh
+            3. \# chmod +x /usr/local/bin/obex_thunar.sh
             4. The last step is to change the line in Blueman tray icon > Local Services > Transfer > Advanced to `obex_thunar.sh %d`.
         6. No matter blueman or bluetoothctl command is used, the basic procedure:
             1. # rc-service bluetooth start, start bluetooth daemon.
