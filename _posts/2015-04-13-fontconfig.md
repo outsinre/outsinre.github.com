@@ -117,7 +117,7 @@ Refer to:
 3. _#_ eselect lcdfilter list
 4. _#_ eselect lcdfilter set 14, set to `windows-7`.
 5. _#_ eselect infinality list
-6. _#_ eselect infinality set to `win7
+6. _#_ eselect infinality set to `win7`.
     1. Make sure `lcdfilter` and `infinality` choose the same category.
 7. Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` (50-user.conf) or `/etc/fonts/local.conf` (51-local.conf). Here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf).
 8. Use `fc-list | head` to check if any errors occur. This is important. During the setting, I found an error about `infinality` configuration files.
