@@ -109,7 +109,7 @@ Refer to:
 
         Where is `infinality`'s own settings locates? Refer to `/etc/fonts/infinality`.
     3. _#_ eselect fontconfig disable xx yy zz ...
-        1. I choose to **keep** `50-user.conf` (for per-user config files) instead of disabling.
+        1. [deprecated, not necessary at all] <s>I choose to **keep** `50-user.conf` (for per-user config files) instead of disabling.</s>
 
         Up to now, `eselect` has created two conf files under `/etc/fonts/conf.d`. Use `ls -l`, you will find them actually symbolic link referring to corresponding files under `/etc/fonts/conf.avail`. Please read the two conf files for an overview.
     4. You will find `fontconfig` (`/etc/fonts/`) and `infinality` (`/etc/fonts/infinality/`) has the nearly the same directory architecture. The `conf.d` sub-directory stores the current font configuration files, while `conf.avail` (or `conf.src`) stores all the possible configuration files. All we need to to is to `eselect` a font portfolio which will choose and create symbolic links under `conf.d` sub-directory.
@@ -119,7 +119,7 @@ Refer to:
 5. _#_ eselect infinality list
 6. _#_ eselect infinality set to `win7`.
     1. Make sure `lcdfilter` and `infinality` choose the same category.
-7. Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` (50-user.conf) or `/etc/fonts/local.conf` (51-local.conf). Here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf).
+7. [deprecated, see step 3.3.1]<s>Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` (50-user.conf) or `/etc/fonts/local.conf` (51-local.conf). Here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf).</s>
 8. Use `fc-list | head` to check if any errors occur. This is important. During the setting, I found an error about `infinality` configuration files.
 9. Refer to [Gentoo字体设置]({{site.baseurl}}assets/Gentoo字体设置.markdown) for the basic procedures.
 10. Reference:
