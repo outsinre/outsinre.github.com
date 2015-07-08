@@ -96,15 +96,23 @@ Refer to:
 3. [TeX Live Fonts](https://wiki.archlinux.org/index.php/TeX_Live#Fonts)
 4. [Install Windows Chinese Fonts](http://www.fangxiang.tk/2015/02/03/TeXLive-2014-Ubuntu-Installation/)
 
-# Fontconfig Customization
-
+# Fontconfig Customization - infinality
 1. _#_ echo "media-libs/freetype adobe-cff infinality" > /etc/portage/package.use/freetype
-2. _#_ emerge -av media-libs/freetype, reinstall freetype to take advantage of `adobe-cff` and `infinality`. 这个命令会自动依赖安装`fontconfig-infinality`和`eselect-infinality`包，如果没有请手动安装。
+
+    It seems that `adobe-cff` is enabled by default.
+2. _#_ emerge -av media-libs/freetype, reinstall freetype to take advantage of `adobe-cff` and `infinality`.
+
+    It will draw in another two packages `fontconfig-infinality` and `eselect-infinality`. If not, emerge them manually.
 2. _#_ eselect fontconfig list, you will find a new option `52-infinality.conf` in the list.
     1. _#_ eselect fontconfig enable 52-infinality.conf
-    2. `fontconfig-infinality` will draw in its own settings which will interfere with the other fontconfig configuration; so need to disable other fontconfig options except `52-infinality.conf`.
+    2. `fontconfig-infinality` will draw in its own settings which will interfere with the other fontconfig configuration; so need to disable all the other fontconfig options except `52-infinality.conf`.
+
+        Where is `infinality`'s own settings locates? Refer to `/etc/fonts/infinality`.
     3. _#_ eselect fontconfig disable xx yy zz ...
-        1. I choose to __keep__ another two options `50-user.conf` (for per-user config files), `51-local.conf` (for system-wide config files). This is a little different from the `Gentoo fontconfig wiki`.
+        1. I choose to **keep** `50-user.conf` (for per-user config files) instead of disabling.
+
+        Up to now, `eselect` has created two conf files under `/etc/fonts/conf.d`. Use `ls -l`, you will find them actually symbolic link referring to corresponding files under `/etc/fonts/conf.avail`. Please read the two conf files for an overview.
+    4. You will find `fontconfig` (`/etc/fonts/`) and `infinality` (`/etc/fonts/infinality/`) has the nearly the same directory architecture. The `conf.d` sub-directory stores the current font configuration files, while `conf.avail` (or `conf.src`) stores all the possible configuration files. All we need to to is to `eselect` a font portfolio which will choose and create symbolic links under `conf.d` sub-directory.
     4. Refer to reference number 3, set `embeddedbitmap` in `/etc/fonts/infinality/infinality.conf` to `true`.
 3. _#_ eselect lcdfilter list
 4. _#_ eselect lcdfilter set 14, set to `windows-7`.
@@ -112,8 +120,7 @@ Refer to:
 6. _#_ eselect infinality set to `win7
     1. Make sure `lcdfilter` and `infinality` choose the same category.
 7. Choose to place customized fontconfig file in `~/.config/fontconfig/fonts.conf` (50-user.conf) or `/etc/fonts/local.conf` (51-local.conf). Here is the sample for per-user [fonts.conf]({{site.baseurl}}assets/fonts.conf).
-8. Notes:
-    1. Use `fc-list | head` to check if any errors occur. This is important. During the setting, I found an error about `infinality` configuration files.
+8. Use `fc-list | head` to check if any errors occur. This is important. During the setting, I found an error about `infinality` configuration files.
 9. Refer to [Gentoo字体设置]({{site.baseurl}}assets/Gentoo字体设置.markdown) for the basic procedures.
 10. Reference:
     1. [Gentoo Linux on T43 (7) 中文字体](http://ted.is-programmer.com/categories/1547/posts)
