@@ -114,7 +114,7 @@ LC_COLLATE="C"
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
     1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to **unstable 4.0.0**_.
-    1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to `e-sources-4.1.0 kernel`.
+    1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to `e-sources-4.1.1 kernel`.
     1. # emerge --ask sys-kernel/gentoo-sources
     2. # ls -l /usr/src/linux
 26. Configuring the Linux kernel - Manual configuration.
@@ -353,7 +353,9 @@ passwd zachary
                 Use emerge @preserved-rebuild to rebuild packages using these libraries
                 ```
             4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
-        6. \# dispatch-conf, usually if needed, you just need to input `u`.
+        6. [optional] # dispatch-conf, if prompted, you just need to input `u`.
+
+            This command will help update files in `/etc/portage` when needed as well. I would like to separate per-package settings by filenames. Simply input `u` will merge several package settings together, which is undesirable. Hence, first check the updates by `diff` the `._cfg*` in corresponding directory. And then rename `._cfg*` to relevant package name.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
     1. Boot with LiveDVD
@@ -874,14 +876,27 @@ blacklist thinkpad_acpi
     14. # emerge -av @module-rebuild
         1. Any external kernel modules, such as `binary kernel modules`, need to be rebuilt for each new kernel.
     15. # reboot
-47. e-sources-4.1.0 kernel
+47. e-sources-4.1.1 kernel
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
 
     To compile `e-sources`, the procedure is all the same as that for `gentoo-sources`. The only difference is to enable a few extra kernel options of `cjktty` patch.
+    1. `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display.
+    2. `e-sources` does not add `symlink` USE flag, so edit `/etc/portage/package.use/e-sources` add a line:
 
-    `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display.
-    3. During the `make` process, it reminds warning:
+        ```
+# 'symlink' will update the 'linux' symbolic automatically whening emerging e-sources.
+sys-kernel/e-sources symlink
+        ```
+    3. `e-sources-4.1.1` draws in `aufs` USE flag by default, which in return draws in `aufs-util` and `aufs-headers` packages. Currently, there is no need. Remove this USE flag for `slot 4.1` in `overlay gentoo-zh`. Add a line:
+
+        ```
+# remove 'aufs' USE flag since it will draw in 'aufs-util' and 'aufs-headers' package. Current system does not need 'aufs' at all.
+sys-kernel/e-sources:4.1::gentoo-zh -aufs
+        ```
+
+        Refer to [Version specifier](https://wiki.gentoo.org/wiki/Version_specifier) for specifying versions of packages as used when interacting with Portage via emerge or `/etc/portage`. These are also known as `DEPEND atoms` in Portage documentation.
+    4. During the `make` process, it reminds warning:
 
         ```
 drivers/tty/vt/vt.c: In function ‘vc_do_resize’:
