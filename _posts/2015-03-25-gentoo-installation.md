@@ -275,6 +275,8 @@ network={
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
     1. # emerge --ask sys-process/cronie
     2. # rc-update add cronie default
+
+    Detail on running scheduled tasks based on input from the command `crontab`, refer to [Cronie and Anacron](http://fangxiang.tk/2015/07/19/cronie/).
 35. File indexing: emerge --ask sys-apps/mlocate
 36. NTFS: emerge --ask sys-fs/ntfs3g
 36. [optional] Remote access: rc-update add sshd default

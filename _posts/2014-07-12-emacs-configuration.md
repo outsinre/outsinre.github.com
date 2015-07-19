@@ -160,7 +160,7 @@ emacsclient -c -a "" "$@"
 3. 为了省略脚本中`-a`参数,在`/etc/env.d/`下创建文件99local，用于存放system-wide environment variable，内容如下：
 
     >export ALTERNATE_EDITOR=""
-4. 修改默认编辑器为ect。在`/usr/local/bin/99local`添加：
+4. 修改默认编辑器为ect。在`/etc/env.d/99local`添加：
 
     >EDITOR=/usr/local/bin/ect
 5. _#_ env-update && source /etc/profile
