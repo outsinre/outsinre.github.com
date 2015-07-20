@@ -273,7 +273,8 @@ network={
     2. # rc-update add syslog-ng default
     3. # emerge --ask app-admin/logrotate
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
-    1. # emerge --ask sys-process/cronie
+    1. # echo "sys-process/cronie anacron" > /etc/portage/package.use/cronie
+    2. # emerge --ask sys-process/cronie
     2. # rc-update add cronie default
 
     Detail on running scheduled tasks based on input from the command `crontab`, refer to [Cronie and Anacron](http://fangxiang.tk/2015/07/19/cronie/).
