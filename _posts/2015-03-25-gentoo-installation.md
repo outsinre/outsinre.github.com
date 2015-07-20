@@ -483,6 +483,13 @@ export XMODIFIERS=@im=fcitx
         5. \# emerge -av fcitx-configtool
     3. \# emerge -av mplayer
     4. \# emerge -av guayadeque
+
+        There is issue with the official ebuild. When playing songs, it reminds *ERROR* like this *Your GStreamer installation is missing a plug-in*. Finally, found `guayadeque` depends on a bundle of `0.10` slot `gstreamer` plugins. Those lot `1.0` plugins does not work at all.
+        1. \# emerge -av =media-plugins/gst-plugins-meta-0.10-r10
+
+            This will draws in 21 `gst-plugins-*`. Actually, `guayadeque` does not so much plugins, but this command is convenient. For detailed plugins that needed, run `equery g guayadeque`.
+
+            Restart `guayadeque`. Works fine now. Refer to [guayadeque missing gstreamer plugin](https://forums.gentoo.org/viewtopic-p-7663344.html).
     4. emacs:
         1. # echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
         2. # emerge -av emacs
