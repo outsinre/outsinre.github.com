@@ -482,6 +482,7 @@ export XMODIFIERS=@im=fcitx
         4. \# emerge -av fcitx-sunpinyin
         5. \# emerge -av fcitx-configtool
     3. \# emerge -av mplayer
+    4. \# emerge -av guayadeque
     4. emacs:
         1. # echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
         2. # emerge -av emacs
