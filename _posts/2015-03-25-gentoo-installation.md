@@ -482,14 +482,26 @@ export XMODIFIERS=@im=fcitx
         4. \# emerge -av fcitx-sunpinyin
         5. \# emerge -av fcitx-configtool
     3. \# emerge -av mplayer
-    4. \# emerge -av guayadeque
+    4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features).
 
-        There is issue with the official ebuild. When playing songs, it reminds *ERROR* like this *Your GStreamer installation is missing a plug-in*. Finally, found `guayadeque` depends on a bundle of `0.10` slot `gstreamer` plugins. Those lot `1.0` plugins does not work at all.
-        1. \# emerge -av =media-plugins/gst-plugins-meta-0.10-r10
+        Since it is *minimal*, when playing songs, guayadeque reminds:
 
-            This will draws in 21 `gst-plugins-*`. Actually, `guayadeque` does not so much plugins, but this command is convenient. For detailed plugins that needed, run `equery g guayadeque`.
+        >Your GStreamer installation is missing a plug-in.
 
-            Restart `guayadeque`. Works fine now. Refer to [guayadeque missing gstreamer plugin](https://forums.gentoo.org/viewtopic-p-7663344.html).
+        This is due to lack of essential *gstreamer* plugins, namely:
+
+        >emerge --ask --verbose gst-plugins-bad:0.10 gst-plugins-good:0.10 gst-plugins-ugly:0.10 gst-plugins-base:0.10 gst-plugins-mad:0.10
+
+        `guayadeque` depends on `0.10` slot `gstreamer` plugins, instead of those `1.0` slot plugins. The official ebuild should be updated to include those five `0.10` slots even `minimal` USE flag is enabled.
+
+        More useful plugins: `gst-plugins-flac:0.10`.
+
+        This link [guayadeque missing gstreamer plugin](https://forums.gentoo.org/viewtopic-p-7663344.html) recommends `emerge gst-plugins-meta:0.10`. However, it will draw in 21 `gst-plugins-*`. Actually, minimal `guayadeque` does not need so much plugins, but this command is convenient. A more convinient way is to remove `minimal` USE flag. These two convenient methods would emerge many unuseful pakcages.
+
+        If you cannot find a plugin to play specific music format, have a look at `equery g gst-plugins-meta:0.10`.
+
+        **Restart guayadeque** to make those plugins work.
+
     4. emacs:
         1. # echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
         2. # emerge -av emacs
