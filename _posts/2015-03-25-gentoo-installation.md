@@ -20,20 +20,22 @@ title: Gentoo Installation
     3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. # sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
-5. # fdisk /dev/sda or parted -a optimal /dev/sda (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+5. # `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
     1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
+
+        Before the following steps, read [Kali Linux Live USB Persistence](http://fangxiang.tk/2015/07/23/kali-usb-persistence/) first.
     1. # parted -a optimal /dev/sda
-    2. # p
-    3. # unit MB
-    3. # rm 10
-    3. # p
-    4. # mkpart primary 309921MB 310049MB, create a boot partition sda10 for Gentoo
-    5. # p
-    6. # name 10 'Gentoo boot partition'
-    7. # mkpart primary 310049MB -1, create root partition sda12 for Gentoo
-    8. # p
-    9. # name 12 'Gentoo root partition'
-    10. # p
+    2. (parted) p
+    3. (parted) unit MiB
+    3. (parted) rm 10
+    3. (parted) p
+    4. (parted) mkpart primary 309921MiB 310049MiB, create a boot partition sda10 for Gentoo
+    5. (parted) p
+    6. (parted) name 10 'Gentoo boot partition'
+    7. (parted) mkpart primary 310049MiB -1, create root partition sda12 for Gentoo
+    8. (parted) p
+    9. (parted) name 12 'Gentoo root partition'
+    10. (parted) p
     11. The annoying thing is that the partition `Type` is `Basic data partition` when checking with `fdisk /dev/sda`. We can change it by Disk GUI application in Ubuntu.
 6. New `/dev/sda10` will be the boot partition while `/dev/sda12` the root partition. We don't need to create `swap` or `efi` partition since we already created it when installing Ubuntu or Windows. Just share these two partitions. If possible, you can also create a separate home partition.
 7. Up to now, only the boot and root partition is prepared. We share swap and EFI partitions with Ubuntu and Windows. Now format the new partition. It's better to format boot partition as `ext2`.
