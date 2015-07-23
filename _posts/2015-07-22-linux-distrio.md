@@ -44,6 +44,7 @@ title: Linux Distributions
 4. Rumours
 
     CentOS让RedHat招安了
+	
 	---
 	
 	Scientific Linux不还有吗。从来都不觉得CentOS有啥好的，package太老，连经常被嘲笑的Debian stable都看不下去了。稍微正常点用Ubuntu，文艺点用Arch Linux，CentOS没有了没什么大不了的
