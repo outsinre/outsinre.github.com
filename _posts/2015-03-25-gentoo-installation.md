@@ -12,7 +12,8 @@ title: Gentoo Installation
     1. UNetbootin;
     2. Universal USB Installer;
     3. *diskpart* terminal command;
-    4. Just copy the ISO contents into a FAT32 format USB stick; 
+    4. Just copy the ISO contents into a FAT32 format USB stick;
+    4. Use `dd` command.
     5. Ubuntu disk creater.
 3. Boot with the USB stick into the default KDE desktop environment. There will be screen ask for user name `gentoo`'s password for loggin. Just wait for a while. It will automatically log into the system.
     1. The very first thing is to connect to WIFI or Ethernet through networkmanager.
@@ -20,11 +21,11 @@ title: Gentoo Installation
     3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. # sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
-5. # `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+5. \# `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
     1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
 
         Before the following steps, read [Kali Linux Live USB Persistence](http://fangxiang.tk/2015/07/23/kali-usb-persistence/) first.
-    1. # parted -a optimal /dev/sda
+    1. \# parted -a optimal /dev/sda
     2. (parted) p
     3. (parted) unit MiB
     3. (parted) rm 10
@@ -71,7 +72,7 @@ title: Gentoo Installation
     1. # mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
     2. # mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the `rsync server` to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
         1. The rotation link setting is changed to `/etc/portage/repos.conf/gentoo.conf` for `portageq --version` >= 2.2.16. But don't worry since we can modify it when chrooting into the new Gentoo system. For now, remain this setting in `/etc/portage/make.conf` since the LiveCD environment uses the old version of portage.
-18. # cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (/mnt/gentoo) environment. `/etc/resolv.conf` contains the name servers for the network. DON'T forget the `-L` parameter when copying.
+18. \# cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (/mnt/gentoo) environment. `/etc/resolv.conf` contains the name servers for the network. DON'T forget the `-L` parameter when copying.
 19. Mounting the necessary filesystems.
     1. # mount -t proc proc /mnt/gentoo/proc
     2. # mount --rbind /sys /mnt/gentoo/sys
@@ -564,7 +565,7 @@ export XMODIFIERS=@im=fcitx
         4. _$_ dropbox &, run dropbox in the backgroud.
         5. We can create a ~/bin/dropbox.sh or /usr/local/bin/dropbox.sh script:
 
-            >#!/bin/bash
+            >\#!/bin/bash
             >
             >/opt/bin/dropbox &
 
