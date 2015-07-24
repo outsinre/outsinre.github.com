@@ -204,6 +204,9 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing.
+
+    If this is not first time to make, then execute `make clean` first.
+
     1. # make
     2. # make modules_install
     2. # make install, this will copy the kernel image into /boot/ together with the System.map file and the kernel configuration file.
@@ -452,6 +455,9 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. # make menuconfig
         1. You don't need to copy and convert the old kernel config file as specified on [Kernel/Upgrade](https://wiki.gentoo.org/wiki/Kernel/Upgrade) since we just re-compile the current working kernel and share the kernel source. So we share the basic `.config` file in `/usr/src/linux/.config`.
         2. Just make some changes to the old config file.
+    3. # make clean
+
+        Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
     3. # make
     4. # make modules_install
     5. # make install
