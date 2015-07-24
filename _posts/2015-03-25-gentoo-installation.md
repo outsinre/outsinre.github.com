@@ -581,7 +581,9 @@ export XMODIFIERS=@im=fcitx
         1. [deprecated for new poratge > 2.2.16] <s># emacs -nw /etc/eix-sync.conf:</s>
 
             ```
-            *
+            # *
+
+            !!exec >/var/log/eix-sync.log ; chown portage: /var/log/eix-sync.log || true
             ```
         2. \# eix-sync
     14. Archive
