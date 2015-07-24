@@ -198,7 +198,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
         Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'M'.</s>
 
         In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
-    10. Dm-crypt. `Device mapper support, CONFIG_BLK_DEV_DM` is set as 'Y' by default. `Crypt target support, CONFIG_DM_CRYPT` must be enabled, set to 'M' (or 'Y'). `XTS support, CONFIG_CRYPTO_XTS` and `AES cipher algorithms (x86_64), CONFIG_CRYPTO_AES_X86_64` optionally set to 'M' (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt).
+    10. Dm-crypt. `Device mapper support, CONFIG_BLK_DEV_DM` is set as 'Y' by default. `Crypt target support, CONFIG_DM_CRYPT` must be enabled, set to 'M' (or 'Y'). `XTS support, CONFIG_CRYPTO_XTS` and `AES cipher algorithms (x86_64), CONFIG_CRYPTO_AES_X86_64` optionally set to 'M' (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below.
     10. [optional] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
@@ -456,8 +456,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         1. You don't need to copy and convert the old kernel config file as specified on [Kernel/Upgrade](https://wiki.gentoo.org/wiki/Kernel/Upgrade) since we just re-compile the current working kernel and share the kernel source. So we share the basic `.config` file in `/usr/src/linux/.config`.
         2. Just make some changes to the old config file.
     3. # make clean
-
-        Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
+        1. Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
     3. # make
     4. # make modules_install
     5. # make install
