@@ -198,8 +198,8 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
         Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'M'.</s>
 
         In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
-
-    10. [optional, does offer extra useful function] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
+    10. Dm-crypt. `Device mapper support, CONFIG_BLK_DEV_DM` is set as 'Y' by default. `Crypt target support, CONFIG_DM_CRYPT` must be enabled, set to 'M' (or 'Y'). `XTS support, CONFIG_CRYPTO_XTS` and `AES cipher algorithms (x86_64), CONFIG_CRYPTO_AES_X86_64` optionally set to 'M' (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt).
+    10. [optional] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
@@ -684,7 +684,15 @@ thunar $HOME/Bluetooth
             2. # modprobe btusb, load bluetooth related modules.
             3. $ bluetoothctl OR blueman-applet OR by Bluetooth manager from App menu as a normal user account.
         7. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist/install*.
-        8. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537); 
+        8. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537).
+    21. Cryptsetup
+
+        Refer to [emerge thin-provisioning-tools-0.3.2-r1 emake failed](https://forums.gentoo.org/viewtopic-p-7784696.html?sid=2ff5b172ba08f06dccc602ecfc4ac164) and [bug 540190](https://bugs.gentoo.org/show_bug.cgi?id=540190). *sys-fs/cryptsetup* depends on *sys-block/thin-provisioning-tools-0.3.2-r1*. However version *0.3.2-r1* has an issue as the bug depicted. Use version *~0.4.1* instead.
+
+        ```
+        # echo "=sys-block/thin-provisioning-tools-0.4.1 ~amd64" > /etc/portage/package.accept_keywords/cryptsetup
+        # emerge -av sys-fs/cryptsetup
+        ```
 46. Configuration consistently.
     1. Update a single package.
 
