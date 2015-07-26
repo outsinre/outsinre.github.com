@@ -914,9 +914,9 @@ blacklist thinkpad_acpi
     11. # make install
     12. # genkernel --install initramfs 
     13. # grub2-mkconfig -o /boot/grub/grub.cfg
+    15. # reboot
     14. # emerge -av @module-rebuild
         1. Any external kernel modules, such as `binary kernel modules`, need to be rebuilt for each new kernel.
-    15. # reboot
 47. e-sources-4.1.1 kernel
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
