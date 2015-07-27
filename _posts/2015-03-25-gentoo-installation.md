@@ -24,7 +24,7 @@ title: Gentoo Installation
 5. \# `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
     1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
 
-        Before the following steps, read [Kali Linux Live USB Persistence](http://fangxiang.tk/2015/07/23/kali-usb-persistence/) first.
+        Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
     1. \# parted -a optimal /dev/sda
     2. (parted) p
     3. (parted) unit MiB
@@ -271,7 +271,7 @@ This needs modified in the steps later on.
     8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
 	https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
     9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
-    10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](http://fangxiang.tk/2015/05/11/gentoo-downgrade-package/)
+    10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](/2015/05/11/gentoo-downgrade-package/)
     10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
 	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 31. Set root password: # passwd
@@ -286,7 +286,7 @@ This needs modified in the steps later on.
     2. # emerge --ask sys-process/cronie
     2. # rc-update add cronie default
 
-    Detail on running scheduled tasks based on input from the command `crontab`, refer to [Cronie and Anacron](http://fangxiang.tk/2015/07/19/cronie/).
+    Detail on running scheduled tasks based on input from the command `crontab`, refer to [Cronie and Anacron](/2015/07/19/cronie/).
 35. File indexing: emerge --ask sys-apps/mlocate
 36. NTFS: emerge --ask sys-fs/ntfs3g
 36. [optional] Remote access: rc-update add sshd default
@@ -552,7 +552,7 @@ export XMODIFIERS=@im=fcitx
 
                 >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
             5. emerge -av wps-office
-	    6. **fonts support** refer to [Fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/)
+	    6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
     7. \# emerge --ask xfce4-volumed xfce4-mixer
     8. \# emerge -av mupdf
         1. The other application may draw in a lot of GTK or QT dependencies consuming many disk space.
@@ -950,7 +950,67 @@ drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialize
         ```
         We can look into the `/usr/src/e-sources/drivers/tty/vt/vt.c` at line 890, we do find that issue. Anyway currently the kernel works fine.
 48. Refer to [Version specifier](https://wiki.gentoo.org/wiki/Version_specifier) for specifying versions of packages as used when interacting with Portage via emerge or `/etc/portage`. These are also known as `DEPEND atoms` in Portage documentation.
+48. Apply `cjktty` patch for kernel `4.0.5`.
+
+    I want to display Chinese characters in *tty*, which can be achieved by `cjktty` patch.
+    1. Get the patch for kernel `4.0.5`.
+
+        This patch is now maintained by *microncai*. It is included in the *e-sources* package. Search `gentoo e-sources` in *Google*, and get [/gentoo-zh/sys-kernel/e-sources](http://data.gpo.zugaina.org/gentoo-zh/sys-kernel/e-sources/).
+
+        We can get this patch from the *files/4.0/* sub-directory as [3.18.14-utf8.diff](/assets/3.18.14-utf8.diff). The current patch version `3.18.14` is at least compatible with kernels up to `4.1.3`.
+    2. Check patch compatibility with `patch --dry-run` option.
+
+        ```
+        # cd /usr/src/linux-4.0.5/
+        # patch --dry-run -p1 < /path/to/3.18.14-utf8.diff
+        ```
+        We get a *hunk* failure reminds. After check the patch file, locate the failure:
+
+        ```
+        @@ -2691,6 +2710,19 @@ static u16 *fbcon_screen_pos(struct vc_data *vc, int offset)
+        	unsigned long p;
+        	int line;
+         	
+        +       if (offset < 0) {
+        +               offset = -offset - 1;
+        +               if (vc->vc_num != fg_console || !softback_lines)
+        +                       return (u16 *)(vc->vc_origin + offset + (vc->vc_screenbuf_size));
+        +               line = offset / vc->vc_size_row;
+        +               if (line >= softback_lines)
+        +                       return (u16 *) (vc->vc_origin + offset - softback_lines * vc->vc_size_row + (vc->vc_screenbuf_size));
+        +               p = softback_curr + offset;
+        +               if (p >= softback_end)
+        +                       p += softback_buf - softback_end;
+        +               return (u16 *) (p + (fbcon_softback_size));
+        +       }
+        +
+        	if (vc->vc_num != fg_console || !softback_lines)
+        		return (u16 *) (vc->vc_origin + offset);
+        	line = offset / vc->vc_size_row;
+        ```
+        The issue lies at the line 4. You might think it a blank line. **IT IS A FAKE BLANK LINE**. It is composed of *one space* and *one tab* that is similar to *one +* and *one tab* for a code line that had been removed. The author *microcai* forget this remove the extra whitespaces before generating the patch file.
+
+        Remove those two whitespaces in patch file to get a real blank line or add corresponding whitespaces in kernel souce file.
+    3. Apply the patch.
+
+        ```
+        # cd /usr/src/linux-4.0.5
+        # patch -p1 < /path/to/3.18.14-utf8.diff
+        ```
+    4. Similarly, we can choose other useful patches as well.
+
+        Finally, I chose four patches:
+
+        ```
+        3.18.14-utf8.diff
+        change-the-number-of-tty-devices.patch
+        lower-undefined-mode-timeout.patch
+        support-micmute-led.patch
+        ```
+    5. Config and build kernel as usual.
 48. Remove old kernels
+
+    `eclean-kernel` only remove files built when compiling kernels like libs, modules, etc. The kernel sources itself in `/usr/src/` will be managed by `portage` instead. So `eclean-kernel` don't remove sources itself! If you want to remove sources as well, use `emerge -ac gentoo-sources-version` and update `package.accept_keyword` and `package.use` files if need.
     1. # emerge -av app-admin/eclean-kernel
     2. # eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
     3. # eclean-kernel -n 4 --ask
@@ -958,10 +1018,7 @@ drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialize
         2. At last, I removed the kernel as  `3.18.11-gentoo.old`
     4. `eclean-kernel` will update the grub menu automatically.
     5. **special note**: the kernel is manually compiled by `make, make modules_install, make install, ...` following the basic procedures of official handbook. But `initramfs` is built by `genkernel` resulting in file names different from conventional format. You can `ls -l /boot` finding that `initramfs`'s file name format is different from that of `vmlinuz, System.map`. Tough the file name format won't cause problems since `grub2-mkconfig` is smart enough to generate the correct boot parameters. However, `eclean-kernel` will remind you removing `-genkernel-x86_64-4.0.0-gentoo: vmlinuz does not exist` which is an undesired action. Details refer to [Bug 464576](https://bugs.gentoo.org/464576)
-    6. After updating the system @world, we usually run `emerge -av --depclean` to removge unncessary package, which also remove the old gentoo-sources not associated with Grub. However this command only remove the kernel sources while leaving the built items alone such *.config, /lib64/modules/old-version*, etc.
-
-        So we can use `eclean-kernel` or manually remove those left-overs.
-49. Refs:
+49. Ref:
     1. [Gentoo on a ThinkPad X200](http://vminko.org/gentoo_manuals/thinkpad_x200)
     2. [thinkpad t440s gentoo](https://wiki.gentoo.org/wiki/Lenovo_ThinkPad_T440s)
     3. [Installing Gentoo on a ThinkPad X220](http://www.thinkwiki.org/wiki/Installing_Gentoo_on_a_ThinkPad_X220)
