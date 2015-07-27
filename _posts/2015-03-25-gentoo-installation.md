@@ -174,7 +174,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     5. `Processor type and features`
         1. `Processor family (Intel Core 2nd Gen AVX)` select `Intel Core 2nd Gen AVX, CONFIG_MCOREI7AVX`. This optioin enables `-march=corei7-avx` which serves the same purpose as the `CFLAGS` value set in `make.conf` in previous step. We enable this option as failure fallback.
 
-            <s> # lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
+            <s> # lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item as `Core 2/newer Xeon, CONFIG_MCORE2`, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
         2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
         3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
         4. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB`. Don't turn on `EFI mixed-mode support, EFI_MIXED`.
@@ -200,6 +200,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
         In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
     10. Dm-crypt. `Device mapper support, CONFIG_BLK_DEV_DM` is set as 'Y' by default. `Crypt target support, CONFIG_DM_CRYPT` must be enabled, set to 'M' (or 'Y'). `XTS support, CONFIG_CRYPTO_XTS` and `AES cipher algorithms (x86_64), CONFIG_CRYPTO_AES_X86_64` optionally set to 'M' (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below.
     10. [optional] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
+    10. [e-sources / cjktty patch specific options] `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display in tty (Ctrl + Alt + Fn).
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
     10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
@@ -220,49 +221,49 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     1. # emerge --ask sys-kernel/linux-firmware
 28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template. Use backup fstab file is possible.
 
-	```
-/dev/sda10   /boot        ext2    defaults,noatime     1 2
-/dev/sda12   /	           ext4    noatime              0 1
-/dev/sda7    none         swap	   sw                   0 0
-	```
+    ```
+    /dev/sda10   /boot        ext2    defaults,noatime     1 2
+    /dev/sda12   /		  ext4    noatime	       0 1
+    /dev/sda7    none	  swap	  sw		       0 0
+    ```
 This needs modified in the steps later on.
 29. Set hostname.
     1. # nano -w /etc/conf.d/hostname
     2. set hostname="zhtux"
 30. Configuring the network.
-	1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
-	2. # emerge --ask net-misc/dhcpcd
-	3. # rc-update add dhcpcd default
-	4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
-	5. # emerge --ask net-wireless/wpa_supplicant
-	6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa\_supplicant/wpa_supplicant.conf` file:
+    1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
+    2. # emerge --ask net-misc/dhcpcd
+    3. # rc-update add dhcpcd default
+    4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
+    5. # emerge --ask net-wireless/wpa_supplicant
+    6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
 
-		```
-# This command is to show the default configuration:
-# bzcat /usr/share/doc/wpa_supplicant-2.2-r1/wpa_supplicant.conf.bz2 | less
-# or http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
-# Except eap and phase2 arguments, the rest are default values. 'phase1' must be 0 NOT 1.
-# This command is to test the wpa_supplicant configuration:
-# wpa_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa_supplicant/wpa_supplicant.conf -d
-ctrl_interface=DIR=/var/run/wpa_supplicant
-ctrl_interface_group=0
-eapol_version=1
-ap_scan=1
-fast_reauth=1
-network={
-	ssid="sMobileNet"
-	proto=WPA RSN
-	key_mgmt=WPA-EAP
-	pairwise=CCMP TKIP
-	group=CCMP TKIP 
-	eap=PEAP
-	identity="XXXXXX"
-	password="YYYYYY"
-	ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
-	phase1="peaplabel=0"
-	phase2="auth=MSCHAPV2"
-}
-		```
+        ```
+        # This command is to show the default configuration:
+        # bzcat /usr/share/doc/wpa_supplicant-2.2-r1/wpa_supplicant.conf.bz2 | less
+        # or http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
+        # Except eap and phase2 arguments, the rest are default values. 'phase1' must be 0 NOT 1.
+        # This command is to test the wpa_supplicant configuration:
+        # wpa_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa_supplicant/wpa_supplicant.conf -d
+        ctrl_interface=DIR=/var/run/wpa_supplicant
+        ctrl_interface_group=0
+        eapol_version=1
+        ap_scan=1
+        fast_reauth=1
+        network={
+            ssid="sMobileNet"
+            proto=WPA RSN
+            key_mgmt=WPA-EAP
+            pairwise=CCMP TKIP
+            group=CCMP TKIP 
+            eap=PEAP
+            identity="XXXXXX"
+            password="YYYYYY"
+            ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
+            phase1="peaplabel=0"
+            phase2="auth=MSCHAPV2"
+        }
+        ```
     7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in plaintext by anyone using the computer:
         1. # chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
         2. Replace the `identity` and `password` entries with your own Wifi information.
@@ -278,6 +279,8 @@ network={
     1. # emerge --ask app-admin/syslog-ng
     2. # rc-update add syslog-ng default
     3. # emerge --ask app-admin/logrotate
+
+    Detail on logrotate for cron jobs refer to [Cronie and Anacron](/2015/07/19/cronie/).
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
     1. # echo "sys-process/cronie anacron" > /etc/portage/package.use/cronie
     2. # emerge --ask sys-process/cronie
@@ -921,22 +924,21 @@ blacklist thinkpad_acpi
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
 
-    To compile `e-sources`, the procedure is all the same as that for `gentoo-sources`. The only difference is to enable a few extra kernel options of `cjktty` patch.
-    1. `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display.
-    2. `e-sources` does not add `symlink` USE flag, so edit `/etc/portage/package.use/e-sources` add a line:
+    To compile `e-sources`, the procedure is all the same as that for `gentoo-sources`. The only difference is to enable a few extra kernel options of `cjktty` patch. Refer to *e-sources / cjktty patch specific options*.
+    2. <s>`e-sources` does not add `symlink` USE flag, so edit `/etc/portage/package.use/e-sources` add a line:
 
         ```
 # 'symlink' will update the 'linux' symbolic automatically whening emerging e-sources.
 sys-kernel/e-sources symlink
         ```
-    3. `e-sources-4.1.1` draws in `aufs` USE flag by default, which in return draws in `aufs-util` and `aufs-headers` packages. Currently, there is no need. Remove this USE flag for `slot 4.1` in `overlay gentoo-zh`. Add a line:
+</s>
+        Use `eselect kernel set xx` after sources emerge instead.
+    3. `e-sources-4.1.1` draws in `aufs` and `tuxonice` USE flags by default, which in return draws in `aufs-util` and `aufs-headers` packages. Currently, there is no need. Remove this USE flag for `slot 4.1` in `overlay gentoo-zh`. Add a line:
 
         ```
 # remove 'aufs' USE flag since it will draw in 'aufs-util' and 'aufs-headers' package. Current system does not need 'aufs' at all.
-sys-kernel/e-sources:4.1::gentoo-zh -aufs
+sys-kernel/e-sources:4.1::gentoo-zh -aufs -tuxonice
         ```
-
-        Refer to [Version specifier](https://wiki.gentoo.org/wiki/Version_specifier) for specifying versions of packages as used when interacting with Portage via emerge or `/etc/portage`. These are also known as `DEPEND atoms` in Portage documentation.
     4. During the `make` process, it reminds warning:
 
         ```
@@ -947,6 +949,7 @@ drivers/tty/vt/vt.c:890:18: warning: ‘old_rows’ may be used uninitialized in
 drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialized in this function [-Wmaybe-uninitialized]
         ```
         We can look into the `/usr/src/e-sources/drivers/tty/vt/vt.c` at line 890, we do find that issue. Anyway currently the kernel works fine.
+48. Refer to [Version specifier](https://wiki.gentoo.org/wiki/Version_specifier) for specifying versions of packages as used when interacting with Portage via emerge or `/etc/portage`. These are also known as `DEPEND atoms` in Portage documentation.
 48. Remove old kernels
     1. # emerge -av app-admin/eclean-kernel
     2. # eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
