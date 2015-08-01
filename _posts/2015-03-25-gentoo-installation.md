@@ -505,7 +505,7 @@ export XMODIFIERS=@im=fcitx
 
         `guayadeque` depends on `0.10` slot `gstreamer` plugins, instead of those `1.0` slot plugins. The official ebuild should be updated to include those five `0.10` slots even `minimal` USE flag is enabled.
 
-        More useful plugins: `gst-plugins-flac:0.10` for `ape` and `flac` track; `gst-plugins-soup` for online `radio`.
+        More useful plugins: `gst-plugins-flac:0.10` `flac` track; `gst-plugins-soup` for online `radio`; `gst-plugins-ffmpeg` for `ape` track.
 
         This link [guayadeque missing gstreamer plugin](https://forums.gentoo.org/viewtopic-p-7663344.html) recommends `emerge gst-plugins-meta:0.10`. However, it will draw in 21 `gst-plugins-*`. Actually, minimal `guayadeque` does not need so much plugins, but this command is convenient. A more convinient way is to remove `minimal` USE flag. These two convenient methods would emerge many unuseful pakcages.
 
