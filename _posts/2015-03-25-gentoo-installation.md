@@ -709,6 +709,24 @@ thunar $HOME/Bluetooth
         ```bash
         # emerge -avtuDN pkg-name
         ```
+    2. Slot conflict.
+
+        When applying a @world update, it reminds the following slot conflicts:
+
+        ```bash
+        !!! Multiple package instances within a single package slot have been pulled
+        !!! into the dependency graph, resulting in a slot conflict:
+
+        dev-libs/openssl:0
+
+          (dev-libs/openssl-1.0.1p:0/0::gentoo, ebuild scheduled for merge) pulled in by
+            dev-libs/openssl:0=[-bindist] required by (net-libs/nodejs-0.12.6:0/0::gentoo, ebuild scheduled for merge)
+        			^^^^^^^^                                                                                                                  
+
+          (dev-libs/openssl-1.0.1p:0/0::gentoo, installed) pulled in by
+            >=dev-libs/openssl-0.9.6d:0[bindist=] required by (net-misc/openssh-6.9_p1-r2:0/0::gentoo, installed)
+        ```
+        `openssh` and `openssl` require the *same* `bindist` USE flag setting - *both* enabled or disabled. However, the scheduled package `nodejs` requires `openssl` disable `bindist` USE flag. So the solution is to disable `bindist` for `openssh`, `openssl` and `nodejs`.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
         1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem. In 4.10, start Xfce with `startxfce4 --with-ck-launch`. This will start xfce4-session with ck-launch-session. In 4.10, **Xfce4-sesion will take care of the dbus-session launch**.
         2. currently the contents of `~/.xinitrc`:
