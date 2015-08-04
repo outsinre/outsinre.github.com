@@ -474,9 +474,10 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. # rc-update add alsasound boot
     3. # speaker-test -t wav -c 2, test the speaker.
 45. Applications:
-    1. Web browser: Firefox. It will take a while installing.
+    1. Web browser: Firefox. It will take over 6 hours compiling.
 
-        > Adblock Edge, ChatZilla
+        > foxy proxy standard
+    2. *hexchat* for IRC.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. # echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
         2. # emerge -av fcitx
