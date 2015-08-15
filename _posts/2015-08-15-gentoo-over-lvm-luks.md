@@ -3,47 +3,48 @@ layout: post
 title: Gentoo rootfs over LVM encrypted in LUKS container.
 ---
 # System scheme
-1. */boot* partition resides on USB stick, say *sdc1* partition.
-2. */boot/efi* is shared among Windows and Gentoo.
-3. *rootfs* (*/, swap, /home*) mountpoints were created op top of LVM group, say *vg1*.
+1. '*/boot*' partition resides on USB stick, say *sdc1* partition.
+2. '*/boot/efi*' is shared among Windows and Gentoo.
+3. *rootfs* ('*/, swap, /home*') mountpoints were created op top of LVM group, say *vg1*.
 4. *vg1* LVM group lays over *Dm-Crypt, LUKS* encrypted sda8*.
 5. Use *keyfile* to encrypt *rootfs*. *keyfile* isteself was encrypted by *GnuPG* and placed at USB stick, say *sdc1* (same as */boot*).
 6. The installation process depends mainly on Gentoo LiveCD.
-# Prepare partitions
-##Use `parted -a optimal /dev/sda` to get a disk partition for *rootfs*. I will use *rootfs* for */, swap, /home* mountpoints in this post.
 
->Run the very first command `unit s` in *parted*to display disk partitions as *sector*. When creating partition with `s` unit, it will be well aligned.
+# Prepare partitions
+##Use `parted -a optimal /dev/sda` to get a disk partition for *rootfs*. I will use *rootfs* for '*/, swap, /home*' mountpoints in this post.
+
+>Run the very first command `unit s` in *parted* to display disk partitions as *sector*. When creating partition with `s` unit, it will be well aligned.
 
 For *parted* example, refer to [gentoo installation](http://www.fangxiang.tk/2015/03/25/gentoo-installation/) and [kali usb persistence](http://www.fangxiang.tk/2015/07/23/kali-usb-persistence/).
     
-Say */dev/sda8* is created for *rootfs*.
-## Use `parted -a optimal /dev/sdc` to create */boot* partition */dev/sdc1* on USB stick.
-*/boot* is *NOT* encrypted! You can use the whole USB space to hold */boot*, or just spare around 256MB parition.
+Say '*/dev/sda8*' is created for *rootfs*.
+## Use `parted -a optimal /dev/sdc` to create '*/boot*' partition on USB stick '*/dev/sdc1*'.
+'*/boot*' is *NOT* encrypted! You can use the whole USB space to hold '*/boot*', or just spare around 256MB parition.
 
 Then formate the partition as *ext2*:
 
 ```
 mkfs.ext2 -L 'usb boot' /dev/sdc1
 ```
-# `cryptsetup` keyfile
-## *dm-crypt* and *LUKS*
+# cryptsetup keyfile
+## dm-crypt and LUKS
 **dm-crypt** is a disk encryption system using the kernels *crypto API* framework and *device mapper* subsystem.
 
 With *dm-crypt*, administrators can encrypt entire disks, logical volumes, partitions, but also single files.
 
-The *dm-crypt* subsystem supports the *Linux Unified Key Setup (LUKS)** structure, which allows for multiple keys to access the encrypted data, as well as manipulate the keys (such as changing the keys, adding additional passphrases, etc.)
+The *dm-crypt* subsystem supports the *Linux Unified Key Setup* (LUKS) structure, which allows for multiple keys to access the encrypted data, as well as manipulate the keys (such as changing the keys, adding additional passphrases, etc.)
 
-Although *dm-crypt* supports *non-LUKS* setups as well, this article will focus on the LUKS functionality mostly due to its flexibility, manageability as well as broad support in the community.
+Although *dm-crypt* supports *non*-LUKS setups as well, this article will focus on the LUKS functionality mostly due to its flexibility, manageability as well as broad support in the community.
 
 Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt) and [Dm-Crypt LUKS](https://wiki.gentoo.org/wiki/DM-Crypt_LUKS).
 ## Keyfile
-We use `cryptsetup` command from LiveCD to encrypt *rootfs* partition */dev/sda8*. We can use **passphrase** or **keyfile** as encryption key.
+We use `cryptsetup` command from LiveCD to encrypt *rootfs* partition '*/dev/sda8*'. We can use **passphrase** or **keyfile** as encryption key.
 
 Considering the length, randomness and complexity of encryption requirements a *keyfile* seems to be the right spot.
 
 We first generate a ramdom *keyfile* for *rootfs* encryption. This *keyfile* is usually put at a secure place, i.e. USB stick.
 
->In this scheme, *keyfile* and */boot* share the same USB stick partition.
+>In this scheme, *keyfile* and '*/boot*' share the same USB stick partition.
 
 If attacker gets the USB stick, system is decrypted!! So next, we need to encrypt this *keyfile* by **GnuPG** before storing it on USB stick.
 
@@ -77,9 +78,10 @@ gpg: symmetric encryption of `[stdin]' failed: Operation cancelled
 Refer to [Genkernel initramfs with LUKS+GPG key](https://forums.gentoo.org/viewtopic-p-7485020.html) and [Using gpg in mkinitcpio hook, gpg doesn't ask for a password](https://bbs.archlinux.org/viewtopic.php?id=120181).
 
 This might be related to *>app-crypt/gnupg-2.0* version and *pinentry* support. To get this issue solved:
+
 1. Generate *keyfile* in another workable environment.
 2. Switch to normal user account shell when run `gpg` command and get he decrypted temporary *luks-key* file for LiveCD.
-# Format *rootfs* using *LUKS*.
+# Format *rootfs* using LUKS
 
 ```bash
 $ gpg --decrypt /mnt/sdc1/key/luks-key.gpg > ~/Desktop/luks-key
@@ -140,7 +142,7 @@ Final preparation:
 # mkdir -p -v /mnt/gentoo/etc/portage/repos.conf
 # cp -v /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 # nano -w /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
-```bash
+```
 Make *gentoo.conf* contents as:
 
 ```
@@ -160,7 +162,7 @@ auto-sync = yes
 The old portage sync system use *SYNC=rsync://rsync.cn.gentoo.org/gentoo-portage* in *make.conf*. In new >portage-2.2.16, it is *sync-url* in *gentoo.conf*. To get the *sync-url* value:
 
 ```bash
-# mirror
+# mirrorselect -i -r -o | sed 's/^SYNC=/sync-uri = /;s/"//g' >> /mnt/gentoo/etc/portage/repos.conf/gentoo.conf 
 ```
 
 ```bash
@@ -201,15 +203,17 @@ From the above, we use `--cipher serpent-xts-plain64` and ` --hash sha512` which
 >CRYPTO_SHA512 Y
 
 Why they are should be 'Y' instead of 'M'? The boot process is basically:
+
 1. Power on;
-2. EFI firmware find the default bootloader Gentoo *grub2* at */dev/sda2/EFI/gentoo/grub64.efi*;
+2. EFI firmware find the default bootloader Gentoo *grub2* at '*/dev/sda2/EFI/gentoo/grub64.efi*';
 3. *grub2* launch *initramfs* into RAM;
-4. *initramfs* found *GnuPG keyfile* at */boot/key* and ask user for decryption; decrypted *keyfile* is used to decrypt *rootfs*.
+4. *initramfs* found *GnuPG keyfile* at '*/boot/key*' and ask user for decryption; decrypted *keyfile* is used to decrypt *rootfs*.
 5. Control pass to *init* scripts. After that, kernel modules loaded.
 
-You find that if the two kernel options compiled as modules, then you cannot pass the 4th step. No *serpent* and *sha512* function for *keyfile* decryption. This is the error message at boot:
+You find that if the two kernel options compiled as modules 'M', then you cannot pass the 4th step. No *serpent* and *sha512* function for *keyfile* decryption. This is the error message at boot:
 
 >http://pastebin.com/fZgMwyNw
+
 ## genkernel
 
 ```bash
@@ -243,18 +247,19 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID=8e105495-5a45-4297-b6ad-6e2d97abb461 dolvm r
 2. dolvm: activate LVM volumes on bootup.
 3. rootfstype: root file system type.
 4. root: the location of the root filesystem to the kernel.
-5. root_keydev: if necessary provide the name of the device that carries the root_key. If unset while using root_key, it will automatically look for the device in every boot. It specifies the device path of device on which the *keyfile* is located. In this scheme, it is the */boot* USB stick.
+5. root\_keydev: if necessary provide the name of the device that carries the root_key. If unset while using root_key, it will automatically look for the device in every boot. It specifies the device path of device on which the *keyfile* is located. In this scheme, it is the '*/boot*' USB stick.
 6. root_key: In case your root is encrypted with a key, you can use a device like a usb pen to store the key. This value should be the key path relative to the mount point. In this scheme, it is in the sub-directory *key/luks-key.gpg*.
 
-    **If it has a `.gpg` extension (as our case), the *init* script will treat it as being a *gpg* encrypted *keyfile*, and prompt for a passphrase to unlock the *keyfile* first (either textually at the console, or using the splash screen manager if the system sets that).
-7. Here we use *UUID* instead of device file path */dev/sda8* or */dev/sdc1*. Since *UUID* is unique while device path name might change. For example, if current PC is plugged in 3 usb sticks as */dev{/sdb,/sdc,/sdd}* and none of them is the boot stick, *initramfs* even cannot find the *gpg keyfile* location.
+    If it has a `.gpg` extension (as our case), the *init* script will treat it as being a *gpg* encrypted *keyfile*, and prompt for a passphrase to unlock the *keyfile* first (either textually at the console, or using the splash screen manager if the system sets that).
+7. Here we use UUID instead of device file path '*/dev/sda8*' or '*/dev/sdc1*'. Since UUID is unique while device path name might change. For example, if current PC is plugged in 3 usb sticks as '*/dev{/sdb,/sdc,/sdd}*' and none of them is the boot stick, *initramfs* even cannot find the *gpg keyfile* location.
 8. More about these command please read `man genkernel` and *kernel.org*.
 
 ```bash
 # grub2-mkconfig -o /boot/grub/grub.cfg
 ```
-In *chroot* environment, *grub2-mkconfig* and  *os-prober* might fail to generate *Windows* menu. Don't worry! You can use the following template to edit */etc/grub.d/40_custom*. Or run *grub2-mkconfig* again when log into the real new system.
+In *chroot* environment, *grub2-mkconfig* and  *os-prober* might fail to generate Windows menu. Don't worry! You can use the following template to edit '*/etc/grub.d/40_custom*'. Or run *grub2-mkconfig* again when log into the real new system.
 
+```bash
 menuentry 'Windows Boot Manager (on /dev/sda2)' --class windows --class os $menuentry_id_option 'osprober-efi-DAD1-F557' {
         insmod part_gpt
         insmod fat
@@ -266,6 +271,7 @@ menuentry 'Windows Boot Manager (on /dev/sda2)' --class windows --class os $menu
         fi
         chainloader /EFI/Microsoft/Boot/bootmgfw.efi
 }
+```
 # fstab
 
 ```
@@ -309,7 +315,7 @@ UUID="aaa-bbb-ccc-ddd..."	/boot	ext2	noauto,noatime	1 2
     ```
     for all users on the system. This is not a good idea since *root* account can run X as well, which is NOT a good scheme.
 
-    So remove */etc/env.d/90xsession* if exists.
+    So remove '*/etc/env.d/90xsession*' if exists.
 3. Editor
 
     ```bash
