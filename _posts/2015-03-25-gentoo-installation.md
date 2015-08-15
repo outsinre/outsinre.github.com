@@ -5,6 +5,8 @@ title: Gentoo Installation
 > Gentoo installation along with Windows 8.1 and Ubuntu 14.04 with UEFI booting.
 
 1. The official [handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64) is important but some items really out of date. If possible, refer to the corresponding ArchWiki part which is pretty excellent and detailed.
+
+    Always read wiki and handbook if not sure.
 2. Download the `LiveDVD` like *livedvd-amd64-multilib-20140826.iso* instead of the so called `Minimal installation CD` like *install-amd64-minimal-20150319.iso*.
     1. The minimal CD cannot generates UEFI bootable USB stick.
     2. The LiveDVD support KDE desktop environment. Specially Wifi internet connection setting is much easier during the installation. You can also surf the internet while installing.
@@ -273,7 +275,33 @@ This needs modified in the steps later on.
     9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
     10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](/2015/05/11/gentoo-downgrade-package/)
     10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
-	10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
+    10. Once get an error like this:
+
+        ```
+        Aug 14 14:12:42 zhtux dhcpcd-run-hooks[4327]: wlp3s0: starting wpa_supplicant
+        Aug 14 14:12:42 zhtux dhcpcd-run-hooks[4330]: wlp3s0: failed to start wpa_supplicant
+        Aug 14 14:12:42 zhtux dhcpcd-run-hooks[4331]: wlp3s0: Successfully initialized wpa_supplicant
+        Line 48: Invalid passphrase length 6 (expected: 8..63) 'YYYYYY"'.
+        Line 48: failed to parse psk '"YYYYYY"'.
+        Line 50: failed to parse network block.
+        Line 54: Invalid passphrase length 6 (expected: 8..63) 'YYYYYY"'.
+        Line 54: failed to parse psk '"YYYYYY"'.
+        Line 56: failed to parse network block.
+        Failed to read or parse configuration '/etc/wpa_supplicant/wpa_supplicant.conf'.
+        Aug 14 14:12:42 zhtux dhcpcd[4312]: no interfaces have a carrier
+        Aug 14 14:12:42 zhtux dhcpcd[4312]: forked to background, child pid 4338
+        Aug 14 14:12:42 zhtux dhcpcd[4338]: enp0s25: waiting for carrier
+        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: L1 Enabled - LTR Disabled
+        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: Radio type=0x1-0x2-0x0
+        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: L1 Enabled - LTR Disabled
+        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: Radio type=0x1-0x2-0x0
+        Aug 14 14:12:42 zhtux dhcpcd[4338]: wlp3s0: waiting for carrier
+        Aug 14 14:12:42 zhtux kernel: IPv6: ADDRCONF(NETDEV_UP): wlp3s0: link is not ready
+        ```
+        This error was caused by the passphrase template in *wpa_\supplicant.conf*. You notice *Invalid passphrase length 6 (expected: 8..63) 'YYYYYY"'*.
+
+        Just change 'YYYYYY' to 'YYYYYYYY'!
+    10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 31. Set root password: # passwd
 33. System logger.
     1. # emerge --ask app-admin/syslog-ng
@@ -301,7 +329,7 @@ This needs modified in the steps later on.
 39. [deprecated, as long as the `/boot` and `/boot/efi` partitions are mounted, grub2-mkconfig will automatically detect the windows operating system in `/etc/grub.d/30_os_prober` through `sys-boot/os-prober`] Chainload Windows system `nano -w /etc/grub.d/40_custom`, add the code below.
     1. The traditional `chainloader +1` does work for UEFI boot.
 
-		```
+        ```
 menuentry "Microsoft Windows 8.1 x86_64" {
     insmod part_gpt
     insmod fat
@@ -310,7 +338,7 @@ menuentry "Microsoft Windows 8.1 x86_64" {
     search --fs-uuid --no-floppy --set=root $hints_string $fs_uuid
     chainloader /efi/Microsoft/Boot/bootmgfw.efi
 }
-		```
+        ```
     2. The next is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
         1. # grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
         2. # grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
@@ -411,8 +439,9 @@ VIDEO_CARDS="intel"
     4. # echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
     5. **Attention** # emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
     6. # emerge --ask x11-terms/xfce4-terminal
-    11. [optional] # echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
-        1. Remember to run `env-update && source /etc/profile` to update environment.
+    11. <s>[optional] # echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
+        1. Remember to run `env-update && source /etc/profile` to update environment.</s>
+        2. This is not a good scheme to set *XSESSION* for all users on the system.
     7. Installation finished. Now reboot and loggin with the regular account to configure xfce.
     8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
     9. _$_ echo "exec startxfce4 --with-ck-launch" > ~/.xinitrc
@@ -477,21 +506,20 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     1. Web browser: Firefox. It will take over 6 hours compiling.
 
         > foxy proxy standard
-    2. *hexchat* for IRC.
+    2. *weechat* for IRC.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. # echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
         2. # emerge -av fcitx
         2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 		
             ```
-eval `dbus-launch --sh-syntax --exit-with-session`
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=xim
 export XMODIFIERS=@im=fcitx
             ```
         But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
-        3. **IMPORTANT**: these four lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
-        4. \# emerge -av fcitx-sunpinyin
+        3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
+        4. \# emerge -av fcitx-googlepinyin
         5. \# emerge -av fcitx-configtool
     3. \# emerge -av mplayer
     4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features). Then emerge plugins on demand.
@@ -554,15 +582,17 @@ export XMODIFIERS=@im=fcitx
                 >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
             5. emerge -av wps-office
 	    6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
-    7. \# emerge --ask xfce4-volumed xfce4-mixer
+    7. \# emerge --ask xfce4-mixer
     8. \# emerge -av mupdf
-        1. The other application may draw in a lot of GTK or QT dependencies consuming many disk space.
+        1. The other PDF viewer may draw in a lot of GTK or QT dependencies consuming many disk space.
     9. \# emerge -av dev-vcs/git
         1. _$_ git config --global user.name "Jim Green"
         2. _$_ git config --global user.email "username@users.noreply.github.com"
         3. _$_ git config --global core.editor emacs
         4. # emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
         5. _$_ git clone xxx
+
+        Refer to [git config](http://www.fangxiang.tk/2015/07/19/git-config/).
     10. \# emerge -av wgetpaste
     11. \# emerge -av net-misc/dropbox xfce-extra/thunar-dropbox
         1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
