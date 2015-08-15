@@ -232,7 +232,25 @@ You see *genkernel* takes *lvm*, *luks*, *gpg*, and *busybox* parameter. Don't w
            root_key argument to the new .gpg file.
 ```
 
-Some posts mention `emerge -av lvm2 busybox cryptsetup` before *genkernel*. There is no need since *sys-kernel/genkernel cryptsetup* will draw in *cryptsetup*, and then *lvm2* as well, while *busybox* is an essential *@system* package which is included in *stage3* tar bar. You can run `equery u busybox`, and find *static* USE flag.
+Some posts mention `emerge -av lvm2 busybox cryptsetup` before *genkernel*. There is no need since *sys-kernel/genkernel cryptsetup* USE flag will draw in *cryptsetup*, and then *lvm2* as well, while *busybox* is an essential *@system* package which is included in *stage3* tar bar. You can run `equery u busybox`, and find *static* USE flag. Try:
+
+```bash
+# emerge -pvc cryptsetup
+```
+It will reminds:
+
+```
+Calculating dependencies... done!
+  sys-fs/cryptsetup-1.6.5 pulled in by:
+    sys-kernel/genkernel-3.4.49.2 requires sys-fs/cryptsetup
+
+>>> No packages selected for removal by depclean
+Packages installed:   549
+Packages in world:    38
+Packages in system:   44
+Required packages:    549
+Number to remove:     0
+```
 
 There is no need to `rc-update add lvm boot`, for this is only useful when there is any other LVM devices like external removable LVM disks, USB stick etc.
 
