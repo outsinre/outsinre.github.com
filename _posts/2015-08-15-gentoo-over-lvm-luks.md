@@ -49,11 +49,11 @@ We first generate a ramdom *keyfile* for *rootfs* encryption. This *keyfile* is 
 If attacker gets the USB stick, system is decrypted!! So next, we need to encrypt this *keyfile* by **GnuPG** before storing it on USB stick.
 
 ```bash
-# mkdir /mnt/sdc1
-# mount /dev/sdc1 /mnt/sdc1
-# mkdir /dev/sdc1/key
+\# mkdir /mnt/sdc1
+\# mount /dev/sdc1 /mnt/sdc1
+\# mkdir /dev/sdc1/key
 $ dd if=/dev/urandom bs=8388607 count=1 | gpg --symmetric --cipher-algo AES256 --output ~/Desktop/luks-key.gpg
-# cp /path/to/luks-key.gpg /mnt/sdc1/key/
+\# cp /path/to/luks-key.gpg /mnt/sdc1/key/
 ```
 Refer to [Preparing the LUKS-LVM Filesystem and Boot USB Key](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Preparing_the_LUKS-LVM_Filesystem_and_Boot_USB_Key#Creating_a_Password-Protected_Keyfile_for_LUKS).
 
@@ -85,63 +85,63 @@ This might be related to *>app-crypt/gnupg-2.0* version and *pinentry* support. 
 
 ```bash
 $ gpg --decrypt /mnt/sdc1/key/luks-key.gpg > ~/Desktop/luks-key
-# cryptsetup --cipher serpent-xts-plain64 --key-size 512 --hash sha512 --key-file /path/to/luks-key luksFormat /dev/sda8
+\# cryptsetup --cipher serpent-xts-plain64 --key-size 512 --hash sha512 --key-file /path/to/luks-key luksFormat /dev/sda8
 ```
 Pay attention to `--cipher serpent-xts-plain64 --key-size 512 --hash sha512` which reminds us the related kernel option must be 'Y' **NOT** 'M'.
 
 Check the formating effect:
 
 ```bash
-# cryptsetup luksDump /dev/sda8
+\# cryptsetup luksDump /dev/sda8
 ```
 ## Adding a Fallback Passphrase (Optional Step)
 If we lost the *gpg* passphrase or the *keyfile*, we lost the entire system data. Besides the *keyfile*, we add a fallback passphrase.
 
 ```bash
-# cryptsetup --key-file /path/to/luks-key luksAddKey /dev/sda8
-# cryptsetup luksDump /dev/sda8
+\# cryptsetup --key-file /path/to/luks-key luksAddKey /dev/sda8
+\# cryptsetup luksDump /dev/sda8
 ```
 # Creating the LVM Structure on Top of LUKS
 
 ```bash
-# cryptsetup --key-file /path/to/luks-key luksOpen /dev/sda8 gentoo
-# ls /dev/mapper
-# pvcreate /dev/mapper/gentoo
-# vgcreate vg1 /dev/mapper/gentoo
-# lvcreate --size 4G --name swap vg1
-# lvcreate --size 18G --name root vg1
-# lvcreate --extents 100%FREE --name home vg1
-# pvdisplay
-# vgdisplay
-# lvdisplay
-# vgchange --available y
-# lvscan
-# ls /dev/mapper
+\# cryptsetup --key-file /path/to/luks-key luksOpen /dev/sda8 gentoo
+\# ls /dev/mapper
+\# pvcreate /dev/mapper/gentoo
+\# vgcreate vg1 /dev/mapper/gentoo
+\# lvcreate --size 4G --name swap vg1
+\# lvcreate --size 18G --name root vg1
+\# lvcreate --extents 100%FREE --name home vg1
+\# pvdisplay
+\# vgdisplay
+\# lvdisplay
+\# vgchange --available y
+\# lvscan
+\# ls /dev/mapper
 ```
 # Formatting and Mounting the LVM Logical Volumes (LVs)
 
 ```bash
-# mkswap -L "swap" /dev/mapper/vg1-swap
-# mkfs.ext4 -L "root" /dev/mapper/vg1-root
-# mkfs.ext4 -m 0 -L "home" /dev/mapper/vg1-home
-# swapon -v /dev/mapper/vg1-swap
-# mount -v -t ext4 /dev/mapper/vg1-root /mnt/gentoo
-# mkdir -v /mnt/gentoo/{home,boot}
-# mount -v -t ext4 /dev/mapper/vg1-home /mnt/gentoo/home
-# umount -v /dev/sdc1
-# mount -v -t ext2 /dev/sdc1 /mnt/gentoo/boot
-# mkdir /mnt/gentoo/boot/efi
-# mount -v /dev/sda2 /mnt/gentoo/boot/efi
+\# mkswap -L "swap" /dev/mapper/vg1-swap
+\# mkfs.ext4 -L "root" /dev/mapper/vg1-root
+\# mkfs.ext4 -m 0 -L "home" /dev/mapper/vg1-home
+\# swapon -v /dev/mapper/vg1-swap
+\# mount -v -t ext4 /dev/mapper/vg1-root /mnt/gentoo
+\# mkdir -v /mnt/gentoo/{home,boot}
+\# mount -v -t ext4 /dev/mapper/vg1-home /mnt/gentoo/home
+\# umount -v /dev/sdc1
+\# mount -v -t ext2 /dev/sdc1 /mnt/gentoo/boot
+\# mkdir /mnt/gentoo/boot/efi
+\# mount -v /dev/sda2 /mnt/gentoo/boot/efi
 ```
 # Chroot for installing
 
 Final preparation:
 
 ```bash
-# mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
-# mkdir -p -v /mnt/gentoo/etc/portage/repos.conf
-# cp -v /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
-# nano -w /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+\# mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
+\# mkdir -p -v /mnt/gentoo/etc/portage/repos.conf
+\# cp -v /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+\# nano -w /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 ```
 Make *gentoo.conf* contents as:
 
@@ -162,34 +162,36 @@ auto-sync = yes
 The old portage sync system use *SYNC=rsync://rsync.cn.gentoo.org/gentoo-portage* in *make.conf*. In new >portage-2.2.16, it is *sync-url* in *gentoo.conf*. To get the *sync-url* value:
 
 ```bash
-# mirrorselect -i -r -o | sed 's/^SYNC=/sync-uri = /;s/"//g' >> /mnt/gentoo/etc/portage/repos.conf/gentoo.conf 
+\# mirrorselect -i -r -o | sed 's/^SYNC=/sync-uri = /;s/"//g' >> /mnt/gentoo/etc/portage/repos.conf/gentoo.conf 
 ```
 
 ```bash
-# cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
-# chroot /mnt/gentoo /bin/bash
-# source /etc/profile && export PS1="(chroot) $PS1"
+\# cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
+\# chroot /mnt/gentoo /bin/bash
+\# source /etc/profile && export PS1="(chroot) $PS1"
 ```
+
+After entering *chroot* environment, the very first is to mask GnuPG 2.0. Refer to *Tips -> GnuPG* at the end of post.
 ## Return to *chroot* environment
 
 ```bash
-# cryptsetup --key-file=/path/to/luks-key luksOpen /dev/sda8 gentoo
-# vgchange --available y
-# lvscan
-# ls /dev/mapper/
-# swapon -v /dev/mapper/vg1-swap
-# mount -v -t ext4 /dev/mapper/vg1-root /mnt/gentoo
-# mount -v -t ext4 /dev/mapper/vg1-home /mnt/gentoo/home
-# mount -v -t ext2 UUID=63053222-d5f9-43af-a7ce-76f0ca5a14ed /mnt/gentoo/boot
-# mount -v /dev/sda2 /mnt/gentoo/boot/efi
-# cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
-# mount -v -t proc proc /mnt/gentoo/proc
-# mount -v --rbind /sys /mnt/gentoo/sys
-# mount -v --rbind /dev /mnt/gentoo/dev
-# mount -v --make-rslave /mnt/gentoo/sys
-# mount -v --make-rslave /mnt/gentoo/dev
-# chroot /mnt/gentoo /bin/bash
-# source /etc/profile && export PS1="(chroot) $PS1"
+\# cryptsetup --key-file=/path/to/luks-key luksOpen /dev/sda8 gentoo
+\# vgchange --available y
+\# lvscan
+\# ls /dev/mapper/
+\# swapon -v /dev/mapper/vg1-swap
+\# mount -v -t ext4 /dev/mapper/vg1-root /mnt/gentoo
+\# mount -v -t ext4 /dev/mapper/vg1-home /mnt/gentoo/home
+\# mount -v -t ext2 UUID=63053222-d5f9-43af-a7ce-76f0ca5a14ed /mnt/gentoo/boot
+\# mount -v /dev/sda2 /mnt/gentoo/boot/efi
+\# cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
+\# mount -v -t proc proc /mnt/gentoo/proc
+\# mount -v --rbind /sys /mnt/gentoo/sys
+\# mount -v --rbind /dev /mnt/gentoo/dev
+\# mount -v --make-rslave /mnt/gentoo/sys
+\# mount -v --make-rslave /mnt/gentoo/dev
+\# chroot /mnt/gentoo /bin/bash
+\# source /etc/profile && export PS1="(chroot) $PS1"
 ```
 # *initramfs* and *grub2*
 After getting into *chroot* environment, the most procedures, pleae refer to [gentoo installation](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
@@ -217,9 +219,9 @@ You find that if the two kernel options compiled as modules 'M', then you cannot
 ## genkernel
 
 ```bash
-# echo "sys-kernel/genkernel cryptsetup" > /etc/portage/package.use/genkernel
-# emerge -av genkernel
-# genkernel --lvm --luks --gpg --busybox --install initramfs
+\# echo "sys-kernel/genkernel cryptsetup" > /etc/portage/package.use/genkernel
+\# emerge -av genkernel
+\# genkernel --lvm --luks --gpg --busybox --install initramfs
 ```
 
 You see *genkernel* takes *lvm*, *luks*, *gpg*, and *busybox* parameter. Don't worry about the `gpg` version issue mentioned earlier! `man genkernel` shows it includes *GnuPG 1.x*:
@@ -232,10 +234,12 @@ You see *genkernel* takes *lvm*, *luks*, *gpg*, and *busybox* parameter. Don't w
            root_key argument to the new .gpg file.
 ```
 
-Some posts mention `emerge -av lvm2 busybox cryptsetup` before *genkernel*. There is no need since *sys-kernel/genkernel cryptsetup* USE flag will draw in *cryptsetup*, and then *lvm2* as well, while *busybox* is an essential *@system* package which is included in *stage3* tar bar. You can run `equery u busybox`, and find *static* USE flag. Try:
+Some posts mention `emerge -av app-crypt/gnupg lvm2 busybox cryptsetup` in the *chroot* system before *genkernel*. Basically, these tools are only needed in LiveCD and 'genkernel'. In our new Gentoo system, it is not a must.
+
+*sys-kernel/genkernel cryptsetup* USE flag will draw in *cryptsetup*, and then *lvm2* in *chroot*, while *busybox* is an essential *@system* package which is included in *stage3* tar bar. You can run `equery u busybox`, and find *static* USE flag. Try:
 
 ```bash
-# emerge -pvc cryptsetup
+\# emerge -pvc cryptsetup
 ```
 It will reminds:
 
@@ -258,7 +262,7 @@ There is no need to `rc-update add lvm boot`, for this is only useful when there
 The core is to set the correct `GRUB_CMDLINE_LINUX` parameters for *kernel* and *init* scripts. Some of those parameters are indeed consumed by the kernel (a reasonable complete list of which is provided by kernel.org); however, others are realy targeted at the *init* script. The Linux kernel passes the *init* script (or program) any parameters it has not already rocessed as arguments, and the *init* script can also read the full command line in any event, via /proc/cmdline.
 
 ```
-# nano -w /etc/default/grub
+\# nano -w /etc/default/grub
 GRUB_CMDLINE_LINUX="crypt_root=UUID=8e105495-5a45-4297-b6ad-6e2d97abb461 dolvm root=/dev/mapper/vg1-root rootfstype=ext4 root_keydev=UUID=63053222-d5f9-43af-a7ce-76f0ca5a14ed root_key=key/luks-key.gpg"
 ```
 1. crypt_root: this tells *init* (provided by *genkernel*) script which partition it should attempt to decrypt with *cryptsetup*. It is set to UUID of the LUKS formatted partition, say *sda8*.
@@ -273,7 +277,7 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID=8e105495-5a45-4297-b6ad-6e2d97abb461 dolvm r
 8. More about these command please read `man genkernel` and *kernel.org*.
 
 ```bash
-# grub2-mkconfig -o /boot/grub/grub.cfg
+\# grub2-mkconfig -o /boot/grub/grub.cfg
 ```
 In *chroot* environment, *grub2-mkconfig* and  *os-prober* might fail to generate Windows menu. Don't worry! You can use the following template to edit '*/etc/grub.d/40_custom*'. Or run *grub2-mkconfig* again when log into the real new system.
 
@@ -308,28 +312,28 @@ UUID="aaa-bbb-ccc-ddd..."	/boot	ext2	noauto,noatime	1 2
 # Get out of *chroot*
 
 ```bash
-# exit
-# swapoff -v /dev/mapper/vg1-swap
-# umount -lv /mnt/gentoo/home
-# umount -lv /mnt/gentoo/boot{/eif,}
-# umount -lv /mnt/gentoo/dev{/shm,/pts,}
-# umount -lv /mnt/gentoo{/proc,/sys,}
-# vgchange --available n
-# cryptsetup luksClose gentoo
-# reboot
+\# exit
+\# swapoff -v /dev/mapper/vg1-swap
+\# umount -lv /mnt/gentoo/home
+\# umount -lv /mnt/gentoo/boot{/eif,}
+\# umount -lv /mnt/gentoo/dev{/shm,/pts,}
+\# umount -lv /mnt/gentoo{/proc,/sys,}
+\# vgchange --available n
+\# cryptsetup luksClose gentoo
+\# reboot
 ```
 # Tips
 1. mtab
 
     ```bash
-    # ln -vsf /proc/self/mounts /etc/mtab
+    \# ln -vsf /proc/self/mounts /etc/mtab
     ```
 2. XSESSION
 
     When emerging *xorg* and *xfce4*, the wiki recommends setting:
 
     ```bash
-    # echo XSESSION="Xfce4" > /etc/env.d/90xsession
+    \# echo XSESSION="Xfce4" > /etc/env.d/90xsession
     ```
     for all users on the system. This is not a good idea since *root* account can run X as well, which is NOT a good scheme.
 
@@ -337,9 +341,17 @@ UUID="aaa-bbb-ccc-ddd..."	/boot	ext2	noauto,noatime	1 2
 3. Editor
 
     ```bash
-    # eselect editor set "/usr/local/bin/ect"
+    \# eselect editor set "/usr/local/bin/ect"
     ```
     Run *eselect* as root set the system default editor for all users. Of course, you can also use method in [emacs configuration](http://www.fangxiang.tk/2014/07/12/emacs-configuration/).
+4. GnuPG
+
+    Though not necessary to emerge GnuPG in the new system. But later on, package *layman* will draw in *git* which in turn draws in GnuPG. As mentioned, *>app-crypt/gnupg-2.0" will cause *pinentry* issue.
+
+    ```bash
+    \# echo "=app-crypt/gnupg-2*" > /etc/portage/package.mask/gnupg
+    ```
+    This should be the 1st thing after entering *chroot*.
 # Reference
 1. http://ceyes.github.io/2015-06/Gentoo-Setup-LVM-over-LUKS/
 1. https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Preparing_the_LUKS-LVM_Filesystem_and_Boot_USB_Key
