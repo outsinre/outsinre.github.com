@@ -71,13 +71,13 @@ title: Gentoo Installation
         2. The boot screen will show you several penguins, that is the number of logical cores.
         3. This value does not apply to *kernel compiling*. So when compiling a kernel, you need to explicitly specify *make -j5*.
         3. Refer to [MAKEOPTS](https://wiki.gentoo.org/wiki/MAKEOPTS).
-    4. `CPU_FLAGS_X86`: The 'USE' flags corresponding to the CPU instruction sets and other features specific to the *x86* (and *amd64*) architecture are being moved into a separate USE flag group called CPU_FLAGS_X86.
+    4. `CPU_FLAGS_X86`: The 'USE' flags corresponding to the CPU instruction sets and other features specific to the *x86* (and *amd64*) architecture are being moved into a separate USE flag group called CPU\_FLAGS\_X86.
 
-        Refer to [cpu_flags_x86 instruction](https://www.gentoo.org/support/news-items/2015-01-28-cpu_flags_x86-introduction.html).
+        Refer to [cpu\_flags\_x86 instruction](https://www.gentoo.org/support/news-items/2015-01-28-cpu_flags_x86-introduction.html).
         2. # emerge -av app-portage/cpuinfo2cpuflags
-        3. # cpuinfo2cpuflags, the output is the flags specific to current CPU. Edit 'make.conf' to set 'CPU_FLAGS_X86' variable to those flags.
-        4. Up to now, some packages in *portage* and overlays are not yet migrating those flags from 'USE' to 'CPU_FLAGS_X86'. So:
-        5. Remove the old CPU specific flags from 'USE'. Then add *${CPU_FLAGS_X86}* to 'USE' in 'make.conf'.
+        3. # cpuinfo2cpuflags, the output is the flags specific to current CPU. Edit 'make.conf' to set 'CPU\_FLAGS\_X86' variable to those flags.
+        4. Up to now, some packages in *portage* and overlays are not yet migrating those flags from 'USE' to 'CPU\_FLAGS\_X86'. So:
+        5. Remove the old CPU specific flags from 'USE'. Then add *${CPU\_FLAGS\_X86}* to 'USE' in 'make.conf'.
 17. Selecting mirrors.
     1. # mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
     2. # mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the `rsync server` to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
