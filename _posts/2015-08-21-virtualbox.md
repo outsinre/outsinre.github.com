@@ -1,5 +1,5 @@
 ---
-style: post
+layout: post
 title: VirtualBox
 ---
 This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a *Windows XP 32-bit* virtual machine.
