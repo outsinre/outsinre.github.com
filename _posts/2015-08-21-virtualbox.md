@@ -80,7 +80,9 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 
     *xfreerdp* can add many parameters except *clipboard*, like window size, audio, video etc.
 
-    Now get into *Windows XP 32-bit*. You might found there are two mouse pointers, one for *host* while another for *guest*. Also the screen resolution is not correctly set. To solve issues like this, to install *VBoxGuestAdditions*. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions* -> *VBoxWindowsAdditions.exe*. Before issues got solved, you can use keyboard shortcuts and TAB, ENTER etc keys.
+    Now get into *Windows XP 32-bit*. If cannot see the Windows start menu, just enter 'Ctrl + Alt + Enter'.
+
+    You might found there are two mouse pointers, one for *host* while another for *guest*. Also the screen resolution is not correctly set. To solve issues like this, to install *VBoxGuestAdditions*. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions* -> *VBoxWindowsAdditions.exe*. Before issues got solved, you can use keyboard shortcuts and TAB, ENTER etc keys.
 
     During *VBoxGuestAddtions* installation, there is a option *Direct3D* which should NOT be enabled.
 10. $ VBoxManage controlvm WinXP savestate/acpipowerbutton/poweroff/pause
@@ -93,6 +95,11 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 11. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 
     Since *VBoxGuestAddtions* is installed. So unmount this ISO file. Other ISO files can also be mounted like step *6.6*.
+12. Folder share
+
+    First, set the folder that will be shared in *host*. Then in *guest*, mount the shared folder.
+    1. $ VBoxManage sharedfolder add WinXP --name "WLshare" --hostpath "/media/WLshare"
+    2. open Windows Explorer and look for it under "My Networking Places" -> "Entire Network" -> "VirtualBox Shared Folders" -> "\\Vboxsvr". By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder. If don't assign a drive letter, each time to access the shared, we have to find it under "\\Vboxsvr".
 12. Launch scripts.
     1. # ect /usr/local/sbin/vboxmodule
 
