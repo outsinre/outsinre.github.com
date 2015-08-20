@@ -49,7 +49,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         *--basefoler* is to specify the VM related files location. If not set, it will default to *${HOME}/.VirtualBox/Machines*, which violate the new configuration file location. Refer to [XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 
         *--register* to register the VM instantly, or run *VBoxManage registervm* afterwards. Attention: *registervm* only accepts *full* path.
-    3. $ VBoxManage modifyvm WinXP --memory 1024 --acpi on --nic1 nat --vrde on
+    3. $ VBoxManage modifyvm WinXP --memory 512 --acpi on --nic1 nat --vrde on --clipboard bidirectional
 
         *--vrde on* is to enable VRDP support thus I can connect to the VM GUI by RDP client.
     4. $ VBoxManage storagectl WinXP --name "IDE Controller" --add ide --controller PIIX4
@@ -57,30 +57,30 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         Set disk controller for VM. Don't use SATA related controller for *WindowsXP*.
     5. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium "/media/Misc/VMs/WinXP/WinXP.vdi"
 
-        *WinXP.vdi* is copied from some guy in QQ group. So I don't need a installation ISO to install VM from cratch. For ISO from cratch, refer those references listed.
+        *WinXP.vdi* is copied from some guy in QQ group. So I don't need a installation ISO to install VM from scratch. For ISO from scratch, refer those references listed.
     6. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso
 
-        *VBoxGuestAddiontions.iso* support file sharing etc between *host* and *guest*. We will install this tool after entering *Windows XP 32-bit* VM.
+        *VBoxGuestAddiontions.iso* support file sharing, mouse switch etc between *host* and *guest*. We will install this tool after entering *Windows XP 32-bit* VM.
 
         Up to now, the VM is created! But *VirtualBox* does not have QT GUI. We need RDP client, i.e. FreeRDP.
 7. \# emerge -av net-misc/freerdp
 8. Magic
 
     ```bash
-    \$ VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001"
+    $ VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001"
     ```
-    *VBoxHeadless* is a tool the launch VM as a server mode instead of traditional GUI mode. If you guy a VPS, say from Linode, you probably control VPS VM through similiar tool.
+    *VBoxHeadless* is a tool the launch VM as a server mode instead of traditional GUI mode. If you guy a VPS, say from Linode, your VPS VM mostly runs as a similar mode (maybe through web protocol for your control in brower).
 
     The RDP TCP port is set to *5001*. If not set, the default is *3389*.
 
     Now the VM is started, but not showing up! We need to use FreeRDP to get X.
-9. $ xfreerdp +clipboard /v:127.0.0.1:5001
+9. $ xfreerdp +clipboard /w:1024 /h:576 /v:127.0.0.1:5001
 
     Attention: the server IP is the IP address of *host*, NOT IP of *guest*. Since I connect to VM locally, so it *127.0.0.1*.
 
     *xfreerdp* can add many parameters except *clipboard*, like window size, audio, video etc.
 
-    Now get into *Windows XP 32-bit*. The very first thing is to install "VBoxGuestAdditions*. Open file explorer, click on the DVD device and find the installer there *xfreerdp +clipboard /v:127.0.0.1:5001
+    Now get into *Windows XP 32-bit*. The very first thing is to install *VBoxGuestAdditions*. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions*.
 10. $ VBoxManage controlvm WinXP savestate/acpipowerbutton/poweroff/pause
 
     *pause*: temporarily puts a virtual machine on hold, without changing its state for good. The VM window will be painted in gray to indicate that the VM is currently paused. 
