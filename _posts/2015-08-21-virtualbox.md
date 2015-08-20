@@ -92,6 +92,8 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
     *poweroff*: has the same effect on a virtual machine as pulling the power cable on a real computer. Again, the state of the VM is not saved beforehand, and data may be lost. (This is equivalent to selecting the "Close" item in the "Machine" menu of the GUI or pressing the window's close button, and then selecting "Power off the machine" in the dialog.)
 
     *savestate*: will save the current state of the VM to disk and then stop the VM. (This is equivalent to selecting the "Close" item in the "Machine" menu of the GUI or pressing the window's close button, and then selecting "Save the machine state" in the dialog.) If the VM is *savestate*, then you cannot *modifyvm* any more. The trick is to start it and *poweroff*.
+
+    *acpipowerbuttion*: just like you press the PC's power buttion to shutdown directly without saving.
 11. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 
     Since *VBoxGuestAddtions* is installed. So unmount this ISO file. Other ISO files can also be mounted like step *6.6*.
