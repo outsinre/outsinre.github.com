@@ -7,7 +7,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 1. *VirtualBox* depends on QT as GUI. But I would like a XFCE4 desktop without any QT packages. QT related USE flags are disabled in Gentoo *make.conf*.
 
     So I will emerge *VirtualBox* without GUI. To manage VMs, resort to CLI.
-2. # echo "app-emulation/virtualbox extensions" > /etc/portage/package.use/virtualbox
+2. \# echo "app-emulation/virtualbox extensions" > /etc/portage/package.use/virtualbox
 
     *extension* USE flag will draw in binary *VirtualBox Extension Pack* which is not open source package *app-emulation/virtualbox-extpack-oracle*.
 
@@ -22,17 +22,17 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
     1. First create VM with *VirtualBox* CLI;
     2. Enable VRDP support for VM;
     3. Connect to VM by VRDP.
-3. # emerge -av app-emulation/virtualbox
+3. \# emerge -av app-emulation/virtualbox
 
     It reminds accepting PUEL licence.
 
     Refer to [VirtualBox wiki](https://wiki.gentoo.org/wiki/VirtualBox).
-4. # gpasswd -a <user> vboxusers
+4. \# gpasswd -a <user> vboxusers
 
     Add current user to *vboxusers* group.
 
     Logout and re-login to have this command take effect.
-5. # modprobe vboxdrv
+5. \# modprobe vboxdrv
 
     Some optional modules: vboxnetadp vboxnetflt vboxpci. If run *VirtualBox* frequently, add these modules to "*/etc/conf.d/modules*".
 
@@ -63,7 +63,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         *VBoxGuestAddiontions.iso* support file sharing etc between *host* and *guest*. We will install this tool after entering *Windows XP 32-bit* VM.
 
         Up to now, the VM is created! But *VirtualBox* does not have QT GUI. We need RDP client, i.e. FreeRDP.
-7. # emerge -av net-misc/freerdp
+7. \# emerge -av net-misc/freerdp
 8. Magic
 
     ```bash
