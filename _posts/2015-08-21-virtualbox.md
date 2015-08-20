@@ -74,13 +74,15 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
     The RDP TCP port is set to *5001*. If not set, the default is *3389*.
 
     Now the VM is started, but not showing up! We need to use FreeRDP to get X.
-9. $ xfreerdp +clipboard /w:1024 /h:576 /v:127.0.0.1:5001
+9. $ xfreerdp +clipboard /v:127.0.0.1:5001
 
     Attention: the server IP is the IP address of *host*, NOT IP of *guest*. Since I connect to VM locally, so it *127.0.0.1*.
 
     *xfreerdp* can add many parameters except *clipboard*, like window size, audio, video etc.
 
-    Now get into *Windows XP 32-bit*. The very first thing is to install *VBoxGuestAdditions*. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions*.
+    Now get into *Windows XP 32-bit*. You might found there are two mouse pointers, one for *host* while another for *guest*. Also the screen resolution is not correctly set. To solve issues like this, to install *VBoxGuestAdditions*. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions* -> *VBoxWindowsAdditions.exe*. Before issues got solved, you can use keyboard shortcuts and TAB, ENTER etc keys.
+
+    During *VBoxGuestAddtions* installation, there is a option *Direct3D* which should NOT be enabled.
 10. $ VBoxManage controlvm WinXP savestate/acpipowerbutton/poweroff/pause
 
     *pause*: temporarily puts a virtual machine on hold, without changing its state for good. The VM window will be painted in gray to indicate that the VM is currently paused. 
@@ -90,8 +92,59 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
     *savestate*: will save the current state of the VM to disk and then stop the VM. (This is equivalent to selecting the "Close" item in the "Machine" menu of the GUI or pressing the window's close button, and then selecting "Save the machine state" in the dialog.) If the VM is *savestate*, then you cannot *modifyvm* any more. The trick is to start it and *poweroff*.
 11. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 
-    Since *VBoxGuestAddtions* is installed. So unmount this ISO file.
-12. Launch VM again.
+    Since *VBoxGuestAddtions* is installed. So unmount this ISO file. Other ISO files can also be mounted like step *6.6*.
+12. Launch scripts.
+    1. # ect /usr/local/sbin/vboxmodule
+
+        ```bash
+        #!/bin/bash
+        for m in vbox{drv,netadp,netflt}; do modprobe $m; done
+        echo 'VirtualBox modules loaded!'
+	```
+    2. # ect ${HOME}/bin/vboxWinXP
+
+        ```bash
+        #!/bin/bash
+        # Bash Menu Script Example
+
+        PS3='Please enter your choice on VM WinXP: '
+        options=("startvm" "rdp" "poweroff" "acpipowerbutton" "savestate" "quit")
+        select opt in "${options[@]}"
+        do
+            case $opt in
+        	"startvm")
+        	    echo "you choose to launch WinXP"
+        	    VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001"
+        	    break
+        	    ;;
+        	"rdp")
+        	    echo "you choose to connect WinXP"
+        	    xfreerdp +clipboard /v:127.0.0.1:5001
+        	    break
+        	    ;;
+        	"acpipowerbutton")
+        	    echo "you chose to acpipowerbuttion WinXP"
+        	    VBoxManage controlvm WinXP poweroff
+        	    break
+        	    ;;
+        	"savestate")
+        	    echo "you chose to save WinXPstate"
+        	    VBoxManage controlvm WinXP savestate
+        	    break
+        	    ;;
+        	"poweroff")
+        	    echo "you chose to poweroff WinXP"
+        	    VBoxManage controlvm WinXP poweroff
+        	    break
+        	    ;;
+        	"quit")
+        	    break
+        	    ;;
+        	*) echo 'invalid option'
+        	   ;;
+            esac
+        ```
+        Pay attention `PS3` and `case` *bash* usage.
 13. Refs:
     1. https://wiki.gentoo.org/wiki/VirtualBox#Configuration
     2. http://baige5117.github.io/blog/install_virtualbox_in_gentoo.html
