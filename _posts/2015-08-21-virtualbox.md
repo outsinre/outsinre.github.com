@@ -91,9 +91,13 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 
     *poweroff*: has the same effect on a virtual machine as pulling the power cable on a real computer. Again, the state of the VM is not saved beforehand, and data may be lost. (This is equivalent to selecting the "Close" item in the "Machine" menu of the GUI or pressing the window's close button, and then selecting "Power off the machine" in the dialog.)
 
-    *savestate*: will save the current state of the VM to disk and then stop the VM. (This is equivalent to selecting the "Close" item in the "Machine" menu of the GUI or pressing the window's close button, and then selecting "Save the machine state" in the dialog.) If the VM is *savestate*, then you cannot *modifyvm* any more. The trick is to start it and *poweroff*.
+    *savestate*: will save the current state of the VM to disk and then stop the VM. (This is equivalent to selecting the "Close" item in the "Machine" menu of the GUI or pressing the window's close button, and then selecting "Save the machine state" in the dialog.) We can think *savestate* as suspend to disk (*hibernate*).
 
     *acpipowerbuttion*: just like you press the PC's power buttion to shutdown directly without saving.
+
+    1. If some jobs in VM not yet finished (like editing a file), use *savestate*;
+    2. If every jobs completed, use *acpipoweroff* (as long as ACPI is enabled for VM) or *poweroff*;
+    3. If still want to leave the VM running remotely, just close the RDP window.
 11. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 
     Since *VBoxGuestAddtions* is installed. So unmount this ISO file. Other ISO files can also be mounted like step *6.6*.
@@ -101,16 +105,18 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 
     First, set the folder that will be shared in *host*. Then in *guest*, mount the shared folder.
     1. $ VBoxManage sharedfolder add WinXP --name "WLshare" --hostpath "/media/WLshare"
-    2. open Windows Explorer and look for it under "My Networking Places" -> "Entire Network" -> "VirtualBox Shared Folders" -> "\\Vboxsvr". By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder. If don't assign a drive letter, each time to access the shared, we have to find it under "\\Vboxsvr".
+    2. Open Windows Explorer and look for it under "My Networking Places" -> "Entire Network" -> "VirtualBox Shared Folders" -> "\\\Vboxsvr". By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder.
+
+        If don't assign a drive letter, each time to access the shared, we have to find it under "\\\Vboxsvr".
 12. Launch scripts.
-    1. # ect /usr/local/sbin/vboxmodule
+    1. \# ect /usr/local/sbin/vboxmodule
 
         ```bash
         #!/bin/bash
         for m in vbox{drv,netadp,netflt}; do modprobe $m; done
         echo 'VirtualBox modules loaded!'
 	```
-    2. # ect ${HOME}/bin/vboxWinXP
+    2. \# ect ${HOME}/bin/vboxWinXP
 
         ```bash
         #!/bin/bash
@@ -128,7 +134,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         	    ;;
         	"rdp")
         	    echo "you choose to connect WinXP"
-        	    xfreerdp +clipboard /v:127.0.0.1:5001
+        	    xfreerdp +clipboard /f /v:127.0.0.1:5001
         	    break
         	    ;;
         	"acpipowerbutton")
