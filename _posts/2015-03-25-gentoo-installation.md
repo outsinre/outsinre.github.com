@@ -113,7 +113,7 @@ Append these flags into `make.conf` file. Actually, only `-qt3 -qt4 -qt5` and `t
     1. # eselect locale list
     2. # eselect locale set 3, set system-wdie locale to `en_US.utf8`.
     2. The following steps can also be done after entering the new Gentoo system.
-    2. # emerge -av arphicfonts wqy-bitmapfont corefonts ttf-bitstream-vera
+    2. # emerge -av wqy-bitmapfont corefonts
     3. \# nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
 
         ```
@@ -566,6 +566,7 @@ export XMODIFIERS=@im=fcitx
         elog
     fi
             ```
+	4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://www.fangxiang.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration]9http://www.fangxiang.tk/2014/07/12/emacs-configuration/).
     5. \# emerge -av www-plugins/adobe-flash
         1. Pay attention to update `package.license` file when needed.
     6. WPS office.
@@ -743,6 +744,13 @@ thunar $HOME/Bluetooth
         # echo "=sys-block/thin-provisioning-tools-0.4.1 ~amd64" > /etc/portage/package.accept_keywords/cryptsetup
         # emerge -av sys-fs/cryptsetup
         ```
+    22. TeXLive-2014
+        ```
+        # echo "app-text/texlive cjk xetex" > /etc/portage/package.use/texlive
+        # emerge -av app-text/texlive
+        ```
+
+        I choose *Emacs + Auctex* as the editor. Refer to [emacs configuration](http://www.fangxiang.tk/2014/07/12/emacs-configuration/).
 46. Configuration consistently.
     1. Update a single package.
 
