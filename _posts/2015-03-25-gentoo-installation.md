@@ -746,7 +746,7 @@ thunar $HOME/Bluetooth
         ```
     22. TeXLive-2014
 
-        Refer to [texlive gentoo](http://www.fangxiang.tk/2015/08/29/texlive-in-gentoo).
+        Refer to [texlive gentoo](http://www.fangxiang.tk/2015/08/29/texlive-gentoo/).
 46. Configuration consistently.
     1. Update a single package.
 
