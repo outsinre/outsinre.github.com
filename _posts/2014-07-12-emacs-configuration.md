@@ -7,9 +7,10 @@ Most of the time, configuring *Emacs* will update *init.el* file ultimately no m
 
 1. If editting it manually, pay attention the *lisp* grammar.
 2. If editing by command line *M-x*, use *C-x C-s* to keep the updates to *init.el*.
-3. If *Emacs* is running at *daemon* server mode, updates to *init.el* does take effect until *daemon* server is re-launched!
+3. If *Emacs* is running at *daemon* server mode, updates to *init.el* does **Not** take effect until *daemon* server is re-launched!
 
     **ATTENTION**: I wasted a lot of time on configuring *AucTex* below since the updates does not take effect until I re-launched *Emacs daemon*.
+
 # frame VS window
 Emacs中两个概念容易混淆，即frame和window。
 
@@ -243,7 +244,7 @@ My Gentoo system use *MuPDF* PDF viewer. How to make it the default previewer fo
     ```
     M-x customize-variable:  will open the builtin editor;
     TeX-view-program-list: open variable for edit
-    INS: add a viewer to the list except the builtin ones
+    INS: click to add a viewer to the list except the builtin ones
     Name: MuPDF
     Command: mupdf %s.pdf
     C-x C-s
@@ -264,8 +265,9 @@ My Gentoo system use *MuPDF* PDF viewer. How to make it the default previewer fo
     ```
     M-x customize-variable:  will open the builtin editor;
     TeX-view-program-selection: open for edit
-    **INS DEL** Choice: **Value Menu** Single predicate: **Value Menu** output-pdf
-                   Viewer: **Value Menu** MuPDF
+    INS DEL Choice: Value Menu Single predicate: Value Menu output-p
+df
+                   Viewer: Value Menu MuPDF
     C-x C-s
     ```
     Just locate *Viewer* for *output-pdf*. Click on **Value Menu**, you could get a drop list menu, choose *MuPDF*. The final *init.el* contents:
