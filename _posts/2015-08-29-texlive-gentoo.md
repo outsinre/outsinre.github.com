@@ -1,0 +1,44 @@
+---
+layout: post
+title: TeXLive in Gentoo
+---
+1. Installation
+
+    ```
+    # echo "app-text/texlive cjk xetex linguas_zh" > /etc/portage/package.use/texlive
+    # emerge -av app-text/texlive
+    ```
+
+    1. `cjk` USE draws in *xeCJK* support which is tedious to use while compiling Chinese TeX documents.
+    2. `xetex` can make use of system fonts. We don't need to care too much about Chinese fonts setting in TeX documents as long as those fonts configured in system.
+    3. `linguas_zh` draws in *ctex* macro package which is based on *xeCJK* macro package.
+2. Fonts name resolution
+
+    Though *xetex* and *ctex* make use of system fonts, we need to make sure the fonts name is correctly resolved between Gentoo and TeX.
+
+    ```bash
+    $ fc-list :lang=zh-cn | sort
+    ```
+    This will list the Gentoo system font names and font files thereof.
+
+    ```bash
+    # ect /usr/share/texmf-dist/tex/latex/ctex/fontset/ctex-xecjk-winfonts.def
+    ```
+    This will show how TeX understand the system fonts. TeX resolve `KaiTi` and `FangSong` by system *font file-name*, not by *font name*.
+
+    We can see some Chinese font names are not consistent between Gentoo system and TeX. So we need to edit *ctex-xecjk-winfonts.def*. Change `[SIMKAI.TTF]` to `KaiTi`, and `[SIMFANG.TTF]` to `FangSong`. Pay attention to *square braces* excluded as well.
+
+    There is another method: let TeX resolves systems fonts by *font file-name* instead of *font name*. Details refer to [texlive ubuntu](http://www.fangxiang.tk/2015/02/03/TeXLive-2014-Ubuntu-Installation/).
+3. Enable TeXLive fonts
+
+    There are many free fonts shipped with TeXLive, we need to enable them for *xetex*.
+
+    ```bash
+    # eselect fontconfig list
+    # eselect fontconfig enable 09-texlive.conf
+    ```
+    More about *eselect fontconfig*, refer to [fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/).
+4. In Gentoo, there is no need to set *PATH* etc environment variables.
+5. Editor
+
+    Choose *Emacs + Auctex* as the editor. Refer to [emacs configuration](http://www.fangxiang.tk/2014/07/12/emacs-configuration/).

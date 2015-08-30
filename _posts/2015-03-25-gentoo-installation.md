@@ -745,12 +745,8 @@ thunar $HOME/Bluetooth
         # emerge -av sys-fs/cryptsetup
         ```
     22. TeXLive-2014
-        ```
-        # echo "app-text/texlive cjk xetex" > /etc/portage/package.use/texlive
-        # emerge -av app-text/texlive
-        ```
 
-        I choose *Emacs + Auctex* as the editor. Refer to [emacs configuration](http://www.fangxiang.tk/2014/07/12/emacs-configuration/).
+        Refer to [texlive gentoo](http://www.fangxiang.tk/2015/08/29/texlive-in-gentoo).
 46. Configuration consistently.
     1. Update a single package.
 
