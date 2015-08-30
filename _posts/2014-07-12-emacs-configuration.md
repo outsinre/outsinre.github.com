@@ -2,6 +2,14 @@
 layout: post
 title: Emacs configuration
 ---
+# init.el
+Most of the time, configuring *Emacs* will update *init.el* file ultimately no matter through editing it *manually* or through *command line* in mini-buffer.
+
+1. If editting it manually, pay attention the *lisp* grammar.
+2. If editing by command line *M-x*, use *C-x C-s* to keep the updates to *init.el*.
+3. If *Emacs* is running at *daemon* server mode, updates to *init.el* does take effect until *daemon* server is re-launched!
+
+    **ATTENTION**: I wasted a lot of time on configuring *AucTex* below since the updates does not take effect until I re-launched *Emacs daemon*.
 # frame VS window
 Emacs中两个概念容易混淆，即frame和window。
 
@@ -196,15 +204,92 @@ mousepad就显得有些多余了.由于emacs的启动速度问题解决了,mouse
 
 具体有哪些基本按键，参考[How to Install Packages Using ELPA, MELPA, Marmalade](http://ergoemacs.org/emacs/emacs_package_system.html)页面。
 
-## 配置Auctex
+### 配置Auctex
+Refer to the beginnig of this post, while updating *init.el*, make sure to re-launch *daemon*, otherwise the updates would not take effect and you would thought your updates error.
+
 The contents of "*${HOME}/.emacs.d/init.el*":
 
-```
+```lisp
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
 (setq-default TeX-master nil)
+
 (setq-default TeX-PDF-mode t)
+
 (setq-default TeX-engine 'xetex)
 ```
+The last line is to set `xetex` as the default *engine*. The last but second set the default output format as PDF.
 
+Up to know, we can compile Chinese *LaTeX* files automatically.
+
+Refer to [emacs-as-the-ultimate-latex-editor](http://piotrkazmierczak.com/2010/emacs-as-the-ultimate-latex-editor/).
+
+### Previewer
+My Gentoo system use *MuPDF* PDF viewer. How to make it the default previewer for *AucTeX*? Basically, we need to update two variable of *AucTeX*, which could be achieved by editing *init.el* manually or by command line *M-x*.
+
+1. TeX-view-program-list
+
+    This variable is a list of viewers for different output formats. *Emacs* has default builtin viewers for *.dvi*, *.pdf*, *.ps* etc. For example, the default viewer for *.pdf* is *Evince*. Here I just want to add *MuPDF* to the list for *.pdf* output. *MuPDF* does *NOT* support *forward* and *backward* search while *Evince*, *okular* etc do.
+
+    If by manual edit *init.el*:
+
+    ```lisp
+    (setq TeX-view-program-list '(("MuPDF" "mupdf %s.pdf")))
+    ```
+    Use *C-c C-v* to preview PDF output.
+
+    If use command line in mini-buffer, we first need to turn on *M-x tex-mode*, or open a *.tex* file.
+    
+    ```
+    M-x customize-variable:  will open the builtin editor;
+    TeX-view-program-list: open variable for edit
+    INS: add a viewer to the list except the builtin ones
+    Name: MuPDF
+    Command: mupdf %s.pdf
+    C-x C-s
+    ```
+    Open the *init.el* file, you will find *MuPDF* is added to the list.
+2. TeX-view-program-selection
+
+    This variable defines the exact viewer to choose from *TeX-view-program-list* when viewing output format. Similarly, edit by manual or by command line.
+
+    Manually:
+
+    ```lisp
+    (setq TeX-view-program-selection '((output-pdf "MuPDF")))
+    ```
+
+    Command line:
+
+    ```
+    M-x customize-variable:  will open the builtin editor;
+    TeX-view-program-selection: open for edit
+    **INS DEL** Choice: **Value Menu** Single predicate: **Value Menu** output-pdf
+                   Viewer: **Value Menu** MuPDF
+    C-x C-s
+    ```
+    Just locate *Viewer* for *output-pdf*. Click on **Value Menu**, you could get a drop list menu, choose *MuPDF*. The final *init.el* contents:
+
+    ```lisp
+    (custom-set-variables
+     ;; custom-set-variables was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     '(TeX-view-program-list (quote (("MuPDF" ("mupdf %s.pdf") ""))))
+     '(TeX-view-program-selection
+       (quote
+        (((output-dvi style-pstricks)
+          "dvips and gv")
+         (output-dvi "xdvi")
+         (output-pdf "MuPDF")
+         (output-html "xdg-open")))))
+    (custom-set-faces
+     ;; custom-set-faces was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     )
+    ``` 
+### Writing LaTeX
 For a bignner, refer to [LaTeX](http://www.fangxiang.tk/2015/02/05/LaTeX/).
