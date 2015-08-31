@@ -206,6 +206,9 @@ mousepad就显得有些多余了.由于emacs的启动速度问题解决了,mouse
 具体有哪些基本按键，参考[How to Install Packages Using ELPA, MELPA, Marmalade](http://ergoemacs.org/emacs/emacs_package_system.html)页面。
 
 ### 配置Auctex
+
+> The lastest *init.el* can be accessed from GitHub.
+
 Refer to the beginnig of this post, while updating *init.el*, make sure to re-launch *daemon*, otherwise the updates would not take effect and you would thought your updates error.
 
 The contents of "*${HOME}/.emacs.d/init.el*":
@@ -292,6 +295,15 @@ df
      ;; Your init file should contain only one such instance.
      ;; If there is more than one, they won't work right.
      )
-    ``` 
+    ```
+3. RefTeX
+
+   ```lisp
+   ; Turn on RefTeX for AUCTeX, http://www.gnu.org/s/auctex/manual/reftex/reftex_5.html
+   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+   ; Make RefTeX interact with AUCTeX, http://www.gnu.org/s/auctex/manual/reftex/AUCTeX_002dRefTeX-Interface.html
+   (setq reftex-plug-into-AUCTeX t)
+   ```
+
 ### Writing LaTeX
 For a bignner, refer to [LaTeX](http://www.fangxiang.tk/2015/02/05/LaTeX/).
