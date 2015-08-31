@@ -5,13 +5,19 @@ title: TeXLive in Gentoo
 1. Installation
 
     ```
-    # echo "app-text/texlive cjk xetex linguas_zh" > /etc/portage/package.use/texlive
+    # echo "app-text/texlive cjk xetex linguas_zh science extra" > /etc/portage/package.use/texlive
     # emerge -av app-text/texlive
     ```
 
     1. `cjk` USE draws in *xeCJK* support which is tedious to use while compiling Chinese *TeX* documents.
     2. `xetex` can make use of system fonts. We don't need to care too much about Chinese fonts setting in *TeX* documents as long as those fonts configured in system.
     3. `linguas_zh` draws in *ctex* macro package which is based on *xeCJK* macro package.
+    4. `science` offers packages related to academic writing like *algorithms*, *hepthesis* etc.
+    5. `extra` offers packages like *biblatex* etc.
+
+    Actually, USE flags like *extra* usually draws in many packages many of which is not necessary. For instalce, I add *extra* to contain *texlive-biblatexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used.
+
+    So a better way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need to look into the *.ebuild* file.
 2. Fonts name resolution
 
     Though *XeTeX* and *CTeX* make use of system fonts, we need to make sure the fonts name is correctly resolved between Gentoo and *TeX*.
