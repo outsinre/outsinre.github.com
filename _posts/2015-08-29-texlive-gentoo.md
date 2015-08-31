@@ -20,7 +20,7 @@ title: TeXLive in Gentoo
     So a better way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
     
     1. Look into the *.ebuild* file.
-    2. # `emerge -av dev-tex/texmfind`
+    2. \# `emerge -av dev-tex/texmfind`
 
         Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*.
 	
