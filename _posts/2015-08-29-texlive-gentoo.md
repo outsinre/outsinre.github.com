@@ -17,7 +17,7 @@ title: TeXLive in Gentoo
 
     Actually, USE flags like *extra* usually draws in many packages many of which is not necessary. For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used.
 
-    So a better way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need to:
+    So a better way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
     
     1. Look into the *.ebuild* file.
     2. # `emerge -av dev-tex/texmfind`
