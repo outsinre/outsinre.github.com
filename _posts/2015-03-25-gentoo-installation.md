@@ -748,10 +748,11 @@ thunar $HOME/Bluetooth
 
         Refer to [texlive gentoo](http://www.fangxiang.tk/2015/08/29/texlive-gentoo/).
 46. Configuration consistently.
+    1. Package can be pulled or emerged into system. There is a big difference. The 1st won't add packages (pulled in by USE flag or dependency) to *@world*ffff, while the second do. The 2nd method implies that you *explicitly* emerged that specific package.
     1. Update a single package.
 
         ```bash
-        # emerge -avtuDN pkg-name
+        # emerge -avtuDN --with-bdeps=y pkg-name
         ```
     2. Slot conflict.
 

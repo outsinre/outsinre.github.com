@@ -17,18 +17,21 @@ title: TeXLive in Gentoo
 
     Actually, USE flags like *extra* usually draws in many packages many of which is not necessary. For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used.
 
-    So a better way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
-    
-    1. Look into the *.ebuild* file.
-    2. \# `emerge -av dev-tex/texmfind`
+    So another way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
 
-        Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*.
+    1. Look into the *.ebuild* file.
+    2. <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*.</s>
+
+        *texmfind* is almost dead since 2010, which results in outdated information.
+    3. Google.
 	
-    Next I need *biblatex* (**NOT** *bibtex*) support:
+    If I need *biblatex* (**NOT** *bibtex*) support:
 
     ```bash
     # emerge -av biblatex
     ```
+
+    > There is a big difference between the two methods. The 1st won't add packages (pulled in by USE flag like `extra`) to *@world*, while the second do. The 2nd method implies that you *explicitly* installed that specific package.
 2. Fonts name resolution
 
     Though *XeTeX* and *CTeX* make use of system fonts, we need to make sure the fonts name is correctly resolved between Gentoo and *TeX*.
