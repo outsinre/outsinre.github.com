@@ -14,6 +14,7 @@ title: TeXLive in Gentoo
     3. `linguas_zh` draws in *ctex* macro package which is based on *xeCJK* macro package.
     4. <s>`science` offers packages related to academic writing like *algorithms*, *hepthesis* etc</s>.
     5. <s>`extra` offers packages like *bibtex* etc</s>.
+    6. ddddd.
 
     Actually, USE flags like *extra* usually draws in many packages many of which is not necessary. For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used.
 
