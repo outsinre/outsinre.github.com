@@ -12,13 +12,12 @@ title: TeXLive in Gentoo
     1. `cjk` USE draws in *xeCJK* support which is tedious to use while compiling Chinese *TeX* documents.
     2. `xetex` can make use of system fonts. We don't need to care too much about Chinese fonts setting in *TeX* documents as long as those fonts configured in system.
     3. `linguas_zh` draws in *ctex* macro package which is based on *xeCJK* macro package.
-    4. <s>`science` offers packages related to academic writing like *algorithms*, *hepthesis* etc.</s>
-    5. <s>`extra` offers packages like *bibtex* etc.</s>
+    4. <s>`science` offers packages related to academic writing like *algorithms*, *hepthesis* etc</s>.
+    5. <s>`extra` offers packages like *bibtex* etc</s>.
 
     Actually, USE flags like *extra* usually draws in many packages many of which is not necessary. For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used.
 
-    So another way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need.
-
+    So another way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
 
     1. Look into the *.ebuild* file.
     2. <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*.</s>
