@@ -15,10 +15,9 @@ title: TeXLive in Gentoo
     3. `linguas_zh` draws in *ctex* macro package which is based on *xeCJK* macro package.
     4. <s>`science` offers packages related to academic writing like *algorithms*, *hepthesis* etc</s>.
     5. <s>`extra` offers packages like *bibtex* etc</s>.
+2. USE flags like *extra* usually draws in many packages many of which is not necessary.
 
-    Actually, USE flags like *extra* usually draws in many packages many of which is not necessary. For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used. So another way, is to just emerge the specific package needed.
-
-        Sometimes, to find out which package offers the wanted function, we need,
+    For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used. So another way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
 
     + Look into the *.ebuild* file.
     + <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*</s>. *texmfind* is almost dead since 2010, which results in outdated information.
