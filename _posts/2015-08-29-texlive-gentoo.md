@@ -24,7 +24,7 @@ title: TeXLive in Gentoo
 
         *texmfind* is almost dead since 2010, which results in outdated information.
     - Google.
-	
+
     If I need *biblatex* (**NOT** *bibtex*) support:
 
     ```bash
