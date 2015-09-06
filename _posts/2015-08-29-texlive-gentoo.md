@@ -25,13 +25,15 @@ title: TeXLive in Gentoo
         *texmfind* is almost dead since 2010, which results in outdated information.
     3. Google.
 
-    If need *biblatex* (**NOT** *bibtex*) support:
+    For example, if need *biblatex* (different from *bibtex*) support:
 
     ```bash
-    # emerge -av biblatex
+    # emerge -av dev-tex/biblatex
     ```
 
-    > There is a big difference between the two methods. The 1st won't add packages (pulled in by USE flag like `extra`) to *@world*, while the second do. The 2nd method implies that you *explicitly* installed that specific package.
+    *dev-tex/biblatex* is marked as *unstable* in portage. It is *not* pulled in `extra` USE flag. However, *dev-tex/latex-beamer* (a more advanced bibliography *TeX* package)is pulled in by *app-text/texlive*.
+
+    > There is a big difference between the two methods. The 1st won't add packages (pulled in by USE flag like `extra`) to *@world*, while the second do. The 2nd method implies that you *explicitly* installed that specific package. Details refer to [53. Configuration consistently](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
 2. Fonts name resolution
 
     Though *XeTeX* and *CTeX* make use of system fonts, we need to make sure the fonts name is correctly resolved between Gentoo and *TeX*.
