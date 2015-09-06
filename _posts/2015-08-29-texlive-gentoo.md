@@ -19,11 +19,13 @@ title: TeXLive in Gentoo
 
     For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used. So another way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
 
-    + Look into the *.ebuild* file.
-    + <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*</s>. *texmfind* is almost dead since 2010, which results in outdated information.
-    + Google.
+    1. Look into the *.ebuild* file.
+    2. <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*</s>.
 
-    If I need *biblatex* (**NOT** *bibtex*) support:
+        *texmfind* is almost dead since 2010, which results in outdated information.
+    3. Google.
+
+    If need *biblatex* (**NOT** *bibtex*) support:
 
     ```bash
     # emerge -av biblatex
