@@ -516,6 +516,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 
         > foxy proxy standard
     2. *weechat* for IRC.
+    2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. # echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
         2. # emerge -av fcitx
