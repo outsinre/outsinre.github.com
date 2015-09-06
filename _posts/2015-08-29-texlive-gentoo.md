@@ -19,11 +19,11 @@ title: TeXLive in Gentoo
 
     For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used. So another way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
 
-    1. Look into the *.ebuild* file.
-    2. <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*</s>.
+    - Look into the *.ebuild* file.
+    - <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*</s>.
 
         *texmfind* is almost dead since 2010, which results in outdated information.
-    3. Google.
+    - Google.
 
     For example, if need *biblatex* (different from *bibtex*) support:
 
@@ -31,7 +31,7 @@ title: TeXLive in Gentoo
     # emerge -av dev-tex/biblatex
     ```
 
-    *dev-tex/biblatex* is marked as *unstable* in portage. It is *not* pulled in `extra` USE flag. However, *dev-tex/latex-beamer* (a more advanced bibliography *TeX* package)is pulled in by *app-text/texlive*.
+    *dev-tex/biblatex* is marked as *unstable* in portage. It is *not* pulled in `extra` USE flag. However, *dev-tex/latex-beamer* (a more advanced bibliography *TeX* package)is included in *app-text/texlive*. So we don't need to install *biblatex* if good at *beamer*.
 
     > There is a big difference between the two methods. The 1st won't add packages (pulled in by USE flag like `extra`) to *@world*, while the second do. The 2nd method implies that you *explicitly* installed that specific package. Details refer to [53. Configuration consistently](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
 2. Fonts name resolution
