@@ -383,8 +383,12 @@ passwd zachary
         1. # eix-sync
             1. For new portageq --version >=2.2.16, use `emaint sync` instead of `emerge --sync`.
         2. # emerge -avtuDN --with-bdeps=y @world
-        3. # emerge -av --depclean
-            1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
+        6. [optional] # dispatch-conf, if prompted, you just need to input `u`.
+
+            This command will help update files in `/etc/portage` when needed as well. I would like to separate per-package settings by filenames. Simply input `u` will merge several package settings together, which is undesirable. Hence, first check the updates by `diff` the `._cfg*` in corresponding directory. And then rename `._cfg*` to relevant package name.
+        3. # perl-cleaner --all
+
+            If *perl* issues still occurs, replace *--all* with *--reallyall*.
         4. # [optional] revdep-rebuild -pv
             1. # revdep-rebuild -v
             2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
@@ -401,9 +405,8 @@ passwd zachary
                 Use emerge @preserved-rebuild to rebuild packages using these libraries
                 ```
             4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
-        6. [optional] # dispatch-conf, if prompted, you just need to input `u`.
-
-            This command will help update files in `/etc/portage` when needed as well. I would like to separate per-package settings by filenames. Simply input `u` will merge several package settings together, which is undesirable. Hence, first check the updates by `diff` the `._cfg*` in corresponding directory. And then rename `._cfg*` to relevant package name.
+        3. # emerge -av --depclean
+            1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
     1. Boot with LiveDVD
