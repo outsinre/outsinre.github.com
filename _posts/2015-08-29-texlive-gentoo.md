@@ -31,11 +31,13 @@ title: TeXLive in Gentoo
     # emerge -av dev-tex/biblatex
     ```
 
-    *dev-tex/biblatex* is marked as *testing* in portage. It is *not* pulled in `extra` USE flag. Usually, 'biblatex' package use 'biber' as te *default* backend. You could change it to 'bibtex' in your *TeX* source. Or if you insist on 'biber' backend:
+    *dev-tex/biblatex* is marked as *testing* in portage. It is *not* inlcuded in *TeXLive*. Since verion over *2.0*, 'biblatex' package use 'biber' as te *default* backend. You could change it to 'bibtex' in your *TeX* source. Or if you insist on 'biber' backend:
 
     ```bash
     # emerge -av dev-tex/biber
     ```
+
+    For more on *bibliography* thing, read [bibtex-vs-biber-and-biblatex-vs-natbib](http://tex.stackexchange.com/a/25702).
 
     > There is a big difference between the two methods. The 1st won't add packages (pulled in by USE flag like `extra`) to *@world*, while the second do. The 2nd method implies that you *explicitly* installed that specific package. Details refer to [53. Configuration consistently](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
 2. Fonts name resolution
