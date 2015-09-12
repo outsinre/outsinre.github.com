@@ -129,6 +129,7 @@ With LVM over LUKS you need only one key/password to unlock all the partitions (
 If you're going to simply dump everything on a single partition (which is totaly fine with some setups), there is no point in going for LVM. However, if you want to have several volumes, LVM will make it more convenient and easier to use, and this is why many people go after 'LVM over LUKS'.
 
 Refer to:
+
 1. [luks without lvm](https://forums.gentoo.org/viewtopic-t-1028630.html)
 2. [LUKS over LVM or LVM over LUKS](https://forums.gentoo.org/viewtopic-t-1028448-highlight-.html)
 3. [dm-crypt/Encrypting an entire system](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system)
