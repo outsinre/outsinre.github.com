@@ -27,9 +27,9 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
     It reminds accepting PUEL licence.
 
     Refer to [VirtualBox wiki](https://wiki.gentoo.org/wiki/VirtualBox).
-4. \# gpasswd -a <user> vboxusers
+4. \# gpasswd -a username vboxusers
 
-    Add current user to *vboxusers* group.
+    Add current *username* to *vboxusers* group.
 
     Logout and re-login to have this command take effect.
 5. \# modprobe vboxdrv

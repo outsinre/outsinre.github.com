@@ -2,7 +2,6 @@
 layout: post
 title: TeXLive in Gentoo
 ---
-
 1. Installation
 
     ```
