@@ -22,8 +22,8 @@ title: Gentoo Installation
     2. Use shortcut `F12` to Open/Retract Yakuake terminal in KDE destop.
     3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
-4. # sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
-5. # `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+4. \# sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
+5. \# `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
     1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
 
         Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
@@ -241,7 +241,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     ```
 This needs modified in the steps later on.
 29. Set hostname.
-    1. # nano -w /etc/conf.d/hostname
+    1. \# nano -w /etc/conf.d/hostname
 
         > hostname="zhtux"
 30. Configuring the network.
@@ -571,7 +571,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     4. emacs:
         1. # echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
         2. # emerge -av emacs
-        3. # emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
+        3. \# emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
 
             Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
 
@@ -653,7 +653,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         2. \# eix-sync
     14. Archive
         1. # emerge -av file-roller
-        2. # emerge -av thunar-archive-plugin
+        2. \# emerge -av thunar-archive-plugin
 
             Steps below might be deprecated depending on related package version
 
@@ -661,10 +661,10 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
             2. # cd /usr/libexec/thunar-archive-plugin/
             3. # ln -s file-roller.tap org.gnome.FileRoller.tap
             4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
-        3. # echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
+        3. \# echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
             1. 使用 “natspec” USE Flag重新编译unzip（zip文件中没有保存压缩时使用的编码，故需将unzip打上编码探测的补丁）
-        4. # [optionl, 7zip can extract zip format] emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
-        5. # emerge -av p7zip, three commands `7z`, `7za` and `7zr` can be used to extract files.
+        4. [optionl, 7zip can extract zip format] # emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
+        5. \# emerge -av p7zip, three commands `7z`, `7za` and `7zr` can be used to extract files.
             1. If `p7zip` is installed, `file-roller` takes `7z` or `7za` to handle `zip` file which cannot handle Chinese filenames.
             2. Solution: rename `/usr/bin/7z` and `/usr/bin/7za` to something else. 若需要安装p7zip，则安装完成后，移除或重命名/usr/bin下除7zr外7z*文件（fileroller在7z或者7za存在的情况下会优先使用。而7z和7za解压zip文件会出现文件名乱码，暂不知如何解决。故删除7z和7za，仅保留7zr以支持7z格式的压缩和解压。)
         6. Use `7z` format instead of `zip` since `7z` support unicode compression especially for filenames.
