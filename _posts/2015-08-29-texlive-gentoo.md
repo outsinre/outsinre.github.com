@@ -8,7 +8,6 @@ title: TeXLive in Gentoo
     # echo "app-text/texlive cjk xetex linguas_zh" > /etc/portage/package.use/texlive
     # emerge -av app-text/texlive
     ```
-
     1. `cjk` USE draws in *xeCJK* support which is tedious to use while compiling Chinese *TeX* documents.
     2. `xetex` can make use of system fonts. We don't need to care too much about Chinese fonts setting in *TeX* documents as long as those fonts configured in system.
     3. `linguas_zh` draws in *ctex* macro package which is based on *xeCJK* macro package.
@@ -17,11 +16,10 @@ title: TeXLive in Gentoo
 2. USE flags like *extra* usually draws in many packages many of which is not necessary.
 
     For instalce, I add *extra* to contain *texlive-bibtexextra*. However many other packages were installed as well, like *texlive-fontsextra*, *chktex* etc which might be never used. So another way, is to just emerge the specific package needed. Sometimes, to find out which package offers the wanted function, we need,
-
     - Look into the *.ebuild* file.
     - <s># `emerge -av dev-tex/texmfind`. Locate the ebuild providing a certain texmf file through regexp. `texmfind bbm.sty` will return *dev-texlive/texlive-fontsextra*</s>.
 
-        *texmfind* is almost dead since 2010, which results in outdated information.
+        *texmfind* is almost dead since 2010, resulting in outdated information.
     - Google.
 
     For example, if need *biblatex* (an advance version of *bibtex*) support:
