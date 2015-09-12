@@ -201,7 +201,7 @@ emacsclient -c -a "" "$@"
 mousepad就显得有些多余了.由于emacs的启动速度问题解决了,mousepad就基本推出历史舞台了.
 
 ## 安装Auctex
-在emacs启动后，M-x: package-list-packages，会启动emacs自带的插件管理器。找到*auctex*，按下*u*键，标记为安装。
+在emacs启动后，M-x: package-list-packages，会启动emacs自带的插件管理器。找到*auctex*，按下*i*标记为安装，再按*x*，开始安装。
 
 具体有哪些基本按键，参考[How to Install Packages Using ELPA, MELPA, Marmalade](http://ergoemacs.org/emacs/emacs_package_system.html)页面。
 

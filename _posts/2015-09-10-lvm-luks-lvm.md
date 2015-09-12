@@ -32,6 +32,7 @@ title: LVM over LUKS over LVM
     ```
     EFI partition should be set 'boot' flag.
 2. mkfs.vfat -F32 /dev/sdc1
+3. USB shared partition is not encrypted. If you put the shared partition within the LVM-LUKS-LVM architecture, then you need add LUKS support to grub2.
 
 # key-file
 
@@ -109,13 +110,28 @@ We don't create filesystem 'ext4' on sda7 or sda8 directly since they are treate
 
 # Why 2nd LVM container?
 
-Actually, up to now, we can install Gentoo on this decrypted device directly by creating necessary mount points /, /home etc. But why need another container?
+This question can be narrowed down to: why need LVM over LUKS?
 
-If we install Gentoo directly on LUKS container (create /, /home etc. on cryptroot) and after a few months, we need to re-install Gentoo or replace Gentoo with Arch. What will happen? 
+    A decrypted LUKS device like /dev/mapper/cryptroot can only be treated as a partition instead of a disk (i.e. /dev/sda). So command like 'parted -a optimal /dev/mapper/cryptroot' is NOT allowed.
 
-We have to ?
+1. If I want to use only part of /dev/mapper/cryptroot storage for Gentoo, while leaving the remaining space for other usage like NTFS data or even another Arch Linux.
+2. If I want to separate /home, /usr, /tmp etc. mount points.
 
-we can easily remove gentoo and its partitions; re-install other system on top 2nd LVM container.
+Actually, up to now, we can install Gentoo on this decrypted LUKS partition directly (single partition Gentoo; /home, /swap etc are just normal directories).
+
+    mkfs -t ext4 /dev/mapper/cryptroot
+    mount -t ext4 /dev/mapper/cryptroot /mnt/gentoo
+
+Afterwards, we can also re-format /dev/mapper/cryptroot for other usage like re-installing Gentoo.
+
+With LVM over LUKS you need only one key/password to unlock all the partitions (LVM volumes); and you can rearrange, resize etc. the partitions without the hassle of re-encrypt everything again. For example, you want to extend / size while reduce /home size.
+
+If you're going to simply dump everything on a single partition (which is totaly fine with some setups), there is no point in going for LVM. However, if you want to have several volumes, LVM will make it more convenient and easier to use, and this is why many people go after 'LVM over LUKS'.
+
+Refer to:
+1. [luks without lvm](https://forums.gentoo.org/viewtopic-t-1028630.html)
+2. [LUKS over LVM or LVM over LUKS](https://forums.gentoo.org/viewtopic-t-1028448-highlight-.html)
+3. [dm-crypt/Encrypting an entire system](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system)
 
 # 2nd LVM container
 
@@ -199,11 +215,11 @@ Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo ov
 ## grub2
 
 1. grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part_gpt /dev/sdc
-
     - '--bootloader-id=grub2' and '/dev/sdc' (USB stick) might be optional.
     - '--efi-directory' specifies the mountpoint of the ESP. It replaces '--root-directory' which is deprecated.
+
     Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://forums.gentoo.org/viewtopic-p-7011836.html) and [grub2 zh-CN](https://wiki.gentoo.org/wiki/GRUB2/zh-CN).
-3. Kernel and init arguments '/etc/default/grub'
+2. Kernel and init arguments '/etc/default/grub'
 
     ```
 GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/dev/mapper/cryptvg-root rootfstype=ext4 root_keydev=UUID='uuid of boot and EFI shared partition' root_key=/relative/path/to/luks-gnupg-key-file"
@@ -216,9 +232,10 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
     6. root_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
     7. You can use device file name or use UUID instead for those arguments. It's free choince.
     8. The 2nd reference adds a parameter 'target=cryptroot' whose usage is unclear. Don't try this if not sure.
-4. grub2-mkconfig -o /boot/grub/grub.cfg
+3. grub2-mkconfig -o /boot/grub/grub.cfg
 
     In chroot, grub2-mkconfig failed to probe (by calling os-prober) Windows on HDD. When getting into Gentoo, execute it again to make up.
+4. In our scheme, boot and EFI shared partition is not encrypted. If it is encrypted by LUKS too, we need more configurations. Read [grub2 advanced storage](https://wiki.gentoo.org/wiki/GRUB2/AdvancedStorage).
 
 # Get out of chroot
 
@@ -238,6 +255,7 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
 
 1. http://www.ms.unimelb.edu.au/~trice/linux/tricks/luksresize/
 2. http://manual.aptosid.com/en/hd-install-crypt-en.htm
+3. [dm-crypt/Encrypting an entire system](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system)
 
 # Notes
 1. deselect=y notifyd? what is the point? weechat
