@@ -61,7 +61,7 @@ Use `git config --global core.xxx` to show the corresponding value. If you have 
     core.autocrlf=false # don't do CRLF to LF conversion when writing to repository database
     core.eol=native     # do LF to system native EOL style when writing to working tree
 
-Though `core.eol=native` is the default setting by Git, but if `.gitattributes` and `core.autocrlf` are not set, `core.eol=native` does nothing. It is a relatively passive parameter that come into effect only when the file line ending is normlized when writing to repository.
+Though `core.eol=native` is the default setting by Git, but if `.gitattributes` or `core.autocrlf` are not set, `core.eol=native` does nothing. It is a relatively passive parameter that come into effect only when the file line ending is normlized when writing to repository.
 
 `global config` is for corse-grained control on line ending control, especially when no specific patterns for a file type can be found in `.gitattributes` file. The exact definition of the parameter is detailed in references.
 

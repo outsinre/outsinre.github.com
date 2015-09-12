@@ -23,10 +23,11 @@ title: Gentoo Installation
     3. Default user and password are both *gentoo*. Use `sudo su -` command to switch to `root`. You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. # sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
-5. \# `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
+5. # `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
     1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
 
         Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
+    ```bash
     1. \# parted -a optimal /dev/sda
     2. (parted) p
     3. (parted) unit MiB
@@ -39,7 +40,9 @@ title: Gentoo Installation
     8. (parted) p
     9. (parted) name 12 'Gentoo root partition'
     10. (parted) p
-    11. The annoying thing is that the partition `Type` is `Basic data partition` when checking with `fdisk /dev/sda`. We can change it by Disk GUI application in Ubuntu.
+    11. (parted) q
+    ```
+    The annoying thing is that the partition `Type` is `Basic data partition` when checking with `fdisk /dev/sda`. We can change it by Disk GUI application in Ubuntu.
 6. New `/dev/sda10` will be the boot partition while `/dev/sda12` the root partition. We don't need to create `swap` or `efi` partition since we already created it when installing Ubuntu or Windows. Just share these two partitions. If possible, you can also create a separate home partition.
 7. Up to now, only the boot and root partition is prepared. We share swap and EFI partitions with Ubuntu and Windows. Now format the new partition. It's better to format boot partition as `ext2`.
     1. # mkfs.ext2 /dev/sda10
@@ -113,7 +116,6 @@ Append these flags into `make.conf` file. Actually, only `-qt3 -qt4 -qt5` and `t
     1. # eselect locale list
     2. # eselect locale set 3, set system-wdie locale to `en_US.utf8`.
     2. The following steps can also be done after entering the new Gentoo system.
-    2. # emerge -av wqy-bitmapfont corefonts
     3. \# nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
 
         ```
@@ -218,28 +220,30 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
     If this is not first time to make, then execute `make clean` first.
 
-    1. # make
+    1. # make -j5
     2. # make modules_install
     2. # make install, this will copy the kernel image into /boot/ together with the System.map file and the kernel configuration file.
         1. Actually you can use a copy command instead.
     3. [deprecated] <s># mkdir -p /boot/efi/boot</s>
     4. [deprecated] <s># cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
     5. # emerge -av genkernel
-    6. # genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs: # ls /boot/initramfs*.
+    6. # genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs.
+    7. # ls /boot/initramfs*
 27. Kernel modules loading. Refer to handbook.
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
     1. # emerge --ask sys-kernel/linux-firmware
 28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template. Use backup fstab file is possible.
 
     ```
-    /dev/sda10   /boot        ext2    defaults,noatime     1 2
-    /dev/sda12   /		  ext4    noatime	       0 1
-    /dev/sda7    none	  swap	  sw		       0 0
+    /dev/sda10   /boot		ext2    defaults,noatime	1 2
+    /dev/sda12   /		ext4    noatime	       0 1
+    /dev/sda7    none	  	swap	sw	       0 0
     ```
 This needs modified in the steps later on.
 29. Set hostname.
     1. # nano -w /etc/conf.d/hostname
-    2. set hostname="zhtux"
+
+        > hostname="zhtux"
 30. Configuring the network.
     1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
     2. # emerge --ask net-misc/dhcpcd
@@ -355,21 +359,22 @@ menuentry "Microsoft Windows 8.1 x86_64" {
 40. Generate GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
 32. Edit `/etc/conf.d/hwclock` to set the clock options.
-    1. set `clock=local`, this is important when dual boot with Windows.
+
+    Set `clock=local`, this is important when dual boot with Windows.
 23. Set the timezone.
     1. I think this step should occur after `hwclock` thing. Otherwise the system time is usually ahead of locale time by 8 hours, thus resulting in portage tree time stamp issues. If possible, I recommend to leave the above two steps immediately before system reboot.
     1. # ls /usr/share/zoneinfo
-    2. # echo "Asia/Hong_Kong" > /etc/timezone
+    2. # echo "Asia/Shanghai" > /etc/timezone
     3. # emerge --config sys-libs/timezone-data
     4. Check with `date` command.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
 
     ```
 exit
-umount -l /mnt/gentoo/dev{/shm,/pts,}
-umount /mnt/gentoo/boot/efi
-umount /mnt/gentoo/boot
-umount /mnt/gentoo
+umount -lv /mnt/gentoo/home
+umount -lv /mnt/gentoo/boot{/efi,}
+umount -lv /mnt/gentoo/dev{/shm,/pts,}
+umount -lv /mnt/gentoo{/proc,/sys,}
     ```
 You may reminded that `/mnt/gentoo` is busy, then you need to exit the current terminal, and opening a new one terminal will work. Just let it go. Then type in that one magical command that initiates the final, true test: `reboot` with your root account.
     1. When rebooting, if the LiveDVD usb stick is still plugged onto the computer, the chainload to Ubuntu grub does not work. It show _error: disk hd0,gpt2 not found_. This is because the grub2 treats the USB stick as _hd0_ while the hard disk as _hd1_. You can unplug the USB, and CTRL+ALT+DEL. Another way is to edit the Ubuntu grub2 chainlaod menu from _hd0_ to _hd1_, then press F10 to boot.
@@ -386,10 +391,10 @@ passwd zachary
         6. [optional] # dispatch-conf, if prompted, you just need to input `u`.
 
             This command will help update files in `/etc/portage` when needed as well. I would like to separate per-package settings by filenames. Simply input `u` will merge several package settings together, which is undesirable. Hence, first check the updates by `diff` the `._cfg*` in corresponding directory. And then rename `._cfg*` to relevant package name.
-        3. # perl-cleaner --all
+        3. \# perl-cleaner --all
 
             If *perl* issues still occurs, replace *--all* with *--reallyall*.
-        4. # [optional] revdep-rebuild -pv
+        4. [optional] # revdep-rebuild -pv
             1. # revdep-rebuild -v
             2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
         5. [optional] # emerge @preserved-rebuild, if prompted.
@@ -405,7 +410,7 @@ passwd zachary
                 Use emerge @preserved-rebuild to rebuild packages using these libraries
                 ```
             4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
-        3. # emerge -av --depclean
+        3. \# emerge -av --depclean
             1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
@@ -454,11 +459,11 @@ VIDEO_CARDS="intel"
         1. Remember to run `env-update && source /etc/profile` to update environment.</s>
         2. This is not a good scheme to set *XSESSION* for all users on the system.
     7. Installation finished. Now reboot and loggin with the regular account to configure xfce.
-    8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
     9. _$_ echo "exec startxfce4 --with-ck-launch" > ~/.xinitrc
         1. At first try, the `logout`, `shutdown` buttons are greyed out. Since those buttons are related to `consolekit`, check the `consolekit` and `dbus` wiki.
         2. Make sure `consolekit` is added to default run level. `consolekit` depends on `dbus`, so `dbus` no need added to default run level. Run `rc-status` with normal user account, you will see dbus is under `Dynamic Runlevel`
         3. After a system update, the issue is solved automatically.
+    8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
     10. # rc-update add consolekit default
     12. You'd better logout and then login again to test xfce: _$_ startx.
 
@@ -512,7 +517,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 45. ALSA - sound.
     1. # emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
-    2. # rc-update add alsasound boot
+    2. [optional] # rc-update add alsasound boot
     3. # speaker-test -t wav -c 2, test the speaker.
 45. Applications:
     1. Web browser: Firefox. It will take over 6 hours compiling.
@@ -526,14 +531,22 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 		
             ```
-export GTK_IM_MODULE=fcitx
-export QT_IM_MODULE=xim
-export XMODIFIERS=@im=fcitx
+            export GTK_IM_MODULE=fcitx
+            export QT_IM_MODULE=xim
+            export XMODIFIERS=@im=fcitx
             ```
         But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
         3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
-        4. \# emerge -av fcitx-googlepinyin
-        5. \# emerge -av fcitx-configtool
+        4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
+    18. ffmpeg
+
+        `ffmpeg` is emerged by some other packages, one of which might be `mplayer`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
+
+        In order to add support `v4l`, update `package.use/ffmpeg` for USE flags `v4l` and `libv4l`.
+
+        ```
+        # emerge -av ffmpeg
+        ```
     3. \# emerge -av mplayer
     4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features). Then emerge plugins on demand.
 
@@ -558,21 +571,24 @@ export XMODIFIERS=@im=fcitx
     4. emacs:
         1. # echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
         2. # emerge -av emacs
-        3. Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
+        3. # emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
+
+            Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
 
             ```
-    if use X; then
-        elog "You need to install some fonts for Emacs."
-        elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
-        elog "machine would satisfy basic Emacs requirements under X11."
-        elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
-        elog "for how to enable anti-aliased fonts."
-        elog
-    fi
+            if use X; then
+                elog "You need to install some fonts for Emacs."
+                elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
+                elog "machine would satisfy basic Emacs requirements under X11."
+                elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
+                elog "for how to enable anti-aliased fonts."
+                elog
+            fi
             ```
-	4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://www.fangxiang.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration]9http://www.fangxiang.tk/2014/07/12/emacs-configuration/).
+    4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://www.fangxiang.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration]9http://www.fangxiang.tk/2014/07/12/emacs-configuration/).
     5. \# emerge -av www-plugins/adobe-flash
-        1. Pay attention to update `package.license` file when needed.
+
+        Pay attention to update `package.license` file when needed.
     6. WPS office.
         1. overlay support
             1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
@@ -598,7 +614,8 @@ export XMODIFIERS=@im=fcitx
 	    6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
     7. \# emerge --ask xfce4-mixer
     8. \# emerge -av mupdf
-        1. The other PDF viewer may draw in a lot of GTK or QT dependencies consuming many disk space.
+
+        The other PDF viewer may draw in a lot of GTK or QT dependencies consuming many disk space.
     9. \# emerge -av dev-vcs/git
         1. _$_ git config --global user.name "Jim Green"
         2. _$_ git config --global user.email "username@users.noreply.github.com"
@@ -608,7 +625,7 @@ export XMODIFIERS=@im=fcitx
 
         Refer to [git config](http://www.fangxiang.tk/2015/07/19/git-config/).
     10. \# emerge -av wgetpaste
-    11. \# emerge -av net-misc/dropbox xfce-extra/thunar-dropbox
+    11. \# emerge -av net-misc/dropbox [optional] xfce-extra/thunar-dropbox
         1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
         2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
             1. This can be overcome by setting the dropbox language to `english`.
@@ -637,7 +654,9 @@ export XMODIFIERS=@im=fcitx
     14. Archive
         1. # emerge -av file-roller
         2. # emerge -av thunar-archive-plugin
-            1. [steps below might be deprecated depending on related package version]
+
+            Steps below might be deprecated depending on related package version
+
             1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
             2. # cd /usr/libexec/thunar-archive-plugin/
             3. # ln -s file-roller.tap org.gnome.FileRoller.tap
@@ -663,15 +682,6 @@ export XMODIFIERS=@im=fcitx
  
             Bingo! This is due to the author did not test this package under Gentoo. So he did not incur the `gst-plugins-mad` dependcy specially for Gentoo. We need to install by ourself.
         3. The default configuration/log is located in `~/.config/kuwo/` and downloaded files are under `~/.cache/kuwo/`. Change the `song` and `mv` directories to `~/Music/Songs` and `~/Music/MVs` through GUI preferences menu. We cannot change the lyrics `lrc` location.
-    18. ffmpeg
-
-        `ffmpeg` is emerged by some other packages, one of which might be `mplayer`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
-
-        In order to add support `v4l`, update `package.use/ffmpeg` for USE flags `v4l` and `libv4l`.
-
-        ```
-# emerge -av ffmpeg
-        ```
     19. bluetooth - bluez obexfs
 
         **Apple iOS does NOT support Obex protocol**. So don't test this part with your iphone.
@@ -740,14 +750,6 @@ thunar $HOME/Bluetooth
             3. $ bluetoothctl OR blueman-applet OR by Bluetooth manager from App menu as a normal user account.
         7. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist/install*.
         8. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537).
-    21. Cryptsetup
-
-        Refer to [emerge thin-provisioning-tools-0.3.2-r1 emake failed](https://forums.gentoo.org/viewtopic-p-7784696.html?sid=2ff5b172ba08f06dccc602ecfc4ac164) and [bug 540190](https://bugs.gentoo.org/show_bug.cgi?id=540190). *sys-fs/cryptsetup* depends on *sys-block/thin-provisioning-tools-0.3.2-r1*. However version *0.3.2-r1* has an issue as the bug depicted. Use version *~0.4.1* instead.
-
-        ```
-        # echo "=sys-block/thin-provisioning-tools-0.4.1 ~amd64" > /etc/portage/package.accept_keywords/cryptsetup
-        # emerge -av sys-fs/cryptsetup
-        ```
     22. TeXLive-2014
 
         Refer to [texlive gentoo](http://www.fangxiang.tk/2015/08/29/texlive-gentoo/).

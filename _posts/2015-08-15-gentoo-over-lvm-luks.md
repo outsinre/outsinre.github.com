@@ -353,6 +353,7 @@ UUID="aaa-bbb-ccc-ddd..."	/boot	ext2	noauto,noatime	1 2
     ```
     This should be the 1st thing after entering *chroot*.
 # Reference
+
 1. http://ceyes.github.io/2015-06/Gentoo-Setup-LVM-over-LUKS/
 1. https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Preparing_the_LUKS-LVM_Filesystem_and_Boot_USB_Key
 1. http://www.gentoo-wiki.info/SECURITY_System_Encryption_DM-Crypt_with_LUKS

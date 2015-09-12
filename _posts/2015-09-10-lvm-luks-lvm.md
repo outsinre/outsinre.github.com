@@ -112,7 +112,7 @@ We don't create filesystem 'ext4' on sda7 or sda8 directly since they are treate
 
 This question can be narrowed down to: why need LVM over LUKS?
 
-    A decrypted LUKS device like /dev/mapper/cryptroot can only be treated as a partition instead of a disk (i.e. /dev/sda). So command like 'parted -a optimal /dev/mapper/cryptroot' is NOT allowed.
+    A decrypted LUKS device like /dev/mapper/cryptroot can only be treated as a partition instead of a disk (i.e. /dev/sda). So command like 'parted -a optimal /dev/mapper/cryptroot' is NOT allowed. Actually you notice that LVM also operates on partitions only. We don't execute 'pvcreate /dev/sda'.
 
 1. If I want to use only part of /dev/mapper/cryptroot storage for Gentoo, while leaving the remaining space for other usage like NTFS data or even another Arch Linux.
 2. If I want to separate /home, /usr, /tmp etc. mount points.
