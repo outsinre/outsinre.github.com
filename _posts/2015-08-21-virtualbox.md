@@ -159,9 +159,8 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         	   ;;
             esac
         ```
-	
-        Pay attention `PS3` and `case` *bash* usage.	
-13. Refs:
+        Pay attention `PS3` and `case` *bash* usage.
+13. References
     1. https://wiki.gentoo.org/wiki/VirtualBox#Configuration
     2. http://baige5117.github.io/blog/install_virtualbox_in_gentoo.html
     3. https://github.com/rustymyers/scripts/blob/master/shell/createVBoxVM.sh
