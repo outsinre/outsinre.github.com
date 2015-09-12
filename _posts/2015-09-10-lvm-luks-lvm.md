@@ -158,18 +158,16 @@ we can easily remove gentoo and its partitions; re-install other system on top 2
 
 # Chroot
 
-1. vgchange -a y [vg]
+```
+vgchange -a y [vg], for '-a y', VG name can be ommited.
+cryptsetup luksOpen /dev/mapper/vg-crypt cryptroot, you could use key-file to decrypt vg-crypt as well.
+vgchange -a y [vgcryptvg]
+mount -v -t ext4 /dev/mapper/cryptvg-root /mnt/gentoo
+mount -v -t ext4 /dev/mapper/cryptvg-home /mnt/gentoo/home
+mount -v -t vfat /dev/sdc1 /mnt/gentoo/boot
+```
+If you return to LiveCD and try to chroot again, please execute the above six commands first. Otherwise, follow steps below.
 
-    For '-a y', VG name can be ommited.
-1. cryptsetup luksOpen /dev/mapper/vg-crypt cryptroot
-
-    You could use key-file to decrypt vg-crypt as well.
-1. vgchange -a y [vgcryptvg]
-1. mount -v -t ext4 /dev/mapper/cryptvg-root /mnt/gentoo
-1. mount -v -t ext4 /dev/mapper/cryptvg-home /mnt/gentoo/home
-1. mount -v -t vfat /dev/sdc1 /mnt/gentoo/boot
-
-    If you return to LiveCD and try to chroot again, please execute the above six commands first. Otherwise, follow steps below.
 1. cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
 2. mount -v -t proc proc /mnt/gentoo/proc2
 3. mount -v --rbind /sys /mnt/gentoo/sys
@@ -181,7 +179,7 @@ we can easily remove gentoo and its partitions; re-install other system on top 2
 
 # Installation
 
-    Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo over lvm luks](2015-08-15-gentoo-over-lvm-luks.md).
+Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo over lvm luks](2015-08-15-gentoo-over-lvm-luks.md).
 
 1. Try to restore some config backup files like 'make.conf', 'fstab', 'wpa_supplicant.conf', '.bashrc' 'repos.conf/{gentoo.conf, layman.conf, local.conf} etc.
 2. Of the most important, the fundamental difference is 'grub2' and 'genkernel initramfs'.
@@ -203,9 +201,8 @@ we can easily remove gentoo and its partitions; re-install other system on top 2
 1. grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part_gpt /dev/sdc
 
     - '--bootloader-id=grub2' and '/dev/sdc' (USB stick) might be optional.
-    - '--efi-directory' specifies the mountpoint of the ESP. It replaces '--root-directory' which is deprecated. 
-    1. https://forums.gentoo.org/viewtopic-p-7011836.html
-    2. https://wiki.gentoo.org/wiki/GRUB2/zh-CN
+    - '--efi-directory' specifies the mountpoint of the ESP. It replaces '--root-directory' which is deprecated.
+    Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://forums.gentoo.org/viewtopic-p-7011836.html) and [grub2 zh-CN](https://wiki.gentoo.org/wiki/GRUB2/zh-CN).
 3. Kernel and init arguments '/etc/default/grub'
 
     ```
