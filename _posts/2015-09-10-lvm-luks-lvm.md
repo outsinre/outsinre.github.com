@@ -218,7 +218,7 @@ Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo ov
 
 ## grub2
 
-1. grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part_gpt /dev/sdc
+1. grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part\_gpt /dev/sdc
     - '--bootloader-id=grub2' and '/dev/sdc' (USB stick) might be optional.
     - '--efi-directory' specifies the mountpoint of the ESP. It replaces '--root-directory' which is deprecated.
 
@@ -231,9 +231,9 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
     1. crypt_root: the UUID of the partition which is encrypted by DM-crypt LUKS. In our case, this is LVM volume /dev/mapper/vg-crypt or /dev/vg/crypt.
     2. dolvm: activate LVM volumes on bootup. This needs support from LVM support in initramfs.
     3. root: the real / mount point for Gentoo. In our case, it is /dev/mapper/cryptvg-root or /dev/cryptvg/root.
-    4. rootfsype: Gentoo root filesystem.
+    4. rootfstype: Gentoo root filesystem.
     5. root_keydev: the device where DM-crypt LUKS key-file is stored. In our case, it is boot and EFI partition on USB stick.
-    6. root_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
+    6. root\_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
     7. You can use device file name or use UUID instead for those arguments. It's free choince.
     8. The 2nd reference adds a parameter 'target=cryptroot' whose usage is unclear. Don't try this if not sure.
 3. grub2-mkconfig -o /boot/grub/grub.cfg
