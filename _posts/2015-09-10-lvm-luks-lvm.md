@@ -255,6 +255,19 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
 7. vgchange -a n vg
 8. reboot
 
+# boot & EFI image backup
+
+1. dd if=/dev/sdc1 | xz > boot-image-backup.xz, backup of boot and EFI shared partition
+2. xzcat image-file.xz | dd of=/dev/sdc1, restore from backup
+
+# Hide under Windows
+
+In previous step, we create a shared partition /dev/sdc1 formated as FAT32. However, what if this USB is inserted into Windows? Enverything in /dev/sdc1 will be exposed as normal USB stick, the luks-gnupg-key included. So, we will create a new partition /dev/sdc2 just after /dev/sdc1.
+
+Please note that windows WILL NOT SHOW BOTH PARTITIONS OF USB at the same time. One partition will be hidden and another will be visible. Technically, Windows allocates a drive letter to only single partition on a USB drive. However on linux operating system both partitions will be visible without any problem.
+
+Refer to [how-to-create-a-separate-hidden-boot-partition-on-usb/](https://tahirzia.wordpress.com/2012/11/20/how-to-create-a-separate-hidden-boot-partition-on-usb/).
+
 # References
 
 1. http://www.ms.unimelb.edu.au/~trice/linux/tricks/luksresize/
