@@ -260,6 +260,17 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
 1. dd if=/dev/sdc1 | xz > boot-image-backup.xz, backup of boot and EFI shared partition
 2. xzcat image-file.xz | dd of=/dev/sdc1, restore from backup
 
+# Operations to USB sdc1
+
+From the installation process, we find for sdc1, we only:
+
+1. Copy the LUKS key there;
+2. grub2-install command;
+3. grub2-mkconfig;
+4. Mount sdc1 as /boot in /etc/fstab
+
+If data ruined in sdc1 or anything else undesirable happend, just repeat step 1-4 as long as LUKS key-file or fall-back passphrase exist.
+
 # Hide in  Windows
 
 The current USB is 1 GiB in size which only part of is needed for boot and EFI. So we could make use of the remaining around 750MiB for usual USB data storage.
@@ -285,7 +296,7 @@ Number  Start   End     Size   File system  Name             Flags
 
 At real practice, you'd best not use sdc1 for data storage just in case for operation mistake to ruin sdc2.
 
-Refer to [how-to-create-a-separate-hidden-boot-partition-on-usb/](https://tahirzia.wordpress.com/2012/11/20/how-to-create-a-separate-hidden-boot-partition-on-usb/).
+Refer to [how-to-create-a-separate-hidden-boot-partition-on-usb/](https://tahirzia.wordpress.com/2012/11/20/how-to-create-a-separate-hidden-boot-partition-on-usb/) and [hide from windows](https://forums.gentoo.org/viewtopic-t-1028800.html).
 
 # References
 
