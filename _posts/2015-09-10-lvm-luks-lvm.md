@@ -112,10 +112,11 @@ We don't create filesystem 'ext4' on sda7 or sda8 directly since they are treate
 
 This question can be narrowed down to: why need LVM over LUKS?
 
-    A decrypted LUKS device like /dev/mapper/cryptroot can only be treated as a partition instead of a disk (i.e. /dev/sda). So command like 'parted -a optimal /dev/mapper/cryptroot' is NOT allowed. Actually you notice that LVM also operates on partitions only. We don't execute 'pvcreate /dev/sda'.
+    A decrypted LUKS device like /dev/mapper/cryptroot should'd better be treated as a partition instead of a disk (like /dev/sda). So command like 'parted -a optimal /dev/mapper/cryptroot' is NOT encouraged. It is complicated to make use of partitions created directly over LUKS device.
 
-1. If I want to use only part of /dev/mapper/cryptroot storage for Gentoo, while leaving the remaining space for other usage like NTFS data or even another Arch Linux.
-2. If I want to separate /home, /usr, /tmp etc. mount points.
+1. If I want to use only part of /dev/mapper/cryptroot storage for Gentoo, while leaving the remaining space for other usage like NTFS data or even another Arch Linux, use 2nd LVM.
+2. If I want to separate /home, /usr, /tmp etc. mount points, use 2nd LVM.
+3. etc.
 
 Actually, up to now, we can install Gentoo on this decrypted LUKS partition directly (single partition Gentoo; /home, /swap etc are just normal directories).
 
@@ -127,6 +128,8 @@ Afterwards, we can also re-format /dev/mapper/cryptroot for other usage like re-
 With LVM over LUKS you need only one key/password to unlock all the partitions (LVM volumes); and you can rearrange, resize etc. the partitions without the hassle of re-encrypt everything again. For example, you want to extend / size while reduce /home size.
 
 If you're going to simply dump everything on a single partition (which is totaly fine with some setups), there is no point in going for LVM. However, if you want to have several volumes, LVM will make it more convenient and easier to use, and this is why many people go after 'LVM over LUKS'.
+
+If you really don't like the 2nd LVM and still need separate partitions for /, /home, etc. Please lvcreate LVM volumes for them in the 1st LVM container. After that, cryptsetup them repsectively with LUKS key-files or passphrases.
 
 Refer to:
 
