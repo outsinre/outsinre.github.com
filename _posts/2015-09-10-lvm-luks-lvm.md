@@ -14,7 +14,7 @@ title: LVM over LUKS over LVM
     2. It should be mounted on /boot if necessary.
     3. Make a directory 'EFI' at root of the shared parition.
     4. The shared USB partition is not encrypted.
-    4. You'd better use the very first partition on USB stick as the shared partition. Previously, I use the 2nd partrition to share, Grub fails to load at the very beginning of boot, and then defaults to Windows.
+    5. You'd better use sdc2 for the shared partition to hide it from Windows. Deatils refer to *Hide in  Windows* next.
 8. Windows uses its own EFI partition on HDD, say sda2.
 9. Why now share boot and EFI on USB stick?
     1. A single USB can now help boot many PCs and notebooks, as long as their boot information is located on the USB stick.
@@ -260,11 +260,30 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
 1. dd if=/dev/sdc1 | xz > boot-image-backup.xz, backup of boot and EFI shared partition
 2. xzcat image-file.xz | dd of=/dev/sdc1, restore from backup
 
-# Hide under Windows
+# Hide in  Windows
 
-In previous step, we create a shared partition /dev/sdc1 formated as FAT32. However, what if this USB is inserted into Windows? Enverything in /dev/sdc1 will be exposed as normal USB stick, the luks-gnupg-key included. So, we will create a new partition /dev/sdc2 just after /dev/sdc1.
+The current USB is 1 GiB in size which only part of is needed for boot and EFI. So we could make use of the remaining around 750MiB for usual USB data storage.
 
-Please note that windows WILL NOT SHOW BOTH PARTITIONS OF USB at the same time. One partition will be hidden and another will be visible. Technically, Windows allocates a drive letter to only single partition on a USB drive. However on linux operating system both partitions will be visible without any problem.
+We create the shared partition /dev/sdc1 formated as FAT32. However, what if this USB is inserted into Windows? Enverything in /dev/sdc1 will be exposed as normal USB stick, the luks-gnupg-key included.
+
+Hence we would like to achieve:
+
+1. Make use of remaining 750MiB capacity.
+2. Hide the shared partition from Windows.
+
+For 1, we just need to create a new partition on the remaining free space. For 2, please note that windows WILL NOT SHOW BOTH PARTITIONS OF USB at the same time. One partition will be hidden and another will be visible. Technically, Windows allocates a drive letter to only single partition on a USB drive. However on linux operating system both partitions will be visible without any problem.
+
+So a better idea is to use sdc1 as the normal data storage partition, while sdc2 for the shared partition. It would be:
+
+```
+Number  Start   End     Size   File system  Name             Flags
+ 1      1049kB  752MB   751MB  ntfs         USB stick
+ 2      752MB   1002MB  251MB  fat32        Gentoo boot EFI  boot, esp
+```
+
+*sdc1 now is formated as ntfs*. If it was formated as mkfs.vfat (fat32), then UEFI firmware would NOT recognize sdc2 as the shared partition for system boot.
+
+At real practice, you'd best not use sdc1 for data storage just in case for operation mistake to ruin sdc2.
 
 Refer to [how-to-create-a-separate-hidden-boot-partition-on-usb/](https://tahirzia.wordpress.com/2012/11/20/how-to-create-a-separate-hidden-boot-partition-on-usb/).
 
