@@ -105,14 +105,17 @@ Refer to:
     It will draw in another two packages `fontconfig-infinality` and `eselect-infinality`. If not, emerge them manually.
 2. _#_ eselect fontconfig list, you will find a new option `52-infinality.conf` in the list.
     1. _#_ eselect fontconfig enable 52-infinality.conf
-    2. `fontconfig-infinality` will draw in its own settings which will interfere with the other fontconfig configuration; so need to disable all the other fontconfig options except `52-infinality.conf`.
+    2. `fontconfig-infinality` will draw in its own settings which will interfere with the other fontconfig configuration; so need to disable most of the other fontconfig options while keeping `52-infinality.conf`.
 
         Where is `infinality`'s own settings locates? Refer to `/etc/fonts/infinality`.
     3. _#_ eselect fontconfig disable xx yy zz ...
         1. [deprecated, not necessary at all] <s>I choose to **keep** `50-user.conf` (for per-user config files) instead of disabling.</s>
 
         Up to now, `eselect` has created two conf files under `/etc/fonts/conf.d`. Use `ls -l`, you will find them actually symbolic link referring to corresponding files under `/etc/fonts/conf.avail`. Please read the two conf files for an overview.
-    4. You will find `fontconfig` (`/etc/fonts/`) and `infinality` (`/etc/fonts/infinality/`) has the nearly the same directory architecture. The `conf.d` sub-directory stores the current font configuration files, while `conf.avail` (or `conf.src`) stores all the possible configuration files. All we need to to is to `eselect` a font portfolio which will choose and create symbolic links under `conf.d` sub-directory.
+
+        config related to fonts themself can be kept like: 62-croscore-*.conf and 57-dejavu-*.conf
+
+        You will find `fontconfig` (`/etc/fonts/`) and `infinality` (`/etc/fonts/infinality/`) has the nearly the same directory architecture. The `conf.d` sub-directory stores the current font configuration files, while `conf.avail` (or `conf.src`) stores all the possible configuration files. All we need to to is to `eselect` a font portfolio which will choose and create symbolic links under `conf.d` sub-directory.
     4. Refer to reference number 3, set `embeddedbitmap` in `/etc/fonts/infinality/infinality.conf` to `true`.
 3. _#_ eselect lcdfilter list
 4. _#_ eselect lcdfilter set 14, set to `windows-7`.
