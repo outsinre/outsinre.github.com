@@ -1028,7 +1028,9 @@ drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialize
 
         This patch is now maintained by *microncai*. It is included in the *e-sources* package. Search `gentoo e-sources` in *Google*, and get [/gentoo-zh/sys-kernel/e-sources](http://data.gpo.zugaina.org/gentoo-zh/sys-kernel/e-sources/).
 
-        We can get this patch from the *files/4.0/* sub-directory as [3.18.14-utf8.diff](/assets/3.18.14-utf8.diff). The current patch version `3.18.14` is at least compatible with kernels up to `4.1.3`.
+        We can get this patch from the *files/4.0/* sub-directory as [4.0.5-cjktty.patch](/assets/4.0.5-cjktty.patch). 
+
+        *If you cannot get the patch file, we can extract it manually [ git diff to get cjktty.patch](http://fangxiang.tk/2015/09/18/git/diff/patch).
     2. Check patch compatibility with `patch --dry-run` option.
 
         ```
