@@ -14,9 +14,9 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
     cd ~/workspace
     git clone --branch 3.19-utf8 --single-branch --deptch 4 https://github.com/Gentoo-zh/linux-cjktty.git
     ```
-    1. --branch: we only need branch 3.19-utf8. If not specified, git will clone all the branches, spending a day maybe depending on your network performance.
-    2. --single-branch: combined with --branch.
-    2. --depth: from the GitHub repository, we find the the top 3 commits are enough to extract our *cjktty.patch*. We only need to clone the top 4 commits. By only cloning the latest 4 commits, we save more time and network load.
+    1. *--branch*: we only need branch 3.19-utf8. If not specified, git will clone all the branches, spending a day maybe depending on your network performance.
+    2. *--single-branch*: combined with *--branch*.
+    2. *--depth*: from the GitHub repository, we find the the top 3 commits are enough to extract our *cjktty.patch*. We only need to clone the top 4 commits. By only cloning the latest 4 commits, we save more time and network load.
 4. git log
 
     ```
@@ -24,27 +24,27 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
     Author: microcai <microcai@fedoraproject.org>
     Date:   Thu Jan 13 05:18:45 2011 +0800
 
-	[vt] add cjk font that has 65536 chars
+        [vt] add cjk font that has 65536 chars
 
     commit 3dbe651a011ac6b6bbd976d96b5d08fb2baf709c
     Author: microcai <microcai@fedoraproject.org>
     Date:   Mon Feb 21 12:58:18 2011 +0800
 
-	[vt] diable setfont if we have cjk font in kernel
+        [vt] diable setfont if we have cjk font in kernel
 
     commit a2553800e3e8ea1d13f3e3a4211599a3268ce9a2
     Author: microcai <microcaicai@gmail.com>
     Date:   Fri Jan 9 12:45:07 2015 +0800
 
-	[vt] fix 255 glyph limit, prepare for CJK font support
+        [vt] fix 255 glyph limit, prepare for CJK font support
 
     commit d8cf08a565defc2f9810b9ecd33b1b3211b029e1
     Author: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
     Date:   Thu Mar 26 14:00:21 2015 +0100
 
-	Linux 3.19.3
+        Linux 3.19.3
     ```
-    From the output, we can see only 4 commits history are cloned. We will extract the patch from the top 3 ones that were committed by microcai.
+    From the output, we can see only 4 commits history are cloned. We will extract the patch from the top 3 commits authored by microcai.
 5. Extract the patch:
 
     ```bash
@@ -52,13 +52,14 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
     or
     git diff HEAD~3 -- > cjktty.patch
     or
-    git format-patch -3 HEAD --stdout > cjktty.
+    git format-patch -3 HEAD --stdout > cjktty.patch
     ```
     1. Pay attention to the order of commit ID (SHA1 hash). Put the earliest commit ID (4th) before the latest one (HEAD).
     2. HEAD~3 means extract patch from top to 3rd commits (inclusive). In this command, the latest ID (HEAD) precedes the 3rd one.
     3. *format-patch* generates the same patch. However, the patch file orgnization is a little different.
 
         If you use the *diff* command to compare the 3rd patch with the 1st or the 2nd one, you will find them different. But actually they are the same patch but with different patch file format. Specially, the *format-patch* patch file, contains mail information.
+    4. We recommend to use *format-patch* to include commit messages, making it more appropriate for most scenarios involving ebbbxchanging patches with other people. Details refer to reference 1.
 6. Test the patch
 
     ```bash
@@ -76,7 +77,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
     patch -p1 < /path/to/cjktty.patch
     ```
     If error occurs, you can reverse the command by adding *-R* option.
-8. If /usr/src/linux source is polluted with modification and patch, you can re-install the kernel source.
+8. If /usr/src/linux source is polluted with modification or patch, you can re-install the kernel source.
 
     ```bash
     emerge -av --unmerge gentoo-sources-4.0.5
