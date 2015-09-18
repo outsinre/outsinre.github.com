@@ -132,6 +132,7 @@ LC_COLLATE="C"
     1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to `e-sources-4.1.1 kernel`.
     1. # emerge --ask sys-kernel/gentoo-sources
     2. # ls -l /usr/src/linux
+    3. If possible, apply kernel patches like 'cjktty.patch'.
 26. Configuring the Linux kernel - Manual configuration.
     1. If you have a backup of kernel `.config` file, then this and the next step can be skipped. Refer to _Upgrade kernel to **unstable 4.0.0**_ below.
     1. # emerge -av sys-apps/pciutils
