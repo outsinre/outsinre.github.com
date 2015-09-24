@@ -49,7 +49,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         *--basefoler* is to specify the VM related files location. If not set, it will default to *${HOME}/.VirtualBox/Machines*, which violate the new configuration file location. Refer to [XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 
         *--register* to register the VM instantly, or run *VBoxManage registervm* afterwards. Attention: *registervm* only accepts *full* path.
-    3. $ VBoxManage modifyvm WinXP --memory 512 --acpi on --nic1 nat --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5000,5010-5012 --clipboard bidirectional
+    3. $ VBoxManage modifyvm WinXP --memory 512 --acpi on --nic1 nat --audio alsa --audiocontroller ac97 --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5000,5010-5012 --clipboard bidirectional
 
         *--vrde on* is to enable VRDP support thus I can connect to the VM GUI by RDP client.
 
@@ -136,7 +136,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         	    ;;
         	"rdp")
         	    echo "you choose to connect WinXP"
-        	    xfreerdp +clipboard /f /v:127.0.0.1:5001
+        	    xfreerdp +clipboard /sound /f /v:127.0.0.1:5001
         	    break
         	    ;;
         	"acpipowerbutton")
