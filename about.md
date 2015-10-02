@@ -4,7 +4,7 @@ title: About
 ---
 
 <p class="message">
-Welcome to ZNHOO's daily jottings. If you find it appropriate, feel free to comment.
+Welcome to ZNHOO's daily technology jottings. If you find it appropriate, feel free to comment.
 </p>
 
 ![celebrities]({{site.baseurl}}assets/celebrities.jpeg)
