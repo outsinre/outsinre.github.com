@@ -82,6 +82,8 @@ Though the problem was solved, I don't need the two sidebar items. So I removed 
 
 Then paste the DISQUS universal code between the two lines. The *comments.html* should be placed under *_include* folder. After that, in *_layout/post.html* file, add a line `{% raw %}{% include comments.html %}{% endraw %}` to the end. Also in the header part add `comments: true`.
 
+What is DISQUS universal code? First, in DISQUS setup, add a site identifier, i.e. *jekylldq*. Then, QISQUS will generate the universal code automatically for you. Lastly, just copy and paste it.
+
 **Archive** page added based on the reference at the beginning.
 
 **Subscribe** page added by modifying `_include/sidebar.html`.
