@@ -36,7 +36,7 @@ title: TeXLive in Gentoo
 
     For more on *bibliography* thing, read [bibtex-vs-biber-and-biblatex-vs-natbib](http://tex.stackexchange.com/a/25702).
 
-    > There is a big difference between the two methods. The 1st won't add packages (pulled in by USE flag like `extra`) to *@world*, while the second do. The 2nd method implies that you *explicitly* installed that specific package. Details refer to [53. Configuration consistently](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
+    > There is a big difference between the two methods. The 1st won't add packages (pulled in by USE flag like `extra`) to *@world*, while the second do. The 2nd method implies that you *explicitly* installed that specific package. You could add `1` *ontshot* option for emerge command as well to exclude `biblatex` from *world* group. Details refer to [53. Configuration consistently](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
 2. Fonts name resolution
 
     Though *XeTeX* and *CTeX* make use of system fonts, we need to make sure the fonts name is correctly resolved between Gentoo and *TeX*.

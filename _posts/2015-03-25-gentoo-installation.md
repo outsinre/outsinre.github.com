@@ -557,7 +557,9 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 
         This is due to lack of essential *gstreamer* plugins, namely:
 
-        >emerge --ask --verbose gst-plugins-bad:0.10 gst-plugins-good:0.10 gst-plugins-ugly:0.10 gst-plugins-base:0.10 gst-plugins-mad:0.10
+        >emerge -av1 gst-plugins-bad:0.10 gst-plugins-good:0.10 gst-plugins-ugly:0.10 gst-plugins-base:0.10 gst-plugins-mad:0.10
+
+        Pay attention to `-1` *oneshot* option to explicitly draw in dependencies.
 
         `guayadeque` depends on `0.10` slot `gstreamer` plugins, instead of those `1.0` slot plugins. The official ebuild should be updated to include those five `0.10` slots even `minimal` USE flag is enabled.
 
@@ -679,7 +681,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         1. \# emerge -av kwplayer
 
             Now play MV but not MP3 songs. After detailed search, I found that mplayer used `mad` to decode MP3. So:
-        2. \# emerge -av gst-plugins-mad
+        2. \# emerge -av1 gst-plugins-mad
  
             Bingo! This is due to the author did not test this package under Gentoo. So he did not incur the `gst-plugins-mad` dependcy specially for Gentoo. We need to install by ourself.
         3. The default configuration/log is located in `~/.config/kuwo/` and downloaded files are under `~/.cache/kuwo/`. Change the `song` and `mv` directories to `~/Music/Songs` and `~/Music/MVs` through GUI preferences menu. We cannot change the lyrics `lrc` location.
@@ -755,7 +757,8 @@ thunar $HOME/Bluetooth
 
         Refer to [texlive gentoo](http://www.fangxiang.tk/2015/08/29/texlive-gentoo/).
 46. Configuration consistently.
-    1. Package can be pulled or emerged into system. There is a big difference. The 1st won't add packages (pulled in by USE flag or dependency) to *@world*ffff, while the second do. The 2nd method implies that you *explicitly* emerged that specific package.
+    1. Package can be pulled or emerged into system. There is a big difference. The 1st won't add packages (pulled in by USE flag or dependency) to *@world* group, while the second do. The 2nd method implies that you *explicitly* emerged that specific package. Of course, you could use `--oneshot` option when emerging to avoid adding package to *world* group. More read [the 2nd step](http://www.fangxiang.tk/2015/08/29/texlive-gentoo/) and *gst-plugins-* installation in this post.
+    1. You use `1` *oneshot* when you want recompile or update a package (like *gst-plugins-*) that is a dependency of another package (like *kwplayer*) in a world file. So when you remove the second package depclean will be able to remove first one. When updating packages in *world* group, its dependencies won't get updated. If necessary, you need to update those dependencies by *oneshot* option.
     1. Try your best to avoid *package.accept_keywords*. *Tesiting* packages and other *stable* packages might cause conflicts in terms of *perl*, *ruby*, *python* etc.
     1. Update a single package.
 
