@@ -12,7 +12,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
 
     ```bash
     cd ~/workspace
-    git clone --branch 3.19-utf8 --single-branch --deptch 4 https://github.com/Gentoo-zh/linux-cjktty.git
+    git clone --branch 3.19-utf8 --single-branch --depth 4 https://github.com/Gentoo-zh/linux-cjktty.git
     ```
     1. *--branch*: we only need branch 3.19-utf8. If not specified, git will clone all the branches, spending a day maybe depending on your network performance.
     2. *--single-branch*: combined with *--branch*.
@@ -53,10 +53,12 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
     git diff HEAD~3 -- > cjktty.patch
     or
     git format-patch -3 HEAD --stdout > cjktty.patch
+    or
+    git format-patch -3 9a5a7d3215307e28df3aea6ac09931a4d55e151e --stdout > cjktty.patch
     ```
     1. Pay attention to the order of commit ID (SHA1 hash). Put the earliest commit ID (4th) before the latest one (HEAD).
     2. HEAD~3 means extract patch from top to 3rd commits (inclusive). In this command, the latest ID (HEAD) precedes the 3rd one.
-    3. *format-patch* generates the same patch. However, the patch file orgnization is a little different.
+    3. *format-patch* generates the same patch. *-n <commit-ID>* means patch for the *n* commits leading up to <commit-ID> (inclusive) of current branch. However, the patch file orgnization is a little different.
 
         If you use the *diff* command to compare the 3rd patch with the 1st or the 2nd one, you will find them different. But actually they are the same patch but with different patch file format. Specially, the *format-patch* patch file, contains mail information.
     4. We recommend to use *format-patch* to include commit messages, making it more appropriate for most scenarios involving ebbbxchanging patches with other people. Details refer to reference 1.
@@ -66,15 +68,27 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
     cd /usr/src/linux/
     patch -p1 --dry-run < /path/to/cjktty.patch
     or
-    git apply -stat < /path/to/cjktty.patch
-    git apply -check < /path/tp/cjktty.patch
+    git apply --whitespace=warn --stat < /path/to/cjktty.patch
+    git apply --whitespace=warn --check < /path/to/cjktty.patch
     ```
+    When testing patch file, it might remind errors like:
+    
+    ```
+    Hunk #17 FAILED at 2708.
+    or
+    error: patch failed: drivers/video/console/fbcon.c:2689
+    error: drivers/video/console/fbcon.c: patch does not apply
+    ```
+    The line number (2707 or 2689) remind is where error occurs in source files (portage *gentoo-sources* and/or microcai *linux-cjktty*). Search *2708* or *2689* in patch file and compare it with source files to see what causes the error. You might go to line *2708* or *2689* directly in source files. However it does not work sometimes.
+    
     *git apply* can be replaced with another command *git am*.
 7. Apply the patch
 
     ```bash
     cd /usr/src/linux/
     patch -p1 < /path/to/cjktty.patch
+    or
+    git apply --whitespace=warn < /path/to/cjktty.patch
     ```
     If error occurs, you can reverse the command by adding *-R* option.
 8. If /usr/src/linux source is polluted with modification or patch, you can re-install the kernel source.
