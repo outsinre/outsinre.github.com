@@ -45,7 +45,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
     2. $ VBoxManage createvm --name WinXP --ostype WindowsXP --basefolder ${HOME}/.config/VirtualBox/Machines --register
 
         *--name* should be enclosed by double quotes if containing white spaces.
-	
+
         *--basefoler* is to specify the VM related files location. If not set, it will default to *${HOME}/.VirtualBox/Machines*, which violate the new configuration file location. Refer to [XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 
         *--register* to register the VM instantly, or run *VBoxManage registervm* afterwards. Attention: *registervm* only accepts *full* path.
@@ -117,7 +117,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         #!/bin/bash
         for m in vbox{drv,netadp,netflt}; do modprobe $m; done
         echo 'VirtualBox modules loaded!'
-	```
+        ```
     2. \# ect ${HOME}/bin/vboxWinXP
 
         ```bash
@@ -129,36 +129,36 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         select opt in "${options[@]}"
         do
             case $opt in
-        	"startvm")
-        	    echo "you choose to launch WinXP"
-        	    VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001"
-        	    break
-        	    ;;
-        	"rdp")
-        	    echo "you choose to connect WinXP"
-        	    xfreerdp +clipboard /sound /f /v:127.0.0.1:5001
-        	    break
-        	    ;;
-        	"acpipowerbutton")
-        	    echo "you chose to acpipowerbuttion WinXP"
-        	    VBoxManage controlvm WinXP poweroff
-        	    break
-        	    ;;
-        	"savestate")
-        	    echo "you chose to save WinXPstate"
-        	    VBoxManage controlvm WinXP savestate
-        	    break
-        	    ;;
-        	"poweroff")
-        	    echo "you chose to poweroff WinXP"
-        	    VBoxManage controlvm WinXP poweroff
-        	    break
-        	    ;;
-        	"quit")
-        	    break
-        	    ;;
-        	*) echo 'invalid option'
-        	   ;;
+                "startvm")
+                    echo "you choose to launch WinXP"
+                    VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001"
+                    break
+                    ;;
+                "rdp")
+                    echo "you choose to connect WinXP"
+                    xfreerdp +clipboard /sound /f /v:127.0.0.1:5001
+                    break
+                    ;;
+                "acpipowerbutton")
+                    echo "you chose to acpipowerbuttion WinXP"
+                    VBoxManage controlvm WinXP poweroff
+                    break
+                    ;;
+                "savestate")
+                    echo "you chose to save WinXPstate"
+                    VBoxManage controlvm WinXP savestate
+                    break
+                    ;;
+                "poweroff")
+                    echo "you chose to poweroff WinXP"
+                    VBoxManage controlvm WinXP poweroff
+                    break
+                    ;;
+                "quit")
+                    break
+                    ;;
+                *) echo 'invalid option'
+                   ;;
             esac
         ```
         Pay attention `PS3` and `case` *bash* usage.
