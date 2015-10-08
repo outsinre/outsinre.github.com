@@ -985,18 +985,27 @@ blacklist thinkpad_acpi
     5. # mount /dev/sda2 /boot/efi
     6. # cd /usr/src/linux
     7. # cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
-    8. # make olddefconfig, to convert the old kernel config to new one without too many questions to answer.
-        1. # make silentoldconfig, choose all the new settings to default ones. It only shows new and different kernel options incurred in new kernel version.
+    8. # make silentoldconfig, choose all the new settings to default ones. It only asks user new kernel options incurred in new kernel version.
+        1. # make olddefconfig, to convert the old config to fit new kernel version, while setting new kernel options to default values without user confirmation.
         2. # make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
     9. # make
     10. # make modules_install
     11. # make install
-    12. # genkernel --install initramfs 
+    12. # genkernel --install initramfs
+
+        If Gentoo depends on LUKS and LVM for system mount points and booting, refer to [LVM LUKS LVM](http://www.fangxiang.tk/2015/09/10/lvm-luks-lvm/).
     13. # grub2-mkconfig -o /boot/grub/grub.cfg
     15. # reboot
     14. # emerge -av @module-rebuild
-        1. Any external kernel modules, such as binary kernel modules, need to be rebuilt for each new kernel.
-	2. For example, Virtualbox will bring along its kernel module 'vboxdrv'.
+
+        Any external kernel modules, such as binary kernel modules, need to be rebuilt for each new kernel.
+
+        For example, Virtualbox will bring along its external module by package *app-emulation/virtualbox-modules*. After getting into system with new kernel and load 'vboxdrv' module, you might get errors:
+
+        ```
+        modprobe: FATAL: Module vboxdrv not found.
+        ```
+        `emerge -av @module-rebuild` is to re-install all external modules (*app-emulation/virtualbox-modules* inclusive). More read [VirtualBox](http://www.fangxiang.tk/2015/08/21/virtualbox/).
 47. e-sources-4.1.1 kernel
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.

@@ -214,7 +214,7 @@ Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo ov
 2. emerge -av genkernel
 3. genkernel --lvm --luks --gpg --busybox --install initramfs
 
-    Don't worry about '--gpg' problem occured in LiveCD above. genkernell will compile GnuPG 1\* instead of 2\*.
+    Don't worry about '--gpg' problem occured in LiveCD above. genkernell will compile GnuPG 1 instead of 2.
 
 ## grub2
 
@@ -239,6 +239,9 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
 3. grub2-mkconfig -o /boot/grub/grub.cfg
 
     In chroot, grub2-mkconfig failed to probe (by calling os-prober) Windows on HDD. When getting into Gentoo, execute it again to make up.
+
+    In real Gentoo system, *grub2-mkconfig* might complain about *lvmetad* issue which does no harm. If you really want to get rid of the warning, just run *rc-service lvmetad start* before *grub2-mkconfig*.
+
 4. In our scheme, boot and EFI shared partition is not encrypted. If it is encrypted by LUKS too, we need more configurations. Read [grub2 advanced storage](https://wiki.gentoo.org/wiki/GRUB2/AdvancedStorage).
 
 # Get out of chroot

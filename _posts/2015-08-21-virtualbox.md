@@ -162,8 +162,17 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
             esac
         ```
         Pay attention `PS3` and `case` *bash* usage.
-13. References
-    1. https://wiki.gentoo.org/wiki/VirtualBox#Configuration
+13. Modules rebuild for new kernel. Read the first reference on *Kernel driver not installed* section.
+
+    After booting with new kernel (by kernel upgrading), you could no longer load modules like *vobxdrv*.
+
+    ```bash
+    # modprobe vboxdrv
+    modprobe: FATAL: Module vboxdrv not found.
+    ```
+    The solution is to reinstall *VirtualBox* external modules `emerge -av app-emulation/virtualbox-modules`. More read [Upgrade kernel to unstable 4.0.0](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
+14. References
+    1. [gentoo wiki](https://wiki.gentoo.org/wiki/VirtualBox)
     2. http://baige5117.github.io/blog/install_virtualbox_in_gentoo.html
     3. https://github.com/rustymyers/scripts/blob/master/shell/createVBoxVM.sh
     4. http://serverfault.com/questions/171665/how-to-attach-a-virtual-hard-disk-using-vboxmanage
