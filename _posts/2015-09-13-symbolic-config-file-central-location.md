@@ -30,7 +30,7 @@ There are all kinds of config files and scripts to take care of during installat
         ln -sv /path/to/source /path/to/target
 
     1. 'target' is the symbolic link to created, pointing to 'source' (normal files or directories).
-    2. 'ln' command can be executed under nay 'pwd' regardless of 'source' or 'target' directory.
+    2. 'ln' command can be executed under any 'pwd' regardless of 'source' or 'target' directory.
     3. relative link: 'target' will look for 'source' through relative path to its own directory.
     4. absolute link: 'target' will look for 'source through absolute path.
     5. If you move absolute link around, it still points to the correct target, while relative link would be dead.

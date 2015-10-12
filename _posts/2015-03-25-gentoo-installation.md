@@ -24,9 +24,8 @@ title: Gentoo Installation
     4. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. \# sudo su -, switches to `root` account. The command prompt is `livecd ~ #` which is not the same as the handbook one `root #`. Maybe this is derived from not setting a temporary root password.
 5. \# `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free up the `/dev/sda10` NTFS partition for Gentoo.
-    1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position.
+    1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position. Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
 
-        Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
     ```bash
     1. \# parted -a optimal /dev/sda
     2. (parted) p
@@ -190,7 +189,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
             <s> # lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item as `Core 2/newer Xeon, CONFIG_MCORE2`, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
         2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
         3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
-        4. Enable EFI stub support and EFI variables in the Linux kernel if UEFI is used to boot the system: `EFI stub support, CONFIG_EFI_STUB`. Don't turn on `EFI mixed-mode support, EFI_MIXED`.
+        4.Enable `EFI runtime service support, CONFIG_EFI` if UEFI is used to boot the system. Turn off `EFI stub support, CONFIG_EFI_STUB`, `EFI mixed-mode support, EFI_MIXED`, `CONFIG_CMDLINE_BOOL, Built-in kernel command line`, `CONFIG_CMDLINE, Built-in kernel command string` and `CONFIG_INITRAMFS_SOURCE, Initramfs source file(s)`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
     5. Set `X86_X32, x32 ABI for 64-bit mode` to 'Y'. This option is useful for WIndows 32 bit binaries (under Wine support) to take advantage of the system 64-bit registers.
     5. Watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
     6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
@@ -506,7 +505,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         2. Just make some changes to the old config file.
     3. # make clean
         1. Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
-    3. # make
+    3. # make -j5
     4. # make modules_install
     5. # make install
         1. This is add `.old` to original kernel and copy the new kernel to `/boot`.
@@ -988,15 +987,15 @@ blacklist thinkpad_acpi
     8. # make silentoldconfig, choose all the new settings to default ones. It only asks user new kernel options incurred in new kernel version.
         1. # make olddefconfig, to convert the old config to fit new kernel version, while setting new kernel options to default values without user confirmation.
         2. # make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
-    9. # make
+    9. # make -j5
     10. # make modules_install
     11. # make install
     12. # genkernel --install initramfs
 
         If Gentoo depends on LUKS and LVM for system mount points and booting, refer to [LVM LUKS LVM](http://www.fangxiang.tk/2015/09/10/lvm-luks-lvm/).
-    13. # grub2-mkconfig -o /boot/grub/grub.cfg
-    15. # reboot
-    14. # emerge -av @module-rebuild
+    13. \# grub2-mkconfig -o /boot/grub/grub.cfg
+    15. \# reboot
+    14. \# emerge -av @module-rebuild
 
         Any external kernel modules, such as binary kernel modules, need to be rebuilt for each new kernel.
 
