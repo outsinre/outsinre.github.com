@@ -1001,16 +1001,17 @@ blacklist thinkpad_acpi
         1. # emerge -av sys-auth/fprintd
         2. # ect /etc/pam.d/system-local-login, add *auth sufficient pam_fprintd.so* to the beginning of the file.
 
-        ```
-        auth		sufficient	pam_fprintd.so
-        auth		include		system-login
-        account		include		system-login
-        password	include		system-login
-        session		include		system-login
-        ```
+            ```
+            auth		sufficient	pam_fprintd.so
+            auth		include		system-login
+            account		include		system-login
+            password		include		system-login
+            session		include		system-login
+            ```
+            Among the */etc/pam.d/* files, *system-auth* is the most important for authentication. For example, if your need to *login*, then you need *authentication* first. So *system-login* file contains a line *auth include system-auth*.
         3. We can edit other files like */etc/pam.d/polkit-1* for GNOME polkit authentication. Add *auth sufficient pam_fprintd.so* to */etc/pam.d/xscreensaver* will help unlock screensaver.
         4. $ fprintd-enroll, wipe finger over the fingerprint reader for 5 times. Later on, we can *fprintd-delete* to remove the enrolled fingerprints.
-        5. Reboot and input username, then it reminds *wipe your ...*.
+        5. Reboot and input username, then it reminds *wipe your finger ...*.
         6. Don't enroll fingerprint for *root* account. If the fingerprint authention failed (3 times), it fall back to normal password login automatically.
         7. Refer to [configuring fprint PAM for all authentications [solved]]( https://forums.gentoo.org/viewtopic-p-6952448.html); [arch fprint](https://wiki.archlinux.org/index.php/Fprint); [how to enable fingerprint](http://www.thinkwiki.org/wiki/How_to_enable_integrated_fingerbbprint_reader_with_fprint).
     10. swapfile
