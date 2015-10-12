@@ -8,7 +8,7 @@ title: LVM over LUKS over LVM
 3. Encrypt the new single LVM volume DM-crypt LUKS - our LUKS container.
 4. Create LVM volumes in LUKS container as Gentoo / and /home - our second LVM container.
 5. LVM -> LUKS -> LVM.
-6. No swap partition. If possible, create a swapfile instead.
+6. No swap partition. If possible, create a swapfile instead referring to [swapfile](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
 7. For boot and EFI, Gentoo resorts to USB stick. boot and EFI shares a single USB partition, say sdc1. This is different from traditional scheme, boot and EFI resides on different partitions no matter they are HDD or USB ones.
     1. The shared USB partition should be formated as vfat (FAT32).
     2. It should be mounted on /boot if necessary.

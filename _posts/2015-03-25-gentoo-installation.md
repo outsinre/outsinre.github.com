@@ -988,6 +988,43 @@ blacklist thinkpad_acpi
 	Refer to [intel microcode](https://wiki.gentoo.org/wiki/Intel_microcode). Updates to CPU microcode have to be re-applied each time the computer is booted, because the memory updated is volatile (despite the term *firmware* also being used for microcode).
 
         CPU的微代码更新支持,建议选中.CPU的微代码更新就像是给CPU打补丁,用于纠正CPU的行为.更新微代码的常规方法是升级BIOS,但是也可以在Linux启动后更新.比如在Gentoo下,可以使用"emerge microcode-ctl"安装microcode-ctl服务,再把这个服务加入boot运行级即可在每次开机时自动更新CPU微代码.
+    10. Fingerprint. Fingerprint login is a bad idea since your fingerprint is left anywhere anytime around, like on bottles, cups, books etc. It easy for hackers to get a copy of it. So don't use it!!!
+
+        Here, I just have a try and test the function. That's all of it. BTW, my current system is locked by [lvm luks lvm](http://www.fangxiang.tk/2015/09/10/lvm-luks-lvm/). So it's relatively safe.
+
+        ```bash
+        # lsusb | grep -i upek
+        Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
+        ```
+        My laptop fingerprint device *Upek 1473:2016*. Fingerprint don't need special device driver.
+
+        1. # emerge -av sys-auth/fprintd
+        2. # ect /etc/pam.d/system-local-login, add *auth sufficient pam_fprintd.so* to the beginning of the file.
+
+        ```
+        auth		sufficient	pam_fprintd.so
+        auth		include		system-login
+        account		include		system-login
+        password	include		system-login
+        session		include		system-login
+        ```
+        3. We can edit other files like */etc/pam.d/polkit-1* for GNOME polkit authentication. Add *auth sufficient pam_fprintd.so* to */etc/pam.d/xscreensaver* will help unlock screensaver.
+        4. $ fprintd-enroll, wipe finger over the fingerprint reader for 5 times. Later on, we can *fprintd-delete* to remove the enrolled fingerprints.
+        5. Reboot and input username, then it reminds *wipe your ...*.
+        6. Don't enroll fingerprint for *root* account. If the fingerprint authention failed (3 times), it fall back to normal password login automatically.
+        7. Refer to [configuring fprint PAM for all authentications [solved]]( https://forums.gentoo.org/viewtopic-p-6952448.html); [arch fprint](https://wiki.archlinux.org/index.php/Fprint); [how to enable fingerprint](http://www.thinkwiki.org/wiki/How_to_enable_integrated_fingerbbprint_reader_with_fprint).
+    10. swapfile
+
+        ```bash
+        # fallocate -l 1G /mnt/1GB-swapfile
+        # chmod 600 /mnt/1GB-swapfile
+        # mkswap /mnt/1GB-swapfile
+        # swapon /mnt/1GB-swapfile
+        # swapon -s
+        # ect /etc/fstab
+        /mnt/1GB-swapfile none swap defaults 0 0
+        ```
+        Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).
 47. Upgrade kernel to **unstable 4.0.0**
 
     >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
