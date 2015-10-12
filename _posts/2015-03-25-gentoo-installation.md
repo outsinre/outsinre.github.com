@@ -999,7 +999,7 @@ blacklist thinkpad_acpi
         My laptop fingerprint device *Upek 1473:2016*. Fingerprint don't need special device driver.
 
         1. # emerge -av sys-auth/fprintd
-        2. # ect /etc/pam.d/system-local-login, add *auth sufficient pam_fprintd.so* to the beginning of the file.
+        2. \# ect /etc/pam.d/system-local-login, add *auth sufficient pam_fprintd.so* to the beginning of the file.
 
             ```
             auth		sufficient	pam_fprintd.so
