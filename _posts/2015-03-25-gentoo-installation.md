@@ -193,9 +193,9 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
             <s> # lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item as `Core 2/newer Xeon, CONFIG_MCORE2`, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
         2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
         3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
-        4.Enable `EFI runtime service support, CONFIG_EFI` if UEFI is used to boot the system. Turn off `EFI stub support, CONFIG_EFI_STUB`, `EFI mixed-mode support, EFI_MIXED`, `CONFIG_CMDLINE_BOOL, Built-in kernel command line`, `CONFIG_CMDLINE, Built-in kernel command string` and `CONFIG_INITRAMFS_SOURCE, Initramfs source file(s)`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
+        4. Enable `EFI runtime service support, CONFIG_EFI` if UEFI is used to boot the system. Turn off `EFI stub support, CONFIG_EFI_STUB`, `EFI mixed-mode support, EFI_MIXED`, `CONFIG_CMDLINE_BOOL, Built-in kernel command line`, `CONFIG_CMDLINE, Built-in kernel command string` and `CONFIG_INITRAMFS_SOURCE, Initramfs source file(s)`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
     5. Set `X86_X32, x32 ABI for 64-bit mode` to 'Y'. This option is useful for WIndows 32 bit binaries (under Wine support) to take advantage of the system 64-bit registers.
-    5. Set `IOMMU_SUPPORT` to 'Y' since my laptop does not support this but VT-x. VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz).
+    5. Set `IOMMU_SUPPORT` and `CALGARY_IOMMU` to 'N' since my laptop does not support this but VT-x. VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz).
     5. Watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
     6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
@@ -1009,7 +1009,7 @@ blacklist thinkpad_acpi
     9. # make -j5
     10. # make modules_install
     11. # make install
-    12. # genkernel --install initramfs
+    12. \# genkernel --install initramfs
 
         If Gentoo depends on LUKS and LVM for system mount points and booting, refer to [LVM LUKS LVM](http://www.fangxiang.tk/2015/09/10/lvm-luks-lvm/).
     13. \# grub2-mkconfig -o /boot/grub/grub.cfg
