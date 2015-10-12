@@ -136,6 +136,7 @@ LC_COLLATE="C"
     1. If you have a backup of kernel `.config` file, then this and the next step can be skipped. Refer to _Upgrade kernel to **unstable 4.0.0**_ below.
     1. # emerge -av sys-apps/pciutils
     1. # emerge -av sys-apps/usbutils
+    1. # emerge -av hwinfo
     2. # cd /usr/src/linux
 26. Details on kernel configuration. Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. menuconfig) and press `/` to search the options like `e1000e`, find their locations and activate them.
     1. \# make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config`.
@@ -151,7 +152,10 @@ LC_COLLATE="C"
         ```
     1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`: these are the dirvers that needs activated. When search "snd-hda-intel", replace the hypen: - with dash: _.
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the LiveCD's kernel config file to help clarify kernel options.
+    2. `NR_CPUS` set to *4* since my laptop has 2 cores and 4 threading. Maybe this value should be *2* for my laptop, but needs test. The smaller this value is, the smaller the kernel image is and the less memory is consumed by kernel.
+    3. `MICROCDE` and `MICROCDE_INTEL` are *Y* by default. Refer to *emerge -av microcode-ctl* below.
     3. Graphics: `i915` = `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
+    3. `CONFIG_X86_SYSFB, CONFIG_FB, CONFIG_FB_EFI, CONFIG_FB_SIMPLE, FRAMEBUFFER_CONSOLE` all set to *Y*.
     4. Ethernet: `e1000e` = `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
     4. Audio: `snd_hda_intel` = `Intel HD Audio, CONFIG_SND_HDA_INTEL`. The default value is 'Y', now **MUST** set to 'M'. Choose the audioi codec:
         1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
@@ -191,6 +195,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
         3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
         4.Enable `EFI runtime service support, CONFIG_EFI` if UEFI is used to boot the system. Turn off `EFI stub support, CONFIG_EFI_STUB`, `EFI mixed-mode support, EFI_MIXED`, `CONFIG_CMDLINE_BOOL, Built-in kernel command line`, `CONFIG_CMDLINE, Built-in kernel command string` and `CONFIG_INITRAMFS_SOURCE, Initramfs source file(s)`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
     5. Set `X86_X32, x32 ABI for 64-bit mode` to 'Y'. This option is useful for WIndows 32 bit binaries (under Wine support) to take advantage of the system 64-bit registers.
+    5. Set `IOMMU_SUPPORT` to 'Y' since my laptop does not support this but VT-x. VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz).
     5. Watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
     6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
@@ -505,7 +510,9 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         2. Just make some changes to the old config file.
     3. # make clean
         1. Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
+    3. # make modules_prepare
     3. # make -j5
+    4. # Backup /lib/modules/\`uname -r\`/ contents. Why? Since we are re-compiling the current kernel, *make modules_install* will override old modules. If the newly-compiled kernel and modules thereof are error-prone or even cannot boot, then you cannot boot into old kernel since its modules (some are crucial) are overriden.
     4. # make modules_install
     5. # make install
         1. This is add `.old` to original kernel and copy the new kernel to `/boot`.
@@ -516,7 +523,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     8. # emerge -av @module-rebuild
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 45. ALSA - sound.
-    1. # emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support.
+    1. # emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.
     2. [optional] # rc-update add alsasound boot
     3. # speaker-test -t wav -c 2, test the speaker.
 45. Applications:
@@ -694,7 +701,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 
         >/proc/acpi/ibm/bluetooth
 
-        1. \# emerge -av bluez, the current version is 5. `bluez` package is bluetooth protocol stack for Linux with several useful tools like `hciconfig`, `bluetoothctl`, etc:
+        1. \# emerge -av bluez, the current version is 5. `bluez` package is bluetooth protocol stack for Linux with several useful tools like `hciconfig`, `bluetoothctl`, etc. It also installs the `/etc/init.d/bluetooth` service daemon.
 
             >\# hciconfig -a
 
@@ -719,6 +726,8 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
             >\# rc-service bluetooth start
 
             >$ bluetoothctl
+
+            >$ [bluetooth]# help
 
             Details on `bluetoothctl` pleae read the references.
         4. `bluez` commands are only for bluetooth connection. Now we need to transfer file between cell phone and PC by command lines:
@@ -970,6 +979,15 @@ blacklist videodev
 # thinkpad_acpi module does offer any useful function support.
 blacklist thinkpad_acpi
             ```
+    9. Intel Microcde
+
+        ```
+        # emerge -av microcode-ctl
+        # rc-update add microcode_ctl boot
+        ```
+	Refer to [intel microcode](https://wiki.gentoo.org/wiki/Intel_microcode). Updates to CPU microcode have to be re-applied each time the computer is booted, because the memory updated is volatile (despite the term *firmware* also being used for microcode).
+
+        CPU的微代码更新支持,建议选中.CPU的微代码更新就像是给CPU打补丁,用于纠正CPU的行为.更新微代码的常规方法是升级BIOS,但是也可以在Linux启动后更新.比如在Gentoo下,可以使用"emerge microcode-ctl"安装microcode-ctl服务,再把这个服务加入boot运行级即可在每次开机时自动更新CPU微代码.
 47. Upgrade kernel to **unstable 4.0.0**
 
     >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
@@ -987,6 +1005,7 @@ blacklist thinkpad_acpi
     8. # make silentoldconfig, choose all the new settings to default ones. It only asks user new kernel options incurred in new kernel version.
         1. # make olddefconfig, to convert the old config to fit new kernel version, while setting new kernel options to default values without user confirmation.
         2. # make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
+    8. # make modules_prepare
     9. # make -j5
     10. # make modules_install
     11. # make install
@@ -1005,6 +1024,8 @@ blacklist thinkpad_acpi
         modprobe: FATAL: Module vboxdrv not found.
         ```
         `emerge -av @module-rebuild` is to re-install all external modules (*app-emulation/virtualbox-modules* inclusive). More read [VirtualBox](http://www.fangxiang.tk/2015/08/21/virtualbox/).
+
+        There is another command from wiki `make modules_prepare` is used when the kernel not built yet or cleaned. For example, you need to compile the external module first, just before the kernel building, then execute this command before `make -j5`.
 47. e-sources-4.1.1 kernel
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
