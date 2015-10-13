@@ -24,7 +24,7 @@ You need to wait for a few minutes for VPS system initialization. The default VP
 1. [bandwagonhost](https://bandwagonhost.com/clientarea.php): the web portal login. The most important page is `Services -> My Services`.
     1. You can also click on `KiviVM Control Panel` to get to the 2nd step.
 2. [KiviVM Control Panel](https://kiwivm.it7.net): VPS management page. Briefly go through the management panel.
-    1. The first tool I avail of is `two-factor authentication` thus another temporary code is required for each login into KiviVM.
+    1. The first tool I avail of is `two-factor authentication` (iOS Google Authenticator) thus another temporary code is required for each login into KiviVM.
     2. Since CentOS6 x86 root password is not send through email any more, reset root password by `root password modification`. You can now SSH into your VPS Centos with clients like `Putty` and `MobaXterm`.
 	3. Under `KiviVM password modification`, set password for [KiviVM Control Panel](https://kiwivm.it7.net).
 
@@ -51,6 +51,7 @@ root       822   708  0 07:03 pts/0    00:00:00 grep ssserver
         >/usr/bin/ssserver -p `cat /root/.kiwivm-shadowsocks-port` -k `cat /root/.kiwivm-shadowsocks-password` -m `cat /root/.kiwivm-shadowsocks-encryption` --user nobody --workers 2 -d start
 
         Pay attention to the command line arguments are stored in `/root/.kiwivm-shadowsocks-*` files.
+    7. Add option `--forbidden-ip 127.0.0.1,::1` to the */etc/rc.d/rc.local* file `ssserver` command for security reason.
 2. Of course, you can also install ss server manually. Among the others, there mainly four versions of ss server: Python version, C libev version, Go version, and C++ with Qt version. Take the Python version as an example:
 
     ```
