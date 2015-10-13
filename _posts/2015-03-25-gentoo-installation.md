@@ -125,6 +125,7 @@ LC_COLLATE="C"
     4. \# env-update && source /etc/profile
     5. \# export PS1="(chroot) $PS1", use this command to reminds you are in `chroot` environment.
     5. Use `xx_YY.UTF-8` (or `xx_YY.utf8`. But this one might not work for some packages). Don't use `xx_YY.UTF8`.
+    5. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/).
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
     1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to **unstable 4.0.0**_.

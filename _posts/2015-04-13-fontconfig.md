@@ -40,6 +40,9 @@ Various specifications specify files and file formats. This specification define
 Refer to the official document [XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html). You can find out where is the default value for `XDG_DATA_HOME`, `XDG_CONFIG_HOME`, etc.
 
 # Per-user installation
+
+Before installing fonts, refer to [Linux字体美化实战](http://www.jinbuguo.com/gui/linux_fontconfig.html) on choosing different fonts for system.
+
 1. Get your fonts file like `*.ttf` and `*.otf`:
 
     ```
