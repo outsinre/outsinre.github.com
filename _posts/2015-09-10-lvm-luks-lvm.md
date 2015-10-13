@@ -236,11 +236,12 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
     6. root\_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
     7. You can use device file name or use UUID instead for those arguments. It's free choince.
     8. The 2nd reference adds a parameter 'target=cryptroot' whose usage is unclear. Don't try this if not sure.
+2. rc-service lvmetad start
+
+    After getting into new Gentoo system, *grub2-mkconfig* might complain about *lvmetad* issue which does no harm. If you really want to get rid of the warning, just run *rc-service lvmetad start* before *grub2-mkconfig* and remember to stop afterwards.
 3. grub2-mkconfig -o /boot/grub/grub.cfg
 
     In chroot, grub2-mkconfig failed to probe (by calling os-prober) Windows on HDD. When getting into Gentoo, execute it again to make up.
-
-    In real Gentoo system, *grub2-mkconfig* might complain about *lvmetad* issue which does no harm. If you really want to get rid of the warning, just run *rc-service lvmetad start* before *grub2-mkconfig*.
 
 4. In our scheme, boot and EFI shared partition is not encrypted. If it is encrypted by LUKS too, we need more configurations. Read [grub2 advanced storage](https://wiki.gentoo.org/wiki/GRUB2/AdvancedStorage).
 
