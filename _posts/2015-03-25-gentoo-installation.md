@@ -1029,6 +1029,15 @@ blacklist thinkpad_acpi
         /mnt/1GB-swapfile none swap defaults 0 0
         ```
         Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).
+    11. OpenRC Log
+
+        Boot process messages are really useful for system bug tracking. By default, boot messages are not logged.
+
+        ```bash
+        # ect /etc/rc.conf
+        rc_logger="YES"
+        ```
+        The default log file path is */var/log/rc.log*. You can change it by *rc_log_path* variable.
 47. Upgrade kernel to **unstable 4.0.0**
 
     >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
