@@ -39,9 +39,11 @@ Various specifications specify files and file formats. This specification define
 
 Refer to the official document [XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html). You can find out where is the default value for `XDG_DATA_HOME`, `XDG_CONFIG_HOME`, etc.
 
-# Per-user installation
+# Fonts installation
 
 Before installing fonts, refer to [Linux字体美化实战](http://www.jinbuguo.com/gui/linux_fontconfig.html) on choosing different fonts for system.
+
+## Per-user installation
 
 1. Get your fonts file like `*.ttf` and `*.otf`:
 
@@ -59,7 +61,7 @@ WINGDNG3.TTF  msyh.ttc     simfang.ttf  simsun.ttc  tahomabd.ttf
 6. _$_ mkfontscale \<path-to-font-directory\>
 7. _$_ mkfontdir \<path-to-font-directory\>
 
-# System-wide installation
+## System-wide installation
 1. Install system-wide fonts are similar except that the fonts directories are different like  `/usr/share/fonts/`.
 2. _#_ mkdir /usr/share/fonts/winfonts
 3. _#_ chmod 755 /usr/share/fonts/winfonts
