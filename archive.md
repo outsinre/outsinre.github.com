@@ -14,8 +14,30 @@ title: Archive
 {% endfor %}
 -->
 
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    width: 500px;
+}
+
+li {
+    list-style-type: none;             
+}
+
+.leftpart {
+    width: 100px;
+    float:right;
+    background-color: yellow;
+}
+
+.rightpart {
+    width: 400px;
+    float:left;
+}
+
 <ul>
     {% for post in site.posts %}
-    <li><span style="color:blue;width:30px;float:right" class="time">{{ post.date | date_to_string }}</span><span style="width:100px;float:left"><a href="{{ post.url }}">{{ post.title }}</a></li>
+    <li><span class="time leftpart">{{ post.date | date_to_string }}</span><span class="rightpart"><a href="{{ post.url }}">{{ post.title }}</a></span></li>
     {% endfor %}
 </ul>
