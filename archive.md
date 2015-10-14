@@ -14,8 +14,21 @@ title: Archive
 {% endfor %}
 -->
 
+<style type="text/css">
+ul 
+{
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+ul li span { 
+    float: left;
+    width: 40px;
+}
+</style>
+
 <ul>
     {% for post in site.posts %}
-    <li><span style="color:blue;font-family:monospace" class="time">{{ post.date | date_to_string }}</span> <a href="{{ post.url }}">{{ post.title }}</a></li>
+    <li><span style="color:blue;" class="time">{{ post.date | date_to_string }}</span> <a href="{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
 </ul>
