@@ -18,7 +18,7 @@ ul {
     margin: 0;
     padding: 0;
     list-style: none;
-    width: 500px;
+    width: 100px;
 }
 
 li {
@@ -26,13 +26,13 @@ li {
 }
 
 .leftpart {
-    width: 100px;
+    width: 20px;
     float:right;
     background-color: yellow;
 }
 
 .rightpart {
-    width: 400px;
+    width: 80px;
     float:left;
 }
 
