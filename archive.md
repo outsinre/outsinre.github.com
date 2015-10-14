@@ -23,7 +23,6 @@ ul
 
 ul li span { 
     float: left;
-    width: 40px;
 }
 </style>
 
