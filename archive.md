@@ -15,7 +15,7 @@ title: Archive
 -->
 
 <ul>
-    {% for post in paginator.posts %}
-    <li> {{ post.date | date_to_string }} <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% for post in site.posts %}
+    <li><span style="color:blue" class="time">{{ post.date | date_to_string }}</span><a href="{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
 </ul>
