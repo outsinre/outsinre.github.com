@@ -10,12 +10,12 @@ title: Archive
     {% if month != nmonth %}
 {{ post.date | date: '%B %Y' }}
     {% endif %}
-  <li><small><span style="color:blue" class="time">{{ post.date | date: "%d/%b" }}</span>&nbsp;&nbsp;<a href="{{ post.url }}">{{ post.title }}</a></small></li>
+  <li><small><span class="time">{{ post.date | date: "%d/%b" }}</span>&nbsp;&nbsp;<a href="{{ post.url }}">{{ post.title }}</a></small></li>
 {% endfor %}
 -->
 
 <ul>
     {% for post in site.posts %}
-    <li><span style="width:5px;float:right" class="time">{{ post.date | date_to_string }}</span><span style="width:10px;float:left"><a href="{{ post.url }}">{{ post.title }}</a></span></li>
+        <li> {{ post.date | date_to_string }} &raquo; [ {{ post.title }} ]({{ post.url }})</li>
     {% endfor %}
 </ul>
