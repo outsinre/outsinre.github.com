@@ -30,7 +30,7 @@ title: wgetpaste default to gists
     # ect /etc/wgetpaste.d/gists.conf
     DEFAULT_SERVICE="gists"
     ```
-    *wgetpaste* supports many other options, *DEFAULT_{NICK,LANGUAGE,EXPIRATION}[_${SERVICE}]* included.
+    *wgetpaste* supports many other options, `DEFAULT_{NICK,LANGUAGE,EXPIRATION}[_${SERVICE}]` included.
 
     Run *wgetpaste -S* again to verify configuration.
 5. $ wgetpaste ~/Documents/test-file
@@ -48,4 +48,4 @@ title: wgetpaste default to gists
     # /etc/wgetpaste.d/gists.conf
     HEADER_gists="Authorization: token 1234abc56789..."
     ```
-    Test again *wgetpaste ~/Documents/test-file*
+    Test again *wgetpaste ~/Documents/test-file*.
