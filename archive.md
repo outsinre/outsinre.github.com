@@ -3,7 +3,7 @@ layout: page
 title: Archive
 ---
 
-<!--
+<!---
 {% for post in site.posts %}
   {% capture month %}{{ post.date | date: '%m%Y' }}{% endcapture %}
   {% capture nmonth %}{{ post.next.date | date: '%m%Y' }}{% endcapture %}
