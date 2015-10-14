@@ -16,6 +16,6 @@ title: Archive
 
 <ul>
     {% for post in site.posts %}
-    <li><span style="width:20px;float:right" class="time">{{ post.date | date_to_string }}</span><span style="width:80px;float:left"><a href="{{ post.url }}">{{ post.title }}</a></span></li>
+    <li><span style="width:5px;float:right" class="time">{{ post.date | date_to_string }}</span><span style="width:10px;float:left"><a href="{{ post.url }}">{{ post.title }}</a></span></li>
     {% endfor %}
 </ul>
