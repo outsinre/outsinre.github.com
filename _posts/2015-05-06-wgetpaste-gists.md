@@ -49,3 +49,7 @@ title: wgetpaste default to gists
     HEADER_gists="Authorization: token 1234abc56789..."
     ```
     Test again *wgetpaste ~/Documents/test-file*.
+7. Now each *wgetpaste* execution will paste contents to GitHub acount, which enables search, edit, comment etc. later on.
+
+    Actually since *gist* supports *markdown*, we can use *gist* as a pure text blog.
+8. If once for a while, you don't want to expose your GitHub account on the Internet, you could add `-g` option to generate *bpaste* service. You can also use `-g -s gists` to generate *anonymous gist*. `-g` option tells *wgetpaste* to ignore configurations.
