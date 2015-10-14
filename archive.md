@@ -18,6 +18,6 @@ title: Archive
 
 <ul>
     {% for post in site.posts %}
-        <li> <span style="display:inline-block;width:108px" class="time">{{ post.date | "%Y-%m-%d" }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a> </li>
+        <li> <span style="display:inline-block;width:108px">{{ post.date | date: "%Y-%m-%d" }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a> </li>
     {% endfor %}
 </ul>
