@@ -548,14 +548,16 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
     18. ffmpeg
 
-        `ffmpeg` is emerged by some other packages, one of which might be `mplayer`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
+        `ffmpeg` is emerged by some other packages, one of which might be `mplayer` or `mpv`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
 
         In order to add support `v4l`, update `package.use/ffmpeg` for USE flags `v4l` and `libv4l`.
 
         ```
         # emerge -av ffmpeg
         ```
-    3. \# emerge -av mplayer
+    3. \# emerge -av mpv
+
+        Previously, I use `mplayer` which is in active development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
     4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features). Then emerge plugins on demand.
 
         Since it is *minimal*, when playing songs, guayadeque reminds:
