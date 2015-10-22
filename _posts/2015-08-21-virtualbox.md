@@ -53,7 +53,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 
         *--vrde on* is to enable VRDP support thus I can connect to the VM GUI by RDP client.
 
-        *--vrdeaddress' set to 127.0.0.1 loopback address. If unset, it defaults to 0.0.0.0 which means other hosts on the network can connect to this virtual machine too. Refer to [127.0.0.1 vs 0.0.0.0](http://fangxiang.tk/2015/09/14/0000-127001-localhost/).
+        *--vrdeaddress* set to 127.0.0.1 loopback address. If unset, it defaults to 0.0.0.0 which means other hosts on the network can connect to this virtual machine too. Refer to [127.0.0.1 vs 0.0.0.0](http://fangxiang.tk/2015/09/14/0000-127001-localhost/).
 
         *--draganddrop* option is useful if you need it. However, it is vunerable to security issue.
     4. $ VBoxManage storagectl WinXP --name "IDE Controller" --add ide --controller PIIX4
