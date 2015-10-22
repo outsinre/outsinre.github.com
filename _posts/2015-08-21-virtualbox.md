@@ -54,6 +54,8 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
         *--vrde on* is to enable VRDP support thus I can connect to the VM GUI by RDP client.
 
         *--vrdeaddress' set to 127.0.0.1 loopback address. If unset, it defaults to 0.0.0.0 which means other hosts on the network can connect to this virtual machine too. Refer to [127.0.0.1 vs 0.0.0.0](http://fangxiang.tk/2015/09/14/0000-127001-localhost/).
+
+        *--draganddrop* option is useful if you need it. However, it is vunerable to security issue.
     4. $ VBoxManage storagectl WinXP --name "IDE Controller" --add ide --controller PIIX4
 
         Set disk controller for VM. Don't use SATA related controller for *WindowsXP*.
@@ -69,11 +71,11 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 8. Magic
 
     ```bash
-    $ VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001"
+    $ VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001,5010-5012"
     ```
     *VBoxHeadless* is a tool the launch VM as a server mode instead of traditional GUI mode. If you guy a VPS, say from Linode, your VPS VM mostly runs as a similar mode (maybe through web protocol for your control in brower).
 
-    The RDP TCP port is set to *5001*. If not set, the default is *3389*.
+    The RDP TCP port is set to an optional list *5001,5010-5012*. If not set, the default is *3389*. Usually, *5001* is not occupied in system, so most of the time, it is chosen as the port to listen for RDP connection.
 
     Now the VM is started, but not showing up! We need to use FreeRDP to get X.
 9. $ xfreerdp +clipboard /v:127.0.0.1:5001
@@ -106,7 +108,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
 12. Folder share
 
     First, set the folder that will be shared in *host*. Then in *guest*, mount the shared folder.
-    1. $ VBoxManage sharedfolder add WinXP --name "WLshare" --hostpath "/media/WLshare"
+    1. $ VBoxManage sharedfolder add WinXP --name "WLshare" --hostpath "/media/misc/VMs/WLshare"
     2. Open Windows Explorer and look for it under "My Networking Places" -> "Entire Network" -> "VirtualBox Shared Folders" -> "\\\Vboxsvr". By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder.
 
         If don't assign a drive letter, each time to access the shared, we have to find it under "\\\Vboxsvr".
@@ -131,7 +133,7 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
             case $opt in
                 "startvm")
                     echo "you choose to launch WinXP"
-                    VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001"
+                    VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001,5010-5012"
                     break
                     ;;
                 "rdp")
