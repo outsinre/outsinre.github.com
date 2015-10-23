@@ -164,6 +164,13 @@ This post indroduces installing *VirtualBox* in *Gentoo host*, and then create a
             esac
         ```
         Pay attention `PS3` and `case` *bash* usage.
+13. Configurations.
+
+    After getting into the XP system, we can still tune some of the configurations including:
+
+    1. If English XP, then set *non-Unicode* language to *Chinese* and set the *Regional Options* values. Also, disable *soundman* on startup.
+    2. Set *Wireless Zero Configuration*, *Workstation* and *Windows Audio* to *Disabled* or *Manual*.
+    3. If installed 迅雷, then set *XLServicePlatform* to *Manual*.
 13. Modules rebuild for new kernel. Read the first reference on *Kernel driver not installed* section.
 
     After booting with new kernel (by kernel upgrading), you could no longer load modules like *vobxdrv*.
