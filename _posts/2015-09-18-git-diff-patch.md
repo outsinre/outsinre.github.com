@@ -90,7 +90,15 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
     or
     git apply --whitespace=warn < /path/to/cjktty.patch
     ```
-    If error occurs, you can reverse the command by adding *-R* option.
+7. If you want to check whether a/the patch is applied or not
+
+    ```bash
+    cd /usr/src/linux/
+    patch -p1 --dry-run -R < /path/to/cjktty.patch
+    or 
+    git apply --whitespace=warn --check -R < /path/to/cjktty.patch
+    ```
+    If error occurs, you can reverse the command by adding *-R* option to remove the patched parts.
 8. If /usr/src/linux source is polluted with modification or patch, you can re-install the kernel source.
 
     ```bash
