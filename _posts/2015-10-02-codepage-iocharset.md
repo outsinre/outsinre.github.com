@@ -5,22 +5,24 @@ title: codepage iocharset
 
 # Background
 
-In this post, I will try to elaborate concepts related to FAT *codepage* and *iocharset* Linux kernel options, while I will also touch on short/long file names, chracter encoding etc.
+In this post, I will try to elaborate concepts related to FAT *codepage*, *iocharset* and *utf8* Linux options, while I will also touch short/long filenames, chracter set and encoding etc.
 
-Dispalying Chinese file names and contents of FAT system within Linux is troublesome in that it involves different parts, like *locale*, *kernel*, *file system*, *X* etc.
+Dispalying Chinese file names and contents of FAT file system within Linux is troublesome in that it involves different parts, like *locale*, *kernel*, *file system*, *X* etc. But in this post, I only focus on displaying FAT file system in Linux.
 
 # Character Set
 
-1. 文字/字符/语言的存储表达。目前的电子计算设备只能存储和运算数字，很显然，对于非数字信息，必须有一个“转义”过程，而这个“转义”规则本身并不能完全被存储，一部分是需要人去设置解释的。我们讨论的主要对象是“字符集”，如中文字符集，英文字符集，日文字符集等。
-2. 字符集 ”character set"。当我需要使用（存储、传输、显示等）字符时，首先规定一个字符范围（一般是本国语言涉及到的字符），范围内的字符的使用规则都有确切的定义，这个范围就是字符集。字符集中的每个字符将使用一个唯一的数字指代，叫”code point“。字符集其实是一张字符和数字的映射表格，计算设备使用的就是指代字符的数字。
+1. 文字/字符/语言的存储表达。目前的电子计算设备只能存储和运算数字，很显然，对于非数字信息，必须有一个“转义”过程，而这个“转义”规则本身并不能完全被存储，一部分需要人工设置。我们讨论的主要对象是“字符集”，如中文字符集，英文字符集，日文字符集等。
+2. 字符集 ”character set“。当我需要使用（存储、传输、显示等）字符时，首先规定一个字符范围（一般是本国语言涉及到的字符），范围内的字符的使用规则都有确切的定义，这个范围就是字符集。字符集中的每个字符将使用一个唯一的数字指代，叫”code point“。字符集其实是一张字符和数字间的逻辑映射表。
 
-    Microsoft designs its own *character set* standard to represent different lanauge characters, which is called *codepage*. *cp437* is for United States and Canada English characters, while *cp936* is for Chinese characters.
+    这里我要对”逻辑“二字解释一下。计算机设计中，我们通常需要用到逻辑的概念，譬如逻辑内存，逻辑地址空间，表示虚拟的、脱离实际计算机设备的概念。字符集就是逻辑概念，只对计算机设计者有意义，对计算机本身来说没有任何意义。这张字符集表格可以写在纸张上，譬如第0项是”你“，第1024项是”好“，计算机是理解不了这个表的。
+
+    Microsoft designs its own *character set* standard to represent different lanauge characters, which is called *codepage*. The *cp437* is for United States and Canada English characters, while the *cp936* is for Chinese characters.
 
 3. 字符集的定义在早期是各自为战的状态，国家、组织等某个地区的权威为各自区域/国家范围内使用到的字符定义字符集。当你的计算机系统只用到本区域/国家的字符时，并没有什么问题。
 
-    但当你需要使用其它区域/国家字符集的字符时，就会出问题，因为不同的字符集可能有“code point”冲突。日本人的日文字符集可能用数字100指代日文中“他”；泰国的给泰文字符集里数字100则可能指代泰文中“好”。很显然使用日文字符集的计算机上无法存储、传输、显示泰文的“好”。
-4. 为了能够在计算机上能够同时使用各区域/国家的语言/字符，有必要对全世界的所有语言字符设置一个统一字符集，这个字符集表格肯定非常大，就是我们耳熟能详的“Unicode”字符集。
-5. 同一字符集合，可以有不同的字符集。譬如中文可以有 Windows “cp936”字符集，你自己可以设计一个，只要实力足够说法其它的软件和操作系统使用你的中文字符集表。
+    但当你需要使用其它区域/国家字符集的字符时，就会出问题，因为不同的字符集可能有“code point”冲突。日本人的日文字符集里，可能数字100是日文中的“他”；泰国的给泰文字符集里数字100则指泰文中“好”。很显然使用日文字符集的计算机上无法存储、传输、显示泰文的“好”字。
+4. 为了能让计算机同时使用各区域/国家的语言/字符，有必要设计一个包含尽可能多字符的字符集，对全世界的所有语言字符设置一个统一字符集，这个字符集表肯定非常大，就是我们耳熟能详的“Unicode”字符集。
+5. 同一语言，可以有不同的字符集。譬如中文可以有 Windows “cp936”字符集，你自己可以设计一个，只要实力足够说法其它的软件和操作系统使用你设置的字符集表。
 
 # Character Encoding
 
