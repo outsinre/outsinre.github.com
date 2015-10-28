@@ -14,11 +14,11 @@ Dispalying Chinese file names and contents of FAT system within Linux is trouble
 1. 文字/字符/语言的存储表达。目前的电子计算设备只能存储和运算数字，很显然，对于非数字信息，必须有一个“转义”过程，而这个“转义”规则本身并不能完全被存储，一部分是需要人去设置解释的。我们讨论的主要对象是“字符集”，如中文字符集，英文字符集，日文字符集等。
 2. 字符集 ”character set"。当我需要使用（存储、传输、显示等）字符时，首先规定一个字符范围（一般是本国语言涉及到的字符），范围内的字符的使用规则都有确切的定义，这个范围就是字符集。字符集中的每个字符将使用一个唯一的数字指代，叫”code point“。字符集其实是一张字符和数字的映射表格，计算设备使用的就是指代字符的数字。
 
-    Microsoft designs its own *character set* standard to represent different lanauge characters, which is called *codepage*. *cp437* is for United States and Canada English, while *cp936* is for Chinese characters.
+    Microsoft designs its own *character set* standard to represent different lanauge characters, which is called *codepage*. *cp437* is for United States and Canada English characters, while *cp936* is for Chinese characters.
 
 3. 字符集的定义在早期是各自为战的状态，国家、组织等某个地区的权威为各自区域/国家范围内使用到的字符定义字符集。当你的计算机系统只用到本区域/国家的字符时，并没有什么问题。
 
-    但当你需要使用其它区域/国家字符集的字符时，就会出问题，因为不同的字符集可能有”code point“冲突。日本人的日文字符集可能用数字100指代日文中“他”；泰国的给泰文字符集里数字100则可能指代泰文中“好”。很显然使用日文字符集的计算机上无法存储、传输、显示泰文的“好”。
+    但当你需要使用其它区域/国家字符集的字符时，就会出问题，因为不同的字符集可能有“code point”冲突。日本人的日文字符集可能用数字100指代日文中“他”；泰国的给泰文字符集里数字100则可能指代泰文中“好”。很显然使用日文字符集的计算机上无法存储、传输、显示泰文的“好”。
 4. 为了能够在计算机上能够同时使用各区域/国家的语言/字符，有必要对全世界的所有语言字符设置一个统一字符集，这个字符集表格肯定非常大，就是我们耳熟能详的“Unicode”字符集。
 5. 同一字符集合，可以有不同的字符集。譬如中文可以有 Windows “cp936”字符集，你自己可以设计一个，只要实力足够说法其它的软件和操作系统使用你的中文字符集表。
 
@@ -73,7 +73,7 @@ FAT12 and early FAT16 only support short filename, while later FAT16 version, *v
 
 Long filename is stored (on *vfat* and FAT32 file system) with character set Unicode (i.e. UTF-8) and short filename is stored (on FAT12 file system) with character set *codepage* (i.e. cp936). 无论是FAT还是*vfat*, FAT32，短文件名按“codepage”编码存储，长文件名按“Unicode”编码存储。
 
-Linux support FAT file systems by enabling *vfat* support. Most of the time, we use *-t vfat* to mount FAT12, FAT16, *vfat8* and FAT32 file system. If we don't use special mount options, *-t vfat* can be omitted. There are three options need special attention: *codepage=*, *iocharset=*, *utf8*. Possible option values should be enabled in kernel and corresponding *mount* command. We can set both *codepage* and *iocharset* default value in kernel. For *utf8*, you should explicitly set it on *mount* command or in *fstab* (see below).
+Linux support FAT file systems by enabling *vfat* support. Most of the time, we use *-t vfat* to mount FAT12, FAT16, *vfat8* and FAT32 file system. If we don't use special mount options, *-t vfat* can be omitted. There are three options need special attention: *codepage=xxx*, *iocharset=xxx*, *utf8*. Possible option values should be enabled in kernel and corresponding *mount* command. We can set both *codepage* and *iocharset* default value in kernel. For *utf8*, you should explicitly set it on *mount* command or in *fstab* (see below).
 
 # codepage
 
