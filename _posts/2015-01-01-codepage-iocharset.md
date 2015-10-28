@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: codepage iocharset Linux
+title: codepage iocharset
 ---
 
 # Background
