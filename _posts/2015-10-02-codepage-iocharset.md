@@ -55,24 +55,24 @@ Windows/Linux kernel (display FAT NTFS filename) or application (read/write file
 
 A filesystem is the methods and data structures that an operating system uses to keep track of files on a disk or partition; that is, the way the files are organized on the disk. The word is also used to refer to a partition or disk that is used to store the files or the type of the filesystem. It only cares about the meta data of indexing, locating, organizing files.
 
-### 3.2 Windows NTFS
+## 3.2 Windows NTFS
 
 NTFS is superior to FAT. Most of the disucssion on FAT below applies to NTFS as well. One difference is that NTFS does not need *codepage* anymore.
 
-### 3.3 Windows FAT
+## 3.3 Windows FAT
 
 [The FAT filesystem](https://www.win.tue.nl/~aeb/linux/fs/fat/fat.html#toc1).
 
 The traditional DOS filesystem types are FAT12 and FAT16. Here FAT stands for *File Allocation Table*: the disk is divided into *clusters*, the *unit* used by the file allocation, and each FAT entry describes which clusters are used by which files. The number of sectors per cluster is given in the *boot sector* byte 13.
 
-#### 3.3.3.1 FAT disk Layout
+### 3.3.1 FAT disk Layout
 
 1. First the boot sector (at relative address 0), and possibly other stuff. Together these are the Reserved Sectors. Usually the boot sector is the only reserved sector.
 2. Then the FAT entries (following the reserved sectors; the number of reserved sectors is given in the boot sector, bytes 14-15; the length of a sector is found in the boot sector, bytes 11-12). The File Allocation Table has one entry per cluster. This entry uses 12, 16 or 28 bits for FAT12, FAT16 and FAT32.
 3. Then the Root Directory (following the FATs; the number of FATs is given in the boot sector, byte 16; each FAT entry has a number of sectors given in the boot sector, bytes 22-23).
 4. Finally the Data Area (following the root directory; the number of root directory entries is given in the boot sector, bytes 17-18, and each directory entry takes 32 bytes; space is rounded up to entire sectors). 
 
-#### 3.3.3.2 12 16 VFAT 32
+### 3.3.2 12 16 VFAT 32
 
 DOS 1.0 and 2.0 used FAT12. The maximum possible size of a FAT12 filesystem (volume) was 8 MB (4086 clusters of at most 4 sectors each).
 
@@ -86,7 +86,7 @@ To be compatible with FAT12 FAT16, when you create a long filename (longer than 
 
 Microsoft operating systems use the following rule to distinguish between FAT12, FAT16 and FAT32. First, compute the number of clusters in the data area (by taking the total number of sectors, subtracting the space for reserved sectors, FATs and root directory, and dividing, rounding down, by the number of sectors in a cluster). If the result is less that 4085 we have FAT12. Otherwise, if it is less than 65525 we have FAT16. Otherwise FAT32. 
 
-#### 3.3.3.3 Short/Long filename
+### 3.3.3 Short/Long filename
 
 *filename* is one of *filesystem* meta data which usually causes garbled screen. FAT12 and FAT16 only support short filename, while VFAT and FAT32 implement both short and long filename. Short filename is case *insensitive*.
 
@@ -96,7 +96,7 @@ We can even disable the shortname creation on NTFS which will improve system per
 
 Garbled *filename* with squares and weird characters is when your computer incorrectly renders filesystem filename.
 
-### 3.3.4 Linux FAT support
+## 3.4 Linux FAT support
 
 When manually compiling Linux kernel, there are a few options related to *codepage* and *iocharset* (both are *character set*). These options are mainly support of Windows FAT meta data decoding and conversion, especially for *filename display* on screen. In short, the *codepage* option is for *short* filename, and the *iocharset* option is for *long* filename.
 
@@ -106,7 +106,7 @@ Most of the time, we don't care about *codepage* since short filenames are almos
 
 Linux support FAT filesystems by enabling MSDOS and VFAT support in kenrel. Most of the time, we use *-t msdos* to mount FAT12 and FAT16; use `-t vfat` to mound VFAT and FAT32. If we don't use special mount options, *-t* mouint option can be omitted since mount detects filesystem itself. There are three options need special attention: *codepage=xxx*, *iocharset=xxx*, *utf8*. Possible option values should be enabled in kernel and/or in corresponding mount command. We can set default *codepage* and *iocharset* value in kernel, which can be overriden in mount command. For *utf8*, you should explicitly add it to *mount* command or in *fstab* (see below).
 
-#### 3.3.4.1 codepage
+### 3.4.1 codepage
 
 In old Windows system, both filesystem meta data and file contents are stored as codepage. But here, we only cares about short filename part.
 
@@ -118,7 +118,7 @@ Say you have a FAT32 parition and mount it with option `-t msdos`, all the filen
 
 If we don't care about short filename (i.e. no application will depend on short filename), just ignore this option. Actually, most of the time, we do omit this option as short filename is almost deprecated. Rare applications depend on it.
 
-#### 3.3.4.2 iocharset
+### 3.4.2 iocharset
 
 Character set to use for converting between the encoding used for user visible long filename characters (display on screen) and 16 bit Unicode characters (long filename are encoded by Unicode UTF-16). Long filenames are stored on disk in Unicode format (usually UTF-16), but Unix for the most part doesn't know how to deal with Unicode. By default, `FAT_DEFAULT_IOCHARSET` setting is used.
 
@@ -128,7 +128,7 @@ It should be set to be the corresponding *character encoding* of your Linux syst
 
 > You may find that *codepage* option is set based on the encoding method of FAT meta data on disk while *iocharset* is set based on Linux *locale*. The value you set for *iocharset* and *codepage* should be enabled as Y or M in kernel.
 
-## 3.4 File Content
+## 3.5 File Content
 
 After talking about *filesystem* and *filename*, let's turn to *file content*. *filesystem* does NOT care about or know *file content*. The former only takes care of file meta data to organize directory, file location, indexing, etc. by system kernel, while the later are real data of user/userspace application interest.
 
@@ -154,11 +154,11 @@ Fontconfig (or *fontconfig*) is a free software program library designed to prov
 
 More on *fontcnfig*, refer to [fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/).
 
-# 4.3 Locale
+# 5 Locale
 
 Locale is the final step responsible for displaying characters on screen no matter of filename or file contents. FAT's *iocharset* and NTFS's *nls* should be set to your system locale to display filename. Userspace program must support GBK (through userspace library like `libiconv`) to decode GBK TXT file. And then your *locale* (at least `LC_CTYPE`) should support GBK (like `zh_CN.GBK`) or compatible with GBK (like `zh_CN.UTF-8`).
 
-# Refs
+# 6 Refs
 
 1. [iocharset和codepage有何联系和区别](http://tieba.baidu.com/p/2317422644)
 2. [关于mount/samba/字符集的两篇好文](http://zengrong.net/post/1019.htm)
