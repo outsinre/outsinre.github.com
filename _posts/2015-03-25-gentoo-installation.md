@@ -114,6 +114,12 @@ Append these flags into `make.conf` file. Actually, only `-qt3 -qt4 -qt5` and `t
     5. # locale -a, to see what locales are generated.
     1. # eselect locale list
     2. # eselect locale set 3, set system-wdie locale to `en_US.utf8`.
+
+        As stated below, it is recommended to use `UTF-8` instead of `utf8`. How to achieve this? Use the *free form* of Gentoo *eselect*.
+
+        ```
+        # eselect locale set en_US.UTF-8
+        ```
     2. The following steps can also be done after entering the new Gentoo system.
     3. \# nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
 
