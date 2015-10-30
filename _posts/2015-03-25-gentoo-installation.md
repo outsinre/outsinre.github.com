@@ -838,6 +838,8 @@ exec startxfce4 --with-ck-launch
         5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF-8` (or `zh_CN.utf8`) is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems. If set to `zh_CN.GB18030` or `zh_CN.GB2312`, the Chinese folder names cannot be displayed in Thunar's address bar.
         6. Refer to [Mounting a Local Microsoft Windows Partition on Linux Systems](http://docs.oracle.com/cd/E19253-01/819-0918/localization-13).
         7. By default, /boot not auto-mounted for security reason. Similarly, the EFI System Partition is not auto-mounted to `/boot/efi` as well at startup.
+        8. `locale` is no longer needed. `nls=utf8` or `utf8` is not needed anymore since *ntfs-3g* defaults to *utf8*.
+        9. Add `noatime` to improve performance.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
 
