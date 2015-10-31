@@ -74,6 +74,8 @@ Unicode has been mapped/encoded in many different ways, but the two most common 
 
 When Unicode first started gaining momentum in the software world, multibyte character sets were not well suited to languages like C, which is the base language of most commonly used programs. Even today, some programs are not able to handle UTF-8 properly. Fortunately the majority of programs, especially the common ones, are supported.
 
+为每一个字符分配全球唯一的一个数字，但是并没有规定这个数字的表示方法。数字的表示方法由 UTF 规范规定。UTF-16 使用 2 个字节表示一个 UNICODE 数字，但是对于 >=216的数字使用 4 字节来表达。UTF-8 则对于 <127 的数字采取单字节表示，大于 127 的数字要根据其大小选择 2~6 个字节进行表示。UNICODE 在程序内部则简单的使用 unsigned long 即可表示一个字符。
+
 ## 2.4 More on Character
 
 1. When storing, transferring, and displaying, computers refer to *character encoding*.
@@ -81,6 +83,7 @@ When Unicode first started gaining momentum in the software world, multibyte cha
     1. Use GBK encoding method to get the *cp936* code point;
     2. Convert *cp936* code point to Unicode code point by system API call;
     3. Encode Unicode code point to UTF-8.
+3. When programming, an *unsigned long* will hold a Unicode code point.
 
 # 3 File
 
@@ -283,7 +286,21 @@ Userspace X application check *locale* and then decode the encoded filename or f
 
 # 6 Console
 
-Above discussion still does solve Chinese filename and file content display on console. I think this is due to console can NOT decode GBK codes back to Unicode by userspace library (i.e. `libiconv`).
+Above discussion still does solve Chinese filename and file content display on console. 
+
+基于字符界面的控制台 console 本身并不支持点阵化字符输出，要想使之支持中文，必须将控制台切换到图形模式并加入中文解码支持。
+
+通常Linux的控制台工作在文本模式下，要想在屏幕上正确显示，汉字必须将屏幕切换到图形模式，这可以通过调用内核FrameBuffer驱动程序来实现。此外，还要能正确识别系统输出到控制台的汉字信息，并调用汉字显示模块将其输出到屏幕。
+
+一种方法是像DOS下的汉字系统所做的那样：利用系统时钟中断定时监视显存地址B800:0000处的显示缓冲区 ，动态识别缓冲区中的字符信息。这种方法要求修改内核中断和TTY驱动程序，实现起来比较困难，而且需要直接操纵硬件视频缓冲区，大大影响了系统的可移植性和稳定性。
+
+另一种方法就是UNIX下多数中文平台采用的基于伪终端（Pseudo-Terminals）的外挂式解决方案。伪终端（Pseudo-Terminal）是一种类似于终端的特殊的进程间通信通道（channel）。通道的一端被称为主设备（master pseudo-terminal device），另一端被称为从设备。写入主设备的数据被发送到从设备，而写入从设备的数据也可从主设备读出，对用户来说就好像自己实际上连接到了真正的计算机终端之上。简而言之，伪终端是位于虚拟终端和最终的终端设备之间的一种承担着输入输出转换功能的设备。
+
+伪终端诞生之初就得到了广泛应用，典型的例子是Telnet服务程序。Telnet是一种远程登录服务，用户使用Telnet客户端程序通过网络登录到远程主机之上进行各种操作。Telnet服务程序就是一个伪终端，一端连接到Telnet客户端程序，另一端连接到主机应用程序，客户和应用程序之间通过伪终端进行对话。
+
+当应用程序需要从输入设备（键盘）读入数据时，它向控制台设备（/dev/console）发出 系统调用read() ，接着内核 console 驱动响应该系统请求，从输入设备驱动程序（通常为键盘驱动keyboard.c）获得输入数据，并将之返回给应用程序。而当应用程序需要想控制台输出数据时，它通过write()系统调用将数据发送至console设备，再由内核 console 驱动转发到真正的输出设备（终端、打印机...）上去。
+
+通过以上分析可以发现如果在应用程序从控制台设备（/dev/console）读入数据之前截获键盘输入信息，并提交输入法模块处理，再将处理后得到的中英文信息发送至应用程序即可完成中文输入。而在应用程序将输出数据写入/dev/console设备之前截获输出并交由汉字识别模块处理，最终由汉字显示模块输出至屏幕，即可实现中英文输出。这就是zhcon之类的中文控制台的基本工作原理。 
 
 So we need `cjktty` patch to to the conversion.
 
@@ -294,6 +311,7 @@ So we need `cjktty` patch to to the conversion.
 3. [ 字符编码详解](http://www.crifan.com/files/doc/docbook/char_encoding/release/html/char_encoding.html)
 4. [字符集编码cp936、ANSI、UNICODE](http://blog.csdn.net/wanghuiqi2008/article/details/8079071)
 5. [UTF-8 WiKi](https://wiki.gentoo.org/wiki/UTF-8).
+6. [如何制造Linux虚拟终端让控制台显示中文](http://www.ibm.com/developerworks/cn/linux/l-cn-termi-hanzi/).
 
 # More
 
