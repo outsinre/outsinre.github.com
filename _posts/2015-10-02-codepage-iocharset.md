@@ -15,7 +15,10 @@ Dispalying Chinese filename and file contents of MSDOS/FAT/NTFS filesystem withi
 
 Computers themselves do not understand printed text as a human would. For computers, every character of text is represented by a number (more concretely *binary digit*). Traditionally, each set of numbers used to represent alphabets and characters (known as a *coding system*, *encoding*, or *character set*) was limited in size due to limitations in computer hardware.
 
-Windows/Linux kernel (display MSDOS/FAT/NTFS filename) or application (read/write MSDOS/FAT/NTFS file content) must understand both the *character set* and *character encoding*. We usually take *character encoding* and *character set* for each other without explicitly clarification, for they always assume each other. For example, Unicode usualy implies UCS-2 or UTF-16. Keep in mind: *character set* is meaningless withtout *character encoding*.
+Windows/Linux kernel or userspace application (read/write MSDOS/FAT/NTFS file content) must understand both the *character set* and *character encoding*. We usually take *character encoding* and *character set* for each other without explicitly clarification, for they always assume each other. For example, Unicode usualy implies UCS-2 or UTF-16. Keep in mind: *character set* is meaningless withtout *character encoding*.
+
+1. Computer only knows 0 and 1. It does not understand *graphical character* as human being.
+2. Kernel is a special superior application to those of userspace.
 
 ## 2.1 Character Set
 
@@ -51,9 +54,9 @@ Windows/Linux kernel (display MSDOS/FAT/NTFS filename) or application (read/writ
 
     For example, if a file is stored on disk as ASCII, the *character set* must be *cp437* on Windows. GB2312 assumes *cp20936*, GBK assumes *cp936* while GB18030 assumes *cp54936*. GB18030 is a varied width encoding method with some characters encoded into 4 bytes. However Windows *code page* only support single-byte or doulbe-byte encoding, *cp54936* does NOT actually implemented on Windows. It is just a name reservation.
 4.Though a language's characters can be represented by different *character sets* and *character encodings*, most often, those different sets and/or encodings are *downward compatible* (ASCII -> GB2312 -> GBK -> GB18030). By the way, GBK is not 国家标准.
-5. 通常看到网页上提到“内码”，这个内码就是内核处理字符的“character set”。早期 Windows 使用的是“codepage”，自从 Windows 2000 后，Windows 内核默认使用 Unicode，但依然支持那些依然依赖 codepage 编码的应用。Current Windows kernel uses UTF-16 character encoding method (Unicode character set of course). So applications that takes Unicode character set can run smoothly. If application uses other character set like GBK, then we should set *default character set* for *non-Unicode Programs* in Windows control panel. Linux 内核倒是一直都是 Unicode。
+5. 通常看到网页上提到“内码”，这个内码就是内核处理字符的“character set”。早期 Windows 使用的是“codepage”，自从 Windows 2000 后，Windows 内核默认使用 Unicode，但依然支持那些依然依赖 codepage 编码的应用。Nowadays, both Linux and Windows kernel uses Unicode character set. So applications that takes Unicode character set can run smoothly. If application uses other character set like GBK, then we should set *default character set* for *non-Unicode Programs* in Windows control panel.
 
-## 2.3 More on Character set/encoding
+## 2.3 Character set/encoding evolution
 
 The most common (or at least the most widely accepted) character set is **ASCII** (American Standard Code for Information Interchange) for modern English. ASCII is strictly seven-bit, meaning that it uses bit patterns representable with seven binary digits, which provides a range of 0 to 127 in decimal.
 
@@ -70,6 +73,14 @@ Unicode throws away the traditional single-byte limit of character sets. It uses
 Unicode has been mapped/encoded in many different ways, but the two most common are UTF (Unicode Transformation Format) and UCS (Universal Character Set). A number after UTF indicates the number of bits in one unit, while the number after UCS indicates the number of bytes, like UCS-2. UTF-8 has become the most widespread means for the interchange of Unicode text as a result of its eight-bit clean nature; it is therefore the subject of this document.
 
 When Unicode first started gaining momentum in the software world, multibyte character sets were not well suited to languages like C, which is the base language of most commonly used programs. Even today, some programs are not able to handle UTF-8 properly. Fortunately the majority of programs, especially the common ones, are supported.
+
+## 2.4 More on Character
+
+1. When storing, transferring, and displaying, computers refer to *character encoding*.
+2. When doing conversion, compuers refer to *code point* as the middle relay: i.e. GBK -> UTF-8:
+    1. Use GBK encoding method to get the *cp936* code point;
+    2. Convert *cp936* code point to Unicode code point by system API call;
+    3. Encode Unicode code point to UTF-8.
 
 # 3 File
 
@@ -130,34 +141,34 @@ For short/long filename to be displayed properly under Linux, we need:
 
     ```
     File systems  --->
-	<*> FUSE (Filesystem in Userspace) support
+        <*> FUSE (Filesystem in Userspace) support
         ...
-	DOS/FAT/NT Filesystems  --->
-	<*> MSDOS fs support
-	<*> VFAT (Windows-95) fs support
-	(437) Default codepage for FAT
-	(iso8859-1) Default iocharset for FAT
-	<M> NTFS file system support
-	[ ]   NTFS debugging support
-	[ ]   NTFS write support 
+        DOS/FAT/NT Filesystems  --->
+        <*> MSDOS fs support
+        <*> VFAT (Windows-95) fs support
+        (437) Default codepage for FAT
+        (iso8859-1) Default iocharset for FAT
+        <M> NTFS file system support
+        [ ]   NTFS debugging support
+        [ ]   NTFS write support 
         ...
     ```
     There is an option *MSDOS fs support* which is almost dead and can only be found on floppy disk. I will focus only FAT/NTFS in the following sections.
 2. Enable *codepage* and *iocharset* in kernel.
 
-    Apart from the basic support in step 1, we should enable NLS options (mainly for displaying filename) in Linux kernel configuration menu, namely - *Native Language Support*. NLS will build those *character encoding* into kernel (Y or M). It is important to not become confused. For the most part, the only thing that needs to be done is to build *UTF-8 NLS* support into the kernel, and change the *Default NLS option* to *utf8* if we don't mount Windows MSDOS/FAT or Apple HFS.
+    Apart from the basic support in step 1, we should enable NLS options (mainly for displaying short/long filename) in Linux kernel configuration menu, namely - *Native Language Support*. NLS will build those *character encoding* into kernel (Y or M) for decoding/converting filename to kernel Unicode and then encoding Unicode to *locale*. It is important to not become confused. For the most part, the only thing that needs to be done is to build *UTF-8 NLS* support into the kernel, and change the *Default NLS option* to *utf8* if we don't mount Windows MSDOS/FAT or Apple HFS and would like to maintain a clean UTF-8 system.
 
     ```
     File Systems -->
       Native Language Support -->
-	(utf8) Default NLS Option
-	...
-	<M>   Simplified Chinese charset (CP936, GB2312)
-	...
-	## (Also <*> or <M> other character sets that are in use in the system's FAT filesystems or Joilet CD-ROMs.)
-	<*> UTF-8 NLS
+        (utf8) Default NLS Option
+        ...
+        <M>   Simplified Chinese charset (CP936, GB2312)
+        ...
+        ## (Also <*> or <M> other character sets that are in use in the system's FAT filesystems or Joilet CD-ROMs.)
+        <*> UTF-8 NLS
     ```
-    Take MSDOS/FAT/NTFS for example, filename is encoded by codepage (short filename) or Unicode (long filename) and stored on disk. Enabled NLS options (i.e. cp936) are to decode binary digits (i.e. GBK or GB2312) to human readable short/long filename when displaying. The first option is the default NLS used for decoding when mounting filesystem. The above example sets it to *utf8*. You can also find that `NLS_CODEPAGE_CP936` (to decode Chinese short filename) and `NLS_UTF8` (to decode Chinese long filename) are enabled.
+    Take MSDOS/FAT/NTFS for example, filename is encoded by codepage (short filename) or Unicode (long filename) and stored on disk. Enabled NLS options (i.e. cp936) decode binary digits (i.e. GBK or GB2312) to kernel Unicode (through kernel API) and then to system *locale* before displaying. The first option (set to *utf8*) is the default NLS used for decoding when mounting filesystem. You can also find that `NLS_CODEPAGE_CP936` (decode Chinese short filename) and `NLS_UTF8` (encode filename Unicode to system UTF-8 *locale*) are enabled.
 
     You can notice many NLS options started with `ISO 8859-` of them most are not necessary for Chinese users. Russian users need to enable `NLS_KOI8_R` instead of `NLS_CODEPAGE_CP936`.
 
@@ -166,7 +177,7 @@ For short/long filename to be displayed properly under Linux, we need:
 3. cjktty patch for Chinese on console.
 
     In order to display Chinese on console, we need [cjktty patch](http://www.fangxiang.tk/2015/09/18/git-diff-patch/).
-4. Correct *mount* command arguments.
+4. *mount* arguments.
 
     Having enabled MSDOS/FAT/NTFS filesystem and corresponding NLS in kernel, we then specify add those NLS to mount command through *codepage*, *iocharset* and/or *utf8* arguments. Suppose a FAT32/NTFS partition with Chinese filename and file contents, they can be mounted in Linux of `zh_CN.GBK` *locale*:
 
@@ -175,29 +186,51 @@ For short/long filename to be displayed properly under Linux, we need:
     # mount -t ntfs-3g -o utf8 /dev/sdb7 /mnt/misc
     ```
  
-    Most of the time, we use *-t msdos* to mount FAT12 and FAT16; use `-t vfat` to mound VFAT and FAT32. If you don't use special mount options (i.e. English language users), *-t* mouint option can be omitted since mount detects filesystem itself. There are three options need special attention: *codepage*, *iocharset*, and *utf8*. Possible argument values must be enabled in kernel. We can set their default values in kernel - *Default codepage for FAT*, *Default iocharset for FAT*, *Default NLS Option* which can be overriden in mount command. *codepage*/*iocharset*/*utf8* arguments support Windows MSDOS/FAT/NTFS short/long filename decoding/conversion. In short, the *codepage* option is for *short* filename, and the *iocharset* option is for *long* filename. The *utf8* option alone is to replace *iocharset=utf8* which is not recommended.
+    Most of the time, we use *-t msdos* to mount FAT12 and FAT16; use `-t vfat` to mound VFAT and FAT32. If you don't use special mount options (i.e. English language users), *-t* mouint option can be omitted since mount detects filesystem itself.
 
-    Filesystems with MS-DOS or Windows origin (i.e.: vfat, ntfs, smbfs, cifs, iso9660, udf) need the *iocharset* mount option in order for non-ASCII characters in file names to be interpreted properly. The value of this option should be the same as the character set of your *locale*, adjusted in such a way that the kernel understands it. This works if the relevant character set definition (found under File systems -> Native Language Support) has been compiled into the kernel or built as a module. The *codepage* option is also needed for *vfat*-compatible (MSDOS/FAT) and *smbfs* filesystems. It should be set to the codepage number used under MS-DOS/Windows in your country.
+    There are three options need special attention: *codepage*, *iocharset*, and *utf8*. Possible NLS options must be enabled in kernel. We can set their default values in kernel - *Default codepage for FAT*, *Default iocharset for FAT*, *Default NLS Option* which can be overriden in mount command. *codepage*/*iocharset*/*utf8* arguments support Windows MSDOS/FAT/NTFS short/long filename decoding/conversion.
+
+    In short, the *codepage* option is for *short* filename, and the *iocharset* option is for *long* filename. The *utf8* option alone is to replace *iocharset=utf8*/*nls=utf8* which is not recommended.
 
 ### 3.4.1 codepage
 
 In old Windows system, both filesystem meta data and file contents are stored as codepage. But in this section, I only talk short filename display under Linux.
 
-NLS *codepage* option sets the codepage number for converting to shortname characters on MSDOS/FAT. By default, *mount* will take `FAT_DEFAULT_CODEPAGE` in Linux kernel. Short filename is encoded by codepage and should be decoded to human readable characters.
+The *codepage* option is needed for *vfat*-compatible (MSDOS/FAT) and *smbfs* filesystems. It should be set to the codepage number used under MS-DOS/Windows in your country.
 
-When should we use *codepage*? MSDOS/FAT12/FAT16 only support short filename of `8.3` format by codepage (i.e. Chinese cp936) encoding (i.e. GB2312 or GBK). If you mount such partitions, NLS *cp936* must be enabled in Linux kernel (M or Y) and *codepage=936* argument be added to mount command such that the short filename can be displayed..
+NLS *codepage* option sets the codepage number for converting to shortname characters on Windows MSDOS/FAT. By default, *mount* will take `FAT_DEFAULT_CODEPAGE` in Linux kernel. Short filename is encoded by codepage and should be decoded and then converted to kernel Unicode before displaying.
+
+When should we use *codepage*? MSDOS/FAT12/FAT16 only support short filename of `8.3` format by codepage (i.e. Chinese cp936) encoding (i.e. GB2312 or GBK). If you mount such partitions, NLS *cp936* must be enabled in Linux kernel (M or Y) and *codepage=936* argument be added to mount command such that the short filename can be displayed.
 
 Say you have a FAT32 parition and mount it with option `-t msdos -o codepage=936`, filenames are displayed short. If you want to display true long filename, use `-t vfat` or just remove `-t` option instead.
 
 Most of the time, we needn't *codepage* mount argument at all since MSDOS/FAT12/FAT15 and applications depending on short filename are almost dead. Currently, VFAT and FAT32 support long filename by Unicode encoding. Actually, we do omit this argument as short filename is almost deprecated.
 
+When we use *codepage=936*, the kernel:
+
+1. Find the relevant NLS *cp936* module;
+2. Decode short filename to GBK/GB2312 code point;
+3. Convert the code point to Unicode code point;
+
+    Kernel operates characters with Unicode.
+
 ### 3.4.2 iocharset
 
 Character set used for converting between the encoding used for user visible long filename characters (display on screen) and 16 bit Unicode characters (long filename are encoded by Unicode UTF-16). Long filenames are stored on disk in Unicode format (usually UTF-16), but Unix for the most part doesn't know how to deal with Unicode. By default, `FAT_DEFAULT_IOCHARSET` setting is used. Since only VFAT/FAT32/NTFS support long filename, when mounting MSDOS/FAT12/FAT16, you should not use *iocharset* argument.
 
-This argument should NOT be ignored since it controls the final display of true long filename unless your kernel Default NLS Option (*utf8* in above kernel configuration menu) equals to your system *locale*. It should be set to be the corresponding *character encoding* of your Linux system *locale*. If locale is not UTF-8, like GBK or GB2312, set it to *iocharset=cp936*. If locale is UTF-8, use *utf8*,  *iocharset=utf8*/*nls=utf8*.
+Filesystems with MS-DOS or Windows origin (i.e.: vfat, ntfs, smbfs, cifs, iso9660, udf) need the *iocharset* mount option in order for non-ASCII characters in file names to be interpreted properly. The value of this option should be the same as the character set of your *locale*, adjusted in such a way that the kernel understands it. This works if the relevant character set definition (found under File systems -> Native Language Support) has been compiled into the kernel or built as a module.
+    
+This argument should NOT be ignored since it controls the display of true long filename unless your kernel Default NLS Option (*utf8* in above kernel configuration menu) equals to your system *locale*. It should be set to be the corresponding *character encoding* of your Linux system *locale*. If locale is not UTF-8, like GBK or GB2312, set it to *iocharset=cp936*. If locale is UTF-8, use *utf8*,  *iocharset=utf8*/*nls=utf8*.
 
 The argument of doing UTF-8 translations with just *utf8* (NOTE: "iocharset=utf8" or *nls=utf8* is not recommended) is recommended if unsure. If *iocharset=utf8* mount argument is used, Linux kernel VFAT module will be case sensitive which is incompatible with Windows short filename which does not differentiate filename character case. *utf8* alone does not have this side effect. Attention: the counterpart of NTFS *iocharset* option is now deprecated and renamed as *nls*. Details refer to `man mount`.
+
+When we use *iocharset=cp936*, the kernel:
+
+1. Read the UTF-16 long filename directly from FAT32/NTFS;
+2. Get the long filename Unicode code point;
+3. Find the relevant NLS *cp936* module;
+4. Encode the Unicode code point to GBK/GB2312
+5. Return the GBK code userspace program like X, file editor etc.
 
 > We notice that *codepage* option is decided basically by the language of Windows users while *iocharset* is set based on Linux *locale*. The NLS value set for *iocharset* and *codepage* should be enabled in kernel - Native Language Support.
 
@@ -206,16 +239,15 @@ The argument of doing UTF-8 translations with just *utf8* (NOTE: "iocharset=utf8
 1. There is a Windows FAT32 partition with Chinese filenames. Each file has two filenames - the short one and the long one.
 2. Short filename is encoded by codepage *cp936* / GBK.
 3. Long filename is encoded by Unicode / UTF-16.
-4. `mount -t vfat -o codepage=936,utf8 /dev/sda1 /mnt/data` on Linux with `zh_CH.UTF-8` locale.
-5. Kernel *cp936* module decodes binary digits of short filename to human readable characters.
-
-    But the decoded human readable short filename won't be displayed on screen! Instead, the default true long filename will be displayed.
+4. `mount -t vfat -o codepage=936,nls=cp936 /dev/sda1 /mnt/data` on Linux with `zh_CH.GBK` locale.
+5. Kernel *cp936* module decodes and convert short filename to Unicode
 
     If use `-t msdos` option, the default true filename will be the short one.
-6. Linux kernel decodes UTF-16 binary digits to Unicode (this happens naturally since Linux kernel uses Unicode naturally). Unicode binary digits are encoded into UTF-8.
-7. Encoded UTF-8 binary digits are delivered to X server.
+6. Linux kernel decodes UTF-16 binary digits to Unicode directly (Linux kernel uses Unicode naturally).
 
-    X server (application) decodes the binary digits based on `zh_CN.UTF-8` *locale* and display the long filename in screen.
+    Then Unicode code points are encoded into GBK.
+7. GBK codes are transferred from kernel to userspace ls, thunar, emacs etc.
+8. Userspace application decode GBK codes and transfer back to kernel input/output system for display.
 
 ## 3.5 File Content
 
@@ -245,9 +277,17 @@ More on *fontcnfig*, refer to [fontconfig](http://www.fangxiang.tk/2015/04/13/fo
 
 # 5 Locale
 
-Locale is the final step responsible for displaying characters on screen no matter of filename or file contents. FAT's *iocharset* and NTFS's *nls* should be set to or the Default NLS Option equals to system locale for filename display. Userspace program must support GBK (through userspace library like `libiconv`) to decode GBK TXT file. And then your *locale* (at least `LC_CTYPE`) should support GBK (like `zh_CN.GBK`) or compatible with GBK (like `zh_CN.UTF-8`).
+Locale is the last but second step responsible for displaying characters no matter of filename or file contents. FAT's *iocharset* and NTFS's *nls* should be set to or the Default NLS Option equals to system locale for filename display. Userspace program must support GBK (through userspace library like `libiconv`) to decode GBK TXT file. And then your *locale* (at least `LC_CTYPE`) should be `zh_CN.GBK`.
 
-# 6 Refs
+Userspace X application check *locale* and then decode the encoded filename or file content to kernel Unicode code points; those code points are then dilivered to kernel IO system for display.
+
+# 6 Console
+
+Above discussion still does solve Chinese filename and file content display on console. I think this is due to console can NOT decode GBK codes back to Unicode by userspace library (i.e. `libiconv`).
+
+So we need `cjktty` patch to to the conversion.
+
+# 7 Refs
 
 1. [iocharset和codepage有何联系和区别](http://tieba.baidu.com/p/2317422644)
 2. [关于mount/samba/字符集的两篇好文](http://zengrong.net/post/1019.htm)
