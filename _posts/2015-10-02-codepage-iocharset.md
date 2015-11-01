@@ -5,7 +5,7 @@ title: codepage iocharset
 
 # 1 Introduction
 
-In Linux, X or console is usually garbled with squares and unknown characters. The screen is in a mess with garbage messages of either filename or file contents, especially of Windows MSDOS/FAT/NTFS filesystem. In this post, I will discuss the reason of garbled screen. And I also try to elaborate the process of storage, transfer, and display characters in computer.
+In Linux, X or console is usually garbled with squares and unknown characters, **mojibak** - the garbled text that is the result of text being decoded using an unintended character encoding. The screen is in a mess with garbage messages of either filename or file contents, especially of Windows MSDOS/FAT/NTFS filesystem. In this post, I will discuss the reason of garbled screen. And I also try to elaborate the process of storage, transfer, and display characters in computer.
 
 There are mainly four parts to be clarified, namely *Character*, *File*, *Font* and *Locale*. Character refers to the basics of language of personal interest, including *Character set* and *Character encoding*. *File* involves *filesystem* and *File Content*, while *Font* requires the support of *fontconfig* and *locale*.
 
