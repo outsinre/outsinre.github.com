@@ -5,13 +5,18 @@ title: Python Virtualenv
 
 > To create isolated Python development environment, each for a specific project.
 
-1. # emerge -av dev-python/virtualenv
+1. Install *virtualenv*.
 
-    `dev-python/pip` will be emerged as a dependency.
-2. **NEVER** use `pip` to install Python packages for system-wide usage. Otherwise, Gentoo portage might be ruined and tangled with those packages, making system difficult to maintain. For example, you `pip install foo` and forgot installing it through `pip`. Later on, you decide to uninstall it, and use `emerge -avc foo`. You can imagine how horrible/bad is that!
+    ```bash
+    # emerge -av dev-python/virtualenv
+    ```
+    `dev-python/pip` will also be emerged as a dependency.
+2. **NEVER** use `pip` to install Python packages for system-wide usage. Otherwise, Gentoo portage might be ruined or tangled with those packages, making system difficult to maintain.
 
-    Use `pip` within *virtualenv*; use `emerge` for system.
-3. Create *virtualenv*
+    For example, you `pip install foo` and forgot installing it through `pip`. Later on, you decide to uninstall it, and use `emerge -avc foo`. You can imagine how horrible/bad is that! *emerge* knows nothing about how `pip` installed *foo*, let alone *equery* tools. 
+
+    Use `pip` within *virtualenv*; use `emerge` for real system.
+3. Create *virtualenv*.
 
     Switch to normal user account:
 
@@ -21,7 +26,7 @@ title: Python Virtualenv
     $ virtualenv -p python2.7 --system-site-packages -v ~/workspace/python/venv-test
     $ ls workspace/python/venv-test/
     ```
-    A new directory named *venv-test* under *~/workspace/python/venv-test* is created. The output will be like this:
+    A new directory named *venv-test* under *~/workspace/python/* is created. The output will be like this:
 
     ```
     zachary@zhtux ~ $ virtualenv -p python2.7 --system-site-packages -v workspace/python/venv-test
@@ -84,8 +89,8 @@ title: Python Virtualenv
     ```
     A new `python` executable is **copied** from system */usr/bin/python* to *~/workspace/venv-test/bin/python*, while `pip`, `setuptools`, `wheel` etc. executables are **installed** there as well.
 
-    We can add many arguments to `virtualenv` command to change default behavior. For example `-p python3.4` to specify our desired Python version instead of system's default */usr/bin/python*. By default, global Python packages (i.e. */usr/lib/python2.7/site-packages/*) are beyond of *virtualenv*, `--system-site-packages` argument allows *virtualenv* to access global site-packages.
-3. Activation
+    We can add many arguments to `virtualenv` command to change default behavior. For example `-p python3.4` to specify our desired Python version instead of system's default */usr/bin/python*. By default, global Python packages (i.e. */usr/lib/python2.7/site-packages/*) are beyond of *virtualenv*, `--system-site-packages` argument allows *virtualenv* to access those global site-packages.
+3. Activate
 
     ```bash
     $ source workspace/python/venv-test/bin/activate
@@ -95,10 +100,10 @@ title: Python Virtualenv
     ```
     Activation of *virtualenv* does NOT change working directory. That is to say, you are not constrained within that newly created directory. Newly created *venv-test* directory is just for holding *virtualenv* files and executables.
 
-    After activation, the created virtual environment name *venv-test* will be appended to the `bash` command prompt. This indicates and reminds that you're in *virtualenv* instead of system Python environment.
-4. pip install
+    After activation, the created virtual environment name *venv-test* will be appended to the `bash` command prompt: `(venv-test)zachary@zhtux ~ $`. This indicates and reminds that you're in *virtualenv* instead of system Python environment.
+4. `pip install`
 
-    In Gentoo, we should not install system-wide packages by `pip install xxx`. However, it can be used in *virtualenv*. Pakcages installed under *virtualenv* environment are bound to and constrained in that environment only!
+    As mentioned, we should not install system-wide packages by `pip install xxx`. However, it can be used in *virtualenv*. Pakcages installed under *virtualenv* environment are bound to and constrained in that environment only!
 
     Installed packages will be located under *~/workspace/python/venv-test/lib/python2.7/site-packages/* instead of the system-wide site-packages director (i.e. */usr/lib/python2.7/site-packages/*).
 5. `pip freeze`
@@ -109,9 +114,9 @@ title: Python Virtualenv
 
     Later on, when re-creating a new *virtualenv*, just use `pip install -r requirements.txt` to install the same set of packages. This can help ensure consistency across installations, across deployments, and across developers.
 
-   Attention: if you used `--system-site-packages` argument, `pip freeze` and `pip freeze` will include your system global site-packages. But don't worry, `pip` won't pull in those packages into *virtualenv*.
-6. Lastly, remember to exclude the virtual environment folder from source control by adding it to the ignore list.
-7. Deactivate to get out of *virtualenv*.
+    Attention: if you used `--system-site-packages` argument, `pip freeze` and `pip freeze` will include your system global site-packages. But don't worry, `pip` won't pull in those packages into *virtualenv*.
+6. Lastly, remember to exclude the virtual environment folder *venv-test* from source control by adding it to the ignore list.
+7. Deactivate
 
     ```bash
     $ deactivate

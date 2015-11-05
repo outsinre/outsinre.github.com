@@ -67,10 +67,10 @@ We should add a DNS *CNAME record* for *blog.example.com* on DNS control panel.
     >
     >␢␢␢␢ A 192.30.252.154
     
-    The four `␢` means leaving the first cell blank.
-5. The two DNS *A records* are making *example.com* the alternative URL of *www.example.com*.
+    The four `␢` means leaving the first cell blank. You could replace `␢` with *example.com*, but FREENOM will ignore this field. If you replace it with other subdomain like *test.example.com*, then the subdomain cannot make use of Github's CDN service to speed up your site.
+5. The two DNS *A records* are making *example.com* the alternative URL to *www.example.com*.
 
-    Top domain *example.com* can ONLY be the alternative of *www* subdomain.
+    Top domain *example.com* can ONLY be the alternative to *www* subdomain.
 
 ## *baseurl* and *url*
 
