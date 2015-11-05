@@ -5,7 +5,7 @@ title: Github project page blog
 1. *blog.example.com* for Github *project page*, mainly hosting Chinese posts.
 2. *www.example.com* and *example.com* for Github *user page*, mainly hosting technical posts.
 
-    Top domain *example.com* can ONLY be used as an alternative of subdomain *www*.
+    Top domain *example.com* can ONLY be used as an alternative to subdomain *www*.
 
 # Project on Github
 
