@@ -89,4 +89,7 @@ You are recommended to use SASL.
     *password* **must be the same** as the one to register NickServ.
 3. /set irc.server.freenode.sasl_password "${sec.data.freenode}"
 4. /set irc.server.freenode.sasl_fail disconnect
+5. /reconnect freenode
+
+    You (as *jimgray*) are automatcially identified by SASL once connected to *freenode* server.
 5. Read [secured data](https://www.weechat.org/files/doc/stable/weechat_user.en.html#secured_data) and [freenode sasl](https://freenode.net/sasl/).
