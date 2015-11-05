@@ -9,7 +9,7 @@ title: Weechat SASL NickServ
 
 After starting `$ weechat`:
 
-1. /set irc.server.freenode.nicks "jimgray,jimgray_,_jimgray,_jimgray_"
+1. /set irc.server.freenode.nicks "jimgray,jimgray\_,\_jimgray,\_jimgray_"
 
     If you don't set default nicks, Weechat will take Gentoo username as the default nickname. Check the `server_default` section of `less .weechat/irc.conf`.
 2. /set irc.server.freenode.username "Jim Gray"
@@ -64,7 +64,7 @@ Make sure you are connected to *freenode* with your desired nickname (*jimgray* 
 
 If you don't configure SASL, then you have two choices:
 
-1. Manually identification
+1. Manually identification after connection to server.
 
     ```
     /connect freenode
