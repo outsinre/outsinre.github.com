@@ -132,3 +132,6 @@ title: Python Virtualenv
     1. [virtualenv](https://virtualenv.pypa.io/en/latest/)
     2. [virtual environment](http://docs.python-guide.org/en/latest/dev/virtualenvs/)
     3. [gentoo python pip and virtualenv](http://blog.samuelololol.org/2013/10/how-python-pip-and-virtualenv-go-along.html)
+    4. [Virtualenv Tutorial Part 2](http://www.simononsoftware.com/virtualenv-tutorial-part-2/)
+    5. [A Primer on virtualenv](http://iamzed.com/2009/05/07/a-primer-on-virtualenv/)
+    6. [a useful video](http://showmedo.com/videotutorials/video?name=2910000&fromSeriesID=291)
