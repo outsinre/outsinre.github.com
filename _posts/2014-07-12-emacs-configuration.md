@@ -2,7 +2,9 @@
 layout: post
 title: Emacs configuration
 ---
+
 # init.el
+
 Most of the time, configuring *Emacs* will update *init.el* file ultimately no matter through editing it *manually* or through *command line* in mini-buffer.
 
 1. If editting it manually, pay attention the *lisp* grammar.
@@ -12,6 +14,7 @@ Most of the time, configuring *Emacs* will update *init.el* file ultimately no m
     **ATTENTION**: I wasted a lot of time on configuring *AucTex* below since the updates does not take effect until I re-launched *Emacs daemon*.
 
 # frame VS window
+
 Emacs中两个概念容易混淆，即frame和window。
 
 frame就是我们通常所说的“窗口”，譬如，在系统菜单点击Emacs，那么eamcs就会运行，那个就称为frame，其实就是an emacs process/an emacs instance。
@@ -19,8 +22,11 @@ frame就是我们通常所说的“窗口”，譬如，在系统菜单点击Ema
 window是frame里的小窗口。譬如，可以把frame分成多个window，每一个window编辑不同的文件（buffer）。
 
 # WINDOWS
+
 The Windows *init.el* has a backup at *GitHub*.
+
 ## Emacs AucTeX Configuration in Windows:
+
 1. [Emacs AUCTeX and PDF Synchronization on Windows](http://www.barik.net/archive/2012/07/18/154432/)
 
 2. [简单搞定 Emacs + \Latex (三)](http://blog.csdn.net/nangnang/article/details/19234853)
@@ -29,6 +35,7 @@ The Windows *init.el* has a backup at *GitHub*.
 4. Add line `(setq-default TeX-engine 'xetex)` to use `xetex` as the default engine.
 
 ## Emacs 24.3 Display Chinese under Windows
+
   系统为英文版WIN8 RTM X64位。在使用Emacs 24.2打开文件时候，发现中文字体部分显示为方块。通过对编码的设置依然不能解决问题。在网上查找解决方案的时候，发现有人提到通过设置字体能够解决这个问题。于是仔细看了下emacs里的那些个方块，里面的内容其实是中文的编码，由于不能显示对应的文字，Emacs于是原样将字符编码给打印出来。能够显示的中文也很丑，歪歪扭扭。进入控制面板里查看了下字体，发现中文该有的字体都有，只是不同的是，英文版下字体自然也是英文名称。于是根据谷歌的搜索，在.emacs文件的最开始写入如下内容：
 
 `(set-fontset-font "fontset-default" 'gb18030' ("Microsoft YaHei" . "unicode-bmp"))`
@@ -36,6 +43,7 @@ The Windows *init.el* has a backup at *GitHub*.
 Reference: [emacs在win8乱码](http://blog.csdn.net/qianchenglenger/article/details/10950769)
 
 ## Emacs Windows Language Environment
+
 Windows 8.1 英文系统，非Unicode语言设置为Simplified Chinese。在Emacs下编辑中文老遇到编码的问题，特别windows ubuntu之间切换各种乱码问题。所以在`init.el`文件中加入如下代码：
 {% highlight ruby linenos %}
 
@@ -201,6 +209,7 @@ emacsclient -c -a "" "$@"
 mousepad就显得有些多余了.由于emacs的启动速度问题解决了,mousepad就基本推出历史舞台了.
 
 ## 安装Auctex
+
 在emacs启动后，M-x: package-list-packages，会启动emacs自带的插件管理器。找到*auctex*，按下*i*标记为安装，再按*x*，开始安装。
 
 具体有哪些基本按键，参考[How to Install Packages Using ELPA, MELPA, Marmalade](http://ergoemacs.org/emacs/emacs_package_system.html)页面。
@@ -229,7 +238,8 @@ Up to know, we can compile Chinese *LaTeX* files automatically.
 Refer to [emacs-as-the-ultimate-latex-editor](http://piotrkazmierczak.com/2010/emacs-as-the-ultimate-latex-editor/).
 
 ### Previewer
-My Gentoo system use *MuPDF* PDF viewer. How to make it the default previewer for *AucTeX*? Basically, we need to update two variable of *AucTeX*, which could be achieved by editing *init.el* manually or by command line *M-x*.
+
+My Gentoo system use *MuPDF* PDF viewer. How to make it the default previewer for *AucTeX*? Basically, we need to update two variable for *AucTeX*, which could be achieved by editing *init.el* manually or by command line *M-x customize-variable*.
 
 1. TeX-view-program-list
 
@@ -306,4 +316,5 @@ df
    ```
 
 ### Writing LaTeX
+
 For a bignner, refer to [LaTeX](http://www.fangxiang.tk/2015/02/05/LaTeX/).
