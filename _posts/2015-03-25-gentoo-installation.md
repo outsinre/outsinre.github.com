@@ -131,7 +131,7 @@ LC_COLLATE="C"
     4. \# env-update && source /etc/profile
     5. \# export PS1="(chroot) $PS1", use this command to reminds you are in `chroot` environment.
     5. Use `xx_YY.UTF-8` (or `xx_YY.utf8`. But this one might not work for some packages). Don't use `xx_YY.UTF8`.
-    5. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](http://www.fangxiang.tk/2015/04/13/fontconfig/).
+    5. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](http://jimgray.tk/2015/04/13/fontconfig/).
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source.
     1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to **unstable 4.0.0**_.
@@ -603,7 +603,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
                 elog
             fi
             ```
-    4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://www.fangxiang.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration]9http://www.fangxiang.tk/2014/07/12/emacs-configuration/).
+    4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://jimgray.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](http://jimgray.tk/2014/09/14/emacs/installation/).
     5. \# emerge -av www-plugins/adobe-flash
 
         Pay attention to update `package.license` file when needed.
@@ -641,7 +641,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         4. # emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
         5. _$_ git clone xxx
 
-        Refer to [git config](http://www.fangxiang.tk/2015/07/19/git-config/).
+        Refer to [git config](http://jimgray.tk/2015/07/19/git-config/).
     10. \# emerge -av wgetpaste
     11. \# emerge -av net-misc/dropbox [optional] xfce-extra/thunar-dropbox
         1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
@@ -772,9 +772,9 @@ thunar $HOME/Bluetooth
         8. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537).
     22. TeXLive-2014
 
-        Refer to [texlive gentoo](http://www.fangxiang.tk/2015/08/29/texlive-gentoo/).
+        Refer to [texlive gentoo](http://jimgray.tk/2015/08/29/texlive-gentoo/).
 46. Configuration consistently.
-    1. Package can be pulled or emerged into system. There is a big difference. The 1st won't add packages (pulled in by USE flag or dependency) to *@world* group, while the second do. The 2nd method implies that you *explicitly* emerged that specific package. Of course, you could use `--oneshot` option when emerging to avoid adding package to *world* group. More read [the 2nd step](http://www.fangxiang.tk/2015/08/29/texlive-gentoo/) and *gst-plugins-* installation in this post.
+    1. Package can be pulled or emerged into system. There is a big difference. The 1st won't add packages (pulled in by USE flag or dependency) to *@world* group, while the second do. The 2nd method implies that you *explicitly* emerged that specific package. Of course, you could use `--oneshot` option when emerging to avoid adding package to *world* group. More read [the 2nd step](http://jimgray.tk/2015/08/29/texlive-gentoo/) and *gst-plugins-* installation in this post.
     1. You use `1` *oneshot* when you want recompile or update a package (like *gst-plugins-*) that is a dependency of another package (like *kwplayer*) in a world file. So when you remove the second package depclean will be able to remove first one. When updating packages in *world* group, its dependencies won't get updated. If necessary, you need to update those dependencies by *oneshot* option.
     1. Try your best to avoid *package.accept_keywords*. *Tesiting* packages and other *stable* packages might cause conflicts in terms of *perl*, *ruby*, *python* etc.
     1. Update a single package.
@@ -1003,7 +1003,7 @@ blacklist thinkpad_acpi
         CPU的微代码更新支持,建议选中.CPU的微代码更新就像是给CPU打补丁,用于纠正CPU的行为.更新微代码的常规方法是升级BIOS,但是也可以在Linux启动后更新.比如在Gentoo下,可以使用"emerge microcode-ctl"安装microcode-ctl服务,再把这个服务加入boot运行级即可在每次开机时自动更新CPU微代码.
     10. Fingerprint. Fingerprint login is a bad idea since your fingerprint is left anywhere anytime around, like on bottles, cups, books etc. It easy for hackers to get a copy of it. So don't use it!!!
 
-        Here, I just have a try and test the function. That's all of it. BTW, my current system is locked by [lvm luks lvm](http://www.fangxiang.tk/2015/09/10/lvm-luks-lvm/). So it's relatively safe.
+        Here, I just have a try and test the function. That's all of it. BTW, my current system is locked by [lvm luks lvm](http://jimgray.tk/2015/09/10/lvm-luks-lvm/). So it's relatively safe.
 
         ```bash
         # lsusb | grep -i upek
@@ -1071,7 +1071,7 @@ blacklist thinkpad_acpi
     11. # make install
     12. \# genkernel --install initramfs
 
-        If Gentoo depends on LUKS and LVM for system mount points and booting, refer to [LVM LUKS LVM](http://www.fangxiang.tk/2015/09/10/lvm-luks-lvm/).
+        If Gentoo depends on LUKS and LVM for system mount points and booting, refer to [LVM LUKS LVM](http://jimgray.tk/2015/09/10/lvm-luks-lvm/).
     13. \# grub2-mkconfig -o /boot/grub/grub.cfg
     15. \# reboot
     14. \# emerge -av @module-rebuild
@@ -1083,7 +1083,7 @@ blacklist thinkpad_acpi
         ```
         modprobe: FATAL: Module vboxdrv not found.
         ```
-        `emerge -av @module-rebuild` is to re-install all external modules (*app-emulation/virtualbox-modules* inclusive). More read [VirtualBox](http://www.fangxiang.tk/2015/08/21/virtualbox/).
+        `emerge -av @module-rebuild` is to re-install all external modules (*app-emulation/virtualbox-modules* inclusive). More read [VirtualBox](http://jimgray.tk/2015/08/21/virtualbox/).
 
         There is another command from wiki `make modules_prepare` is used when the kernel not built yet or cleaned. For example, you need to compile the external module first, just before the kernel building, then execute this command before `make -j5`.
 47. e-sources-4.1.1 kernel
