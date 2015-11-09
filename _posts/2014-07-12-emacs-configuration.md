@@ -393,7 +393,7 @@ Mainly personal like to adjust the basics of Emacs.
 
 ## init-auctex
 
-Please refer to [auctex emacs](http://jimgray.tk/2015/01/30/auctex/emacs).
+Please refer to [auctex emacs](http://jimgray.tk/2015/01/30/auctex-emacs/).
 
 ## init-elpy
 
