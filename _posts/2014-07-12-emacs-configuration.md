@@ -497,6 +497,7 @@ Emacs's builtin undo/redo (see above *Undo/Redo*) is confusing and not intuitive
     (evil-mode 1)
     ```
     By setting `(evil-mode 1)`, Emacs enters evil mode by default. `C-z` to switch between evil and normal Emacs.
+
 ## init-win-nt
 
 Mainly special options for Windows system.
