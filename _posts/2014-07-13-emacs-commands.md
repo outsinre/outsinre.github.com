@@ -3,19 +3,17 @@ layout: post
 title: Emacs Commands
 ---
 
-## Redo Undo
+# Redo Undo
 
 >We can use `C-/` to undo editing. But how do we **redo**?
 
-   Consecutive repetitions  of the  `C-_`, `C-x  u` or  `C-/` commands undo earlier and  earlier changes, back to the limit  of what has been recorded.  If all recorded changes  have already been undone, the undo command prints an error message and does nothing.
+Consecutive repetitions  of the  `C-_`, `C-x  u` or  `C-/` commands undo earlier and  earlier changes, back to the limit  of what has been recorded.  If all recorded changes  have already been undone, the undo command prints an error message and does nothing.
 
-   Any command other than an undo  command breaks the sequence of undo commands.  Starting  at this  moment, the  previous undo  commands are considered ordinary changes that can  themselves be undone.  Thus, you can redo changes you have undone  by typing `C-f' or any other command that will have no important effect, and then using more undo commands.
+Any command other than an undo  command breaks the sequence of undo commands.  Starting  at this  moment, the  previous undo  commands are considered ordinary changes that can  themselves be undone.  Thus, you can redo changes you have undone  by typing `C-f' or any other command that will have no important effect, and then using more undo commands.
 
-   **Short explanation**: by undoing the undo. If you undo, and then do a non-editing command such as `C-f`, then the next undo will undo the undo, resulting in a redo.
+*Short explanation*: by undoing the undo. If you undo, and then do a non-editing command such as `C-f`, then the next undo will undo the undo, resulting in a redo.
 
-   **loger explanation**:
-
-You can think of undo as operating on a stack of operations. If you perform some command (even a navigation command such as `C-f`) after a sequence of undo operations, all the undos are pushed on to the operation stack. So the next undo undoes the last command. Suppose you do have an operation sequence that looks like this:
+*loger explanation*: you can think of undo as operating on a stack of operations. If you perform some command (even a navigation command such as `C-f`) after a sequence of undo operations, all the undos are pushed on to the operation stack. So the next undo undoes the last command. Suppose you do have an operation sequence that looks like this:
 
     Insert "foo"
     Insert "bar"
@@ -49,14 +47,14 @@ If you do a modifying command to break the undo sequence, that command is added 
 
 This adding/re-adding happens ad infinitum. It takes a little getting used to, but it really does give Emacs a highly flexible and powerful undo/redo mechanism.
 
-**Reference**
+*Reference*:
 
 1. [(emacs)Undo](http://www.cs.cmu.edu/cgi-bin/info2www?%28emacs%29Undo)
 2. [How do you 'redo' changes after 'undo' with Emacs?](http://stackoverflow.com/questions/3527142/how-do-you-redo-changes-after-undo-with-emacs)
 
-## Killing and Deleting
+# Killing and Deleting
 
-**Killing**: put the killed text in a ring for recovery; usually earase a text blcok.
+*Killing*: put the killed text in a ring for recovery; usually earase a text blcok.
 
 `C-k`  (kill-line) kills all the text from point up to the end of the line.
 
@@ -74,7 +72,7 @@ This adding/re-adding happens ad infinitum. It takes a little getting used to, b
 
 `C-d` (the <delect> key) deletes the next character. `<DEL>` ( the <Backspace> key) deletes the the previous character.
 
-## Emacs file and buffer Encoding
+# Emacs file and buffer Encoding
 
 有时候同一个文件在不同的系统下编码不一样，导致乱码的问题。这时，就要用到emacs的一些M-x命令来**临时**改变编码。
 
@@ -82,4 +80,17 @@ This adding/re-adding happens ad infinitum. It takes a little getting used to, b
 
 `M-x set-buffer-file-coding-system`这是设置buffer所对应的文件的编码，表示彻底改变编码了。
 
-Reference: [How to switch back text encoding to UTF-8 with emacs?](http://superuser.com/questions/549497/how-to-switch-back-text-encoding-to-utf-8-with-emacs)
+*Reference*:
+
+1. [How to switch back text encoding to UTF-8 with emacs?](http://superuser.com/questions/549497/how-to-switch-back-text-encoding-to-utf-8-with-emacs)
+
+# Help
+
+1. `C-h v`: to describe variables.
+2. `C-h k`: to describe key bindings.
+3. `c-h t`: to get your built-in tutorials.
+4. `C-h f`: to describe lisp functions.
+
+*Reference*:
+
+1. [help summary](https://www.gnu.org/software/emacs/manual/html_node/emacs/Help-Summary.html)
