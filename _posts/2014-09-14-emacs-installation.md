@@ -3,6 +3,10 @@ layout: post
 title: Emacs installation
 ---
 
+# Windows 安装
+
+Refer to [从零开始——Emacs 安装配置使用教程 2015](http://www.jianshu.com/p/b4cf683c25f3).
+
 # Linux 安装
 
 下面关于 Linux 的部分主要以 Gentoo 为主。
@@ -19,26 +23,25 @@ title: Emacs installation
 
 > Emacs = Emacs Makes A Computer Slow.
 
-Emacs 由于要加载好多脚本，特别是 .emacs 或 init.el 里的内容很多时，太慢，是 Emacs 一大诟病。不过我们可以利用 Emacs 的 C/S 模式，先让 Emacs 运行在 server mode，脚本的加载让 server 来完成。然后再用客户端 emacsclient 连接 Emacs server，方法如下：
+Emacs 由于要加载好多脚本，特别是 .emacs 或 init.el 里的内容很多时，太慢，是 Emacs 一大诟病。不过我们可以利用 Emacs 的 C/S 模式，脚本的加载让 server 来完成。然后再用客户端 emacsclient 连接 Emacs server，方法如下：
 
 ### Emacs 23 之前的版本：
 
 可以在启动 Emacs 的时候，顺便选择开启 server-start。
 
 1. 一种方法是在 init.el 里面设定加入 `(server-start)` 或 `(server-mode)`。
-2. 另一种是直接在 Emacs 的 mini-buffer 输入命令`M-x server-start/server-mode`。
+2. 另一种是直接在 Emacs 的 mini-buffer 输入命令`M-x: server-start/server-mode`。
 
+Emacs 23 之前的那种方法有个缺点，即所开启的 server mode 只属于当前的 Emacs frame，如果这个 frame 关闭了，那么 server 就随之关闭。再运行 Eamcs 时，又要重新加载 server mode。所以为了能够利用这个 C/S 模式，开启 server mode 的那个 frame/instance/session 不能关闭！ 只能在另一个 terminal 启动 emacsclient 来链接复用这个 server。
 ### Emacs 23 开始的版本
 
-Emacs 23 之前的那种方法有个缺点，即所开启的 server mode 只属于当前的 Emacs frame，如果这个 frame 关闭了，那么 server 就随之关闭。再运行 Eamcs 时，又要重新加载 server mode。
+幸好 Emacs 23 引入 `emacs --daemon`，那么 daemon 与 server 有细微区别，可以常驻系统（内存）中，与某个 Emacs frame/instance 无关。关闭当前的 Emacs frame，daemon 服务依然存在，这时关闭的仅仅是 client 端。
 
-幸好 Emacs 23 引入 `emacs --daemon`，那么 server mode 可以常驻系统（内存）中，与某个 Emacs frame/instance 无关。关闭当前的 Emacs frame，server 服务依然存在，这时关闭的仅仅是 client 端。
-
-解决了 server mode 问题后，下面看看 client 端如何链接 server mode。
+下面开始不区分 server 和 daemon 两个词汇。看看 client 端如何链接 daemon/server。
 
 ### eamcsclient
 
-解决来server mode问题之后，运行客户端`emacsclient`，连接server，对文件进行处理。eamcsclient有几个关键参数：
+运行客户端`emacsclient`，连接 daemon/server，对文件进行处理。eamcsclient有几个关键参数：
 
 1. -t
 
