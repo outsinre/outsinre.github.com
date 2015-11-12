@@ -111,6 +111,7 @@ Emacs is a sophisticated self-documenting editor. Every facet of Emacsis searcha
 4. `C-x TAB`: Indent all lines starting in the region. If called interactively with no prefix argument, activate a transient mode in which the indentation can be adjusted interactively by typing <left>, <right>, <S-left>, or <S-right>.
 
     You can prefix it with `C-u C-x TAB` or `C-u 6 C-x TAB`. Alternatively, after `C-x TAB`, use left/right key to move the selected region.
+
 ## Universay arguments
 
 Negative arguments add directionality to commands; digits add repetition or change how a command works.
