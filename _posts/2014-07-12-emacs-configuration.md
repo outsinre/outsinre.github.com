@@ -108,7 +108,9 @@ Emacs is a sophisticated self-documenting editor. Every facet of Emacsis searcha
 
     `ESC-ESC-ESC`: three consective ESC key. This command can exit an interactive command such as `query-replace (M-%)`,can clear out a prefix argument or a region,can get out of the minibuffer or other recursive edit,cancel the use of the current buffer (for special-purpose buffers),or go back to just one window (by deleting all but the selected window).
 3. `M-:`: evaluate lisp statement.
+4. `C-x TAB`: Indent all lines starting in the region. If called interactively with no prefix argument, activate a transient mode in which the indentation can be adjusted interactively by typing <left>, <right>, <S-left>, or <S-right>.
 
+    You can prefix it with `C-u C-x TAB` or `C-u 6 C-x TAB`. Alternatively, after `C-x TAB`, use left/right key to move the selected region.
 ## Universay arguments
 
 Negative arguments add directionality to commands; digits add repetition or change how a command works.
@@ -728,3 +730,4 @@ To change the default directory by either of the two:
 2. https://github.com/purcell/emacs.d, https://github.com/bbatsov/prelude
 3. eshell?
 4. Caps Lock VS Ctrl?
+5. use package to speed up
