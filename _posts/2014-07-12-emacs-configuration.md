@@ -98,6 +98,9 @@ Emacs is a sophisticated self-documenting editor. Every facet of Emacsis searcha
 5. `C-w` kill a selected region. `M-w` copies the region into the kill ring.
 1. `M-d` kills the next word. `M-<DEL>` kills the previous word.
 1. `C-d` (the <delect> key) deletes the next character. `<DEL>` ( the <Backspace> key) deletes the the previous character.
+1. `M-a` and `M-e` moves the beginning and end of *sentence*. But Emacs assumes you begin your sentences with *two whitespaces* after a period.
+
+    There is long history of debate over the *sentence spacing*. Two whitespaces are mostly used in old days when typewriter was heavily used. While, in modern computer society, *proportional/vector fonts* are good at isolating sentences by one space with a period, especially on the WEB.
 
 ## Useful keys
 
@@ -111,6 +114,7 @@ Emacs is a sophisticated self-documenting editor. Every facet of Emacsis searcha
 4. `C-x TAB`: Indent all lines starting in the region. If called interactively with no prefix argument, activate a transient mode in which the indentation can be adjusted interactively by typing <left>, <right>, <S-left>, or <S-right>.
 
     You can prefix it with `C-u C-x TAB` or `C-u 6 C-x TAB`. Alternatively, after `C-x TAB`, use left/right key to move the selected region.
+5. `M-m`: move point to the first non-whitespace character on this line.
 
 ## Universay arguments
 
@@ -123,7 +127,50 @@ Negative arguments add directionality to commands; digits add repetition or chan
 
     But it the former is more convenient as there is no need to switch our finger from Ctrl to Alt.
 
-Refer to *Universal Arguments* part of *Mastering Emacs* book. 
+Refer to *Universal Arguments* part of *Mastering Emacs* book.
+
+## Frame and Window operation
+
+1. `C-x 0`: delete *active* window; `C-x o`: switch window.
+2. If other window will be accessed frequently, `C-x o` is tedious. Emacs support sending commands directly into another window by prefix `C-x 4`.
+
+    Use `C-x 4 C-h` to display the list. For example, `C-x 4 C-f` will open a file in another window and switch to that window immediately. If we omit the `4`, then it will be command opening file in current window.
+
+### Frame management
+
+Most of the time, on X system with one monitor, we only open up ONE frame. But what if the monitor big enough and/or two monitors exist?
+
+Yes, we can make use of more frames at a time. The prefix key used for frames is `C-x 5`. Like the prefix key for windows, ( `C-x 4` ) the commands are mostly the same.
+
+| Key Binding | Purpose |
+| ----------- | ------- |
+| C-x 5 2 | Create a new frame |
+| C-x 5 b | Switch buffer in other frame |
+| C-x 5 0 | Delete active frame |
+| C-x 5 1 | Delete other frames |
+| C-x 5 C-f | Finds a file in the other frame window |
+
+## Move by S-expression
+
+*s-expression* (*sexp*) can be called *balanced expression* especially in programming languages i.e. Python, C, Java etc, typically include:
+
+1. *Strings*: Programming languages being the primary example of strings, which are balanced expressions because they begin and end with `"` or `'`.
+2. *Brackets*: In most major modes brackets are considered balanced as they have defined open and close characters: `[` and `]` , `(` and `)` , `{` and `}` , `<` and `>`.
+
+Balanced expressions can span multiple lines – multi-line strings for instance – and Emacs knows this.
+
+| key binding | purpose |
+| --- | --- |
+| C-M-f | Move forward by s-expression |
+| C-M-b | Move backward by s-expression |
+| C-M-d | Move down into a list |
+| C-M-u | Move up out of a list |
+| C-M-n | Move forward to the next list |
+| C-M-p | Move backward to the previous list |
+
+The first two commands support *sexp* fully. The next four work on balanced expressions — but only brackets, and not strings. Emacs those expressions as 'list* which means *lisp* in the old times. But all cover a wide variaty of coding languages.
+
+*attention*: these key bindings might not work in Emacs due to *fcitx* occupying them.
 
 ## Undo/Redo
 
