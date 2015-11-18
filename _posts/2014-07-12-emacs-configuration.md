@@ -236,8 +236,9 @@ This adding/re-adding happens ad infinitum. It takes a little getting used to, b
 
 # Configuration
 
-> Everything is synced on GitHub repository - *.emacs.d*
+> It has been a long time since this post and many updates were made to optimize performance. For latest configuration, refer to the GitHub repository instead. The configuration Elisp cdoes are self-explanatory full of comments and easy to start off.
 
+1. Everything is synced on GitHub repository - *.emacs.d*
 1. Plugin/package/library are the same meaning for Emacs, all regarded as *.el* or *.elc* files. These words are used losely, and do NOT have TECHNICAL definitions in Elisp.
 
     Emacs 一般称“插件”为 "package" 或者 "library" 。本质上，它们都提供一堆定义好的函数，来实现一些操作，进而实现某个功能。这里多说几句。在 Emacs 中，连移动光标这种最底层的操作都有对应的函数。比如，你在 Emacs 中可以键入 `C-f` 来将光标向右移动一个字符，同时也可键入 `M-x forward-char` 来实现。任何复杂的功能，比如给文档生成一个目录，都可以被分解为一个个操作，或者说调用一个个函数，而这些函数顺序执行下来功能就得到了实现。
