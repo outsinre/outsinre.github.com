@@ -93,3 +93,10 @@ You are recommended to use SASL.
 
     You (as *jimgray*) are automatcially identified by SASL once connected to *freenode* server.
 5. Read [secured data](https://www.weechat.org/files/doc/stable/weechat_user.en.html#secured_data) and [freenode sasl](https://freenode.net/sasl/).
+
+## unaffilicated cloak
+
+1. *Unaffiliated cloak* is to hide your IP from IRC command like `whois`.
+2. To obtain a cloak, just join *freenode* channel, ask for one.
+
+    When channel staff notices your request, you *might* get cloaked. Unaffiliated cloak applies to all channels on *freenode* server.
