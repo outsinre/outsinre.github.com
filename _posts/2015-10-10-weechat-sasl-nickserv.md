@@ -21,6 +21,9 @@ After starting `$ weechat`:
 6. /set irc.server.freenode.ssl on
 
     Connect to *freenode* using SSL.
+6. /set irc.server.freenode.command "/mode jimgray +w"
+
+    Add *walops* to receive important operator announcements.
 7. /set irc.server.freenode.autojoin "\#gentoo"
 
     This is NOT recommended.
