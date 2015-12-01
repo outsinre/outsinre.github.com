@@ -68,10 +68,10 @@ title: Gentoo Installation
     2. `CFLAGS` and `CXXFLAGS`. Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). Command `grep -m1 -A3 "vendor_id" /proc/cpuinfo` will show the current CPU architecure information. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two _.gcc_ files.
         1. CFALGS="-march=corei7-avx -O2 -pipe"
         2. CXXFLAGS="${CFLAGS}"
-    3. The `MAKEOPTS` variable defines how many parallel compilations should occur when installing a package. The recommended value is the number of logical processors in the CPU plus 1..
-        1. Add a line `MAKEOPTS="-j5"`
+    3. The `MAKEOPTS` variable defines how many parallel compilations should occur when installing a package. The recommended value is the number of logical processors in the CPU plus 1. But this rule is outdated. I have 4GB memory and swap/swapfile enabled, *emerge* will make use of swap havily. *swap* naturally slow down application performance. So turn down MAKEOPTS to 2 or 3.
+        1. Add a line `MAKEOPTS="-j3"`
         2. The boot screen will show you several penguins, that is the number of logical cores.
-        3. This value does not apply to *kernel compiling*. So when compiling a kernel, you need to explicitly specify *make -j5*.
+        3. This value does not apply to *kernel compiling*. So when compiling a kernel, you need to explicitly specify *make -j3*.
         3. Refer to [MAKEOPTS](https://wiki.gentoo.org/wiki/MAKEOPTS).
     4. `CPU_FLAGS_X86`: The 'USE' flags corresponding to the CPU instruction sets and other features specific to the *x86* (and *amd64*) architecture are being moved into a separate USE flag group called CPU\_FLAGS\_X86.
 
@@ -232,7 +232,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
     If this is not first time to make, then execute `make clean` first.
 
-    1. # make -j5
+    1. # make -j3
     2. # make modules_install
     2. # make install, this will copy the kernel image into /boot/ together with the System.map file and the kernel configuration file.
         1. Actually you can use a copy command instead.
@@ -518,7 +518,8 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     3. # make clean
         1. Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
     3. # make modules_prepare
-    3. # make -j5
+    1. # echo 3 > /proc/sys/vm/drop_caches
+    3. # make -j3
     4. # Backup /lib/modules/\`uname -r\`/ contents. Why? Since we are re-compiling the current kernel, *make modules_install* will override old modules. If the newly-compiled kernel and modules thereof are error-prone or even cannot boot, then you cannot boot into old kernel since its modules (some are crucial) are overriden.
     4. # make modules_install
     5. # make install
@@ -1061,12 +1062,14 @@ blacklist thinkpad_acpi
     5. # mount /boot
     5. # mount /dev/sda2 /boot/efi
     6. # cd /usr/src/linux
+    6. # echo 3 > /proc/sys/vm/drop_caches
     7. # cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
     8. # make silentoldconfig, choose all the new settings to default ones. It only asks user new kernel options incurred in new kernel version.
         1. # make olddefconfig, to convert the old config to fit new kernel version, while setting new kernel options to default values without user confirmation.
         2. # make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
     8. # make modules_prepare
-    9. # make -j5
+    1. # echo 3 > /proc/sys/vm/drop_caches
+    9. # make -j3
     10. # make modules_install
     11. # make install
     12. \# genkernel --install initramfs
@@ -1085,7 +1088,7 @@ blacklist thinkpad_acpi
         ```
         `emerge -av @module-rebuild` is to re-install all external modules (*app-emulation/virtualbox-modules* inclusive). More read [VirtualBox](http://jimgray.tk/2015/08/21/virtualbox/).
 
-        There is another command from wiki `make modules_prepare` is used when the kernel not built yet or cleaned. For example, you need to compile the external module first, just before the kernel building, then execute this command before `make -j5`.
+        There is another command from wiki `make modules_prepare` is used when the kernel not built yet or cleaned. For example, you need to compile the external module first, just before the kernel building, then execute this command before `make -j3`.
 47. e-sources-4.1.1 kernel
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
