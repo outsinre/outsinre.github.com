@@ -24,7 +24,7 @@ After starting `$ weechat`:
 6. /set irc.server.freenode.command "/mode jimgray +w"
 
     Add *wallops* to receive important operator announcements.
-7. /set irc.network.send_unknown_commands on
+7. /set irc.network.send\_unknown_commands on
 
     Some commands (like */ns*) are specific to IRC servers (like *freenode*) which cannot be recoginized by IRC client (like *weechat*). This setting enables such commands.
 8. /set irc.server.freenode.autojoin "\#gentoo"
@@ -44,7 +44,11 @@ After starting `$ weechat`:
 
 # 2 Register NickServ
 
-Make sure you are connected to *freenode* with your desired nickname (primary nickname *jimgray* in this post) and now you are in the *server* tab. **Don't execute the following command in a channel tab**, otherwise sensitive information (i.e. password) might be sniffed by guys there.
+*most settings below are known to/for freenode server*.
+
+Make sure you are connected to *freenode* with your desired nickname (primary nickname *jimgray* in this post) and now you are in the *server* tab.
+
+**Don't execute the following command in a channel tab**, otherwise sensitive information (i.e. password) might be sniffed by guys there.
 
 1. /msg NickServ REGISTER password youremail@example.com
 
@@ -55,7 +59,7 @@ Make sure you are connected to *freenode* with your desired nickname (primary ni
     In a while, you will receive an email, from which you should copy the verification command to complete the registration process:
 2. /msg NickServ VERIFY REGISTER jimgray xxxxxxxx
 
-    This temporary code is only for verification. The *freenode* account name will the very nickname used when registering.
+    This temporary code is only for verification. The *freenode* account name will the very nickname used when registering (*jimgray* here).
 3. /msg NickServ SET HIDEMAIL ON
 
     To keep your email address private, rather than displaying it publicly, mark it as hidden (which is done by default for new accounts).
@@ -63,7 +67,7 @@ Make sure you are connected to *freenode* with your desired nickname (primary ni
 
     Now, account and nick name *jimgray* is registered on *freenode* server, no one else can use it unless the correct *password* is supplied identify himself.
 
-    An *freenode* account can register/reserve/hold several nicknames. First switch to that nickname and then group it to account. Grouping nicks in this way gives you the benefit of having all your nicks covered by the same cloak, should you choose to wear a cloak (see *unaffiliated cloak* below).
+    An *freenode* account can register/reserve/hold several nicknames. First switch to that nickname and then group it to account as long as that nickname is not owned by others. Grouping nicks in this way gives you the benefit of having all your nicks covered by the same cloak, should you choose to wear a cloak (see *unaffiliated cloak* below).
 
     ```
     /nick jimgray_
@@ -95,7 +99,7 @@ If you don't configure SASL, then you have two choices:
     ```
     /set irc.server.freenode.command "/msg NickServ identify jimgray password"
     ```
-    To run a command after connection to server, for example to authenticate with nickserv (only if you don’t use SASL for authentication).
+    To run a command **after connection** to server automatically, for example to authenticate with nickserv (only if you don’t use SASL for authentication).
 
 ## SASL
 
