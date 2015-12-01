@@ -201,6 +201,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
         2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
         3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
         4. Enable `EFI runtime service support, CONFIG_EFI` if UEFI is used to boot the system. Turn off `EFI stub support, CONFIG_EFI_STUB`, `EFI mixed-mode support, EFI_MIXED`, `CONFIG_CMDLINE_BOOL, Built-in kernel command line`, `CONFIG_CMDLINE, Built-in kernel command string` and `CONFIG_INITRAMFS_SOURCE, Initramfs source file(s)`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
+    5. Set `INPUT_PCSPKR` as 'M' or 'Y' for the standard PC Speaker to be used for bells and whistles. Don't enable `SND_PCSP` (read the kernel help message)!
     5. Set `X86_X32, x32 ABI for 64-bit mode` to 'Y'. This option is useful for WIndows 32 bit binaries (under Wine support) to take advantage of the system 64-bit registers.
     5. Set `IOMMU_SUPPORT` and `CALGARY_IOMMU` to 'N' since my laptop does not support this but VT-x. VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz).
     5. Watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
@@ -467,6 +468,15 @@ VIDEO_CARDS="intel"
     4. # echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
     5. **Attention** # emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
     6. # emerge --ask x11-terms/xfce4-terminal
+
+        By default, xfce4-terminal disables beep by default.
+
+        ```bash
+        grep -i bell ~/.config/xfce4/terminal/terminalrc
+        MiscBell=TRUE
+        printf "\7"; sleep 1; printf "\a" 
+	```
+        To turn on beep in terminal is useful especially for IRC Weechat (when others messaging you).
     11. <s>[optional] # echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
         1. Remember to run `env-update && source /etc/profile` to update environment.</s>
         2. This is not a good scheme to set *XSESSION* for all users on the system.
@@ -538,7 +548,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     1. Firefox: enable `gstreamer` USE flag to support more video codecs (like H264).
         1. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
         2. Add *FoxyProxy Standard* proxy plugin to firefox.
-    2. *weechat* for IRC.
+    2. Weechat for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
         1. # echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
