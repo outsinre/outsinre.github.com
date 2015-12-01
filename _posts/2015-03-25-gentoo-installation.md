@@ -535,9 +535,9 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. [optional] # rc-update add alsasound boot
     3. # speaker-test -t wav -c 2, test the speaker.
 45. Applications:
-    1. Web browser: Firefox. It will take over 6 hours compiling.
-
-        > foxy proxy standard
+    1. Firefox: enable `gstreamer` USE flag to support more video codecs (like H264).
+        1. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
+        2. Add *FoxyProxy Standard* proxy plugin to firefox.
     2. *weechat* for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
