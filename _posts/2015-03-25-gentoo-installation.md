@@ -554,7 +554,8 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         ```
         1. Enable `gstreamer` USE flag for Firefox to support more video codecs (like H264).
         2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
-        3. Add *FoxyProxy Standard* proxy plugin to firefox.
+        3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented.mp4.\**,  *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
+        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*) plugins.
     2. Weechat for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).

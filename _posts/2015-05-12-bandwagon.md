@@ -2,7 +2,9 @@
 layout: post
 title: Firewall
 ---
+
 # Concepts
+
 1. The paramount is to get your own VPS (virtual private server) - a server located outside of the firewall. VPS can be bought from commercial supplier. If you possess a PC outside of the firewall, that can be treated as your own VPS. Most users don't own a physical PC outside the firewall, which is an awkward situation urging them buying VPS.
 2. Then you can deploy VPN or Shadowsocks (ss) servers on your own VPS.
 3. Up to now, a local VPN or ss needs installed.
@@ -13,22 +15,38 @@ title: Firewall
 6. Choose ss instead of VPN.
 
 # VPS
+
 There are many VPS suppliers of which I chose `bandwagonhost.com` or the so-called "搬瓦工". `bandwagonhost` is easy to manage by web portal including installing VPN or ss server, offering different kinds of pricing package specifying _RAM, DISK, BANDWIDTH etc_.
 
 My choice is [$9.99 USD annually](https://bandwagonhost.com/cart.php?a=confproduct&i=1). Of course, it will reminds you to register your web account before paying through paypal.
 
 Pay attention to the pricing link which is an _inviting_ link. If you buy VPS through [bandwagonhost.com](https://bandwagonhost.comm), you might not locate the _$9.99 USD annually_ pricing package.
 
-You need to wait for a few minutes for VPS system initialization. The default VPS system is `CentOS6 x86`. You can also reinstall OS after which a new root passowrd and port for SSH are generated as well.
+You need to wait for a few minutes for VPS system initialization. The default VPS system is `CentOS6 x86`. You can also reinstall or choose a different operating system.
 
 1. [bandwagonhost](https://bandwagonhost.com/clientarea.php): the web portal login. The most important page is `Services -> My Services`.
     1. You can also click on `KiviVM Control Panel` to get to the 2nd step.
 2. [KiviVM Control Panel](https://kiwivm.it7.net): VPS management page. Briefly go through the management panel.
     1. The first tool I avail of is `two-factor authentication` (iOS Google Authenticator) thus another temporary code is required for each login into KiviVM.
-    2. Since CentOS6 x86 root password is not send through email any more, reset root password by `root password modification`. You can now SSH into your VPS Centos with clients like `Putty` and `MobaXterm`.
-	3. Under `KiviVM password modification`, set password for [KiviVM Control Panel](https://kiwivm.it7.net).
+    2. Since CentOS6 x86 root password is not send through email any more, generate root password through `root password modification` on the lest panel. You can now SSH into your VPS Centos with clients like Putty, MobaXterm and even SSH command line. Attention: the default SSH port is different from normal 22. You can get the port from `Main controls`.
 
+        Don't use the root password often (create a new user account for daily operation, see below). If you need root privilege, just generate a new one!
+    3. Under `KiviVM password modification`, set password for [KiviVM Control Panel](https://kiwivm.it7.net).
+3. You can SSH into VPS often to do work. First SSH as root, then create a daily use user account.
+
+    ```
+    adduser username
+    passwd username
+    ```
+    Then SSH as *username* for daily operation.
+
+    ```
+    ssh -p xxx username@host
+    ```
+    A better way of SSH, please refer to [ssh](http://jimgray.tk/2015/05/11/ssh/).
+    
 ## ss server Python version
+
 1. At the bottom of `KiviVM Control Panel` lies `KiviVM Extras` from which you find `Shadowsocks Server`. What a relief! You no longer are bothered installing ss server manually. The default is Shadowsocks Python version. After installing finished, click `Go back`. Instructions on setting ss client for Windows system is illustrated. ss server will run automatically after the automatic installation.
     1. Command `ps -ef | grep ssserver` will print the ss server command:
 
@@ -99,9 +117,13 @@ pip install shadowsocks
 3. Refer to [shadowsocks 2.6.8](https://pypi.python.org/pypi/shadowsocks); [VPS之自建shadowsocks服务器（Centos及Ubuntu方法）](http://www.vtestvps.tk/?p=18)
 
 ## ss client
+
 ###Windows
+
 There are many clients available, my current windows 8.1 client is [shadowsocks-csharp](https://github.com/shadowsocks/shadowsocks-csharp). Fill in the `encryption method`, `server port`, `password`, and `proxy port` for client. The default proxy mode is `PAC` (Proxy auto-config) not `Global`.
+
 ###Linux
+
 Basically, different shadowsocks on Linux system share serve and client - YES, the same package. For example, my `banwagonhost` uses Python shadowsocks, while Gentoo uses the same package. After installation, the package will install both server side and client side. Usually server side command is `ssserver` or `ss-server`, while client side command is `sslocal` or `ss-local`.
 
 >_#_ emerge -av shadowsocks
@@ -127,7 +149,9 @@ Up to now, connected to my VPS server! But one step further - __foxy proxy__ for
 >https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt
 
 Refer to this link for usage: [shadowsocks-go](https://github.com/shadowsocks/shadowsocks-go). Though this is shadowsocks-go version, but the principle is the similar.
+
 ### PAC VS Global on WIndows
+
 pac是只对被墙的使用ss，全局就是无论什么网站都用ss。
 
 pac可以自己修改，添加任意网站。当然也可以用网上网友维护的文件，最有名的是就是GFWlist列表。windows下右键点击ss client，出现一个菜单"Update PAC from GFWlist" 。
@@ -137,6 +161,7 @@ pac可以自己修改，添加任意网站。当然也可以用网上网友维�
 参考[ShadowSocks教程:SS软件中的pac自动代理模式是什么？](http://shadowsocks.info/shadowsocks-pac/)
 
 # VPS credentials
+
 1. [Official web portal client area](https://bandwagonhost.com/clientarea.php)
 2. KiviVM Control Panel two-factor authentication:
     1. [KiviVM password](https://kiwivm.it7.net)
@@ -145,15 +170,15 @@ pac可以自己修改，添加任意网站。当然也可以用网上网友维�
 4. ss server password for ss client connectoin on `Shadowsocks Server` of KiviVM control panel.
 
 # References
+
 1. [shadowsocks.org](http://shadowsocks.org)
 2. [shadowsocks github](https://github.com/shadowsocks/shadowsocks)
 3. [shadowsocks搭建教程](http://shadowsocks.blogspot.com/2015/01/shadowsocks.html)
 4. [ShadowSocks教程:Bandwagonhost搬瓦工一键安装Shadowsocks新手小白教程](http://shadowsocks.info/shadowsocks-bandwagonhost/)
 
 # Notes
+
 1. SwichSharp is no longer needed.
 2. If VPS CentOS restarted, then make sure to run `ssserver` again as a daemon if you don't set it run on boot.
-
-# Issues remained
-3. VPN
+3. *DO NOT use OpenVPN* on VPS. GFW can easily siniff OpenVPN traffic and block VPS IP.
 4. ss优化
