@@ -27,6 +27,9 @@ After starting `$ weechat`:
 7. /set irc.network.send\_unknown_commands on
 
     Some commands (like */ns*) are specific to IRC servers (like *freenode*) which cannot be recoginized by IRC client (like *weechat*). This setting enables such commands.
+7. /set irc.look.part_closes_buffer on
+
+    This will close the *buffer* (or called *tab*) immediately when parting a channel.
 8. /set irc.server.freenode.autojoin "\#gentoo"
 
     This is NOT recommended.

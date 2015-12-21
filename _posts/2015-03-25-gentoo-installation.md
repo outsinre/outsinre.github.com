@@ -485,8 +485,8 @@ VIDEO_CARDS="intel"
         1. At first try, the `logout`, `shutdown` buttons are greyed out. Since those buttons are related to `consolekit`, check the `consolekit` and `dbus` wiki.
         2. Make sure `consolekit` is added to default run level. `consolekit` depends on `dbus`, so `dbus` no need added to default run level. Run `rc-status` with normal user account, you will see dbus is under `Dynamic Runlevel`
         3. After a system update, the issue is solved automatically.
-    8. _$_ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
-    10. # rc-update add consolekit default
+    8. \$ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
+    10. \# rc-update add consolekit default
     12. You'd better logout and then login again to test xfce: _$_ startx.
 
         > **Attention**: Use _startx_ command to launch xfce desktop. No graphical loggin configured.
@@ -496,7 +496,8 @@ VIDEO_CARDS="intel"
         3.  #  rm -r ~/.config/Thunar
 45. [deprecated, replaced by method in fstab]
 
-    <s> When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
+    When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
+    
     1. # nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
 
@@ -505,7 +506,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         ```
         `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
     3. Similarly, since the root and home partition is formatted in previous step, you should go into Ubuntu system to hide these two partitions.
-    4. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).</s>
+    4. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).
 43. Partitions:
     1. sda1 Windows recovery partition
     2. sda2 EFI partition
