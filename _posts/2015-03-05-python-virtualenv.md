@@ -114,7 +114,7 @@ title: Python Virtualenv
 
     Later on, when re-creating a new *virtualenv*, just use `pip install -r requirements.txt` to install the same set of packages. This can help ensure consistency across installations, across deployments, and across developers.
 
-    Attention: if you used `--system-site-packages` argument, `pip freeze` and `pip freeze` will include your system global site-packages. But don't worry, `pip` won't pull in those packages into *virtualenv*.
+    Attention: if `--system-site-packages` was added, `pip freeze` and `pip list` include system-wide site-packages. But don't worry, `pip install -r requirements.txt` won't pull in those packages into *virtualenv* as long as we keep consistent on argument `--system-site-packages`.
 6. Lastly, remember to exclude the virtual environment folder *venv-test* from source control by adding it to the ignore list.
 7. Deactivate
 
