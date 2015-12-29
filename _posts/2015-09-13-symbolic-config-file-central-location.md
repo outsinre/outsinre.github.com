@@ -2,6 +2,11 @@
 layout: post
 title: symbolic links to config in central location
 ---
+
+*UPDATE*: Real config files remain at where they are. Create symbolic links to them at a central place. When backup, add `-L` argument to `cp`.
+
+---
+
 There are all kinds of config files and scripts to take care of during installation or system backup. It is smart practice to put them in a central place, while creating corresponding symbolic links to them.
 
 1. mkdir /gtmisc
