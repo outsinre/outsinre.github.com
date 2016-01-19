@@ -258,7 +258,7 @@ This needs modified in the steps later on.
 
         > hostname="zhtux"
 30. Configuring the network.
-    1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support of `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
+    1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support from `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
     2. # emerge --ask net-misc/dhcpcd
     3. # rc-update add dhcpcd default
     4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
@@ -294,7 +294,9 @@ This needs modified in the steps later on.
     7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in plaintext by anyone using the computer:
         1. # chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
         2. Replace the `identity` and `password` entries with your own Wifi information.
-    7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `wpa_supplicant`. No need to create so called `/etc/conf.d/net` file as the handbook.
+    7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant` hook. No need to create so called `/etc/conf.d/net` file as the handbook.
+
+        From 'dhcpcd-6.10.0' onward, '10-wpa_supplicant' hook is no longer supplied by default. We should copy '/usr/share/dhcpcd/hooks/10-wpa_supplicant' to '/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant'.
     8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
 	https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
     9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
@@ -560,7 +562,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. Weechat for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
-        1. # echo "app-i18n/fcitx gtk3" >> /etc/portage/package.use/fcitx
+        1. # echo "app-i18n/fcitx gtk gtk3" >> /etc/portage/package.use/fcitx
         2. # emerge -av fcitx
         2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 		
@@ -572,6 +574,8 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
         3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
         4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
+
+            It's optional to install *fcitx-configtool* if you are OK to configure Fcitx on command line manually.
     18. ffmpeg
 
         `ffmpeg` is emerged by some other packages, one of which might be `mplayer` or `mpv`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
