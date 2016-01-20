@@ -359,6 +359,7 @@ More precisely, Emacs first determines which user’s init file to use. It gets 
 
     ```lisp
     M-x: load-file
+    M-x: load-library
     ```
     To load *HOME/.emacs.d/init.el*. If current buffer is your init file config, use:
 
@@ -369,6 +370,11 @@ More precisely, Emacs first determines which user’s init file to use. It gets 
 
     ```lisp
     M-x: eval-region
+    ```
+    Simple code can be evaluated in minibuffer as well:
+
+    ```lisp
+    M-: list-code-here
     ```
     More read on [How can I reload .emacs after changing it?](http://stackoverflow.com/q/2580650).
     
@@ -744,6 +750,53 @@ Mainly special options for Windows system.
 (provide 'init-win-nt)
 ```
 There are many other Windows configs, but integrated into other features, like AucTeX PDF viewer in *init-auctex*.
+
+## init-chinese-pyim
+
+中文输入法，可以在 console/terminal 下使用。
+
+1. Install through *melpa* repository.
+
+    In *\*scratch\** buffer input:
+
+    ```lisp
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+    ```
+    Temporarily enable *melpa* repository.
+
+    ```lisp
+    M-: eval-buffer
+    M-x: list-packages
+    ```
+    Find *chinese-pyim* and install it.
+2. Configure
+
+    ```
+    (setq pyim-dicts
+	  ; 主词库
+	  '((:name "bigdict"
+	     :file #("/home/zachary/.emacs.d/pyim/dicts/pyim-bigdict.pyim" 14 23
+		     (face flx-highlight-face)
+		     23 25
+		     (face flx-highlight-face))
+	     :coding utf-8-unix
+	     :dict-type pinyin-dict)
+	    ; guesss dict 两个联想词库
+	    (:name "guessdict-a"
+	     :file "/home/zachary/.emacs.d/pyim/dicts/pyim-guessdict-a.gpyim"
+	     :coding utf-8-unix
+	     :dict-type guess-dict)
+	    (:name "guessdict-b"
+	     :file "/home/zachary/.emacs.d/pyim/dicts/pyim-guessdict-b.gpyim"
+	     :coding utf-8-unix
+	     :dict-type guess-dict)))
+    ```
+    It's important to configure a good phrase file (词库）. More details refer to Emacs config on Github.
+3. Refer to [github chinese-pyim](https://github.com/tumashu/chinese-pyim).
+
+## init-sdcv
+
+A console version of *StarDict*.
 
 ### Emacs 24.3 Chinese characters on Windows
 
