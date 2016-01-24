@@ -799,9 +799,7 @@ There are many other Windows configs, but integrated into other features, like A
     ```
     里面的 `14 23 (face flx-highlight-face)` 好像可以去掉，不知道是不是因为我的 Emacs 里其它插件自动调整的。
 
-    It's important to configure a good phrase file (词库）. More details refer to Emacs config on Github. *chinese-pyim* phrase file *.pyim* which is much the same as *.org* format except that it uses `-` instead of `'`. Both *org* and *pyim* are normal text file. Use `sed "s/'/-/g" org-format-file` to generage a phrase file.
-
-    More on *org* phrase file, refer to [fcitx](http://jimgray.tk/2016/01/01/fcitx/) post. By *org* phrase file, we can generate both phrase file format for *fcitx .mb* and *chinese-pyim .pyim* format.
+    It's important to configure a good phrase file (词库）. *chinese-pyim* phrase file *.pyim* is much the same as *.org* format except that it uses `-` instead of `'`. Both *org* and *pyim* are normal text file. More on *org* phrase file, refer to [fcitx](http://jimgray.tk/2016/01/01/fcitx-chinese-pyim/) post. By *org* phrase file, we can generate both phrase file for *fcitx .mb* and *chinese-pyim .pyim* format. But pay attention to their difference.
 3. Refer to [github chinese-pyim](https://github.com/tumashu/chinese-pyim). 
 
 ## init-sdcv
