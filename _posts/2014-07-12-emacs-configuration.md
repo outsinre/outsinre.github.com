@@ -332,6 +332,12 @@ This is only a lose convention. There are a lot exceptions. For example:
 
 All the above means, you could have a file named *Joe-xyz-mode_v2.1.el*, which provides a feature named *abc*, while the command name to activate it may be *opq*, and it might be displayed in mode line as *OPQ helper*. And, this file can be considered as a *package* or *library*.
 
+## buffer-local variable
+
+1. If a variable is *buffer-local*, means the value is specific to that current buffer (where the cursor blinks). Different buffers might have different values. *default-directory* and *tab-width* are such variables.
+2. Use `setq` to change current value, which will overrides global default value. For example, on Linux, Emacs's global default *default-directory* is *~/* for all buffers. After evaluating `(setq default-directory "~/workspace/")`, the *default-directory* of current buffer is changed to *~/workspace/*, while other buffers' (without `setq`) *default-directory* remains to be global default *~/*.
+3. Usually in Emacs *init.el*, we can change the global default *default-directory* by `(setq-default default-directory "/path/")`. `(setq default-directory "/path/")` in *init.el* only change the very first buffer's *default-directory* on startup.
+
 ## elpa
 
 1. Compared to install libraries manually, *elpa* automates the process.
@@ -791,8 +797,12 @@ There are many other Windows configs, but integrated into other features, like A
 	     :coding utf-8-unix
 	     :dict-type guess-dict)))
     ```
-    It's important to configure a good phrase file (词库）. More details refer to Emacs config on Github.
-3. Refer to [github chinese-pyim](https://github.com/tumashu/chinese-pyim).
+    里面的 `14 23 (face flx-highlight-face)` 好像可以去掉，不知道是不是因为我的 Emacs 里其它插件自动调整的。
+
+    It's important to configure a good phrase file (词库）. More details refer to Emacs config on Github. *chinese-pyim* phrase file *.pyim* which is much the same as *.org* format except that it uses `-` instead of `'`. Both *org* and *pyim* are normal text file. Use `sed "s/'/-/g" org-format-file` to generage a phrase file.
+
+    More on *org* phrase file, refer to [fcitx](http://jimgray.tk/2016/01/01/fcitx/) post. By *org* phrase file, we can generate both phrase file format for *fcitx .mb* and *chinese-pyim .pyim* format.
+3. Refer to [github chinese-pyim](https://github.com/tumashu/chinese-pyim). 
 
 ## init-sdcv
 

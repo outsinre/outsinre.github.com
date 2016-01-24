@@ -611,7 +611,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         **Restart guayadeque** to make those plugins work.
 
     4. emacs:
-        1. # echo "app-editors/emacs xft toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display.
+        1. # echo "app-editors/emacs xft libxml2 toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display. `libxml2` is to support builtin `shr`, which in return support `eww` web browser and Gnus viewing HTML.
         2. # emerge -av emacs
         3. \# emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
 
