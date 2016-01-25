@@ -113,7 +113,7 @@ Append these flags into `make.conf` file. Actually, only `-qt3 -qt4 -qt5` and `t
     3. # locale-gen, if reminds: run ". /etc/profile" to reload the variable in your shell". If you run it, you need to run `export PS1="(chroot) $PS1"` again.
     5. # locale -a, to see what locales are generated.
     1. # eselect locale list
-    2. # eselect locale set 3, set system-wdie locale to `en_US.utf8`.
+    2. \# eselect locale set 3, set system-wdie locale to `en_US.utf8`.
 
         As stated below, it is recommended to use `UTF-8` instead of `utf8`. How to achieve this? Use the *free form* of Gentoo *eselect*.
 
@@ -249,7 +249,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
     ```
     /dev/sda10   /boot		ext2    defaults,noatime	1 2
-    /dev/sda12   /		ext4    noatime	       0 1
+    /dev/sda12   /   		ext4    noatime	       0 1
     /dev/sda7    none	  	swap	sw	       0 0
     ```
 This needs modified in the steps later on.
@@ -297,8 +297,7 @@ This needs modified in the steps later on.
     7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant` hook. No need to create so called `/etc/conf.d/net` file as the handbook.
 
         From 'dhcpcd-6.10.0' onward, '10-wpa_supplicant' hook is no longer supplied by default. We should copy '/usr/share/dhcpcd/hooks/10-wpa_supplicant' to '/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant'.
-    8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](
-	https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
+    8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
     9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
     10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](/2015/05/11/gentoo-downgrade-package/)
     10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
@@ -469,7 +468,7 @@ VIDEO_CARDS="intel"
     3. # echo 'gnome-base/gvfs -http' >> /etc/portage/package.use/gvfs
     4. # echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
     5. **Attention** # emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
-    6. # emerge --ask x11-terms/xfce4-terminal
+    6. \# emerge --ask x11-terms/xfce4-terminal
 
         By default, xfce4-terminal disables beep by default.
 
@@ -477,7 +476,7 @@ VIDEO_CARDS="intel"
         grep -i bell ~/.config/xfce4/terminal/terminalrc
         MiscBell=TRUE
         printf "\7"; sleep 1; printf "\a" 
-	```
+        ```
         To turn on beep in terminal is useful especially for IRC Weechat (when others messaging you).
     11. <s>[optional] # echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
         1. Remember to run `env-update && source /etc/profile` to update environment.</s>
@@ -565,7 +564,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         1. # echo "app-i18n/fcitx gtk gtk3" >> /etc/portage/package.use/fcitx
         2. # emerge -av fcitx
         2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
-		
+
             ```
             export GTK_IM_MODULE=fcitx
             export QT_IM_MODULE=xim
@@ -653,7 +652,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 
                 >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
             5. emerge -av wps-office
-	    6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
+            6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
     7. \# emerge --ask xfce4-mixer
     8. \# emerge -av mupdf
 
@@ -1020,7 +1019,7 @@ blacklist thinkpad_acpi
         # emerge -av microcode-ctl
         # rc-update add microcode_ctl boot
         ```
-	Refer to [intel microcode](https://wiki.gentoo.org/wiki/Intel_microcode). Updates to CPU microcode have to be re-applied each time the computer is booted, because the memory updated is volatile (despite the term *firmware* also being used for microcode).
+        Refer to [intel microcode](https://wiki.gentoo.org/wiki/Intel_microcode). Updates to CPU microcode have to be re-applied each time the computer is booted, because the memory updated is volatile (despite the term *firmware* also being used for microcode).
 
         According to the reference, you should run `dmesg | grep -i microcode` to check whether CPU microcode is updated or not. If not, I think there is not need to add *microcode-ctl* to boot level until *microcode-ctl* package is updated.
 
@@ -1085,7 +1084,6 @@ blacklist thinkpad_acpi
     5. # mount /boot
     5. # mount /dev/sda2 /boot/efi
     6. # cd /usr/src/linux
-    6. # echo 3 > /proc/sys/vm/drop_caches
     7. # cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
     8. # make silentoldconfig, choose all the new settings to default ones. It only asks user new kernel options incurred in new kernel version.
         1. # make olddefconfig, to convert the old config to fit new kernel version, while setting new kernel options to default values without user confirmation.
