@@ -218,9 +218,10 @@ Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo ov
 
 ## grub2
 
-1. grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part\_gpt /dev/sdc
+1. grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part\_gpt
     - '--bootloader-id=grub2' and '/dev/sdc' (USB stick) might be optional.
-    - '--efi-directory' specifies the mountpoint of the ESP. It replaces '--root-directory' which is deprecated.
+    - '--efi-directory' specifies the mountpoint of the ESP (i.e. the USB sdc1 is mounted at /boot). It replaces '--root-directory' which is deprecated.
+    -  No need to append '/dev/sdc' since '--efi-directory=' is enough. The 'INSTALL_DEVICE' parameter of 'grub2-install' is mainly for BIOS boot.
 
     Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://forums.gentoo.org/viewtopic-p-7011836.html) and [grub2 zh-CN](https://wiki.gentoo.org/wiki/GRUB2/zh-CN).
 2. Kernel and init arguments '/etc/default/grub'

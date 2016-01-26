@@ -27,7 +27,7 @@ title: Gentoo Installation
     1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position. Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
 
     ```bash
-    1. \# parted -a optimal /dev/sda
+    1. # parted -a optimal /dev/sda
     2. (parted) p
     3. (parted) unit MiB
     3. (parted) rm 10
