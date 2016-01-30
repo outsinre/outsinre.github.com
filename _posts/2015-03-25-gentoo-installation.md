@@ -253,10 +253,22 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     /dev/sda7    none	  	swap	sw	       0 0
     ```
 This needs modified in the steps later on.
-29. Set hostname.
+29. Set hostname and local domain
     1. \# nano -w /etc/conf.d/hostname
 
         > hostname="zhtux"
+    2. On login, usually get message like *This is zhtux.unkown_domain ...* which is not a error, but annoying. There are two ways to get rid of it.
+
+        The first way is to set a fake domain for localhost, edit */etc/hosts*. Add fake *hostname.domain* to *localhost*.
+
+        ```
+        # <ip address>	<fully qualified hostname>	<aliases>
+        127.0.0.1       zhtux.jiantu.boxes      zhtux   localhost
+        ::1             zhtux.jiantu.boxes      zhtux   localhost
+        ```
+        Now try to `ping zhtux.jiantu.boxes/zhtux/localhost` to test.
+
+        Another method is edit */etc/issue*, remove `.\O`.
 30. Configuring the network.
     1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support from `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
     2. # emerge --ask net-misc/dhcpcd
