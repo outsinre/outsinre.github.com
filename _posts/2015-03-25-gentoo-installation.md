@@ -622,7 +622,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         **Restart guayadeque** to make those plugins work.
 
     4. emacs:
-        1. # echo "app-editors/emacs xft libxml2 toolkit-scrool-bars" > /etc/portage/package.use/emacs, `xft` is to support Chinese display. `libxml2` is to support builtin `shr`, which in return support `eww` web browser and Gnus viewing HTML.
+        1. # echo "app-editors/emacs xft libxml2 gnutls athena Xaw3d -gtk -gtk3 -motif" > /etc/portage/package.use/emacs, `xft` is to support Chinese display. `libxml2` is to support builtin `shr`, which in return support `eww` web browser and Gnus viewing HTML. `gnutls` supports Gnus imap connection. `athena Xaw3d -gtk -gtk3 -motif` is to solve *daemon mode* bug [reddit](https://www.reddit.com/r/emacs/comments/2ans0z/have_you_encountered_that_gtk_bug_in_daemon_mode/?ref=share&ref_source=link) and [wiki](https://wiki.gentoo.org/wiki/GNU_Emacs).
         2. # emerge -av emacs
         3. \# emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
 

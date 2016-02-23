@@ -644,14 +644,18 @@ Emacs Python Development Environment.
 (provide 'init-elpy)
 ```
 
-1. *elpy* requires *pyeven* - python virtualenv support which is a global minor mode.
+1. *elpy* requires *pyvenv* - python virtualenv support which is a global minor mode.
 
     So when programming, Emacs is aware of and can activate/deactivate virutalenv! By default, *pyvenv* mode is turned globally on Emacs startup.
 
     Mainly through command `M-x: pyvenv-activate` and `M-x: pyvenv-deactivate`.
-2. In order to support *elpy* better, we can `pip install` several backends like *rope*, *jedi*, *flake8*, *importmagic*, *autopep8*, *yapf* etc.
+2. In order to support *elpy* better, we need to `pip install` several backends like *rope*, *jedi*, *flake8*, *importmagic*, *autopep8* in *virtualenv*.
 
     Install these Python packages in *virtualenv* instead of in global environment. Do NOT mess true system up.
+
+    Details refer to [python virtualenv](http://www.jimgray.tk/2015/03/05/python-virtualenv/).
+3. When programing with Python, first `M-x: pyvenv-activate` to enable virtualenv in Emacs.
+4. Use `M-x: elpy-config` to check elpy configs.
 
 *reference*:
 
@@ -805,6 +809,10 @@ There are many other Windows configs, but integrated into other features, like A
 ## init-sdcv
 
 A console version of *StarDict*.
+
+## init-yasnippet
+
+这个插件可以让你用 TAB 键自动补齐代码。
 
 ### Emacs 24.3 Chinese characters on Windows
 
