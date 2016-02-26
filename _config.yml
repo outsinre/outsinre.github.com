@@ -1,34 +1,32 @@
-# Dependencies
-markdown:	kramdown
-highlighter:	Rouge
-
-# Permalinks
-permalink:	pretty
-
-# Use of `relative_permalinks` ensures post links from the index work properly.
-# `relative_permalinks` deprecated now. Remove it.
-#
-#relative_permalinks:	true
+# Engine
+markdown: kramdown
+kramdown:
+   input: GFM
+   syntax_highlighter: rouge
 
 # encoding of filenames
-encoding:	utf-8
+encoding: utf-8
 
-# Setup
-title:		ZNHOO
-tagline:	'Whatever you are, be a good one!'
-description:	'I am ZNHOO. Make yourself at home. Contact me at <a href="https://twitter.com/znhoo" target="_blank">@znhoo</a>.'
+# Permalinks
+permalink: pretty
 
 # If not set custom url: if user pages, then use "/"; if project page, use "/project-name" (without trailing slash).
-baseurl:	/
-paginate:	5
+baseurl: /
+url: http://www.jimgray.tk
+paginate: 5
+
+# Site info
+title: ZNHOO
+tagline: 'Whatever you are, be a good one!'
+description: 'I am ZNHOO. Make yourself at home. Contact me at <a href="https://twitter.com/znhoo" target="_blank">@znhoo</a>.'
 
 # About/contact
 author:
-  name:		ZNHOO
-  url:		https://www.jimgray.tk
-  email:	znhoo@noreply.com
+  name: ZNHOO
+  url: https://www.jimgray.tk
+  email: znhoo@noreply.com
 
 # Custom vars
-version:	1.0.0
-url:		http://www.jimgray.tk
+version: 1.0.0
+
 
