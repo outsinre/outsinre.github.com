@@ -1,8 +1,9 @@
 # Engine
 markdown: kramdown
+
 kramdown:
-   input: GFM
-   syntax_highlighter: rouge
+  input: GFM
+  syntax_highlighter: rouge
 
 # encoding of filenames
 encoding: utf-8
