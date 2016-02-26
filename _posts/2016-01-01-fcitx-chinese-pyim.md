@@ -20,7 +20,7 @@ title: Fcitx chinese-pyim 词库
     如果编码非 UTF-8, 可能转换出错，即使转换成功，或者转换过程丢失很多词组。
 6. org 格式既可以转成 *chinese-pyim*   的 pyim 格式，也可以转换成 Fcitx 的 MB 格式。所以，有必要维护一份 org 词库文件。
 
-    *重要*: 虽然 chinese-pyim(参考 emacs configuration 文） 和 fcitx 都可以用 org 词库转换，但是不同的是，前者必需对 org 词库进行排序。如果没有排好序，那么 chinese-pyim 性能严重降低，因为它用二分法搜索词库，只有排好序，才可以加速搜索。而 fcitx 则要求 org 词库不能排序，必需按照它自己的顺序（可能是高频率的在前）。
+    *重要*: 虽然 chinese-pyim(参考 emacs configuration 文） 和 fcitx 都可以用 org 词库转换，但是不同的是，前者必需对 org 词库进行排序。如果没有排好序，那么 chinese-pyim 性能严重降低，因为它用二分法搜索词库，只有排好序，才可以加速搜索。<s>而 fcitx 则要求 org 词库不能排序，必需按照它自己的顺序（可能是高频率的在前）</s>。
 
 ＃ 安装 Fcitx
 
@@ -108,7 +108,7 @@ Fcitx 自带的拼音文件 *gbkpy.org* 可以直接使用，但自带的词库�
 
     1. 从网上下载词库文件搜狗词库文件的 org 格式，检查编码是否 UTF-8, 如果不是，则用 enca 转换。
     2. 用 createPYMB 转换成 Fcitx MB 格式词库。
-    3. 用 sed 命令把 `'` 替换成 `-`. 用 sort 命令进行排序，得到 chinese-pyim PYIM 格式词库。
+    3. 用 sed 命令把 `'` 替换成 `-`: `sed -i "s/'/-/g" 3.org`. 用 sort 命令进行排序，得到 chinese-pyim PYIM 格式词库。
 
         注意：先替换，再排序。
 

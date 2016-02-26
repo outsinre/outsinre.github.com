@@ -503,6 +503,18 @@ VIDEO_CARDS="intel"
     12. You'd better logout and then login again to test xfce: _$_ startx.
 
         > **Attention**: Use _startx_ command to launch xfce desktop. No graphical loggin configured.
+    13. If you really want to start X upon login without manually typing `startx`:
+
+        ```bash
+	# ~/.bashrc
+	#
+	# Starting X11 on console login automatically when login to the first terminal tty1.
+	# This is useful when you want to use X and avoid type 'startx' on the termnial.
+	# But if you login to terminal tty2 ~ tty7, this script won't start X for you.
+	if [[ $(tty) == /dev/tty1 ]]; then
+	    exec startx
+	fi
+	```
     14. If you have a messed desktop setting, you can executing the following commands to have a default setting:
         1.  #  rm -r ~/.cache/sessions
         2.  # rm -r ~/.config/xfce*
