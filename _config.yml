@@ -4,7 +4,8 @@ markdown: kramdown
 kramdown:
   input: GFM
   hard_wrap: false
-  syntax_highlighter: rouge
+#  syntax_highlighter: rouge
+highlighter: rouge
 
 # encoding of filenames
 encoding: utf-8
