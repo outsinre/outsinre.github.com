@@ -4,8 +4,7 @@ markdown: kramdown
 kramdown:
   input: GFM
   hard_wrap: false
-#  syntax_highlighter: rouge
-highlighter: rouge
+  syntax_highlighter: rouge
 
 # encoding of filenames
 encoding: utf-8
@@ -31,5 +30,3 @@ author:
 
 # Custom vars
 version: 1.0.0
-
-

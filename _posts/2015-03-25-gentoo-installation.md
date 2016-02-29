@@ -99,7 +99,7 @@ title: Gentoo Installation
 22. Choosing the right profile.
     1. # eselect profile list
     2. # eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
-23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected. Xfce will be installed as desktop.
+23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected and different USE update in *make.conf*. Xfce will be installed as desktop.
     4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags:
 
         ```
@@ -107,6 +107,7 @@ USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thuna
         ```
 Append these flags into `make.conf` file. Actually, only `-qt3 -qt4 -qt5` and `thunar` need inserted for the others are already included in `emerge --info | grep ^USE`. I want to remove all QT things from system.
     5. Check if `nls` is enabled by `emerge --info | grep ^USE`. If not, update `make.conf` file.
+    6. By default, *bindist* is enabled by *stage3*'s *make.conf*. If we don't plan to distribute binary packages, disable it globally. Add `--bindist` USE to *make.conf*. Otherwise, this will eliminate those *bindist* USE conflicts when emerge pkgs, especially between *openssh* and *openssl*.
 24. Localization
     1. # cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
     2. Uncomment `en_US.UTF-8 UTF-8` in /etc/locale.gen.
@@ -581,7 +582,8 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         1. Enable `gstreamer` USE flag for Firefox to support more video codecs (like H264).
         2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
         3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented.mp4.\**,  *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
-        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*) plugins.
+        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll* plugins.
+	5. 
     2. Weechat for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
