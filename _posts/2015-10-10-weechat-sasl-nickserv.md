@@ -7,17 +7,19 @@ title: Weechat SASL NickServ
 
 # 1 Basic setup
 
+> At any moment, you can use */unset* to restore setting to its default values.
+
 After starting `$ weechat`:
 
-1. /set irc.server.freenode.nicks "jimgray,jimgray\_,\_jimgray,\_jimgray_"
+1. /server add freenode chat.freenode.net/7000
+2. /set irc.server.freenode.nicks "jimgray,jimgray\_,\_jimgray,\_jimgray_"
 
     If you don't set default nicks, Weechat will take Gentoo username as the default nick. Check the `server_default` section of `less .weechat/irc.conf`.
-2. /set irc.server.freenode.username "Jim_Gray"
-3. /set irc.server.freenode.realname "Jim Gray"
-4. /set irc.server.freenode.autoconnect on
+3. /set irc.server.freenode.username "Jim_Gray"
+4. /set irc.server.freenode.realname "Jim Gray"
+5. /set irc.server.freenode.autoconnect on
 
     Autoconnect to *freenode* on startup.
-5. /set irc.server.freenode.addresses "chat.freenode.net/7000"
 6. /set irc.server.freenode.ssl on
 
     Connect to *freenode* using SSL.
@@ -30,6 +32,12 @@ After starting `$ weechat`:
 7. /set irc.look.part\_closes_buffer on
 
     This will close the *buffer* (or called *tab*) immediately when parting a channel.
+7. /set irc.look.server_buffer independent
+
+   Don't merge *server buffer* with *core* buffer.
+7. /set ctcp.irc.{version, userinfo, time, finger, clientinfo, ping} ""
+
+   Set all these variables to empty preventing from others querying Weechat's information.
 8. /set irc.server.freenode.autojoin "\#gentoo"
 
     This is *NOT* recommended.
@@ -139,3 +147,22 @@ Settings below are all locally stored.
 2. To obtain a cloak, just join *freenode* channel, ask for one.
 
     When channel staff notices your request, you *might* get cloaked. Unaffiliated cloak applies to all channels on *freenode* server.
+
+# proxy
+
+Suppose you would like to connect to IRC server (i.e. oftc.net) by proxy, how to set?
+
+1. Add proxy
+
+   ```
+   /proxy add tor socks5 127.0.0.1 9050
+   ```
+
+   This will tell Weechat that a proxy named 'tor-ss' is added.
+2. Enable proxy for IRC server
+
+   ```
+   /set irc.server.oftc.proxy tor
+   ```
+
+   Connection to *oftc* server uses proxy named 'tor-ss'.
