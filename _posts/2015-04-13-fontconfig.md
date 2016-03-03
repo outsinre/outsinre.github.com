@@ -39,6 +39,10 @@ Various specifications specify files and file formats. This specification define
 
 Refer to the official document [XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html). You can find out where is the default value for `XDG_DATA_HOME`, `XDG_CONFIG_HOME`, etc.
 
+## XDG user directory
+
+Different from XDG base directory, XDG user directory refers to Desktop, Documents, Downloads, Pictures, Templates etc.
+
 # Fonts installation
 
 Before installing fonts, refer to [Linux字体美化实战](http://www.jinbuguo.com/gui/linux_fontconfig.html) on choosing different fonts for system.
@@ -47,12 +51,13 @@ Before installing fonts, refer to [Linux字体美化实战](http://www.jinbuguo.
 
 1. Get your fonts file like `*.ttf` and `*.otf`:
 
-    ```
-MTEXTRA.TTF   fonts.dir    msyhbd.ttc   simhei.ttf  symbol.ttf    webdings.ttf
-WINGDNG2.TTF  fonts.scale  msyhl.ttc    simkai.ttf  tahoma.ttf    wingding.ttf
-WINGDNG3.TTF  msyh.ttc     simfang.ttf  simsun.ttc  tahomabd.ttf
-    ```
-    Some of the fonts are for `wps-office` and others are for Chinese fonts.
+   ```
+   MTEXTRA.TTF   fonts.dir    msyhbd.ttc   simhei.ttf  symbol.ttf    webdings.ttf
+   WINGDNG2.TTF  fonts.scale  msyhl.ttc    simkai.ttf  tahoma.ttf    wingding.ttf
+   WINGDNG3.TTF  msyh.ttc     simfang.ttf  simsun.ttc  tahomabd.ttf
+   ```
+
+   Some of the fonts are for `wps-office` and others are for Chinese fonts.
 2. _$_ mkdir -p ~/.local/share/fonts/myFonts, create a subdirectory under `.local/share/fonts` to hold your fonts.
 3. _$_ cd ~/.local/share/fonts/myFonts
 4. Copy your downloaded fonts to `myFonts`.
