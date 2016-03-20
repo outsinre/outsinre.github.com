@@ -225,6 +225,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
         In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
     10. Dm-crypt. `Device mapper support, CONFIG_BLK_DEV_DM` is set as 'Y' by default. `Crypt target support, CONFIG_DM_CRYPT` must be enabled, set to 'M' (or 'Y'). `XTS support, CONFIG_CRYPTO_XTS` and `AES cipher algorithms (x86_64), CONFIG_CRYPTO_AES_X86_64` optionally set to 'M' (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below.
+    10. Iptables: `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (for Tor's `-m owner` support), `CONFIG_IP_NF_TARGET_REDIRECT` for `-j REDIRECT` which will enable `NF_NAT_REDIRECT` and `NETFILTER_XT_TARGET_REDIRECT` as well. We only need `NETFILTER_XT_TARGET_REDIRECT' for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NT_NAT_IPV6` as dependency) to enable ip6tables nat table.
     10. [optional] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
     10. [e-sources / cjktty patch specific options] `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display in tty (Ctrl + Alt + Fn).
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
@@ -578,12 +579,16 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         www-client/firefox gstreamer
         media-plugins/gst-plugins-libav -libav
         # emerge -av firefox
+        # emerge -av www-plugins/adobe-flash
         ```
         1. Enable `gstreamer` USE flag for Firefox to support more video codecs (like H264).
         2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
-        3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented.mp4.\**,  *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
-        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll* plugins.
-	5. 
+        3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
+        4. Run `$ flash-player-properties` or from application menu to set flash player.
+        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll*, *Disconnect* etc. plugins.
+        5. Remove unecessary default whitelist of NoScript plugin.
+        5. *privacy.trackingprotection.enabled* to TRUE.
+	5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
     2. Weechat for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
@@ -653,9 +658,6 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
             fi
             ```
     4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://jimgray.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](http://jimgray.tk/2014/09/14/emacs/installation/).
-    5. \# emerge -av www-plugins/adobe-flash
-
-        Pay attention to update `package.license` file when needed.
     6. WPS office.
         1. overlay support
             1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.

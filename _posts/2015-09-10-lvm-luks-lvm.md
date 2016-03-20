@@ -262,8 +262,8 @@ GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/d
 
 # boot & EFI image backup
 
-1. dd if=/dev/sdc1 | xz > boot-image-backup.xz, backup of boot and EFI shared partition
-2. xzcat image-file.xz | dd of=/dev/sdc1, restore from backup
+1. dd if=/dev/sdb2 | xz > boot-image-backup.xz, backup of boot and EFI shared partition
+2. xzcat image-file.xz | dd of=/dev/sdb2, restore from backup
 
 # Operations to USB sdc1
 
