@@ -158,11 +158,11 @@ Suppose you would like to connect to IRC server (i.e. oftc.net) by proxy, how to
    /proxy add tor socks5 127.0.0.1 9050
    ```
 
-   This will tell Weechat that a proxy named 'tor-ss' is added.
+   This will tell Weechat that a proxy named 'tor' is added.
 2. Enable proxy for IRC server
 
    ```
    /set irc.server.oftc.proxy tor
    ```
 
-   Connection to *oftc* server uses proxy named 'tor-ss'.
+   Connection to *oftc* server uses proxy named 'tor'.

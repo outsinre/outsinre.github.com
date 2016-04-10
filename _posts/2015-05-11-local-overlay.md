@@ -29,75 +29,66 @@ Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd met
 
 1. Search wpa_supplicant version information:
 
-    >_#_ emerge --search wpa_supplicant
-    But that returns only trouble versions >=2.4. That is to say, the old working version <2.4 is no longer in the official portage tree.
+   `emerge --search wpa_supplicant`
+
+   But that returns only trouble versions >=2.4. That is to say, the old working version <2.4 is no longer in the official portage tree.
 2. Mask versions that does not work:
 
-    >_#_ echo ">=net-wireless/wpa\_supplicant-2.4" > /etc/portage/package.mask/wpa_supplicant
+   `echo ">=net-wireless/wpa\_supplicant-2.4" > /etc/portage/package.mask/wpa_supplicant`
 3. From above two steps, we know there are no working versions in official portage tree. All the trouble versions in official portage are masked. How to handle this?
 
-    > Local overlay! The basic idea is to create local overlay and then download the old version `.ebuild` and corresponding supporting files.
+   Local overlay! The basic idea is to create local overlay and then download the old version `.ebuild` and corresponding supporting files.
 4. Create local overlay, refer to [Overlay/Local overlay](https://wiki.gentoo.org/wiki/Overlay/Local_overlay):
-    1. _#_ mkdir -p /usr/local/portage/{metadata,profiles}
-    2. _#_ echo 'zhtux' > /usr/local/portage/profiles/repo_name
-    3. _#_ echo 'masters = gentoo' > /usr/local/portage/metadata/layout.conf
-    4. _#_ chown -R portage:portage /usr/local/portage
-    5. _#_ emacs -nw /etc/portage/repos.conf/local.conf:
+   1. # mkdir -p /usr/local/portage/{metadata,profiles}
+   2. # echo 'zhtux' > /usr/local/portage/profiles/repo_name
+   3. # echo 'masters = gentoo' > /usr/local/portage/metadata/layout.conf
+   4. # chown -R root:portage /usr/local/portage
+   5. # chmod g+s /usr/local/portage
+   6. # nano -w /etc/portage/repos.conf/local.conf:
 
-        >[zhtux]
-	
-        >location = /usr/local/portage
-	
-        >masters = gentoo
-	
-        >auto-sync = no
+      ```
+      [zhtux]
+      location = /usr/local/portage
+      masters = gentoo
+      auto-sync = no
+      ```
+      
 5. Adding an ebuild to the local overlay. Now we need to locate wpa_supplicant 2.3, 2.3-r1, or 2.3-r2 ebuild file and download it
-    1. Go through [/net-wireless/wpa_supplicant](https://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/wpa_supplicant/)
-    2. You cannot find `wpa_supplicant-2.3*.ebuild` since version 2.3 is out of portage tree: dead.
-    3. Click on `Show 78 dead files` from which you will find old ebuild files: wpa_supplicant-2.3.ebuild, wpa_supplicant-2.3-r1.ebuild, and wpa_supplicant-2.3-r2.ebuild. Here I choose `wpa_supplicant-2.3-r2.ebuild`. Download this file from `Links to HEAD: (view) (download) (annotate)`. Then click on `Hide 78 dead files`.
-    4. _#_ mkdir -p /usr/local/portage/net-wireless/wpa\_supplicant
-    4. _#_ cd /usr/local/portage/net-wireless/wpa_supplicant
-    5. _#_ cp /path/to/downloaded/wpa\_supplicant-2.3-r2.ebuild /usr/local/portage/net-wireless/wpa_supplicant/
-        1. Some points out that we also need copy the `metadata.xml` file. This file does not change along different versions. If emerge complains lacking this file, copy it from step 1 link or from `/usr/portage/net-wireless/wpa_supplicant/`.
-    6. _#_ repoman manifest (pay attention to: the current directory)
-        1. Generate the `Manifest` file each time you change files in this overlay.
-    7. _#_ chown -R portage:portage /usr/local/portage
-        1. This is important each time you create or copied new files to local overlay to make those files belong to portage:portage.
-    8. _#_ emerge -av1 wpa_supplicant
-        1. This will not install wpa\_supplicant 2.3-r2 since it complains lacking files. If you go back to step 1, you will find a folder `/net-wireless/wpa_supplicant/files`. Items under this directory is supporting files like patches. emerge won't get this file for you automatically since you are installing from local overlay, you need to get those support files by yourself.
-        2. On the other hand, emerge will download the source files for wpa_supplicant-2.3-r2. It is specified in the ebuild file:
+   1. Go through [/net-wireless/wpa_supplicant](https://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/wpa_supplicant/)
+   2. You cannot find `wpa_supplicant-2.3*.ebuild` since version 2.3 is out of portage tree: dead.
+   3. Click on `Show 78 dead files` from which you will find old ebuild files: wpa_supplicant-2.3.ebuild, wpa_supplicant-2.3-r1.ebuild, and wpa_supplicant-2.3-r2.ebuild. Here I choose `wpa_supplicant-2.3-r2.ebuild`. Download this file from `Links to HEAD: (view) (download) (annotate)`. Then click on `Hide 78 dead files`.
+   4. # mkdir -p /usr/local/portage/net-wireless/wpa\_supplicant
+   4. # cd /usr/local/portage/net-wireless/wpa_supplicant
+   5. # cp /path/to/downloaded/wpa\_supplicant-2.3-r2.ebuild /usr/local/portage/net-wireless/wpa\_supplicant/
+   5. # cp /usr/portage/net-wireless/wpa\_supplicant/metadata.xml .
 
-            >_#_ grep "SRC\_URI=" /usr/local/portage/net-wireless/wpa\_supplicant/wpa_supplicant-2.3-r2.ebuild
+       *metadata.xml* is a XML file denoting package information. Usually just a few lines.
+   6. # repoman manifest (pay attention to: the current directory)
 
-            But the downloaded source file is kept under `/usr/portage/distfiles/` where offical portage `gentoo` and layman overlay `gentoo-zh` stores source files.
-        3. The 3rd emerge optiono is number one, not character L. This means for one time installation.
-    9. _#_ mkdir files
-        1. Now based the emerge error message, we go to step 1, and download the missing files.
-        2. We can also read through the ebuild files to locate what supporting files needed.
-        3. The top of the page in step 1 reminds that we can use `cvs` command to locate the files.
-        4. [IMPORTANT] Repeat steps starting from 6.
+      Calculate the package source (download from `GENTOO_MIRROR` or `SRC_URI`) checksum and put into `Manifest`.
+   6. # repoman full -d
 
----
-Wpa_supplicant debug:
+       Check if any errors. If successfull, get a line:
 
-1. Run wpa_supplicant in debug mode:
+       >RepoMan sez: "If everyone were like you, I'd be out of business!"
+   7. # chown -R portage:portage /usr/local/portage
+   8. # emerge -av1 wpa_supplicant
+      1. This will not install wpa\_supplicant 2.3-r2 since it complains lacking files. If you go back to step 1, you will find a folder `/net-wireless/wpa_supplicant/files`. Items under this directory is supporting files like patches. Supporting files are downloaded when you sync the portage. For local overly, we need to put the files manually.
+      2. On the other hand, emerge only downloads the source tarbar for wpa_supplicant-2.3-r2. It is specified in the ebuild file:
 
-    > _#_ killall -TERM wpa_supplicant
+	  ># grep "SRC\_URI=" /usr/local/portage/net-wireless/wpa\_supplicant/wpa_supplicant-2.3-r2.ebuild
 
-    > _#_ /etc/init.d/dhcpcd stop
+	  The downloaded source file is kept under `/usr/portage/distfiles/`.
+      3. The 3rd emerge optiono is number one, not character L. This means for one time installation.
+   9. # mkdir files
+      1. Now based the emerge error message, we go to step 1, and download the missing files.
+      2. We can also read through the ebuild files to locate what supporting files needed.
+      3. The top of the page in step 1 reminds that we can use `cvs` command to locate the files.
+6. GitHub
 
-    > _#_ wpa\_supplicant -Dnl80211 -iwlp3s0 -C/var/run/wpa\_supplicant/ -c/etc/wpa\_supplicant/wpa_supplicant.conf -dd
+   It's useful to push local portage to Github for backup.
 
-    For this step, you can also run `wpa_cli` command interactively.
-2. Retart wpa_supplicant if need reconnection:
-
-    > _#_ killall -TERM wpa_supplicant
-
-    > _#_ /etc/init.d/dhcpcd restart
-3. Enable log: refer to wiki.
-
----
-Reference:
+*Reference*:
 
 1. https://wireless.wiki.kernel.org/en/users/documentation/wpa_supplicant
 2. https://www.marc.info/?t=143013943600001&r=1&w=4

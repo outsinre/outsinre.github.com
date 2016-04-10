@@ -137,7 +137,7 @@ LC_COLLATE="C"
 25. Install the kernel source.
     1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to **unstable 4.0.0**_.
     1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to `e-sources-4.1.1 kernel`.
-    1. # emerge --ask sys-kernel/gentoo-sources
+    1. # emerge -avt sys-kernel/gentoo-sources
     2. # ls -l /usr/src/linux
     3. If possible, apply kernel patches like 'cjktty.patch'.
 26. Configuring the Linux kernel - Manual configuration.
@@ -212,7 +212,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     9. Bluetooth: enable `CONFIG_BT, Bluetooth subsystem support` as 'M'. Enter and find `BT_RFCOMM, RFCOMM protocol support`. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `CONFIG_BT_HCIBTUSB, HCI USB driver` as 'M'. The sub-option `CONFIG_BT_HCIBTUSB_BCM turned on automatically` will be enabled as 'Y' by default. `BT_HIDP, HIDP protocol support` is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as 'N'. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Read more from *bluetooth - bluez obexfs*.
     2. MMC: `sdhci_pci` = `SDHCI support on PCI bus, CONFIG_MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG_MMC_RICOH_MMC` as 'Y'.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
-    7. `NTFS` support: set `CONFIG_NTFS_FS` and `CONFIG_FUSE_FS` to 'M'. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge --ask sys-fs/ntfs3g` to install `ntfs3g` package later on. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW`.
+    7. `NTFS` support: set `CONFIG_NTFS_FS` and `CONFIG_FUSE_FS` to 'M'. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge -avt sys-fs/ntfs3g` to install `ntfs3g` package later on. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW`.
     9. Turn on `CONFIG_PACKET` (default 'Y')  to support wireless tool `wpa_supplicant` which will be installed later on.
     9. Turn off `NET_VENDOR_NVIDIA` to 'N' since no `NVIDIA` card in x220 laptop.
     10. [Deprecated, use the default 437 and iso8859-1].
@@ -246,7 +246,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     7. # ls /boot/initramfs*
 27. Kernel modules loading. Refer to handbook.
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
-    1. # emerge --ask sys-kernel/linux-firmware
+    1. # emerge -avt sys-kernel/linux-firmware
 28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template. Use backup fstab file is possible.
 
     ```
@@ -271,12 +271,12 @@ This needs modified in the steps later on.
         Now try to `ping zhtux.jiantu.boxes/zhtux/localhost` to test.
 
         Another method is edit */etc/issue*, remove `.\O`.
-30. Configuring the network.
+30. Configuring the network - More refer to *post - Gentoo Networking*.
     1. **DO NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support from `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
-    2. # emerge --ask net-misc/dhcpcd
+    2. # emerge -avt net-misc/dhcpcd
     3. # rc-update add dhcpcd default
     4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
-    5. # emerge --ask net-wireless/wpa_supplicant
+    5. # emerge -avt net-wireless/wpa_supplicant
     6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
 
         ```
@@ -305,16 +305,26 @@ This needs modified in the steps later on.
             phase2="auth=MSCHAPV2"
         }
         ```
-    7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in plaintext by anyone using the computer:
-        1. # chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
-        2. Replace the `identity` and `password` entries with your own Wifi information.
+    7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in *psk* or *passphrase* by anyone using the computer: `chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf`.
+    7. For home wireless connection, usuaully you just need to specify *ssid* and *psk* arguments. *psk* can be a normal wifi password (call *passphrase*) or a 256-character string. When use normal password, need quotes, while 256-character string does not. How to generate the long string?
+
+        ```
+        wpa_passphrase wifi-ssid wifi-password
+        ```
+
+        The long string will show on *stdout*.
     7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant` hook. No need to create so called `/etc/conf.d/net` file as the handbook.
 
         From 'dhcpcd-6.10.0' onward, '10-wpa_supplicant' hook is no longer supplied by default. We should copy '/usr/share/dhcpcd/hooks/10-wpa_supplicant' to '/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant'.
-    8. If you have installed `net-misc/netifrc` and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
+    8. `lspci -k` shows wireless driver in use is *iwlwifi*. However if specify `-D iwlwifi`, *wpa\_supplicant* will fail with error:
+
+        >Unsupported driver 'iwlwifi'
+
+        Either do not speicfy the driver or set to `-D nl80211`.
+    8. If you have installed `net-misc/netifrc` (by default from *stage3*) and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
     9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
     10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](/2015/05/11/gentoo-downgrade-package/)
-    10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`. It is more like a wrapper of `wpa_supplicant`.
+    10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`.
     10. Once get an error like this:
 
         ```
@@ -344,23 +354,23 @@ This needs modified in the steps later on.
     10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 31. Set root password: # passwd
 33. System logger.
-    1. # emerge --ask app-admin/syslog-ng
+    1. # emerge -avt app-admin/syslog-ng
     2. # rc-update add syslog-ng default
-    3. # emerge --ask app-admin/logrotate
+    3. # emerge -avt app-admin/logrotate
 
     Detail on logrotate for cron jobs refer to [Cronie and Anacron](/2015/07/19/cronie/).
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
     1. # echo "sys-process/cronie anacron" > /etc/portage/package.use/cronie
-    2. # emerge --ask sys-process/cronie
+    2. # emerge -avt sys-process/cronie
     2. # rc-update add cronie default
 
     Detail on running scheduled tasks based on input from the command `crontab`, refer to [Cronie and Anacron](/2015/07/19/cronie/).
-35. File indexing: emerge --ask sys-apps/mlocate
-36. NTFS: emerge --ask sys-fs/ntfs3g
+35. File indexing: emerge -avt sys-apps/mlocate
+36. NTFS: emerge -avt sys-fs/ntfs3g
 36. [optional] Remote access: rc-update add sshd default
 38. Configuring the bootloader. Refer to [GRUB2 Quick Start](https://wiki.gentoo.org/wiki/GRUB2_Quick_Start).
     1. Add `GRUB_PLATFORMS="efi-64"` to `/etc/portage/make.conf`. This step must occur before installing the grub package. Otherwise it would show `error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist`.
-    2. # emerge --ask sys-boot/grub:2, currently it is version 2.
+    2. # emerge -avt sys-boot/grub:2, currently it is version 2.
     3. # emerge -av sys-boot/os-prober
     3. Mount the EFI partition /dev/sda2 to /boot/efi directory. Because Gentoo, Ubuntu, Windows share the EFI partition, we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition. **This step is really important!**.
         1. # mkdir /boot/efi
@@ -467,9 +477,9 @@ INPUT_DEVICES="evdev synaptics"
 ## (For intel cards)
 VIDEO_CARDS="intel"
         ```
-    4. \# emerge --ask --verbose --pretend x11-base/xorg-drivers, check the dependency.
+    4. \# emerge -avt --verbose --pretend x11-base/xorg-drivers, check the dependency.
     5. \# echo "x11-base/xorg-server udev" >> /etc/portage/package.use/xorg-server. Actually this step is unnecessary since `udev` is enabled by default when selecting the system profile in previous step.
-    6. \# emerge --ask x11-base/xorg-server
+    6. \# emerge -avt x11-base/xorg-server
     7. \# env-update && source /etc/profile
     9. \# export PS1="(chroot) $PS1"
     10. The official wiki suggests installing `x11-wm/twm` and `x11-terms/xterm` to test `xorg` installation. However, we are currently chrooting, startx is already running supporting the LiveDVD KDE environment. Hence, we cannot test by issuing command `startx` in chroot environment. It's only possible when reboot into the genuine gentoo system. So skip this step.
@@ -481,8 +491,8 @@ VIDEO_CARDS="intel"
     4. [optional] # echo 'dev-util/cmake -qt4' >> /etc/portage/package.use/cmake
     3. # echo 'gnome-base/gvfs -http' >> /etc/portage/package.use/gvfs
     4. # echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
-    5. **Attention** # emerge --ask xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
-    6. \# emerge --ask x11-terms/xfce4-terminal
+    5. **Attention** # emerge -avt xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
+    6. \# emerge -avt x11-terms/xfce4-terminal
 
         By default, xfce4-terminal disables beep by default.
 
@@ -585,7 +595,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
         2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
         3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
         4. Run `$ flash-player-properties` or from application menu to set flash player.
-        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll*, *Disconnect* etc. plugins.
+        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll*, *user agent switcher* etc. plugins.
         5. Remove unecessary default whitelist of NoScript plugin.
         5. *privacy.trackingprotection.enabled* to TRUE.
 	5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
@@ -658,6 +668,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
             fi
             ```
     4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://jimgray.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](http://jimgray.tk/2014/09/14/emacs/installation/).
+    5. Nano. We can tune some configs of Nano editor */etc/nanorc*: *set autoindent*, *set backup*, *set tabsize 4* etc. If need to totally disable an option, use *unset <option>*.
     6. WPS office.
         1. overlay support
             1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
@@ -681,7 +692,7 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
                 >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
             5. emerge -av wps-office
             6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
-    7. \# emerge --ask xfce4-mixer
+    7. \# emerge -avt xfce4-mixer
     8. \# emerge -av mupdf
 
         The other PDF viewer may draw in a lot of GTK or QT dependencies consuming many disk space.
@@ -710,8 +721,8 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 
             Remember to `chmod +x ~/bin/dropbox.sh`, just run `~/bin/dropbox.sh`.
         6. If blocked by GFW, set the corresponding proxy address and port.
-    12. \# emerge --ask app-portage/gentoolkit
-    13. \# emerge --ask app-portage/eix
+    12. \# emerge -avt app-portage/gentoolkit
+    13. \# emerge -avt app-portage/eix
         1. [deprecated for new poratge > 2.2.16] <s># emacs -nw /etc/eix-sync.conf:</s>
 
             ```
@@ -1233,8 +1244,8 @@ drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialize
     `eclean-kernel` only remove files built when compiling kernels like libs, modules, etc. The kernel sources itself in `/usr/src/` will be managed by `portage` instead. So `eclean-kernel` don't remove sources itself! If you want to remove sources as well, use `emerge -ac gentoo-sources-version` and update `package.accept_keyword` and `package.use` files if need.
     1. # emerge -av app-admin/eclean-kernel
     2. # eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
-    3. # eclean-kernel -n 4 --ask
-        1. Option `--ask` is very important, it will ask for your confirmation for each kernel to be removed by an interactive way. You can just remove the kernels you don't need. You can also adjust the number from `4` to something else to pop out the desired kernel for removal.
+    3. # eclean-kernel -n 4 -avt
+        1. Option `-avt` is very important, it will ask for your confirmation for each kernel to be removed by an interactive way. You can just remove the kernels you don't need. You can also adjust the number from `4` to something else to pop out the desired kernel for removal.
         2. At last, I removed the kernel as  `3.18.11-gentoo.old`
     4. `eclean-kernel` will update the grub menu automatically.
     5. **special note**: the kernel is manually compiled by `make, make modules_install, make install, ...` following the basic procedures of official handbook. But `initramfs` is built by `genkernel` resulting in file names different from conventional format. You can `ls -l /boot` finding that `initramfs`'s file name format is different from that of `vmlinuz, System.map`. Tough the file name format won't cause problems since `grub2-mkconfig` is smart enough to generate the correct boot parameters. However, `eclean-kernel` will remind you removing `-genkernel-x86_64-4.0.0-gentoo: vmlinuz does not exist` which is an undesired action. Details refer to [Bug 464576](https://bugs.gentoo.org/464576)

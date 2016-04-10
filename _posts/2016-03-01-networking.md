@@ -223,7 +223,7 @@ How to release? If use *dhcpcd* to serve DHCP, add `release` option to *dhcpcd.c
 
 The above spoofing method assumes *dhcpcd + wpa\_supplicant* networking scheme. Actually the old *net config* now supports MAC spoofing with *macchanger*. This is new networking scheme:
 
-   Now *net config* + *dhcpcd* + *wpa\_supplicant* new networking scheme.
+   Now *net config* + DHCP + *wpa\_supplicant* new networking scheme, where *dhcpcd* serves DHCP functionality.
 
 1. Symbolic
 
@@ -286,26 +286,139 @@ The above spoofing method assumes *dhcpcd + wpa\_supplicant* networking scheme. 
 3. Update *dhcpcd* config
    1. Keep *dhcpcd* at *default* runlevel though *net config* can launch *dhcpcd* process automatically!
 
-      But this lanuching is not a *daemon* but a normal process. If revoked as a normal process, then `rc-service net.wlp3s0 restart` won't work due to failure stop of the *dhcpcd* process.
+      But this lanuching is not a *daemon* but a normal *process*. If revoked as a normal process, then `rc-service net.wlp3s0 restart` won't work due to failure stop of the *dhcpcd process*. Seriously, we rarely execute the service restart. Hence it's safely to remove from *default* runlevel.
 
       The key is we still ned *dhcpcd* to serve DHCP functionality.
    2. Disable *wpa\_supplicant* hook since *net config* will lanuch *wpa\_supplicant* functinality automatically.
 
       *net config* will definitely launch *wpa\_supplicant* but *dhcpcd* will launch *wpa\_supplicant* as well. Thus *wpa\_supplicant* is revoked twice, causing error.
-   3. Keep the *release* option in *dhcpcd.conf*.
+   3. Keep the *release* option in *dhcpcd.conf* though it's already set in */etc/conf.d/net*. Just in case.
 4. It seems that *net config* does NOT spoof MAC address if is no connection (i.e. no wired cable), which is a preferred way.
+5. Booting warning:
+
+   ```
+   * Starting DHCP Client Daemon ...
+    [ ok ]
+    * Bringing up interface wlan0
+    *   Changing MAC address of wlan0 ...
+    [ ok ]
+    *     changed to 00:08:D3:11:9F:77
+    *   Starting wpa_supplicant on wlan0 ...
+   Successfully initialized wpa_supplicant
+    [ ok ]
+    *   Starting wpa_cli on wlan0 ...
+    [ ok ]
+    *   Backgrounding ... ...
+    * WARNING: net.wlan0 has started, but is inactive
+    * WARNING: netmount will start when net.wlan0 has started
+    * Starting Shadowsocks ...
+   INFO: loading config from /etc/shadowsocks.json
+   started
+    [ ok ]
+    * WARNING: tor will start when net.wlan0 has started
+   ```
+
+   These warnings don't affect networking. The possbile cause is: net.wlan0 needs some to warm up (started, but not finished yet) while another service (dependency) is starting. Service started but not finished might be at *scheduling* or *inactive* status. We can check this by stoping all networking init service and `rc default; rc-status`.
 5. More
 
    I can set an interface down by default. For example, to let Ethernet eth0 down default, in *net config*, we can add *config_eth0="null"*. And in *dhcpcd.conf*, add *denyinterfaces eth0*.
-## Summary
+6. Notes
 
-The *Udev init script* is the easiest method.
+   *net config* is just a script manages networking at high level. To get connected, *net config* revokes other tools, like *ifconfig*, *iproute2*, *wpa\_supplicant*, DHCP client etc. *dhcpcd* is standalone tool, with *wpa\_supplicant*, it handles all networking connection (though *dhcpcd* can just serves DHCP). *networkmanager* is at a more higher level with GUI.
+
+   We'd better NOT mix *net config* and *dhcpcd*. Use either one of them.
+
+## MAC Spoofing Summary
+
+1. The *Udev init script* is the easiest method.
+2. Just a Udev rule. No other configuration.
+3. No need of *net config*. Just keep original *dhcpcd + wpa\_supplicant* settings.
 
 ## Refs
 
 1. [archi wiki](https://wiki.archlinux.org/index.php/MAC_address_spoofing)
 2. [what why how](https://perot.me/mac-spoofing-what-why-how-and-something-about-coffee)
 3. [gentoo forum](https://forums.gentoo.org/viewtopic-p-7737632.html)
+
+# wpa\_supplicant
+
+1. *wpa\_supplicant* authenticates wireless router - data link layer where wireless traffic resides. Call it *wireless authentication*.
+2. *wpa\_supplicant* does NOT authenticates ISP's Internet access - namely *network authentication*.
+3. Without ISP authentication, even connected to wireless router, still coult NOT connect to the Internet.
+4. When subscribing to a ISP network service, you usually are given a account and password for *network authentication*. After that, you go home setting up a wireless router for home *wireless authentication* - a new pair of account (*ssid*) and password.
+5. *network authentication* is usually done:
+   1. An automatic browser page poping up for ISP account name and password; Or use the ISP software.
+   2. For public WiFi, no *network authentication* is required. In many free WiFi situations the first time you use the service no matter where you try to go you're first intercepted and sent to a browser page where you're required to "login" or otherwise accept the terms of service. This page does not protect you at all. It has nothing to do with security, wireless or otherwise. It's nothing more than a bit of legalese to protect the internet provider.
+
+## psk VS passphrase
+
+1. *passphrase* is what we usually called *WiFI password*, namely a short ( around 8) characters string. It's *easy* to remember.
+2. *psk* is a *wpa_supplicant* term used to authenticate wireless router, namely a 256 characters string. It's *hard* to remember. To get this long *psk*:
+
+   ```bash
+   # wpa_passphrase ssid passhrase
+   ```
+
+   We use *passphrase* to generate *psk*. The result is shown on *stdout*.
+3. We can find *psk* item in *wpa\_supplicant.conf*. However, this *psk* is a little different from the above one. *psk* in *wpa\_supplicant.conf* can be either:
+   1. Short *passphrase* with quotes;
+   2. Long *psk* without quotes.
+   
+## wpa\_cli
+
+1. In spite of editing *wpa\_supplicant.conf* manually, we can actually use *wpa\_cli* to configure WiFi and optionally save to *wpa\_supplicant.conf*.
+2. Before running *wpa\_cli*, *wpa_supplicant* must be started! Either by system networking init script or manually starting. If manually:
+
+   ```bash
+   # wpa_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa_supplicant/wpa_supplicant.conf -B -dd
+   ```
+
+   1. `-B` puts *wpa\_supplicant* to the background as a daemon.
+   2. *wpa\_supplicant.conf* should at least include a line `ctrl_interface=DIR=/var/run/wpa_supplicant`. If we will save connected WiFi, then add `update_config=1` which is not recommended for security.
+3. At this point, run
+
+   ```
+   # wpa_cli	# entering *wpa\_cli* interactive mode
+
+   > scan
+   OK
+   <3>CTRL-EVENT-SCAN-RESULTS
+
+   > scan_results
+   bssid / frequency / signal level / flags / ssid
+   00:00:00:00:00:00 2462 -49 [WPA2-PSK-CCMP][ESS] MYSSID
+   11:11:11:11:11:11 2437 -64 [WPA2-PSK-CCMP][ESS] ANOTHERSSID
+
+   > add_network
+   7
+   > set_network 7 ssid "ssid"
+   > set_network 7 psk "passphrase"
+   > enable_network 7
+   <3>CTRL-EVENT-CONNECTED - Connection to 00:00:00:00:00:00 completed (reauth) [id=7 id_str=]
+
+   >save_config		   # optionally if turned on 'update_config=1'
+   OK
+
+   >quit
+
+   # dhcpcd wlan0	# optionally if NO DHCP client client is running on the interface
+   ```
+
+   1. You can see just *scan scan\_results add\_network set\_network enable\_network* is OK. The network has a number (0 above) specifying how many networks has been configured in *wpa\_supplicant.conf*. This number increases sequencially.
+   2. If the SSID does not have password authentication (i.e. public WiFi), you must explicitly configure the network as keyless by replacing the command `set_network 0 psk "passphrase"` with `set_network 0 key_mgmt NONE`.
+   3. At the point of `save_config`, a *wireless authentication* is established. To surf the Internet, we need IP and *network authentication*.
+      1. To get IP, usually just run a DHCP client. If there is not a DHCP client running on the interface, `dhcpcd wlan0`. *Attention*: this will only letting DHCP client running on the specified interface *wlan0*, neglecting others.
+      2. Network authentication, discussed above.
+   
+## Refs
+
+1. [arch wiki]9https://wiki.archlinux.org/index.php/Wpa_supplicant#Connecting_with_wpa_cli)
+2. [gists](https://gist.github.com/buhman/7162560)
+
+# Other functionality
+
+1. Proxy
+2. Tor
 
 # Refs
 
