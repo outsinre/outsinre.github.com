@@ -512,6 +512,14 @@ VIDEO_CARDS="intel"
         3. After a system update, the issue is solved automatically.
     8. \$ emerge --search consolekit, you can see consolekit is installed. So follow the 2nd reference:
     10. \# rc-update add consolekit default
+    11. Disable automatic launch of *gpg-agent* or *ssh-agent*
+
+        ```bash
+        $ xfconf-query -c xfce4-session -p /startup/gpg-agent/enabled -n -t bool -s false
+        $ xfconf-query -c xfce4-session -p /startup/ssh-agent/enabled -n -t bool -s false
+	```
+
+        More refer to post *GnuPG 2*.
     12. You'd better logout and then login again to test xfce: _$_ startx.
 
         > **Attention**: Use _startx_ command to launch xfce desktop. No graphical loggin configured.
