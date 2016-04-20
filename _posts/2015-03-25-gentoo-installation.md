@@ -160,6 +160,7 @@ LC_COLLATE="C"
         ```
     1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`: these are the dirvers that needs activated. When search "snd-hda-intel", replace the hypen: - with dash: _.
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the LiveCD's kernel config file to help clarify kernel options.
+    2. `IKCONFIG` as M and `IKCONFIG_PROC` as Y. This allows you to inspect the configuration of the kernel while it is running, without having to worry whether you've changed or cleaned the source directory after it was built. 
     2. `NR_CPUS` set to *4* since my laptop has 2 cores and 4 threading. Maybe this value should be *2* for my laptop, but needs test. The smaller this value is, the smaller the kernel image is and the less memory is consumed by kernel.
     3. `MICROCDE` and `MICROCDE_INTEL` are *Y* by default. Refer to *emerge -av microcode-ctl* below.
     3. Graphics: `i915` = `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
@@ -225,7 +226,10 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
         In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
     10. Dm-crypt. `Device mapper support, CONFIG_BLK_DEV_DM` is set as 'Y' by default. `Crypt target support, CONFIG_DM_CRYPT` must be enabled, set to 'M' (or 'Y'). `XTS support, CONFIG_CRYPTO_XTS` and `AES cipher algorithms (x86_64), CONFIG_CRYPTO_AES_X86_64` optionally set to 'M' (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below.
-    10. Iptables: `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (for Tor's `-m owner` support), `CONFIG_IP_NF_TARGET_REDIRECT` for `-j REDIRECT` which will enable `NF_NAT_REDIRECT` and `NETFILTER_XT_TARGET_REDIRECT` as well. We only need `NETFILTER_XT_TARGET_REDIRECT' for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NT_NAT_IPV6` as dependency) to enable ip6tables nat table.
+    10. Iptables: `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (for Tor's `-m owner` support), `CONFIG_IP_NF_TARGET_REDIRECT` for `-j REDIRECT` which will enable `NF_NAT_REDIRECT` (in return, `NETFILTER_XT_TARGET_REDIRECT` be enabled as well). We only need `NETFILTER_XT_TARGET_REDIRECT' for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NT_NAT_IPV6` as dependency) to enable ip6tables nat table. Turn on `NETFILTER_XT_MATCH_MULTIPORT` for *-m multiport*
+    10. System log: `CONFIG_SECURITY_DMESG_RESTRICT` to Y. Refer to [Restrict unprivileged access to kernel syslog](https://lwn.net/Articles/414813/).
+
+        More refer to *syslog-ng* below.
     10. [optional] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
     10. [e-sources / cjktty patch specific options] `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display in tty (Ctrl + Alt + Fn).
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
@@ -355,6 +359,8 @@ This needs modified in the steps later on.
 31. Set root password: # passwd
 33. System logger.
     1. # emerge -avt app-admin/syslog-ng
+
+        By default, there is a line `log { source(src); destination(console_all); };` in */etc/syslog-ng/syslog-ng.conf*, which outputs system logs to */dev/tty12*. That's to say, any users can read system logs by switching to the 12th virtual terminal. For security reason, comment out that line if there are multiple users.
     2. # rc-update add syslog-ng default
     3. # emerge -avt app-admin/logrotate
 

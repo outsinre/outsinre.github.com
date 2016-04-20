@@ -39,12 +39,12 @@ Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd met
 
    Local overlay! The basic idea is to create local overlay and then download the old version `.ebuild` and corresponding supporting files.
 4. Create local overlay, refer to [Overlay/Local overlay](https://wiki.gentoo.org/wiki/Overlay/Local_overlay):
-   1. # mkdir -p /usr/local/portage/{metadata,profiles}
-   2. # echo 'zhtux' > /usr/local/portage/profiles/repo_name
-   3. # echo 'masters = gentoo' > /usr/local/portage/metadata/layout.conf
-   4. # chown -R root:portage /usr/local/portage
-   5. # chmod g+s /usr/local/portage
-   6. # nano -w /etc/portage/repos.conf/local.conf:
+   1. \# mkdir -p /usr/local/portage/{metadata,profiles}
+   2. \# echo 'zhtux' > /usr/local/portage/profiles/repo_name
+   3. \# echo 'masters = gentoo' > /usr/local/portage/metadata/layout.conf
+   4. \# chown -R root:portage /usr/local/portage
+   5. \# chmod g+s /usr/local/portage
+   6. \# nano -w /etc/portage/repos.conf/local.conf:
 
       ```
       [zhtux]
@@ -57,22 +57,23 @@ Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd met
    1. Go through [/net-wireless/wpa_supplicant](https://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/wpa_supplicant/)
    2. You cannot find `wpa_supplicant-2.3*.ebuild` since version 2.3 is out of portage tree: dead.
    3. Click on `Show 78 dead files` from which you will find old ebuild files: wpa_supplicant-2.3.ebuild, wpa_supplicant-2.3-r1.ebuild, and wpa_supplicant-2.3-r2.ebuild. Here I choose `wpa_supplicant-2.3-r2.ebuild`. Download this file from `Links to HEAD: (view) (download) (annotate)`. Then click on `Hide 78 dead files`.
-   4. # mkdir -p /usr/local/portage/net-wireless/wpa\_supplicant
-   4. # cd /usr/local/portage/net-wireless/wpa_supplicant
-   5. # cp /path/to/downloaded/wpa\_supplicant-2.3-r2.ebuild /usr/local/portage/net-wireless/wpa\_supplicant/
-   5. # cp /usr/portage/net-wireless/wpa\_supplicant/metadata.xml .
+   4. \# mkdir -p /usr/local/portage/net-wireless/wpa\_supplicant
+   4. \# cd /usr/local/portage/net-wireless/wpa_supplicant
+   5. \# cp /path/to/downloaded/wpa\_supplicant-2.3-r2.ebuild /usr/local/portage/net-wireless/wpa\_supplicant/
+   5. \# cp /usr/portage/net-wireless/wpa\_supplicant/metadata.xml .
 
        *metadata.xml* is a XML file denoting package information. Usually just a few lines.
-   6. # repoman manifest (pay attention to: the current directory)
+   6. \# repoman manifest (pay attention to: the current directory)
 
       Calculate the package source (download from `GENTOO_MIRROR` or `SRC_URI`) checksum and put into `Manifest`.
-   6. # repoman full -d
+   5. \# repoman scan -d
+   6. \# repoman full -d -x
 
        Check if any errors. If successfull, get a line:
 
        >RepoMan sez: "If everyone were like you, I'd be out of business!"
-   7. # chown -R portage:portage /usr/local/portage
-   8. # emerge -av1 wpa_supplicant
+   7. \# chown -R portage:portage /usr/local/portage
+   8. \# emerge -av1 wpa_supplicant
       1. This will not install wpa\_supplicant 2.3-r2 since it complains lacking files. If you go back to step 1, you will find a folder `/net-wireless/wpa_supplicant/files`. Items under this directory is supporting files like patches. Supporting files are downloaded when you sync the portage. For local overly, we need to put the files manually.
       2. On the other hand, emerge only downloads the source tarbar for wpa_supplicant-2.3-r2. It is specified in the ebuild file:
 
@@ -80,10 +81,11 @@ Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd met
 
 	  The downloaded source file is kept under `/usr/portage/distfiles/`.
       3. The 3rd emerge optiono is number one, not character L. This means for one time installation.
-   9. # mkdir files
+   9. \# mkdir files
       1. Now based the emerge error message, we go to step 1, and download the missing files.
       2. We can also read through the ebuild files to locate what supporting files needed.
       3. The top of the page in step 1 reminds that we can use `cvs` command to locate the files.
+   10. Each time, change the ebuild, re-run `repoman`.
 6. GitHub
 
    It's useful to push local portage to Github for backup.

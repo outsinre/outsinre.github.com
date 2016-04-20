@@ -318,7 +318,9 @@ The above spoofing method assumes *dhcpcd + wpa\_supplicant* networking scheme. 
     * WARNING: tor will start when net.wlan0 has started
    ```
 
-   These warnings don't affect networking. The possbile cause is: net.wlan0 needs some to warm up (started, but not finished yet) while another service (dependency) is starting. Service started but not finished might be at *scheduling* or *inactive* status. We can check this by stoping all networking init service and `rc default; rc-status`.
+   These warnings don't affect networking. The possbile cause is: net.wlan0 needs some time to warm up (started, but not finished yet) waiting for other services depending on (*need net*) it. We can check *netmount* and *tor* init scrpit and find *need net* in the *depend* function.
+
+   Service started but not finished might be at *scheduling* or *inactive* status. We can check this by stoping all networking init service and `rc default; rc-status`.
 5. More
 
    I can set an interface down by default. For example, to let Ethernet eth0 down default, in *net config*, we can add *config_eth0="null"*. And in *dhcpcd.conf*, add *denyinterfaces eth0*.
