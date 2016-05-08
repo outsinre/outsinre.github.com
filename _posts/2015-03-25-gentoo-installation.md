@@ -28,23 +28,24 @@ title: Gentoo Installation
    5. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. `sudo su -`, switches to `root` account. The command prompt is *livecd ~ #* which is not the same as the handbook one *root #*. Maybe this is derived from not setting a temporary root password.
 5. `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free the `/dev/sda10` NTFS partition for Gentoo.
-   1. **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position. Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
 
-      ```bash
-      1. # parted -a optimal /dev/sda
-      2. (parted) p
-      3. (parted) unit MiB
-      3. (parted) rm 10
-      3. (parted) p
-      4. (parted) mkpart primary 309921MiB 310049MiB, create a boot partition sda10 for Gentoo
-      5. (parted) p
-      6. (parted) name 10 'Gentoo boot partition'
-      7. (parted) mkpart primary 310049MiB -1, create root partition sda12 for Gentoo
-      8. (parted) p
-      9. (parted) name 12 'Gentoo root partition'
-      10. (parted) p
-      11. (parted) q
-      ```
+   **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position. Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
+
+   ```bash
+   1. # parted -a optimal /dev/sda
+   2. (parted) p
+   3. (parted) unit MiB
+   3. (parted) rm 10
+   3. (parted) p
+   4. (parted) mkpart primary 309921MiB 310049MiB, create a boot partition sda10 for Gentoo
+   5. (parted) p
+   6. (parted) name 10 'Gentoo boot partition'
+   7. (parted) mkpart primary 310049MiB -1, create root partition sda12 for Gentoo
+   8. (parted) p
+   9. (parted) name 12 'Gentoo root partition'
+   10. (parted) p
+   11. (parted) q
+   ```
    
    The annoying thing is that the partition *Type* is *Basic data partition* when checking with *fdisk /dev/sda*. We can change it by Disk GUI application in Ubuntu.
 6. New */dev/sda10* will be the boot partition while */dev/sda12* the root partition. We don't need to create *swap* or *efi* partition since we already created it when installing Ubuntu and Windows. Just share these two partitions. If possible, you can also create a separate home partition, say *sda13*.
@@ -54,7 +55,7 @@ title: Gentoo Installation
    3. [*optional*] mkfs.ext4 /dev/sda13, sda13 is home partition if created
 8. From step 5 we know the Ubuntu swap partition is */dev/sda7*. So we need to activate it:
    1. If you need to create a new swap partition, use command `mkswap /dev/sdaXY` to format the partition.
-   2. # swapon /dev/sda7
+   2. \# swapon /dev/sda7
 9. Mount the ewnly created partitions into the LiveDVD USB stick. Make sure the `gentoo` directory exists in /mnt/gentoo, otherwise create one.
    1. mount /dev/sda12 /mnt/gentoo
    2. mkdir /mnt/gentoo/boot
@@ -134,7 +135,7 @@ title: Gentoo Installation
     5. Check if *nls* is enabled by `emerge --info | grep ^USE`. If not, update *make.conf* file.
     6. By default, *bindist* is enabled by *stage3*'s default *make.conf*. If we don't plan to distribute binary packages, disable it globally. Add `--bindist` USE to *make.conf*. Otherwise, this will eliminate those *bindist* USE conflicts when emerge pkgs, especially between *openssh* and *openssl*.
 24. Localization
-    1. cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
+    1. `cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen`
     2. Uncomment `en_US.UTF-8 UTF-8` in */etc/locale.gen*
     3. locale-gen, if reminds *run ". /etc/profile"* to reload the variable in your shell. If you run it, you need to run `export PS1="(chroot) $PS1"` again to recover shell prompt.
     5. locale -a, to see what locales are generated.
@@ -197,7 +198,7 @@ title: Gentoo Installation
     4. Ethernet: `e1000e` = `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
     4. Audio: `snd_hda_intel` = `Intel HD Audio, CONFIG_SND_HDA_INTEL`. The default value is 'Y', now **MUST** set to 'M'. Choose the audioi codec:
        1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
-       2. cat /proc/asound/card0/codec#* | grep -i codec, the output is as follows:
+       2. `cat /proc/asound/card0/codec#* | grep -i codec`, the output is as follows:
        
           **Attension**: execute this command in LiveCD environment by opening a new terminal.
 	  
@@ -213,19 +214,19 @@ title: Gentoo Installation
         5. You notice these options are all set to 'M'! You can also set them all to 'Y'. But never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
     5. Webcamera
        1. lsusb
-       
-           ```
-           Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-           Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-           Bus 001 Device 006: ID 04f2:b217 Chicony Electronics Co., Ltd Lenovo Integrated Camera (0.3MP)
-           Bus 001 Device 005: ID 0a5c:217f Broadcom Corp. BCM2045B (BDC-2.1)
-           Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
-           Bus 001 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver
-           Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-           Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-           ```
-	   
-           The 3rd item is the integrated webcamera which is a multimedia USB device.
+
+          ```
+	  Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+	  Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+	  Bus 001 Device 006: ID 04f2:b217 Chicony Electronics Co., Ltd Lenovo Integrated Camera (0.3MP)
+	  Bus 001 Device 005: ID 0a5c:217f Broadcom Corp. BCM2045B (BDC-2.1)
+	  Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
+	  Bus 001 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver
+	  Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+	  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+	  ```
+
+          The 3rd item is the integrated webcamera which is a multimedia USB device.
        2. Enable `MEDIA_SUPPORT` = `Multimedia support`, `MEDIA_CAMERA_SUPPORT` = `Cameras/video grabbers support`, `CONFIG_MEDIA_USB_SUPPORT` = `Media USB Adapters`, and `USB_VIDEO_CLASS` = `USB Video Class (UVC)`. The 2nd and 4th items are the key to make webcamera to work.
     5. Processor type and features
        1. `Processor family (Intel Core 2nd Gen AVX)` select `Intel Core 2nd Gen AVX, CONFIG_MCOREI7AVX`. This optioin enables `-march=corei7-avx` which serves the same purpose as the `CFLAGS` value set in `make.conf` in previous step. We enable this option as failure fallback.
@@ -397,11 +398,11 @@ title: Gentoo Installation
     ```
 
 33. System logger.
-    1. # emerge -avt app-admin/syslog-ng
+    1. \# emerge -avt app-admin/syslog-ng
 
         By default, there is a line `log { source(src); destination(console_all); };` in */etc/syslog-ng/syslog-ng.conf*, which outputs system logs to */dev/tty12*. That's to say, any users can read system logs by switching to the 12th virtual terminal. For security reason, comment out that line if there are multiple users.
-    2. # rc-update add syslog-ng default
-    3. # emerge -avt app-admin/logrotate
+    2. \# rc-update add syslog-ng default
+    3. \# emerge -avt app-admin/logrotate
 
     Detail on logrotate for cron jobs refer to [Cronie and Anacron](/2015/07/19/cronie/).
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
