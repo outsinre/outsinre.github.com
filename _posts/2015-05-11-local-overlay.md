@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Downgrade Package && wpa_supplicant && local overlay
+title: local overlay for wpa_supplicant
 ---
 
 > Once for a while after an update, you system might bump into problem due to a new package version or to an unstable package. Thus the trouble-making packages should be downgraded to its old working version.
@@ -73,11 +73,11 @@ Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd met
 
        >RepoMan sez: "If everyone were like you, I'd be out of business!"
    7. \# chown -R portage:portage /usr/local/portage
-   8. \# emerge -av1 wpa_supplicant
+   8. \# emerge -av --oneshot wpa_supplicant
       1. This will not install wpa\_supplicant 2.3-r2 since it complains lacking files. If you go back to step 1, you will find a folder `/net-wireless/wpa_supplicant/files`. Items under this directory is supporting files like patches. Supporting files are downloaded when you sync the portage. For local overly, we need to put the files manually.
       2. On the other hand, emerge only downloads the source tarbar for wpa_supplicant-2.3-r2. It is specified in the ebuild file:
 
-	  ># grep "SRC\_URI=" /usr/local/portage/net-wireless/wpa\_supplicant/wpa_supplicant-2.3-r2.ebuild
+	  >\# grep "SRC\_URI=" /usr/local/portage/net-wireless/wpa\_supplicant/wpa_supplicant-2.3-r2.ebuild
 
 	  The downloaded source file is kept under `/usr/portage/distfiles/`.
       3. The 3rd emerge optiono is number one, not character L. This means for one time installation.
