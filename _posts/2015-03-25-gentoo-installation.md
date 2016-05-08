@@ -50,17 +50,17 @@ title: Gentoo Installation
    The annoying thing is that the partition *Type* is *Basic data partition* when checking with *fdisk /dev/sda*. We can change it by Disk GUI application in Ubuntu.
 6. New */dev/sda10* will be the boot partition while */dev/sda12* the root partition. We don't need to create *swap* or *efi* partition since we already created it when installing Ubuntu and Windows. Just share these two partitions. If possible, you can also create a separate home partition, say *sda13*.
 7. Up to now, only the boot and root partition is prepared. We share swap and EFI partitions with Ubuntu and Windows. Now format the new partition. It's better to format boot partition as `ext2`.
-   1. mkfs.ext2 /dev/sda10
-   2. mkfs.ext4 /dev/sda12
-   3. [*optional*] mkfs.ext4 /dev/sda13, sda13 is home partition if created
+   1. \# mkfs.ext2 /dev/sda10
+   2. \# mkfs.ext4 /dev/sda12
+   3. [*optional*] # mkfs.ext4 /dev/sda13, sda13 is home partition if created
 8. From step 5 we know the Ubuntu swap partition is */dev/sda7*. So we need to activate it:
    1. If you need to create a new swap partition, use command `mkswap /dev/sdaXY` to format the partition.
    2. \# swapon /dev/sda7
 9. Mount the ewnly created partitions into the LiveDVD USB stick. Make sure the `gentoo` directory exists in /mnt/gentoo, otherwise create one.
-   1. mount /dev/sda12 /mnt/gentoo
-   2. mkdir /mnt/gentoo/boot
-   3. mount /dev/sda10 /mnt/gentoo/boot
-   4. [*optional*] mkdir /mnt/gentoo/home; mount /dev/sda13 /mnt/gentoo/home
+   1. \# mount /dev/sda12 /mnt/gentoo
+   2. \# mkdir /mnt/gentoo/boot
+   3. \# mount /dev/sda10 /mnt/gentoo/boot
+   4. [*optional*] # mkdir /mnt/gentoo/home; mount /dev/sda13 /mnt/gentoo/home
 9. Setting the date and time using `date` command.
 10. Go to the Gentoo mountpoint where the root file system is mounted (most likely /mnt/gentoo)
 
@@ -90,7 +90,7 @@ title: Gentoo Installation
     Make sure that the same options `xvjpf` are used. The x stands for Extract, the v for Verbose to see what happens during the extraction process (optional), the j for Decompress with bzip2, the p for Preserve permissions and the f to denote that we want to extract a File, not standard input.
     
 15. Configuring compile options. To keep the settings, Portage reads in the /etc/portage/make.conf file, a configuration file for Portage.
-    1. nano -w /mnt/gentoo/etc/portage/make.conf
+    1. \# nano -w /mnt/gentoo/etc/portage/make.conf
     2. `CFLAGS` and `CXXFLAGS`. Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). Command `grep -m1 -A3 "vendor_id" /proc/cpuinfo` will show the current CPU architecure information. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two *.gcc* files.
        1. CFALGS="-march=corei7-avx -O2 -pipe"
        2. CXXFLAGS="${CFLAGS}"
@@ -106,24 +106,25 @@ title: Gentoo Installation
        4. Up to now, some packages in *portage* and overlays are not yet migrating those flags from 'USE' to 'CPU\_FLAGS\_X86'. So:
        5. Remove the old CPU specific flags from 'USE'. Then add *${CPU\_FLAGS\_X86}* to 'USE' in *make.conf*.
 17. Selecting mirrors
-    1. mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
-    2. mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the *rsync server* to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
+    1. \# mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
+    2. \# mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the *rsync server* to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
        1. The rotation link setting is changed to */etc/portage/repos.conf/gentoo.conf* for *portageq --version* >= 2.2.16. But don't worry since we can modify it when chrooting into the new Gentoo system. For now, remain this setting in */etc/portage/make.conf* since the LiveCD environment uses the old version of portage.
-18. cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (*/mnt/gentoo*) environment. */etc/resolv.conf* contains the name servers for the network. DON'T forget the `-L` parameter when copying.
+18. \# cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (*/mnt/gentoo*) environment. */etc/resolv.conf* contains the name servers for the network. DON'T forget the `-L` parameter when copying.
 19. Mounting the necessary filesystems.
-    1. mount -t proc proc /mnt/gentoo/proc
-    2. mount --rbind /sys /mnt/gentoo/sys
-    3. mount --make-rslave /mnt/gentoo/sys
-    4. mount --rbind /dev /mnt/gentoo/dev
-    5. mount --make-rslave /mnt/gentoo/dev
-    1. **chroot /mnt/gentoo /bin/bash**, chrooting into the new environment.
-    2. source /etc/profile
-    3. export PS1="(chroot) $PS1", this create a new different command prompt for the new environment.
+    1. \# mount -t proc proc /mnt/gentoo/proc
+    2. \# mount --rbind /sys /mnt/gentoo/sys
+    3. \# mount --make-rslave /mnt/gentoo/sys
+    4. \# mount --rbind /dev /mnt/gentoo/dev
+    5. \# mount --make-rslave /mnt/gentoo/dev
+    1. \# **chroot /mnt/gentoo /bin/bash**, chrooting into the new environment.
+    2. \# source /etc/profile
+    3. \# export PS1="(chroot) $PS1", this create a new different command prompt for the new environment.
 21. Installing a portage snapshot:
-    1. emerge-webrsync, it might complain about a missing `/usr/portage/` location. This is to be expected and nothing to worry about - the tool will create the location.
+    1. \# emerge-webrsync, it might complain about a missing `/usr/portage/` location. This is to be expected and nothing to worry about - the tool will create the location.
+    2. Sometimes, `eix-sync`, `emaint sync -a` or `emerge --sync` fail, you can fetch a brand new portage.
 22. Choosing the right profile.
-    1. eselect profile list
-    2. eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
+    1. \# eselect profile list
+    2. \# eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
 23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected and different USE update in *make.conf*. Xfce will be installed as desktop.
     4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags:
 
@@ -135,12 +136,12 @@ title: Gentoo Installation
     5. Check if *nls* is enabled by `emerge --info | grep ^USE`. If not, update *make.conf* file.
     6. By default, *bindist* is enabled by *stage3*'s default *make.conf*. If we don't plan to distribute binary packages, disable it globally. Add `--bindist` USE to *make.conf*. Otherwise, this will eliminate those *bindist* USE conflicts when emerge pkgs, especially between *openssh* and *openssl*.
 24. Localization
-    1. `cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen`
+    1. \# cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
     2. Uncomment `en_US.UTF-8 UTF-8` in */etc/locale.gen*
-    3. locale-gen, if reminds *run ". /etc/profile"* to reload the variable in your shell. If you run it, you need to run `export PS1="(chroot) $PS1"` again to recover shell prompt.
-    5. locale -a, to see what locales are generated.
-    1. eselect locale list
-    2. eselect locale set 3, set system-wdie locale to `en_US.utf8`.
+    3. \# locale-gen, if reminds *run ". /etc/profile"* to reload the variable in your shell. If you run it, you need to run `export PS1="(chroot) $PS1"` again to recover shell prompt.
+    5. \# locale -a, to see what locales are generated.
+    1. \# eselect locale list
+    2. \# eselect locale set 3, set system-wdie locale to `en_US.utf8`.
     
        As stated below, it is recommended to use `UTF-8` instead of `utf8`. How to achieve this? Use the *free form* of Gentoo *eselect*.
 
@@ -149,7 +150,7 @@ title: Gentoo Installation
        ```
        
     2. The following steps can also be done after entering the new Gentoo system.
-    3. `nano -w /etc/env.d/02locale`. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
+    3. \# nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
 
        ```
        LANG="en_US.UTF-8"
@@ -157,26 +158,26 @@ title: Gentoo Installation
        LC_COLLATE="C"
        ```
        
-    4. env-update && source /etc/profile
-    5. export PS1="(chroot) $PS1"
+    4. \# env-update && source /etc/profile
+    5. \# export PS1="(chroot) $PS1"
     5. Use `xx_YY.UTF-8` (or `xx_YY.utf8`. But this one might not work for some packages). NOT `xx_YY.UTF8`.
     5. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](http://jimgray.tk/2015/04/13/fontconfig/).
     5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
 25. Install the kernel source
     1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to unstable 4.0.0_.
     1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to *e-sources-4.1.1 kernel*.
-    1. emerge -avt sys-kernel/gentoo-sources
-    2. ls -l /usr/src/
+    1. \# emerge -avt sys-kernel/gentoo-sources
+    2. \# ls -l /usr/src/
     3. If possible, apply kernel patches like 'cjktty.patch'.
 26. Configuring the Linux kernel - Manual configuration
     1. If you have a backup of kernel *.config* file, then this and the next step can be skipped. Refer to _Upgrade kernel to unstable 4.0.0_ below.
-    1. emerge -av sys-apps/pciutils sys-apps/usbutils sys-apps/hwinfo
-    2. cd /usr/src/linux
+    1. \# emerge -av sys-apps/pciutils sys-apps/usbutils sys-apps/hwinfo
+    2. \# cd /usr/src/linux
 26. Kernel configuration
 
     Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. `make menuconfig`) and press `/` to search the options like `e1000e`, find their locations and activate them.
     
-    1. make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config` first.
+    1. \# make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config` first.
 
        Or you can refer to the LiveCD's kernel config directly.
     1. Search with `/`. The *Prompt* part is the corresponding kernel option.
@@ -187,7 +188,8 @@ title: Gentoo Installation
        Prompt:
 	 Location:
        ```
-       
+
+    1. Usually there are several search options with prefix number (1, 2, 3 ...). Press the number to enter the kernel option. Then *exit* or two successive ESC to return to search.
     1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`. These are the dirvers that needs activated. When search "snd-hda-intel", replace the hypen with dash.
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the LiveCD's kernel config file to help clarify kernel options.
     2. `IKCONFIG` as M and `IKCONFIG_PROC` as Y. This allows you to inspect the configuration of the kernel while it is running, without having to worry whether you've changed or cleaned the source directory after it was built. 
@@ -639,162 +641,164 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 45. Applications:
     1. Firefox
 
-        ```
-        www-client/firefox gstreamer
-        media-plugins/gst-plugins-libav -libav
-        # emerge -av firefox
-        # emerge -av www-plugins/adobe-flash
-        ```
-        1. Enable `gstreamer` USE flag for Firefox to support more video codecs (like H264).
-        2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
-        3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
-        4. Run `$ flash-player-properties` or from application menu to set flash player.
-        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll*, *user agent switcher* etc. plugins.
-        5. Remove unecessary default whitelist of NoScript plugin.
-        5. *privacy.trackingprotection.enabled* to TRUE.
-        5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
+       ```
+       www-client/firefox gstreamer
+       media-plugins/gst-plugins-libav -libav
+       # emerge -av firefox
+       # emerge -av www-plugins/adobe-flash
+       ```
+
+       1. Enable `gstreamer` USE flag for Firefox to support more video codecs (like H264).
+       2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
+       3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
+       4. Run `$ flash-player-properties` or from application menu to set flash player.
+       4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll*, *user agent switcher* etc. plugins.
+       5. Remove unecessary default whitelist of NoScript plugin.
+       5. *privacy.trackingprotection.enabled* to TRUE.
+       5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
     2. Weechat for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
-        1. # echo "app-i18n/fcitx gtk gtk3" >> /etc/portage/package.use/fcitx
-        2. # emerge -av fcitx
-        2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
+       1. # echo "app-i18n/fcitx gtk gtk3" >> /etc/portage/package.use/fcitx
+       2. # emerge -av fcitx
+       2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 
-            ```
-            export GTK_IM_MODULE=fcitx
-            export QT_IM_MODULE=xim
-            export XMODIFIERS=@im=fcitx
-            ```
-        But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
-        3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
-        4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
+	   ```
+	   export GTK_IM_MODULE=fcitx
+	   export QT_IM_MODULE=xim
+	   export XMODIFIERS=@im=fcitx
+	   ```
+       But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
+       3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
+       4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
 
-            It's optional to install *fcitx-configtool* if you are OK to configure Fcitx on command line manually.
+          It's optional to install *fcitx-configtool* if you are OK to configure Fcitx on command line manually.
     18. ffmpeg
 
         `ffmpeg` is emerged by some other packages, one of which might be `mplayer` or `mpv`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
 
-        In order to add support `v4l`, update `package.use/ffmpeg` for USE flags `v4l` and `libv4l`.
+        In order to add support `v4l`, add USE flags `v4l` and `libv4l`.
 
         ```
-        # emerge -av ffmpeg
+        # emerge -av1 ffmpeg
         ```
+
     3. \# emerge -av mpv
 
-        Previously, I use `mplayer` which is in active development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
+       Previously, I use `mplayer` which is in active development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
     4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features). Then emerge plugins on demand.
 
-        Since it is *minimal*, when playing songs, guayadeque reminds:
+       Since it is *minimal*, when playing songs, guayadeque reminds:
 
-        >Your GStreamer installation is missing a plug-in.
+       >Your GStreamer installation is missing a plug-in.
 
-        This is due to lack of essential *gstreamer* plugins, namely:
+       This is due to lack of essential *gstreamer* plugins, namely:
 
-        >emerge -av1 gst-plugins-bad:0.10 gst-plugins-good:0.10 gst-plugins-ugly:0.10 gst-plugins-base:0.10 gst-plugins-mad:0.10
+       >emerge -av1 gst-plugins-bad:0.10 gst-plugins-good:0.10 gst-plugins-ugly:0.10 gst-plugins-base:0.10 gst-plugins-mad:0.10
 
-        Pay attention to `-1` *oneshot* option to explicitly draw in dependencies.
+       Pay attention to `-1` *oneshot* option to explicitly draw in dependencies.
 
-        `guayadeque` depends on `0.10` slot `gstreamer` plugins, instead of those `1.0` slot plugins. The official ebuild should be updated to include those five `0.10` slots even `minimal` USE flag is enabled.
+       `guayadeque` depends on `0.10` slot `gstreamer` plugins, instead of those `1.0` slot plugins. The official ebuild should be updated to include those five `0.10` slots even `minimal` USE flag is enabled.
 
-        More useful plugins: `gst-plugins-flac:0.10` `flac` track; `gst-plugins-soup` for online `radio`; `gst-plugins-ffmpeg` for `ape` track.
+       More useful plugins: `gst-plugins-flac:0.10` `flac` track; `gst-plugins-soup` for online `radio`; `gst-plugins-ffmpeg` for `ape` track.
 
-        This link [guayadeque missing gstreamer plugin](https://forums.gentoo.org/viewtopic-p-7663344.html) recommends `emerge gst-plugins-meta:0.10`. However, it will draw in 21 `gst-plugins-*`. Actually, minimal `guayadeque` does not need so much plugins, but this command is convenient. A more convinient way is to remove `minimal` USE flag. These two convenient methods would emerge many unuseful pakcages.
+       This link [guayadeque missing gstreamer plugin](https://forums.gentoo.org/viewtopic-p-7663344.html) recommends `emerge gst-plugins-meta:0.10`. However, it will draw in 21 `gst-plugins-*`. Actually, minimal `guayadeque` does not need so much plugins, but this command is convenient. A more convinient way is to remove `minimal` USE flag. These two convenient methods would emerge many unuseful pakcages.
 
-        If you cannot find a plugin to play specific music format, have a look at `equery g gst-plugins-meta:0.10`.
+       If you cannot find a plugin to play specific music format, have a look at `equery g gst-plugins-meta:0.10`.
 
-        **Restart guayadeque** to make those plugins work.
-
+       **Restart guayadeque** to make those plugins work.
     4. emacs:
-        1. # echo "app-editors/emacs xft libxml2 gnutls athena Xaw3d -gtk -gtk3 -motif" > /etc/portage/package.use/emacs, `xft` is to support Chinese display. `libxml2` is to support builtin `shr`, which in return support `eww` web browser and Gnus viewing HTML. `gnutls` supports Gnus imap connection. `athena Xaw3d -gtk -gtk3 -motif` is to solve *daemon mode* bug [reddit](https://www.reddit.com/r/emacs/comments/2ans0z/have_you_encountered_that_gtk_bug_in_daemon_mode/?ref=share&ref_source=link) and [wiki](https://wiki.gentoo.org/wiki/GNU_Emacs).
-        2. # emerge -av emacs
-        3. \# emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
+       1. \# echo "app-editors/emacs xft libxml2 gnutls athena Xaw3d -gtk -gtk3 -motif" > /etc/portage/package.use/emacs, `xft` is to support Chinese display. `libxml2` is to support builtin `shr`, which in return support `eww` web browser and Gnus viewing HTML. `gnutls` supports Gnus imap connection. `athena Xaw3d -gtk -gtk3 -motif` is to solve *daemon mode* bug [reddit](https://www.reddit.com/r/emacs/comments/2ans0z/have_you_encountered_that_gtk_bug_in_daemon_mode/?ref=share&ref_source=link) and [wiki](https://wiki.gentoo.org/wiki/GNU_Emacs).
+       2. \# emerge -av emacs
+       3. \# emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
 
-            Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
+	  Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
 
-            ```
-            if use X; then
-                elog "You need to install some fonts for Emacs."
-                elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
-                elog "machine would satisfy basic Emacs requirements under X11."
-                elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
-                elog "for how to enable anti-aliased fonts."
-                elog
-            fi
-            ```
+	   ```
+	   if use X; then
+	       elog "You need to install some fonts for Emacs."
+	       elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
+	       elog "machine would satisfy basic Emacs requirements under X11."
+	       elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
+	       elog "for how to enable anti-aliased fonts."
+	       elog
+	   fi
+	   ```
     4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://jimgray.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](http://jimgray.tk/2014/09/14/emacs/installation/).
     5. Nano. We can tune some configs of Nano editor */etc/nanorc*: *set autoindent*, *set backup*, *set tabsize 4* etc. If need to totally disable an option, use *unset <option>*.
     6. WPS office.
-        1. overlay support
-            1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
-            1. # echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
-            2. # emerge -av layman
-            2. # echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
-            3. # layman -f -a gentoo-zh
-            4. # layman -S
+       1. overlay support
+	   1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
+	   1. # echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
+	   2. # emerge -av layman
+	   2. # echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
+	   3. # layman -f -a gentoo-zh
+	   4. # layman -S
 
-            >The previous version (<= 9.1.0.4953\_alpha18) located in `gentoo-zh` overlay relies on a bundle of customized and pre-built `QT` packages. Use command `qlist wps-office | grep -i qt` or `equery files wps-office | grep -i qt` to list the bundled `QT` libs in wps-office installation directory (/opt/kingsoft/wps-office/).  Since version `9.1.0.4953_alpha18-r1` wps-office was published through official Gentoo portage as well. The coming new versions no longer use those prebuilt `QT` libs. Instead, they will draw in *qtwebkit*, *qtscript*, *qttranslate*, *qtcore*, etc as system-wide packages.
+	   >The previous version (<= 9.1.0.4953\_alpha18) located in `gentoo-zh` overlay relies on a bundle of customized and pre-built `QT` packages. Use command `qlist wps-office | grep -i qt` or `equery files wps-office | grep -i qt` to list the bundled `QT` libs in wps-office installation directory (/opt/kingsoft/wps-office/).  Since version `9.1.0.4953_alpha18-r1` wps-office was published through official Gentoo portage as well. The coming new versions no longer use those prebuilt `QT` libs. Instead, they will draw in *qtwebkit*, *qtscript*, *qttranslate*, *qtcore*, etc as system-wide packages.
 
-            >But I prefer a Gentoo system without `QT` things since most of my packages are `GTK`-based, especially the `xfce4` desktop environment. So I will not install or update to the new versions.
+	   >But I prefer a Gentoo system without `QT` things since most of my packages are `GTK`-based, especially the `xfce4` desktop environment. So I will not install or update to the new versions.
 
-            >Current method is to mask those higher version in `portage.mask/` directory: `>app-office/wps-office-9.1.0.4953_alpha18::gentoo`.
-        2. WPS 32-bit `abi_x86_32` support. You should activate abi\_x86_32 use flag for packages on which WPS office depends.
-            1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually. You can also cange `pv` to `-av`.
-            2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
-            3. package.license/wps-office: app-office/wps-office WPS-EULA
-            4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945\_alpha16_p3 ~amd64
+	   >Current method is to mask those higher version in `portage.mask/` directory: `>app-office/wps-office-9.1.0.4953_alpha18::gentoo`.
+       2. WPS 32-bit `abi_x86_32` support. You should activate abi\_x86_32 use flag for packages on which WPS office depends.
+	   1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually. You can also cange `pv` to `-av`.
+	   2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
+	   3. package.license/wps-office: app-office/wps-office WPS-EULA
+	   4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945\_alpha16_p3 ~amd64
 
-                >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
-            5. emerge -av wps-office
-            6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
+	       >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
+	   5. emerge -av wps-office
+	   6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
     7. \# emerge -avt xfce4-mixer
     8. \# emerge -av mupdf
 
         The other PDF viewer may draw in a lot of GTK or QT dependencies consuming many disk space.
     9. \# emerge -av dev-vcs/git
-        1. _$_ git config --global user.name "Jim Green"
-        2. _$_ git config --global user.email "username@users.noreply.github.com"
-        3. _$_ git config --global core.editor emacs
-        4. # emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
-        5. _$_ git clone xxx
+       1. $ git config --global user.name "Jim Green"
+       2. $ git config --global user.email "username@users.noreply.github.com"
+       3. $ git config --global core.editor emacs
+       4. \# emerge -av jekyll, it will install the rubygems, nodejs etc dependencies.
+       5. $ git clone xxx
 
-        Refer to [git config](http://jimgray.tk/2015/07/19/git-config/).
+       Refer to [git config](http://jimgray.tk/2015/07/19/git-config/).
     10. \# emerge -av wgetpaste
     11. \# emerge -av net-misc/dropbox [optional] xfce-extra/thunar-dropbox
-        1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
-        2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
-            1. This can be overcome by setting the dropbox language to `english`.
-        3. _$_ dropbox start, Gentoo and Windows share the Dropbox location in /media/Misc/Dropbox. When firstly run this command, you need to configure dropbox as default setting (Dropbox folder in /home/zachary/Dropbox). But then exit dropbox immediately. And remove /home/zachary/Dropbox.
-            1. _$_ rmdir /home/zachary/Dropbox
-            2. _$_ ln -s /media/Misc/Dropbox /home/zachary/Dropbox
-        4. _$_ dropbox &, run dropbox in the backgroud.
-        5. We can create a ~/bin/dropbox.sh or /usr/local/bin/dropbox.sh script:
+       1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
+       2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
+	   1. This can be overcome by setting the dropbox language to `english`.
+       3. _$_ dropbox start, Gentoo and Windows share the Dropbox location in /media/Misc/Dropbox. When firstly run this command, you need to configure dropbox as default setting (Dropbox folder in /home/zachary/Dropbox). But then exit dropbox immediately. And remove /home/zachary/Dropbox.
+	   1. _$_ rmdir /home/zachary/Dropbox
+	   2. _$_ ln -s /media/Misc/Dropbox /home/zachary/Dropbox
+       4. _$_ dropbox &, run dropbox in the backgroud.
+       5. We can create a ~/bin/dropbox.sh or /usr/local/bin/dropbox.sh script:
 
-            >\#!/bin/bash
-            >
-            >/opt/bin/dropbox &
+	   >\#!/bin/bash
+	   >
+	   >/opt/bin/dropbox &
 
-            Remember to `chmod +x ~/bin/dropbox.sh`, just run `~/bin/dropbox.sh`.
-        6. If blocked by GFW, set the corresponding proxy address and port.
+	   Remember to `chmod +x ~/bin/dropbox.sh`, just run `~/bin/dropbox.sh`.
+       6. If blocked by GFW, set the corresponding proxy address and port.
     12. \# emerge -avt app-portage/gentoolkit
     13. \# emerge -avt app-portage/eix
-        1. [deprecated for new poratge > 2.2.16] <s># emacs -nw /etc/eix-sync.conf:</s>
+       1. [deprecated for new poratge > 2.2.16] <s># emacs -nw /etc/eix-sync.conf:</s>
 
-            ```
-            # *
+	   ```
+	   # *
 
-            !!exec >/var/log/eix-sync.log ; chown portage: /var/log/eix-sync.log || true
-            ```
-        2. \# eix-sync
+	   !!exec >/var/log/eix-sync.log ; chown portage: /var/log/eix-sync.log || true
+	   ```
+
+       2. \# eix-sync
     14. Archive
         1. # emerge -av file-roller
         2. \# emerge -av thunar-archive-plugin
 
-            Steps below might be deprecated depending on related package version
+	   Steps below might be deprecated depending on related package version
 
-            1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
-            2. # cd /usr/libexec/thunar-archive-plugin/
-            3. # ln -s file-roller.tap org.gnome.FileRoller.tap
-            4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
+	   1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
+	   2. # cd /usr/libexec/thunar-archive-plugin/
+	   3. # ln -s file-roller.tap org.gnome.FileRoller.tap
+	   4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
         3. \# echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
             1. 使用 “natspec” USE Flag重新编译unzip（zip文件中没有保存压缩时使用的编码，故需将unzip打上编码探测的补丁）
         4. [optionl, 7zip can extract zip format] # emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
