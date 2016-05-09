@@ -46,15 +46,17 @@ Emacs 23 之前的那种方法有个缺点，即所开启的 server mode 只属�
 
 1. -t
 
-    -t 表示在 Terminal 中打开字符界面的 frame。
+    -t 表示在 Terminal 中打开字符界面的 frame.
 2. -c
 
-    -c 表示创建 create 一个 X11 界面的 frame，也就是通常所说的 GUI。
+    -c 表示创建 create 一个 X11 界面的 frame，也就是通常所说的 GUI.
 2. -n
 
     -n 表示不必等待 Emacs 结束，立即返回。譬如在命令行运行 emcasclient，默认当前 Terminal 被 Emacs 占用，无法干别的事情。加上 -n 后，Emacs 创建 frame 后立马释放 Termial，你可以继续使用 Terminal。一般 -n 和 -c 相结合使用。注意，-a 和 -n 没有意义。
 
-    注意，如果开启了 -n，那些需要等待 Emacs 结束的主调用程序就无法正常工作了。譬如，git commit 默认调用系统 EDITOR 或者它自己的 core.editor，如果设置成了下面的 ecx 或者 emc，那么用户无法输入 commit 信息，Emacs已经立马返回了，无法 commit。
+    注意，如果开启了 -n，那些需要等待 Emacs 结束的主调用程序就无法正常工作了。譬如，git commit 默认调用系统 EDITOR 或者它自己的 core.editor，如果设置成了下面的 ecx 或者 emc，那么用户无法输入 commit 信息，Emacs已经立马返回了，无法 commit.
+
+    另外，没有 -n 时，C-x # 会自动关闭 buffer，但是开了 -n 后，就不用 C-x # 了，而是直接 C-x k 或 C-x 5 0.
 3. -a
 
     -a, --alternate-editor=, 表示如果 server mode 没有开启，那么选择一个替代编辑器，譬如 vim/gedit 等。

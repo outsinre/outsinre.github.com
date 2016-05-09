@@ -456,24 +456,27 @@ menuentry "Microsoft Windows 8.1 x86_64" {
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
 
     ```
-exit
-umount -lv /mnt/gentoo/home
-umount -lv /mnt/gentoo/boot{/efi,}
-umount -lv /mnt/gentoo/dev{/shm,/pts,}
-umount -lv /mnt/gentoo{/proc,/sys,}
+    exit
+    umount -lv /mnt/gentoo/home
+    umount -lv /mnt/gentoo/boot{/efi,}
+    umount -lv /mnt/gentoo/dev{/shm,/pts,}
+    umount -lv /mnt/gentoo{/proc,/sys,}
     ```
-You may reminded that `/mnt/gentoo` is busy, then you need to exit the current terminal, and opening a new one terminal will work. Just let it go. Then type in that one magical command that initiates the final, true test: `reboot` with your root account.
+
+    You may be reminded that `/mnt/gentoo` is busy, then you need to exit the current terminal, and opening a new one terminal will work. Just let it go. Then type in that one magical command that initiates the final, true test: `reboot` with your root account.
+
     1. When rebooting, if the LiveDVD usb stick is still plugged onto the computer, the chainload to Ubuntu grub does not work. It show _error: disk hd0,gpt2 not found_. This is because the grub2 treats the USB stick as _hd0_ while the hard disk as _hd1_. You can unplug the USB, and CTRL+ALT+DEL. Another way is to edit the Ubuntu grub2 chainlaod menu from _hd0_ to _hd1_, then press F10 to boot.
     2. The very first thing after rebooting is to create a regular user account:
 
-        ```
-useradd -g users -G wheel,audio,video -m zachary
-passwd zachary
-        ```
+       ```
+       useradd -g users -G wheel,audio,video -m zachary
+       passwd zachary
+       ```
+
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
-        1. # eix-sync
+        1.\ # eix-sync
             1. For new portageq --version >=2.2.16, use `emaint sync` instead of `emerge --sync`.
-        2. # emerge -avtuDN --with-bdeps=y @world
+        2. \# emerge -avtuDN --with-bdeps=y @world
         6. [optional] # dispatch-conf, if prompted, you just need to input `u`.
 
             This command will help update files in `/etc/portage` when needed as well. I would like to separate per-package settings by filenames. Simply input `u` will merge several package settings together, which is undesirable. Hence, first check the updates by `diff` the `._cfg*` in corresponding directory. And then rename `._cfg*` to relevant package name.
@@ -685,7 +688,18 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 
     3. \# emerge -av mpv
 
-       Previously, I use `mplayer` which is in active development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
+       If *mpv* does not play videos after kernel upgrades, try to reinstall `emerge -av1 mpv xf86-video-intel` and reboot.
+
+       Previously, I use `mplayer` which is inactive of development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
+
+       If want to play video from URL (like live broadcast), install *youtube-dl*. And make sure *ffmpeg* is installed with `network` USE flag. If the url is *https*, then add `gnutls` or `openssl` USE flag to *ffmpeg*. Ether `gnutls` or `openssl` is fine and you don't need both. The default *lua* USE flag of *mpv* brings along a *youtube-dl* hook script. `mpv url` will automatically invoke *youtube-dl* to download video cache while palying.
+
+       Though *youtube-dl* support many sites, it does play well with Chinese ones. We can try `mpv $(youtube-dl --get-url http://v.youku.com/v_show/id_XMTU2Mjc4MTc4NA==.html)`.
+
+       There is another tool tuned for Chinese sites, that is *you-get* written by Python3. It's brilliant like this `you-get -p mpv url`. I install this package in Python3 virtual environment (*pyvenv*). Of course, *you-get* can be used to download video directly from sites like youtube-dl.
+
+       If the url is blocked, we should first enable *proxychains* or *torify*.
+    4. Details on [*youtube-dl*](https://github.com/rg3/youtube-dl) and [*you-get*](https://github.com/soimort/you-get), refer to their Github pages.
     4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features). Then emerge plugins on demand.
 
        Since it is *minimal*, when playing songs, guayadeque reminds:
@@ -943,20 +957,21 @@ exec startxfce4 --with-ck-launch
         4. Refer to [ConsoleKit](http://docs.xfce.org/xfce/xfce4-session/advanced); [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059); [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
     2. fstab including NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
 
-        ```
-/dev/sda8 /boot ext2 noauto,noatime 1 2
-/dev/sda2 /boot/efi vfat noauto,noatime 1 0
-/dev/sda10 / ext4 noatime,errors=remount-ro 0 1
-/dev/sda9 none swap sw 0 0
-/dev/sda11 /home ext4 defaults 0 0
-#/dev/cdrom /mnt/cdrom auto noauto,ro 0 0
-#/dev/fd0 /mnt/floppy auto noauto 0 0
-/dev/sda1 /mnt/Recovery ntfs-3g noauto,ro 0 0
-/dev/sda4 /mnt/Win81 ntfs-3g noauto,ro 0 0
-/dev/sda5 /media/Data ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
-/dev/sda6 /media/Misc ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
-/dev/sda7 /media/WLShare ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,users,dmask=022,fmask=133 0 0
-        ```
+       ```
+       /dev/sda8 /boot ext2 noauto,noatime 1 2
+       /dev/sda2 /boot/efi vfat noauto,noatime 1 0
+       /dev/sda10 / ext4 noatime,errors=remount-ro 0 1
+       /dev/sda9 none swap sw 0 0
+       /dev/sda11 /home ext4 defaults 0 0
+       #/dev/cdrom /mnt/cdrom auto noauto,ro 0 0
+       #/dev/fd0 /mnt/floppy auto noauto 0 0
+       /dev/sda1 /mnt/Recovery ntfs-3g noauto,ro 0 0
+       /dev/sda4 /mnt/Win81 ntfs-3g noauto,ro 0 0
+       /dev/sda5 /media/Data ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
+       /dev/sda6 /media/Misc ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,dmask=022,fmask=133 0 0
+       /dev/sda7 /media/WLShare ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,users,dmask=022,fmask=133 0 0
+       ```
+
         1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
         2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
         3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So you can; creating new Chinese filenames in virtual terminal.
@@ -971,38 +986,71 @@ exec startxfce4 --with-ck-launch
 
         > `> = < ~` operators are used for per-package configuration in these files/directories. Use `=` at best if allowed.
     5. New portage plug-in sync system. This new sync system requires `emerge -av \>=sys-apps/portage-2.2.16` and `emerge -av \>=app-portage/layman-2.3.0`.
-        1. After a world update, my `portage` has updated to version `2.2.18`. Commands related to `emerge` reminds:
+       1. After a world update, my `portage` has updated to version `2.2.18`. Commands related to `emerge` reminds:
 
-            ```
-!!! SYNC setting found in make.conf.
-    This setting is Deprecated and no longer used.  Please ensure your 'sync-type' and 'sync-uri' are set correctly in /etc/portage/repos.conf/gentoo.conf
-            ```
-        2. Refer to [Portage/Sync](https://wiki.gentoo.org/wiki/Project:Portage/Sync)
-        3. \# mkdir /etc/portage/repos.conf
-        4. \# cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
-            1. This default setting is enough for the official portage sync. The argument `sync-uri` can be changed to someone near your local region. For instalce, it can be replaced by the one in your original `/etc/portage/make.conf`: `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
-        5. Install new >=layman-2.3.0 supporting the new portage plug-in sync system.
-            1. Add `sync-plugin-portage` USE flag to `/etc/package.use/layman` file.
-            2. # emerge -avt \>=app-portage/layman-2.3.0, the new layman package will create `/etc/portage/repos.conf/layman.conf` automatically.
-            3. # rm /var/lib/layman/make.conf, delete is the old-style layman config file.
-        6. Edit `etc/portage/make.conf` and commnet out the lines `source /var/lib/layman/make.conf` and `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
-        7. Primary control of all sync operations has been moved from `emerge` to `emaint`. `emerge --sync` now just calls the `emaint sync` module with the default `--auto` option. The `--auto` option performs a sync on only those repositories (both portage and overlays) with the auto-sync setting not set to `no` or `false`. If it is absent, then it will default to `yes` and "emerge --sync" will sync the repository. This means the original `emerge --sync` acts like `emaint sync` with default argument `--auto` or `-a`.
-        8. As always `eix-sync` can update both overlays and portage while the new sync system will add overlays to `/etc/portage/repos.conf/layman` as well. So when `eix-sync` is called, the new procedure is likely: `layman -S; emerge --sync`. But the new `emerge --sync` will also update overlays in `/etc/portage/repos.conf/layman.conf`.
+	  ```
+	  !!! SYNC setting found in make.conf.
+	      This setting is Deprecated and no longer used.  Please ensure your 'sync-type' and 'sync-uri' are set correctly in /etc/portage/repos.conf/gentoo.conf
+	  ```
 
-            ```
-NOTE: As a result of the default auto-sync = True/Yes setting, commands 
- like "eix-sync", "esync -l", "emerge --sync && layman -S" will cause 
- many repositories to be synced multiple times in a row. Please edit 
- your configs or scripts to adjust for the new operation.
-            ```
-            9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out `*` therein.
-        10. Choose one of the follwing command for daily operation:
-            1. # emaint sync -a
-            2. # emerge --sync
-            3. # eix-sync
+       2. Refer to [Portage/Sync](https://wiki.gentoo.org/wiki/Project:Portage/Sync)
+       3. \# mkdir /etc/portage/repos.conf
+       4. \# cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
+          1. This default setting is enough for the official portage sync. The argument `sync-uri` can be changed to other mirrors like *rsync://rsync.cn.gentoo.org/gentoo-portage*.
+          2. We can now set *sync-type = git* instead of *rsync*.
 
-            Although they all update portage and overlays. However, *eix-sync* will call *eix-update* (for *eix* query) and *eix-diff* (showing what has changed) as well. So for daily management and eix operation, you'd better use *eix-sync*.
-        11. [sys-apps/portage-2.2.16 发布，支持多种同步方式](http://www.gentoo-cn.info/article/new-portage-plug-in-sync-system/); [Gentoo的portage已支持直接更新第三方源（overlay）](http://phpcj.org/portage-emerge-overlay-on-gentoo/).
+          ```
+	  [DEFAULT]
+	  main-repo = gentoo
+
+	  [gentoo]
+	  location = /usr/portage
+	  sync-type = git
+	  #sync-uri = https://github.com/gentoo-mirror/gentoo
+	  sync-uri = git://github.com/gentoo-mirror/gentoo.git
+	  auto-sync = yes
+
+	  # for daily squashfs snapshots
+	  #sync-type = squashdelta
+	  #sync-uri = mirror://gentoo/../snapshots/squashfs
+	  ```
+
+          *sync-uri* can be either *https://* or *git://*. The trailing *.git* does not make any difference.
+
+          3. Before switching to *git* sync. We should remove the old portage snapshot.
+
+             ```bash
+	     \# mv /usr/portage/distfiles ~/
+	     \# mv /usr/portage/packages ~/
+             \# rm -rf /usr/portage/*
+	     ```
+
+          4. \# emaint sync -r gentoo
+          5. \# mv ~/distfiles /usr/portage
+          6. \# mv ~/packages /usr/portage
+       5. Install new >=layman-2.3.0 supporting the new portage plug-in sync system.
+	  1. Add `sync-plugin-portage` USE flag to `/etc/package.use/layman` file.
+	  2. \# emerge -avt \>=app-portage/layman-2.3.0, the new layman package will create `/etc/portage/repos.conf/layman.conf` automatically.
+	  3. \# rm /var/lib/layman/make.conf, delete is the old-style layman config file.
+       6. Edit `etc/portage/make.conf` and commnet out the lines `source /var/lib/layman/make.conf` and `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
+       7. Sync operations have been moved from `emerge` to `emaint`. `emerge --sync` calls `emaint sync` module with the default `--auto` option. The `--auto` option performs a sync on only those repositories (both official portage and overlays) with the *auto-sync* NOT set to `no` or `false`. If absent, then default to `yes` / `true`. This means the original `emerge --sync` acts like `emaint sync` with default argument `--auto` or `-a`.
+       8. As always `eix-sync` can update both overlays and portage while the new sync system will add overlays to `/etc/portage/repos.conf/layman.conf` as well. So when `eix-sync` is called, the new procedure is likely: `layman -S; emerge --sync`. But the new `emerge --sync` will also update overlays in `/etc/portage/repos.conf/layman.conf`.
+
+	  ```
+	  NOTE: As a result of the default auto-sync = True/Yes setting, commands 
+	  like "eix-sync", "esync -l", "emerge --sync && layman -S" will cause 
+	  many repositories to be synced multiple times in a row. Please edit 
+	  your configs or scripts to adjust for the new operation.
+	  ```
+
+          9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out `*` therein.
+       10. Choose one of the follwing command for daily operation:
+	   1. # emaint sync -a
+	   2. # emerge --sync
+	   3. # eix-sync
+
+	   Although they all update portage and overlays. However, *eix-sync* will call *eix-update* (for *eix* query) and *eix-diff* (showing what has changed) as well. So for daily management and eix operation, you'd better use *eix-sync*.
+       11. [sys-apps/portage-2.2.16 发布，支持多种同步方式](http://www.gentoo-cn.info/article/new-portage-plug-in-sync-system/); [Gentoo的portage已支持直接更新第三方源（overlay）](http://phpcj.org/portage-emerge-overlay-on-gentoo/).
     6. Touchpad configuration. After X and Xfce4 installation, parts of Touchpad does not work. The primary method of configuration for the touchpad is through an Xorg server configuration file. After installation of `x11-drivers/xf86-input-synaptics`, a default configuration file is located at `/usr/share/X11/xorg.conf.d/50-synaptics.conf`. Users can copy this file to `/etc/X11/xorg.conf.d/` and edit it to configure the various driver options available. 
         1. \# emacs /etc/X11/xorg.conf.d/50-synaptics.conf
 
