@@ -107,9 +107,12 @@ Refer to:
 4. [Install Windows Chinese Fonts](http://www.fangxiang.tk/2015/02/03/TeXLive-2014-Ubuntu-Installation/)
 
 # Fontconfig Customization - infinality
+
+> It's better to enable `infinality` USE globally in */etc/portage/make.conf*.
+
 1. _#_ echo "media-libs/freetype adobe-cff infinality" > /etc/portage/package.use/freetype
 
-    It seems that `adobe-cff` is enabled by default.
+    It seems that `adobe-cff` is enabled by the profile.
 2. _#_ emerge -av media-libs/freetype, reinstall freetype to take advantage of `adobe-cff` and `infinality`.
 
     It will draw in another two packages `fontconfig-infinality` and `eselect-infinality`. If not, emerge them manually.

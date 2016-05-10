@@ -51,13 +51,13 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
 5. Extract the patch
 
    ```bash
-   git diff d8cf08a565defc2f9810b9ecd33b1b3211b029e1 9a5a7d3215307e28df3aea6ac09931a4d55e151e -- > cjktty.patch
+   $ git diff d8cf08a565defc2f9810b9ecd33b1b3211b029e1 9a5a7d3215307e28df3aea6ac09931a4d55e151e -- > cjktty.patch
    or
-   git diff HEAD~3 -- > cjktty.patch
+   $ git diff HEAD~3 -- > cjktty.patch
    or
-   git format-patch -3 HEAD --stdout > cjktty.patch
+   $ git format-patch -3 HEAD --stdout > cjktty.patch
    or
-   git format-patch -3 9a5a7d3215307e28df3aea6ac09931a4d55e151e --stdout > cjktty.patch
+   $ git format-patch -3 9a5a7d3215307e28df3aea6ac09931a4d55e151e --stdout > cjktty.patch
    ```
    
    1. Pay attention to the order of commit ID (SHA1 hash). Put the earliest commit ID (4th) before the latest one (HEAD).
@@ -85,7 +85,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    error: drivers/video/console/fbcon.c: patch does not apply
    ```
    
-   The line number (2708 or 2689) remind is where error occurs in source files (portage *gentoo-sources* and/or microcai *linux-cjktty*). Search *2708* or *2689* in patch file and compare it with source files to see what causes the error. You might go to line *2708* or *2689* directly in source files. However it might not locate corretly.
+   The line number (2708 or 2689) remind is where error occurs in source files (portage *gentoo-sources* and/or microcai *linux-cjktty*). Search *2708* or *2689* in patch file and compare it with source files to see what causes the error. You might go to line *2708* or *2689* directly in source files. However it might not locate error precisely.
 
    *git apply* has a alternative of *git am*.
 7. Apply the patch
@@ -99,14 +99,14 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    
 7. If you want to check whether a/the patch is applied correctly,
 
-    ```bash
-    # cd /usr/src/linux/
-    # patch -p1 --dry-run -R < /path/to/cjktty.patch
-    or 
-    # git apply --whitespace=warn --check -R < /path/to/cjktty.patch
-    ```
-    
-    You can reverse a patch by adding *-R* argument.
+   ```bash
+   # cd /usr/src/linux/
+   # patch -p1 --dry-run -R < /path/to/cjktty.patch
+   or 
+   # git apply --whitespace=warn --check -R < /path/to/cjktty.patch
+   ```
+   
+   You can reverse a patch by adding *-R* argument.
 8. If /usr/src/linux source is polluted by patch error, you can re-install the kernel source.
 
    ```bash

@@ -676,29 +676,53 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
        4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
 
           It's optional to install *fcitx-configtool* if you are OK to configure Fcitx on command line manually.
+    3. mpv
+
+       By default, stable *mpv* is really old (0.9.2). We can install the recent 0.17.0 instead.
+
+       >media-video/mpv vaapi
+
+       >~media-video/mpv-0.17.0
+
+       1. *mpv* depends on *ffmpeg* as dependency. Some playback features are not enabled by default. We should tune *ffmpeg* USE flags to enable them.
+       1. If *mpv* does not play videos after kernel upgrades, try to reinstall `emerge -av1 mpv xf86-video-intel` and reboot.
+       2. Previously, I use `mplayer` which is inactive of development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
+       3. The default *lua* USE flag of *mpv* brings along a *youtube-dl* hook script. `mpv url` (like live broadcast) will automatically invoke *youtube-dl* to download video cache while palying. Before that, install *youtube-dl*. And make sure *ffmpeg* is installed with `network` USE flag. If the url is *https*, then add `gnutls` or `openssl` USE flag to *ffmpeg*. Ether `gnutls` or `openssl` is fine and you don't need both.
+       4. Though *youtube-dl* support many sites, it does play well with Chinese ones. We can try `mpv $(youtube-dl --get-url http://v.youku.com/v_show/id_XMTU2Mjc4MTc4NA==.html)`.
+
+          If *youtube-dl* sucks, try *livestreamer*.
+       5. There is another tool tuned for Chinese sites, that is *you-get* written with Python3. It's brilliant like this `you-get -p mpv url`. I install this package in Python3 virtual environment (*pyvenv*). Of course, *you-get* can be used to download video directly from sites like youtube-dl.
+       6. If the url is blocked, we should first enable *proxychains* or *torify*.
+       7. If want to make use of *hardware decoding*, both *mpv* and *ffmpeg* should enable *vaapi* USE flag.
+       8. Watching speed.
+
+          When playing url videos, *mpv* might throtle/stuck a lot waiting for cache. This is due to ISP throtling; video provider streaming limit; network bandwidth etc.
+
+          1. Set `--cache=500000`; press SPACE to pause for a while (say 10 minutes); then SPACE to play.
+          2. Run *youtube-dl url* and *mpv partial-downloaded-file* separately (say in two terminals). If does play the partial file, try `-f best` argument which tell to download audio and video into a single file (without merging support). If downloading audio and video separately, there would be no audio or video when playing.
+          3. Tunning playback speed.
+       9. We can use Firefox addons *Watch with MPV* or *Open With* to watch video by invoking *mpv*. But *Watch with MPV* cannot handle GFW issue. Also *mpv*'s default *youtube-dl* may not handle Chinese sites. *Open With* addon is capable of customizing multiple personal applications:
+
+          ```
+	  /usr/bin/proxychains /usr/bin/mpv  --
+	  or
+	  ~/workspace/virtualenv3/bin/you-get -p /usr/bin/mpv --
+          ```
+
+          Since using the *Open With* addon, save more CPU and memory.
     18. ffmpeg
+        1. `ffmpeg` is emerged by some other packages, one of which might be `mplayer` or `mpv`.
+        2. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working. In order to add support `v4l`, add USE flags `v4l` and `libv4l`.
+        3. By default *mpv* use *software decoding*. To use *hardware decoding* of Intel GPU, enable *vaapi* for *ffmpeg*. When playing, add `--hwdec=auto` or `--hwdec=vaapi` argument. Of course, it can be added to configuration file (like *~/.config/mpv/mpv.conf*).
 
-        `ffmpeg` is emerged by some other packages, one of which might be `mplayer` or `mpv`. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working.
+        Manually enabled USE flags are:
 
-        In order to add support `v4l`, add USE flags `v4l` and `libv4l`.
+        >media-video/ffmpeg gnutls v4l libv4l vaapi
 
         ```
         # emerge -av1 ffmpeg
         ```
 
-    3. \# emerge -av mpv
-
-       If *mpv* does not play videos after kernel upgrades, try to reinstall `emerge -av1 mpv xf86-video-intel` and reboot.
-
-       Previously, I use `mplayer` which is inactive of development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
-
-       If want to play video from URL (like live broadcast), install *youtube-dl*. And make sure *ffmpeg* is installed with `network` USE flag. If the url is *https*, then add `gnutls` or `openssl` USE flag to *ffmpeg*. Ether `gnutls` or `openssl` is fine and you don't need both. The default *lua* USE flag of *mpv* brings along a *youtube-dl* hook script. `mpv url` will automatically invoke *youtube-dl* to download video cache while palying.
-
-       Though *youtube-dl* support many sites, it does play well with Chinese ones. We can try `mpv $(youtube-dl --get-url http://v.youku.com/v_show/id_XMTU2Mjc4MTc4NA==.html)`.
-
-       There is another tool tuned for Chinese sites, that is *you-get* written by Python3. It's brilliant like this `you-get -p mpv url`. I install this package in Python3 virtual environment (*pyvenv*). Of course, *you-get* can be used to download video directly from sites like youtube-dl.
-
-       If the url is blocked, we should first enable *proxychains* or *torify*.
     4. Details on [*youtube-dl*](https://github.com/rg3/youtube-dl) and [*you-get*](https://github.com/soimort/you-get), refer to their Github pages.
     4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features). Then emerge plugins on demand.
 
