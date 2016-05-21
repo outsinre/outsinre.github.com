@@ -136,7 +136,7 @@ title: Gentoo Installation
     5. Check if *nls* is enabled by `emerge --info | grep ^USE`. If not, update *make.conf* file.
     6. By default, *bindist* is enabled by *stage3*'s default *make.conf*. If we don't plan to distribute binary packages, disable it globally. Add `--bindist` USE to *make.conf*. Otherwise, this will eliminate those *bindist* USE conflicts when emerge pkgs, especially between *openssh* and *openssl*.
 24. Localization
-    1. \# cat /usr/share/i18n/SUPPORTED | grep zh_CN >> /etc/locale.gen
+    1. \# cat /usr/share/i18n/SUPPORTED \| grep zh_CN >> /etc/locale.gen
     2. Uncomment `en_US.UTF-8 UTF-8` in */etc/locale.gen*
     3. \# locale-gen, if reminds *run ". /etc/profile"* to reload the variable in your shell. If you run it, you need to run `export PS1="(chroot) $PS1"` again to recover shell prompt.
     5. \# locale -a, to see what locales are generated.
@@ -186,7 +186,7 @@ title: Gentoo Installation
        Symbol:
        Type:
        Prompt:
-	 Location:
+         Location:
        ```
 
     1. Usually there are several search options with prefix number (1, 2, 3 ...). Press the number to enter the kernel option. Then *exit* or two successive ESC to return to search.
@@ -200,15 +200,15 @@ title: Gentoo Installation
     4. Ethernet: `e1000e` = `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
     4. Audio: `snd_hda_intel` = `Intel HD Audio, CONFIG_SND_HDA_INTEL`. The default value is 'Y', now **MUST** set to 'M'. Choose the audioi codec:
        1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
-       2. `cat /proc/asound/card0/codec#* | grep -i codec`, the output is as follows:
+       2. \# cat /proc/asound/card0/codec#* \| grep -i codec`, the output is as follows:
        
           **Attension**: execute this command in LiveCD environment by opening a new terminal.
-	  
+          
           ```
           Codec Conexant CX20590
           Codec Intel CougarPoint HDMI
           ```
-	  
+          
         3. Then select those two codecs as modules 'M': `Build HDMI/DisplayPort HD-audio codec support, SND_HDA_CODEC_HDMI`, and `Conexant HD-audio support, SND_HDA_CODEC_CONEXANT`.
         4. `Enable generic HD-audio codec parser, SND_HDA_GENERIC` must be selected (default) as well.
         4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
@@ -218,15 +218,15 @@ title: Gentoo Installation
        1. lsusb
 
           ```
-	  Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-	  Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-	  Bus 001 Device 006: ID 04f2:b217 Chicony Electronics Co., Ltd Lenovo Integrated Camera (0.3MP)
-	  Bus 001 Device 005: ID 0a5c:217f Broadcom Corp. BCM2045B (BDC-2.1)
-	  Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
-	  Bus 001 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver
-	  Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-	  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-	  ```
+          Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+          Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+          Bus 001 Device 006: ID 04f2:b217 Chicony Electronics Co., Ltd Lenovo Integrated Camera (0.3MP)
+          Bus 001 Device 005: ID 0a5c:217f Broadcom Corp. BCM2045B (BDC-2.1)
+          Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
+          Bus 001 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver
+          Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+          Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+          ```
 
           The 3rd item is the integrated webcamera which is a multimedia USB device.
        2. Enable `MEDIA_SUPPORT` = `Multimedia support`, `MEDIA_CAMERA_SUPPORT` = `Cameras/video grabbers support`, `CONFIG_MEDIA_USB_SUPPORT` = `Media USB Adapters`, and `USB_VIDEO_CLASS` = `USB Video Class (UVC)`. The 2nd and 4th items are the key to make webcamera to work.
@@ -426,16 +426,17 @@ title: Gentoo Installation
 39. [deprecated, as long as the `/boot` and `/boot/efi` partitions are mounted, grub2-mkconfig will automatically detect the windows operating system in `/etc/grub.d/30_os_prober` through `sys-boot/os-prober`] Chainload Windows system `nano -w /etc/grub.d/40_custom`, add the code below.
     1. The traditional `chainloader +1` does work for UEFI boot.
 
-        ```
-menuentry "Microsoft Windows 8.1 x86_64" {
-    insmod part_gpt
-    insmod fat
-    insmod search_fs_uuid
-    insmod chain
-    search --fs-uuid --no-floppy --set=root $hints_string $fs_uuid
-    chainloader /efi/Microsoft/Boot/bootmgfw.efi
-}
-        ```
+       ```
+       menuentry "Microsoft Windows 8.1 x86_64" {
+	   insmod part_gpt
+	   insmod fat
+	   insmod search_fs_uuid
+	   insmod chain
+	   search --fs-uuid --no-floppy --set=root $hints_string $fs_uuid
+	   chainloader /efi/Microsoft/Boot/bootmgfw.efi
+       }
+       ```
+
     2. The next is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
         1. # grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
         2. # grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
@@ -490,13 +491,14 @@ menuentry "Microsoft Windows 8.1 x86_64" {
             2. In Gentoo profile, there might be `preserve-libs` enabled for `FEATURES`, which is usually the real case. This setting will cause `Portage` to preserve libraries when `soname`s change during upgrade or downgrade, only as necessary to satisfy shared library dependencies of installed consumers/packages. Preserved libraries are automatically removed when there are no remaining consumers, which occurs when consumer packages are rebuilt or uninstalled. Ideally, rebuilds are triggered automatically during updates, in order to satisfy slot-operator dependencies.
             3. However, before emerge exits after installing updates, if there are remaining preserved libraries because slot-operator dependencies have not been used to trigger automatic rebuilds, then emerge will display a message like the following:
 
-                ```
-                !!! existing preserved libs:
-                >>> package: sys-libs/libfoo-1
-                 * - /lib/libfoo.so.1
-                 *      used by /usr/bin/bar (app-foo/bar-1)
-                Use emerge @preserved-rebuild to rebuild packages using these libraries
-                ```
+	       ```
+	       !!! existing preserved libs:
+	       >>> package: sys-libs/libfoo-1
+		* - /lib/libfoo.so.1
+		*      used by /usr/bin/bar (app-foo/bar-1)
+	       Use emerge @preserved-rebuild to rebuild packages using these libraries
+	       ```
+
             4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
         3. \# emerge -av --depclean
             1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
@@ -559,6 +561,7 @@ menuentry "Microsoft Windows 8.1 x86_64" {
         MiscBell=TRUE
         printf "\7"; sleep 1; printf "\a" 
         ```
+
         To turn on beep in terminal is useful especially for IRC Weechat (when others messaging you).
     11. <s>[optional] # echo XSESSION="Xfce4" > /etc/env.d/90xsession, refer to the 11th item in previous step.
         1. Remember to run `env-update && source /etc/profile` to update environment.</s>
@@ -593,6 +596,7 @@ menuentry "Microsoft Windows 8.1 x86_64" {
             exec startx
         fi
         ```
+
     14. If you have a messed desktop setting, you can executing the following commands to have a default setting:
         1.  #  rm -r ~/.cache/sessions
         2.  # rm -r ~/.config/xfce*
@@ -604,10 +608,11 @@ menuentry "Microsoft Windows 8.1 x86_64" {
     1. # nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
 
-        ```
-KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
-        ```
-        `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
+       ```
+       KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
+       ```
+
+       `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
     3. Similarly, since the root and home partition is formatted in previous step, you should go into Ubuntu system to hide these two partitions.
     4. Refer to [udev 99-hide-disks.rules is no longer working](http://superuser.com/questions/695791/udev-99-hide-disks-rules-is-no-longer-working).
 43. Partitions:
@@ -677,11 +682,12 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
        2. \# emerge -av fcitx
        2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 
-	   ```
-	   export GTK_IM_MODULE=fcitx
-	   export QT_IM_MODULE=xim
-	   export XMODIFIERS=@im=fcitx
-	   ```
+	  ```
+	  export GTK_IM_MODULE=fcitx
+	  export QT_IM_MODULE=xim
+	  export XMODIFIERS=@im=fcitx
+	  ```
+
        But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
        3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
        4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
@@ -723,9 +729,9 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
        9. We can use Firefox addons *Watch with MPV* or *Open With* to watch video by invoking *mpv*. But *Watch with MPV* cannot handle GFW issue. Also *mpv*'s default *youtube-dl* may not handle Chinese sites. *Open With* addon is capable of customizing multiple personal applications:
 
           ```
-	  /usr/bin/proxychains /usr/bin/mpv  --
-	  or
-	  ~/workspace/virtualenv3/bin/you-get -p /usr/bin/mpv --
+          /usr/bin/proxychains /usr/bin/mpv  --
+          or
+          ~/workspace/virtualenv3/bin/you-get -p /usr/bin/mpv --
           ```
 
           The last two hypens means arguments afterwards are input files/urls. Since using the *Open With* addon, save more CPU and memory.
@@ -773,43 +779,44 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
        2. \# emerge -av emacs
        3. \# emerge -av media-fonts/font-adobe-75dpi media-fonts/font-adobe-100dpi
 
-	  Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
+          Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
 
-	   ```
-	   if use X; then
-	       elog "You need to install some fonts for Emacs."
-	       elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
-	       elog "machine would satisfy basic Emacs requirements under X11."
-	       elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
-	       elog "for how to enable anti-aliased fonts."
-	       elog
-	   fi
-	   ```
+	  ```
+	  if use X; then
+	      elog "You need to install some fonts for Emacs."
+	      elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
+	      elog "machine would satisfy basic Emacs requirements under X11."
+	      elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
+	      elog "for how to enable anti-aliased fonts."
+	      elog
+	  fi
+	  ```
+
     4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://jimgray.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](http://jimgray.tk/2014/09/14/emacs/installation/).
     5. Nano. We can tune some configs of Nano editor */etc/nanorc*: *set autoindent*, *set backup*, *set tabsize 4* etc. If need to totally disable an option, use *unset <option>*.
     6. WPS office.
        1. overlay support
-	   1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
-	   1. # echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
-	   2. # emerge -av layman
-	   2. # echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
-	   3. # layman -f -a gentoo-zh
-	   4. # layman -S
+           1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
+           1. # echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
+           2. # emerge -av layman
+           2. # echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
+           3. # layman -f -a gentoo-zh
+           4. # layman -S
 
-	   >The previous version (<= 9.1.0.4953\_alpha18) located in `gentoo-zh` overlay relies on a bundle of customized and pre-built `QT` packages. Use command `qlist wps-office | grep -i qt` or `equery files wps-office | grep -i qt` to list the bundled `QT` libs in wps-office installation directory (/opt/kingsoft/wps-office/).  Since version `9.1.0.4953_alpha18-r1` wps-office was published through official Gentoo portage as well. The coming new versions no longer use those prebuilt `QT` libs. Instead, they will draw in *qtwebkit*, *qtscript*, *qttranslate*, *qtcore*, etc as system-wide packages.
+           >The previous version (<= 9.1.0.4953\_alpha18) located in `gentoo-zh` overlay relies on a bundle of customized and pre-built `QT` packages. Use command `qlist wps-office | grep -i qt` or `equery files wps-office | grep -i qt` to list the bundled `QT` libs in wps-office installation directory (/opt/kingsoft/wps-office/).  Since version `9.1.0.4953_alpha18-r1` wps-office was published through official Gentoo portage as well. The coming new versions no longer use those prebuilt `QT` libs. Instead, they will draw in *qtwebkit*, *qtscript*, *qttranslate*, *qtcore*, etc as system-wide packages.
 
-	   >But I prefer a Gentoo system without `QT` things since most of my packages are `GTK`-based, especially the `xfce4` desktop environment. So I will not install or update to the new versions.
+           >But I prefer a Gentoo system without `QT` things since most of my packages are `GTK`-based, especially the `xfce4` desktop environment. So I will not install or update to the new versions.
 
-	   >Current method is to mask those higher version in `portage.mask/` directory: `>app-office/wps-office-9.1.0.4953_alpha18::gentoo`.
+           >Current method is to mask those higher version in `portage.mask/` directory: `>app-office/wps-office-9.1.0.4953_alpha18::gentoo`.
        2. WPS 32-bit `abi_x86_32` support. You should activate abi\_x86_32 use flag for packages on which WPS office depends.
-	   1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually. You can also cange `pv` to `-av`.
-	   2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
-	   3. package.license/wps-office: app-office/wps-office WPS-EULA
-	   4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945\_alpha16_p3 ~amd64
+           1. emerge -pv wps-office. It will reminds you what packages needs `abi_x86_32` support. Just answer 'Y' to the question and run command `dispatch-conf` to update configuration file. Of course you can update those files manually. You can also cange `pv` to `-av`.
+           2. package.use/wps-office: check WPS overlay [wps-office-9.1.0.4945_alpha16_p3.ebuild](https://github.com/microcai/gentoo-zh/blob/master/app-office/wps-office/wps-office-9.1.0.4945_alpha16_p3.ebuild). You'd better use dispatch-conf to finish this work.
+           3. package.license/wps-office: app-office/wps-office WPS-EULA
+           4. package.accept\_keywords/wps-office: =app-office/wps-office-9.1.0.4945\_alpha16_p3 ~amd64
 
-	       >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
-	   5. emerge -av wps-office
-	   6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
+               >To use a specific software version from the testing branch but don't want portage to use the testing branch for subsequent versions, add in the version in the package.accept_keywords location. In this case use the = operator. It is also possible to enter a version range using the <=, <, > or >= operators. In any case, if version information is added, an operator must be used. Without version information, an operator cannot be used. Refer to [mixing branches](https://wiki.gentoo.org/wiki/Handbook:AMD64/Portage/Branches).
+           5. emerge -av wps-office
+           6. **fonts support** refer to [Fontconfig](/2015/04/13/fontconfig/)
     7. \# emerge -avt xfce4-mixer
     8. \# emerge -av mupdf
 
@@ -826,40 +833,40 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     11. \# emerge -av net-misc/dropbox [optional] xfce-extra/thunar-dropbox
        1. Xfce4 and Dropbox does not get along well. There is no application menu for Dropbox.
        2. The system `LANG` or `LC_CTYPE` cannot be `zh_CN.GB18030`, otherswise dropbox does not launch with errors like _Gdk Critical...failed_.
-	   1. This can be overcome by setting the dropbox language to `english`.
+           1. This can be overcome by setting the dropbox language to `english`.
        3. _$_ dropbox start, Gentoo and Windows share the Dropbox location in /media/Misc/Dropbox. When firstly run this command, you need to configure dropbox as default setting (Dropbox folder in /home/zachary/Dropbox). But then exit dropbox immediately. And remove /home/zachary/Dropbox.
-	   1. _$_ rmdir /home/zachary/Dropbox
-	   2. _$_ ln -s /media/Misc/Dropbox /home/zachary/Dropbox
+           1. _$_ rmdir /home/zachary/Dropbox
+           2. _$_ ln -s /media/Misc/Dropbox /home/zachary/Dropbox
        4. _$_ dropbox &, run dropbox in the backgroud.
        5. We can create a ~/bin/dropbox.sh or /usr/local/bin/dropbox.sh script:
 
-	   >\#!/bin/bash
-	   >
-	   >/opt/bin/dropbox &
+           >\#!/bin/bash
+           >
+           >/opt/bin/dropbox &
 
-	   Remember to `chmod +x ~/bin/dropbox.sh`, just run `~/bin/dropbox.sh`.
+           Remember to `chmod +x ~/bin/dropbox.sh`, just run `~/bin/dropbox.sh`.
        6. If blocked by GFW, set the corresponding proxy address and port.
     12. \# emerge -avt app-portage/gentoolkit
     13. \# emerge -avt app-portage/eix
        1. [deprecated for new poratge > 2.2.16] <s># emacs -nw /etc/eix-sync.conf:</s>
 
-	   ```
-	   # *
+	  ```
+	  # *
 
-	   !!exec >/var/log/eix-sync.log ; chown portage: /var/log/eix-sync.log || true
-	   ```
+	  !!exec >/var/log/eix-sync.log ; chown portage: /var/log/eix-sync.log || true
+	  ```
 
        2. \# eix-sync
     14. Archive
         1. # emerge -av file-roller
         2. \# emerge -av thunar-archive-plugin
 
-	   Steps below might be deprecated depending on related package version
+           Steps below might be deprecated depending on related package version
 
-	   1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
-	   2. # cd /usr/libexec/thunar-archive-plugin/
-	   3. # ln -s file-roller.tap org.gnome.FileRoller.tap
-	   4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
+           1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
+           2. # cd /usr/libexec/thunar-archive-plugin/
+           3. # ln -s file-roller.tap org.gnome.FileRoller.tap
+           4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
         3. \# echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
             1. 使用 “natspec” USE Flag重新编译unzip（zip文件中没有保存压缩时使用的编码，故需将unzip打上编码探测的补丁）
         4. [optionl, 7zip can extract zip format] # emerge -av unzip, up to now, Chinese `zip` file can be extracted correctly by `file-roller`.
@@ -937,12 +944,13 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
             1. $ mkdir $HOME/Bluetooth
             2. \# ect /usr/local/bin/obex_thunar.sh
 
-                ```bash
-#!/bin/bash
-fusermount -u $HOME/Bluetooth
-obexfs -b $1 $HOME/Bluetooth
-thunar $HOME/Bluetooth
-                ```
+               ```bash
+               #!/bin/bash
+               fusermount -u $HOME/Bluetooth
+               obexfs -b $1 $HOME/Bluetooth
+               thunar $HOME/Bluetooth
+               ```
+
             3. \# chmod +x /usr/local/bin/obex_thunar.sh
             4. The last step is to change the line in Blueman tray icon > Local Services > Transfer > Advanced to `obex_thunar.sh %d`.
         6. No matter blueman or bluetoothctl command is used, the basic procedure:
@@ -960,47 +968,50 @@ thunar $HOME/Bluetooth
     1. Try your best to avoid *package.accept_keywords*. *Tesiting* packages and other *stable* packages might cause conflicts in terms of *perl*, *ruby*, *python* etc.
     1. Update a single package.
 
-        ```bash
-        # emerge -avtuDN --with-bdeps=y pkg-name
-        ```
+       ```bash
+       # emerge -avtuDN --with-bdeps=y pkg-name
+       ```
+
     2. Slot conflict.
 
-        When applying a @world update, it reminds the following slot conflicts:
+       When applying a @world update, it reminds the following slot conflicts:
 
-        ```bash
-        !!! Multiple package instances within a single package slot have been pulled
-        !!! into the dependency graph, resulting in a slot conflict:
+       ```bash
+       !!! Multiple package instances within a single package slot have been pulled
+       !!! into the dependency graph, resulting in a slot conflict:
 
-        dev-libs/openssl:0
+       dev-libs/openssl:0
 
-          (dev-libs/openssl-1.0.1p:0/0::gentoo, ebuild scheduled for merge) pulled in by
-            dev-libs/openssl:0=[-bindist] required by (net-libs/nodejs-0.12.6:0/0::gentoo, ebuild scheduled for merge)
-        			^^^^^^^^                                                                                                                  
+	 (dev-libs/openssl-1.0.1p:0/0::gentoo, ebuild scheduled for merge) pulled in by
+	   dev-libs/openssl:0=[-bindist] required by (net-libs/nodejs-0.12.6:0/0::gentoo, ebuild scheduled for merge)
+			       ^^^^^^^^                                                                                                                  
 
-          (dev-libs/openssl-1.0.1p:0/0::gentoo, installed) pulled in by
-            >=dev-libs/openssl-0.9.6d:0[bindist=] required by (net-misc/openssh-6.9_p1-r2:0/0::gentoo, installed)
-        ```
-        `openssh` and `openssl` require the *same* `bindist` USE flag setting - *both* enabled or disabled. However, the scheduled package `nodejs` requires `openssl` disable `bindist` USE flag. So the solution is to disable `bindist` for `openssh`, `openssl` and `nodejs`.
+	 (dev-libs/openssl-1.0.1p:0/0::gentoo, installed) pulled in by
+	   >=dev-libs/openssl-0.9.6d:0[bindist=] required by (net-misc/openssh-6.9_p1-r2:0/0::gentoo, installed)
+       ```
+
+       `openssh` and `openssl` require the *same* `bindist` USE flag setting - *both* enabled or disabled. However, the scheduled package `nodejs` requires `openssl` disable `bindist` USE flag. So the solution is to disable `bindist` for `openssh`, `openssl` and `nodejs`.
     1. Mount partition. Up to now, everything is fine except internal partitions like /dev/sda8,9 cannot be mounted in Thunar. When clicking the partition label, an error message `Failed to mount XXX. Not authorized to perform operation`. If you search around google, you might find many suggestions on changing configuration files of `polkit`. Relevant links [thunar 无权限挂载本地磁盘](http://blog.chinaunix.net/uid-25906175-id-3030600.html) and [Can't mount drive in Thunar anymore](http://unix.stackexchange.com/q/53498). None of this suggestions work. Detailed description of the problem is here [startx Failed to mount XXX, Not authorized to perform operat](https://forums.gentoo.org/viewtopic-t-1014734.html).
-        1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem. In 4.10, start Xfce with `startxfce4 --with-ck-launch`. This will start xfce4-session with ck-launch-session. In 4.10, **Xfce4-sesion will take care of the dbus-session launch**.
-        2. currently the contents of `~/.xinitrc`:
+       1. **dbus should NOT launch before consolekit; dbus is already added into default runlevel**. This is the key to solve problem. In 4.10, start Xfce with `startxfce4 --with-ck-launch`. This will start xfce4-session with ck-launch-session. In 4.10, **Xfce4-sesion will take care of the dbus-session launch**.
+       2. currently the contents of `~/.xinitrc`:
 
-            ```
-eval `dbus-launch --sh-syntax --exit-with-session`
-export GTK_IM_MODULE=fcitx
-export QT_IM_MODULE=xim
-export XMODIFIERS=@im=fcitx
-exec startxfce4 --with-ck-launch
+          ```
+          eval `dbus-launch --sh-syntax --exit-with-session`
+          export GTK_IM_MODULE=fcitx
+          export QT_IM_MODULE=xim
+          export XMODIFIERS=@im=fcitx
+          exec startxfce4 --with-ck-launch
+          ```
 
-            ```
         3. You can find `dbus-launch` is at the beginning of the file while `--with-ck-launch` is at the end along with command `exec`. So just remove the first line on dbus part:
 
-            ```
-export GTK_IM_MODULE=fcitx
-export QT_IM_MODULE=xim
-export XMODIFIERS=@im=fcitx
-exec startxfce4 --with-ck-launch
-            ```
+           ```
+           export GTK_IM_MODULE=fcitx
+           export QT_IM_MODULE=xim
+           export XMODIFIERS=@im=fcitx
+           exec startxfce4 --with-ck-launch
+           ```
+
         4. Refer to [ConsoleKit](http://docs.xfce.org/xfce/xfce4-session/advanced); [Why is pcmanfm such a headache when it comes to mounting filesystems?](http://unix.stackexchange.com/q/30059); [ dwm and .xinitrc - thunar-daemon not mounting usb](http://crunchbang.org/forums/viewtopic.php?id=30373).
     2. fstab including NTFS partition [NTFS-3G](https://wiki.archlinux.org/index.php/NTFS-3G):
 
@@ -1019,15 +1030,15 @@ exec startxfce4 --with-ck-launch
        /dev/sda7 /media/WLShare ntfs-3g noauto,nls=utf8,locale=zh_CN.utf8,uid=zachary,gid=users,users,dmask=022,fmask=133 0 0
        ```
 
-        1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
-        2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
-        3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So you can; creating new Chinese filenames in virtual terminal.
-        4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
-        5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF-8` (or `zh_CN.utf8`) is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems. If set to `zh_CN.GB18030` or `zh_CN.GB2312`, the Chinese folder names cannot be displayed in Thunar's address bar.
-        6. Refer to [Mounting a Local Microsoft Windows Partition on Linux Systems](http://docs.oracle.com/cd/E19253-01/819-0918/localization-13).
-        7. By default, /boot not auto-mounted for security reason. Similarly, the EFI System Partition is not auto-mounted to `/boot/efi` as well at startup.
-        8. `locale` is no longer needed. `nls=utf8` or `utf8` is not needed anymore since *ntfs-3g* defaults to *utf8*.
-        9. Add `noatime` to improve performance.
+       1. We should create the corresponding directory under `/media/` NOT under `/mnt/`. The reason can be found here [What is the difference between mounting in fstab and by mounting in file manager](http://unix.stackexchange.com/questions/169571/what-is-the-difference-between-mounting-in-fstab-and-by-mounting-in-file-manager).
+       2. Pay attention to `nls` support which help displaying Chinese filenames correctly.
+       3. But when you create a new Chinese filename in Thunar and copy it to NTFS partition, errors same as above step appear. If you change the mount option in `/etc/fstab` to `en_US.utf8`, you can handle Chinese filenames between Thunar and ntfs partition smoothly which will eventually conflicts with the above step. So you can; creating new Chinese filenames in virtual terminal.
+       4. The first line /dev/sda4 is the Windows partition, this will hide it from Thunar sidebar.
+       5. I think the most important thing is: the `locale` in `fstab` should be the same as the one in system `LC_CTYPE`. Also as an English system supporting Chinese, `zh_CN.UTF-8` (or `zh_CN.utf8`) is better than `zh_CN.GB2312` or `zh_CN.GB18030`. The later ones are for pure Chinese systems. If set to `zh_CN.GB18030` or `zh_CN.GB2312`, the Chinese folder names cannot be displayed in Thunar's address bar.
+       6. Refer to [Mounting a Local Microsoft Windows Partition on Linux Systems](http://docs.oracle.com/cd/E19253-01/819-0918/localization-13).
+       7. By default, /boot not auto-mounted for security reason. Similarly, the EFI System Partition is not auto-mounted to `/boot/efi` as well at startup.
+       8. `locale` is no longer needed. `nls=utf8` or `utf8` is not needed anymore since *ntfs-3g* defaults to *utf8*.
+       9. Add `noatime` to improve performance.
     3. Don't use temporary USE flags in command line when emerge a package. Use `package.use` directory instead.
     4. `package.use`,`package.license` etc might be files or directories. I prefer directory ones and create specific files with finenames exactly the same as package name under directory
 
@@ -1035,10 +1046,10 @@ exec startxfce4 --with-ck-launch
     5. New portage plug-in sync system. This new sync system requires `emerge -av \>=sys-apps/portage-2.2.16` and `emerge -av \>=app-portage/layman-2.3.0`.
        1. After a world update, my `portage` has updated to version `2.2.18`. Commands related to `emerge` reminds:
 
-	  ```
-	  !!! SYNC setting found in make.conf.
-	      This setting is Deprecated and no longer used.  Please ensure your 'sync-type' and 'sync-uri' are set correctly in /etc/portage/repos.conf/gentoo.conf
-	  ```
+          ```
+          !!! SYNC setting found in make.conf.
+              This setting is Deprecated and no longer used.  Please ensure your 'sync-type' and 'sync-uri' are set correctly in /etc/portage/repos.conf/gentoo.conf
+          ```
 
        2. Refer to [Portage/Sync](https://wiki.gentoo.org/wiki/Project:Portage/Sync)
        3. \# mkdir /etc/portage/repos.conf
@@ -1047,137 +1058,139 @@ exec startxfce4 --with-ck-launch
           2. We can now set *sync-type = git* instead of *rsync*.
 
           ```
-	  [DEFAULT]
-	  main-repo = gentoo
+          [DEFAULT]
+          main-repo = gentoo
 
-	  [gentoo]
-	  location = /usr/portage
-	  sync-type = git
-	  #sync-uri = https://github.com/gentoo-mirror/gentoo
-	  sync-uri = git://github.com/gentoo-mirror/gentoo.git
-	  auto-sync = yes
+          [gentoo]
+          location = /usr/portage
+          sync-type = git
+          #sync-uri = https://github.com/gentoo-mirror/gentoo
+          sync-uri = git://github.com/gentoo-mirror/gentoo.git
+          auto-sync = yes
 
-	  # for daily squashfs snapshots
-	  #sync-type = squashdelta
-	  #sync-uri = mirror://gentoo/../snapshots/squashfs
-	  ```
+          # for daily squashfs snapshots
+          #sync-type = squashdelta
+          #sync-uri = mirror://gentoo/../snapshots/squashfs
+          ```
 
           *sync-uri* can be either *https://* or *git://*. The trailing *.git* does not make any difference.
 
           3. Before switching to *git* sync. We should remove the old portage snapshot.
 
              ```bash
-	     \# mv /usr/portage/distfiles ~/
-	     \# mv /usr/portage/packages ~/
+             \# mv /usr/portage/distfiles ~/
+             \# mv /usr/portage/packages ~/
              \# rm -rf /usr/portage/*
-	     ```
+             ```
 
           4. \# emaint sync -r gentoo
           5. \# mv ~/distfiles /usr/portage
           6. \# mv ~/packages /usr/portage
        5. Install new >=layman-2.3.0 supporting the new portage plug-in sync system.
-	  1. Add `sync-plugin-portage` USE flag to `/etc/package.use/layman` file.
-	  2. \# emerge -avt \>=app-portage/layman-2.3.0, the new layman package will create `/etc/portage/repos.conf/layman.conf` automatically.
-	  3. \# rm /var/lib/layman/make.conf, delete is the old-style layman config file.
+          1. Add `sync-plugin-portage` USE flag to `/etc/package.use/layman` file.
+          2. \# emerge -avt \>=app-portage/layman-2.3.0, the new layman package will create `/etc/portage/repos.conf/layman.conf` automatically.
+          3. \# rm /var/lib/layman/make.conf, delete is the old-style layman config file.
        6. Edit `etc/portage/make.conf` and commnet out the lines `source /var/lib/layman/make.conf` and `SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"`.
        7. Sync operations have been moved from `emerge` to `emaint`. `emerge --sync` calls `emaint sync` module with the default `--auto` option. The `--auto` option performs a sync on only those repositories (both official portage and overlays) with the *auto-sync* NOT set to `no` or `false`. If absent, then default to `yes` / `true`. This means the original `emerge --sync` acts like `emaint sync` with default argument `--auto` or `-a`.
        8. As always `eix-sync` can update both overlays and portage while the new sync system will add overlays to `/etc/portage/repos.conf/layman.conf` as well. So when `eix-sync` is called, the new procedure is likely: `layman -S; emerge --sync`. But the new `emerge --sync` will also update overlays in `/etc/portage/repos.conf/layman.conf`.
 
-	  ```
-	  NOTE: As a result of the default auto-sync = True/Yes setting, commands 
-	  like "eix-sync", "esync -l", "emerge --sync && layman -S" will cause 
-	  many repositories to be synced multiple times in a row. Please edit 
-	  your configs or scripts to adjust for the new operation.
-	  ```
+          ```
+          NOTE: As a result of the default auto-sync = True/Yes setting, commands 
+          like "eix-sync", "esync -l", "emerge --sync && layman -S" will cause 
+          many repositories to be synced multiple times in a row. Please edit 
+          your configs or scripts to adjust for the new operation.
+          ```
 
           9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out `*` therein.
        10. Choose one of the follwing command for daily operation:
-	   1. # emaint sync -a
-	   2. # emerge --sync
-	   3. # eix-sync
+           1. # emaint sync -a
+           2. # emerge --sync
+           3. # eix-sync
 
-	   Although they all update portage and overlays. However, *eix-sync* will call *eix-update* (for *eix* query) and *eix-diff* (showing what has changed) as well. So for daily management and eix operation, you'd better use *eix-sync*.
+           Although they all update portage and overlays. However, *eix-sync* will call *eix-update* (for *eix* query) and *eix-diff* (showing what has changed) as well. So for daily management and eix operation, you'd better use *eix-sync*.
        11. [sys-apps/portage-2.2.16 发布，支持多种同步方式](http://www.gentoo-cn.info/article/new-portage-plug-in-sync-system/); [Gentoo的portage已支持直接更新第三方源（overlay）](http://phpcj.org/portage-emerge-overlay-on-gentoo/).
     6. Touchpad configuration. After X and Xfce4 installation, parts of Touchpad does not work. The primary method of configuration for the touchpad is through an Xorg server configuration file. After installation of `x11-drivers/xf86-input-synaptics`, a default configuration file is located at `/usr/share/X11/xorg.conf.d/50-synaptics.conf`. Users can copy this file to `/etc/X11/xorg.conf.d/` and edit it to configure the various driver options available. 
-        1. \# emacs /etc/X11/xorg.conf.d/50-synaptics.conf
+       1. \# emacs /etc/X11/xorg.conf.d/50-synaptics.conf
 
-            ```
-            Section "InputClass"
-                Identifier "touchpad"
-                Driver "synaptics"
-                MatchIsTouchpad "on"
-                    Option "TapButton1" "1"
-                    Option "TapButton2" "2"
-                    Option "TapButton3" "3"
-                    Option "VertEdgeScroll" "on"
-                    Option "VertTwoFingerScroll" "on"
-                    Option "HorizEdgeScroll" "on"
-                    Option "HorizTwoFingerScroll" "on"
-                    Option "CircularScrolling" "on"
-                    Option "CircScrollTrigger" "2"
-                    Option "EmulateTwoFingerMinZ" "40"
-                    Option "EmulateTwoFingerMinW" "8"
-                    Option "CoastingSpeed" "0"
-                    Option "FingerLow" "35"
-                    Option "FingerHigh" "40"
-            EndSection
-            ```
-        3. You can also set a temporary config at command line, which is not persisitent. Refer to command `synclient`.  
+          ```
+          Section "InputClass"
+              Identifier "touchpad"
+              Driver "synaptics"
+              MatchIsTouchpad "on"
+                  Option "TapButton1" "1"
+                  Option "TapButton2" "2"
+                  Option "TapButton3" "3"
+                  Option "VertEdgeScroll" "on"
+                  Option "VertTwoFingerScroll" "on"
+                  Option "HorizEdgeScroll" "on"
+                  Option "HorizTwoFingerScroll" "on"
+                  Option "CircularScrolling" "on"
+                  Option "CircScrollTrigger" "2"
+                  Option "EmulateTwoFingerMinZ" "40"
+                  Option "EmulateTwoFingerMinW" "8"
+                  Option "CoastingSpeed" "0"
+                  Option "FingerLow" "35"
+                  Option "FingerHigh" "40"
+          EndSection
+          ```
+
+       3. You can also set a temporary config at command line, which is not persisitent. Refer to command `synclient`.  
     7. Brightness key: Fn + Home/End.
 
-        The thinkpad brightness key does not work even though I enabled the revelant `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI`. The final solution is add a special kernel boot parameter **acpi_osi="!Windows 2012"**. This is to use the *standard ACPI* (advanced configuration and power management interfance) system instead of *thinkpad-acpi*.
+       The thinkpad brightness key does not work even though I enabled the revelant `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI`. The final solution is add a special kernel boot parameter **acpi_osi="!Windows 2012"**. This is to use the *standard ACPI* (advanced configuration and power management interfance) system instead of *thinkpad-acpi*.
 
-        If want to make this change permanent, then modify the the `/etc/default/grub` template and update `/boot/grub/grub.cfg`.
+       If want to make this change permanent, then modify the the `/etc/default/grub` template and update `/boot/grub/grub.cfg`.
 
-        ```bash
-        # cp /etc/default/grub /etc/default/grub_backup
-        # ect /etc/default/grub, find the kernel parameter GRUB_CMDLINE_LINUX_DEFAULT="". By default it is empty and commented out. Insert the following value:
-            acpi_osi=\"!Windows 2012\"
-        or,
-            acpi_osi='!Windows 2012'
-        Get:
-            GRUB_CMDLINE_LINUX_DEFAULT="acpi_osi=\"!Windows 2012\"".
-        # mount /boot /boot/efi
-        # grub2-mkconfig -o /boot/grub/grub.cfg
-        ```
-        The brightness config value is located in `/sys/class/backlight/`.
+       ```bash
+       # cp /etc/default/grub /etc/default/grub_backup
+       # ect /etc/default/grub, find the kernel parameter GRUB_CMDLINE_LINUX_DEFAULT="". By default it is empty and commented out. Insert the following value:
+           acpi_osi=\"!Windows 2012\"
+       or,
+           acpi_osi='!Windows 2012'
+       Get:
+           GRUB_CMDLINE_LINUX_DEFAULT="acpi_osi=\"!Windows 2012\"".
+       # mount /boot /boot/efi
+       # grub2-mkconfig -o /boot/grub/grub.cfg
+       ```
 
-        Refer to [Thinkpad T430 brightness keys broken after firmware upgrade](https://bbs.archlinux.org/viewtopic.php?id=157600); [Brightness Key Levels T430](https://bbs.archlinux.org/viewtopic.php?id=158775); [arch wiki backlight](https://wiki.archlinux.org/index.php/Backlight); [Backlight keys stopped working, unless acpi_osi="!Windows 2012"](https://bugzilla.kernel.org/show_bug.cgi?id=51231).
+       The brightness config value is located in `/sys/class/backlight/`.
+
+       Refer to [Thinkpad T430 brightness keys broken after firmware upgrade](https://bbs.archlinux.org/viewtopic.php?id=157600); [Brightness Key Levels T430](https://bbs.archlinux.org/viewtopic.php?id=158775); [arch wiki backlight](https://wiki.archlinux.org/index.php/Backlight); [Backlight keys stopped working, unless acpi_osi="!Windows 2012"](https://bugzilla.kernel.org/show_bug.cgi?id=51231).
     8. Module blacklist/install. Some modules are rarely used. It's better to deactivate it at boot to save time and memory. For example, to deactivate bluetooth-related modules.
-        1. _$_ lsmod, to locate what modules are for bluetooth:
+       1. _$_ lsmod, to locate what modules are for bluetooth:
 
-            ```
-            btusb
-              btbcm
-              btintel
-                bluetooth
-            ```
-            `modinfo | grep -i depends` help clarify the module dependencies. Here, modole `btusb` is the root module.
+          ```
+          btusb
+            btbcm
+            btintel
+              bluetooth
+          ```
+
+          `modinfo | grep -i depends` help clarify the module dependencies. Here, modole `btusb` is the root module.
         2. So need to deactivate those 4 modules at boot.
 
-                # ect /etc/modprobe.d/bluetooth.conf:
+           ```
+           # /etc/modprobe.d/bluetooth.conf
+           # disable bluetooth modules at boot since most of the time, don't need it at all.
+           # Don't forget to remove `/etc/init.d/bluetooth` from *boot* or *default* runlevel if ever added.
+           blacklist btusb
+           #install btbcm /bin/true
+           #install btintel /bin/true
+           #install bluetooth /bin/true
+           blacklist btbcm
+           blacklist btintel
+           blacklist bluetooth
+           ```
 
-            ```
-# /etc/modprobe.d/bluetooth.conf
-# disable bluetooth modules at boot since most of the time, don't need it at all.
-# Don't forget to remove `/etc/init.d/bluetooth` from *boot* or *default* runlevel if ever added.
-blacklist btusb
-#install btbcm /bin/true
-#install btintel /bin/true
-#install bluetooth /bin/true
-blacklist btbcm
-blacklist btintel
-blacklist bluetooth
-            ```
         3. `blacklist mod-name` and `install mod-name /bin/true (or false)` methods are slightly different:
 
-            For blacklisted modules, they will be loaded if another non-blacklisted module depends on it, or if it is loaded manually. For example, *bluetooth* is blacklisted. And now we need to pair cell phone with PC by bluetooth protocol. So we need to manullay `modprobe btusb`. *bluetooth* module will load as a dependency. 
+           For blacklisted modules, they will be loaded if another non-blacklisted module depends on it, or if it is loaded manually. For example, *bluetooth* is blacklisted. And now we need to pair cell phone with PC by bluetooth protocol. So we need to manullay `modprobe btusb`. *bluetooth* module will load as a dependency. 
 
-            However, to ensure the modules (bluetooth service) are never inserted, even if they are needed by other modules you load or by manually modprobed, use `install` instead. To install a module as `true` or `false` does not make much difference. But `false` will remind you error message when you manually modprobe the module or a root module tries to load it. Refer to [Modprobe is better disabled by using /bin/true (not/bin/false](https://github.com/OpenSCAP/scap-security-guide/issues/539).
+           However, to ensure the modules (bluetooth service) are never inserted, even if they are needed by other modules you load or by manually modprobed, use `install` instead. To install a module as `true` or `false` does not make much difference. But `false` will remind you error message when you manually modprobe the module or a root module tries to load it. Refer to [Modprobe is better disabled by using /bin/true (not/bin/false](https://github.com/OpenSCAP/scap-security-guide/issues/539).
 
-            If you want to **totally disable** the a service, `blacklist` or `install` root module; `install` all dependency modules.
+           If you want to **totally disable** the a service, `blacklist` or `install` root module; `install` all dependency modules.
  
-            If you might need a service temporarily from time to time, `blacklist` root and all dependency modules.
+           If you might need a service temporarily from time to time, `blacklist` root and all dependency modules.
         5. Refer to [arch wiki blacklist](https://wiki.archlinux.org/index.php/Kernel_modules#Blacklisting); [changes to module blacklisting](https://www.archlinux.org/news/changes-to-module-blacklisting/).
         6. Similarly, some other rarely used modules can also be deactivated from startup:
 
@@ -1206,17 +1219,19 @@ blacklist bluetooth
            # thinkpad_acpi module does offer any useful function support.
            blacklist thinkpad_acpi
            ```
+
     9. Intel Microcde
 
-        ```
-        # emerge -av microcode-ctl
-        # rc-update add microcode_ctl boot
-        ```
-        Refer to [intel microcode](https://wiki.gentoo.org/wiki/Intel_microcode). Updates to CPU microcode have to be re-applied each time the computer is booted, because the memory updated is volatile (despite the term *firmware* also being used for microcode).
+       ```
+       # emerge -av microcode-ctl
+       # rc-update add microcode_ctl boot
+       ```
 
-        According to the reference, you should run `dmesg | grep -i microcode` to check whether CPU microcode is updated or not. If not, I think there is not need to add *microcode-ctl* to boot level until *microcode-ctl* package is updated.
+       Refer to [intel microcode](https://wiki.gentoo.org/wiki/Intel_microcode). Updates to CPU microcode have to be re-applied each time the computer is booted, because the memory updated is volatile (despite the term *firmware* also being used for microcode).
 
-        CPU的微代码更新支持,建议选中.CPU的微代码更新就像是给CPU打补丁,用于纠正CPU的行为.更新微代码的常规方法是升级BIOS,但是也可以在Linux启动后更新.比如在Gentoo下,可以使用"emerge microcode-ctl"安装microcode-ctl服务,再把这个服务加入boot运行级即可在每次开机时自动更新CPU微代码.
+       According to the reference, you should run `dmesg | grep -i microcode` to check whether CPU microcode is updated or not. If not, I think there is not need to add *microcode-ctl* to boot level until *microcode-ctl* package is updated.
+
+       CPU的微代码更新支持,建议选中.CPU的微代码更新就像是给CPU打补丁,用于纠正CPU的行为.更新微代码的常规方法是升级BIOS,但是也可以在Linux启动后更新.比如在Gentoo下,可以使用"emerge microcode-ctl"安装microcode-ctl服务,再把这个服务加入boot运行级即可在每次开机时自动更新CPU微代码.
     10. Fingerprint. Fingerprint login is a bad idea since your fingerprint is left anywhere anytime around, like on bottles, cups, books etc. It easy for hackers to get a copy of it. So don't use it!!!
 
         Here, I just have a try and test the function. That's all of it. BTW, my current system is locked by [lvm luks lvm](http://jimgray.tk/2015/09/10/lvm-luks-lvm/). So it's relatively safe.
@@ -1230,19 +1245,20 @@ blacklist bluetooth
         1. # emerge -av sys-auth/fprintd
         2. \# ect /etc/pam.d/system-local-login, add *auth sufficient pam_fprintd.so* to the beginning of the file.
 
-            ```
-            auth		sufficient	pam_fprintd.so
-            auth		include		system-login
-            account		include		system-login
-            password		include		system-login
-            session		include		system-login
-            ```
-            Among the */etc/pam.d/* files, *system-auth* is the most important for authentication. For example, if your need to *login*, then you need *authentication* first. So *system-login* file contains a line *auth include system-auth*.
-        3. We can edit other files like */etc/pam.d/polkit-1* for GNOME polkit authentication. Add *auth sufficient pam_fprintd.so* to */etc/pam.d/xscreensaver* will help unlock screensaver.
-        4. $ fprintd-enroll, wipe finger over the fingerprint reader for 5 times. Later on, we can *fprintd-delete* to remove the enrolled fingerprints.
-        5. Reboot and input username, then it reminds *wipe your finger ...*.
-        6. Don't enroll fingerprint for *root* account. If the fingerprint authention failed (3 times), it fall back to normal password login automatically.
-        7. Refer to [configuring fprint PAM for all authentications [solved]]( https://forums.gentoo.org/viewtopic-p-6952448.html); [arch fprint](https://wiki.archlinux.org/index.php/Fprint); [how to enable fingerprint](http://www.thinkwiki.org/wiki/How_to_enable_integrated_fingerbbprint_reader_with_fprint).
+           ```
+           auth		sufficient	pam_fprintd.so
+           auth		include		system-login
+           account		include		system-login
+           password		include		system-login
+           session		include		system-login
+           ```
+
+           Among the */etc/pam.d/* files, *system-auth* is the most important for authentication. For example, if your need to *login*, then you need *authentication* first. So *system-login* file contains a line *auth include system-auth*.
+       3. We can edit other files like */etc/pam.d/polkit-1* for GNOME polkit authentication. Add *auth sufficient pam_fprintd.so* to */etc/pam.d/xscreensaver* will help unlock screensaver.
+       4. $ fprintd-enroll, wipe finger over the fingerprint reader for 5 times. Later on, we can *fprintd-delete* to remove the enrolled fingerprints.
+       5. Reboot and input username, then it reminds *wipe your finger ...*.
+       6. Don't enroll fingerprint for *root* account. If the fingerprint authention failed (3 times), it fall back to normal password login automatically.
+       7. Refer to [configuring fprint PAM for all authentications [solved]]( https://forums.gentoo.org/viewtopic-p-6952448.html); [arch fprint](https://wiki.archlinux.org/index.php/Fprint); [how to enable fingerprint](http://www.thinkwiki.org/wiki/How_to_enable_integrated_fingerbbprint_reader_with_fprint).
     10. Intel VGA bug
 
         My Intel VGA is HD3000 series. Refer to [Hangs on Sandy Bridge](https://forums.gentoo.org/viewtopic-p-7319152.html), [freedesktop 54226](https://bugs.freedesktop.org/show_bug.cgi?id=54226), [archwiki SNA](https://wiki.archlinux.org/index.php/intel_graphics#SNA_issues) and [gentoo intel](https://wiki.gentoo.org/wiki/Intel).
@@ -1292,6 +1308,7 @@ blacklist bluetooth
         # ect /etc/fstab
         /mnt/1GB-swapfile none swap defaults 0 0
         ```
+
         Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).
     11. OpenRC Log
 
@@ -1301,29 +1318,30 @@ blacklist bluetooth
         # ect /etc/rc.conf
         rc_logger="YES"
         ```
+
         The default log file path is */var/log/rc.log*. You can change it by *rc_log_path* variable.
 47. Upgrade kernel to **unstable 4.0.0**
 
     >Before updating to newest kernel version, you'd best update system @world. Refer to *Update the system*.
 
-    1. # echo "=sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources
-        1. `eix` helps find out which unstable package version is located in portage mirror.
-    2. # eix-sync
-    3. # emerge -av gentoo-sources
-    4. # eselect kernel list
-    5. # eselect kernel set 2, this is update the `/usr/src/linx` symbol link pointing to the new 4.0.0 kernel.
-    5. # mount /boot
-    5. # mount /dev/sda2 /boot/efi
-    6. # cd /usr/src/linux
-    7. # cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
-    8. # make silentoldconfig, choose all the new settings to default ones. It only asks user new kernel options incurred in new kernel version.
-        1. # make olddefconfig, to convert the old config to fit new kernel version, while setting new kernel options to default values without user confirmation.
-        2. # make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
-    8. # make modules_prepare
-    1. # echo 3 > /proc/sys/vm/drop_caches
-    9. # make -j3
-    10. # make modules_install
-    11. # make install
+    1. \# echo "=sys-kernel/gentoo-sources-4.0.0 ~amd64" > /etc/portage/package.accept_keywords/gentoo-sources
+       1. `eix` helps find out which unstable package version is located in portage mirror.
+    2. \# eix-sync
+    3. \# emerge -av gentoo-sources
+    4. \# eselect kernel list
+    5. \# eselect kernel set 2, this is update the `/usr/src/linx` symbol link pointing to the new 4.0.0 kernel.
+    5. \# mount /boot
+    5. \# mount /dev/sda2 /boot/efi
+    6. \# cd /usr/src/linux
+    7. \# cp ../linux-3.18.11-gentoo/.config ./linux/, copy the old kernel config to the new kernel sources directory
+    8. \# make silentoldconfig, choose all the new settings to default ones. It only asks user new kernel options incurred in new kernel version.
+       1. \# make olddefconfig, to convert the old config to fit new kernel version, while setting new kernel options to default values without user confirmation.
+       2. \# make oldconfig, similar to `make silentoldconfig` excpet asking you the same kernel options between two kernel versions as well.
+    8. \# make modules_prepare
+    1. \# echo 3 > /proc/sys/vm/drop_caches
+    9. \# make -j3
+    10. \# make modules_install
+    11. \# make install
     12. \# genkernel --install initramfs
 
         If Gentoo depends on LUKS and LVM for system mount points and booting, refer to [LVM LUKS LVM](http://jimgray.tk/2015/09/10/lvm-luks-lvm/).
@@ -1338,6 +1356,7 @@ blacklist bluetooth
         ```
         modprobe: FATAL: Module vboxdrv not found.
         ```
+
         `emerge -av @module-rebuild` is to re-install all external modules (*app-emulation/virtualbox-modules* inclusive). More read [VirtualBox](http://jimgray.tk/2015/08/21/virtualbox/).
 
         There is another command from wiki `make modules_prepare` is used when the kernel not built yet or cleaned. For example, you need to compile the external module first, just before the kernel building, then execute this command before `make -j3`.
@@ -1348,25 +1367,26 @@ blacklist bluetooth
     To compile `e-sources`, the procedure is all the same as that for `gentoo-sources`. The only difference is to enable a few extra kernel options of `cjktty` patch. Refer to *e-sources / cjktty patch specific options*.
     2. <s>`e-sources` does not add `symlink` USE flag, so edit `/etc/portage/package.use/e-sources` add a line:
 
-        ```
-# 'symlink' will update the 'linux' symbolic automatically whening emerging e-sources.
-sys-kernel/e-sources symlink
-        ```
-</s>
-        Use `eselect kernel set xx` after sources emerge instead.
+       ```
+       # 'symlink' will update the 'linux' symbolic automatically whening emerging e-sources.
+       sys-kernel/e-sources symlink
+       ```</s>
+
+       Use `eselect kernel set xx` after sources emerge instead.
     3. `e-sources-4.1.1` draws in `aufs` and `tuxonice` USE flags by default, which in return draws in `aufs-util` and `aufs-headers` packages. Currently, there is no need. Remove this USE flag for `slot 4.1` in `overlay gentoo-zh`. Add a line:
 
-        ```
-# remove 'aufs' USE flag since it will draw in 'aufs-util' and 'aufs-headers' package. Current system does not need 'aufs' at all.
-sys-kernel/e-sources:4.1::gentoo-zh -aufs -tuxonice
-        ```
+       ```
+       # remove 'aufs' USE flag since it will draw in 'aufs-util' and 'aufs-headers' package. Current system does not need 'aufs' at all.
+       sys-kernel/e-sources:4.1::gentoo-zh -aufs -tuxonice
+       ```
+
     4. During the `make` process, it reminds warning:
 
        ```
        drivers/tty/vt/vt.c: In function ‘vc_do_resize’:
        drivers/tty/vt/vt.c:890:18: warning: ‘old_rows’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-	 old_screen_size = old_rows * old_row_size;
-			 ^
+         old_screen_size = old_rows * old_row_size;
+        		 ^
        drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialized in this function [-Wmaybe-uninitialized]
        ```
 
@@ -1377,69 +1397,74 @@ sys-kernel/e-sources:4.1::gentoo-zh -aufs -tuxonice
     I want to display Chinese characters in *tty*, which can be achieved by `cjktty` patch.
     1. Get the patch for kernel `4.0.5`.
 
-        This patch is now maintained by *microncai*. It is included in the *e-sources* package. Search `gentoo e-sources` in *Google*, and get [/gentoo-zh/sys-kernel/e-sources](http://data.gpo.zugaina.org/gentoo-zh/sys-kernel/e-sources/).
+       This patch is now maintained by *microncai*. It is included in the *e-sources* package. Search `gentoo e-sources` in *Google*, and get [/gentoo-zh/sys-kernel/e-sources](http://data.gpo.zugaina.org/gentoo-zh/sys-kernel/e-sources/).
 
-        We can get this patch from the *files/4.0/* sub-directory as [4.0.5-cjktty.patch](/assets/4.0.5-cjktty.patch). 
+       We can get this patch from the *files/4.0/* sub-directory as [4.0.5-cjktty.patch](/assets/4.0.5-cjktty.patch). 
 
-        If you cannot get the patch file, we can extract it manually [ git diff to get cjktty.patch](http://fangxiang.tk/2015/09/18/git/diff/patch).
+       If you cannot get the patch file, we can extract it manually [ git diff to get cjktty.patch](http://fangxiang.tk/2015/09/18/git/diff/patch).
     2. Check patch compatibility with `patch --dry-run` option.
 
-        ```
-        # cd /usr/src/linux-4.0.5/
-        # patch --dry-run -p1 < /path/to/3.18.14-utf8.diff
-        ```
-        We get a *hunk* failure reminds. After check the patch file, locate the failure:
+       ```
+       # cd /usr/src/linux-4.0.5/
+       # patch --dry-run -p1 < /path/to/3.18.14-utf8.diff
+       ```
 
-        ```
-        @@ -2691,6 +2710,19 @@ static u16 *fbcon_screen_pos(struct vc_data *vc, int offset)
-        	unsigned long p;
-        	int line;
-         	
-        +       if (offset < 0) {
-        +               offset = -offset - 1;
-        +               if (vc->vc_num != fg_console || !softback_lines)
-        +                       return (u16 *)(vc->vc_origin + offset + (vc->vc_screenbuf_size));
-        +               line = offset / vc->vc_size_row;
-        +               if (line >= softback_lines)
-        +                       return (u16 *) (vc->vc_origin + offset - softback_lines * vc->vc_size_row + (vc->vc_screenbuf_size));
-        +               p = softback_curr + offset;
-        +               if (p >= softback_end)
-        +                       p += softback_buf - softback_end;
-        +               return (u16 *) (p + (fbcon_softback_size));
-        +       }
-        +
-        	if (vc->vc_num != fg_console || !softback_lines)
-        		return (u16 *) (vc->vc_origin + offset);
-        	line = offset / vc->vc_size_row;
-        ```
-        The issue lies at the line 4. You might think it a blank line. **IT IS A FAKE BLANK LINE**. It is composed of *one space* and *one tab* that is similar to *one +* and *one tab* for a code line that had been removed. The author *microcai* forget this remove the extra whitespaces before generating the patch file.
+       We get a *hunk* failure reminds. After check the patch file, locate the failure:
 
-        Remove those two whitespaces in patch file to get a real blank line or add corresponding whitespaces in kernel souce file.
+       ```
+       @@ -2691,6 +2710,19 @@ static u16 *fbcon_screen_pos(struct vc_data *vc, int offset)
+               unsigned long p;
+               int line;
+
+       +       if (offset < 0) {
+       +               offset = -offset - 1;
+       +               if (vc->vc_num != fg_console || !softback_lines)
+       +                       return (u16 *)(vc->vc_origin + offset + (vc->vc_screenbuf_size));
+       +               line = offset / vc->vc_size_row;
+       +               if (line >= softback_lines)
+       +                       return (u16 *) (vc->vc_origin + offset - softback_lines * vc->vc_size_row + (vc->vc_screenbuf_size));
+       +               p = softback_curr + offset;
+       +               if (p >= softback_end)
+       +                       p += softback_buf - softback_end;
+       +               return (u16 *) (p + (fbcon_softback_size));
+       +       }
+       +
+               if (vc->vc_num != fg_console || !softback_lines)
+                       return (u16 *) (vc->vc_origin + offset);
+               line = offset / vc->vc_size_row;
+       ```
+
+       The issue lies at the line 4. You might think it a blank line. **IT IS A FAKE BLANK LINE**. It is composed of *one space* and *one tab* that is similar to *one +* and *one tab* for a code line that had been removed. The author *microcai* forget this remove the extra whitespaces before generating the patch file.
+
+       Remove those two whitespaces in patch file to get a real blank line or add corresponding whitespaces in kernel souce file.
     3. Apply the patch.
 
-        ```
-        # cd /usr/src/linux-4.0.5
-        # patch -p1 < /path/to/3.18.14-utf8.diff
-        ```
+       ```
+       # cd /usr/src/linux-4.0.5
+       # patch -p1 < /path/to/3.18.14-utf8.diff
+       ```
+
     4. Similarly, we can choose other useful patches as well.
 
-        Finally, I chose four patches:
+       Finally, I chose four patches:
 
-        ```
-        3.18.14-utf8.diff
-        change-the-number-of-tty-devices.patch
-        lower-undefined-mode-timeout.patch
-        support-micmute-led.patch
-        ```
+       ```
+       3.18.14-utf8.diff
+       change-the-number-of-tty-devices.patch
+       lower-undefined-mode-timeout.patch
+       support-micmute-led.patch
+       ```
+
     5. Config and build kernel as usual.
 48. Remove old kernels
 
     `eclean-kernel` only remove files built when compiling kernels like libs, modules, etc. The kernel sources itself in `/usr/src/` will be managed by `portage` instead. So `eclean-kernel` don't remove sources itself! If you want to remove sources as well, use `emerge -ac gentoo-sources-version` and update `package.accept_keyword` and `package.use` files if need.
+
     1. # emerge -av app-admin/eclean-kernel
     2. # eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
     3. # eclean-kernel -n 4 -avt
-        1. Option `-avt` is very important, it will ask for your confirmation for each kernel to be removed by an interactive way. You can just remove the kernels you don't need. You can also adjust the number from `4` to something else to pop out the desired kernel for removal.
-        2. At last, I removed the kernel as  `3.18.11-gentoo.old`
+       1. Option `-avt` is very important, it will ask for your confirmation for each kernel to be removed by an interactive way. You can just remove the kernels you don't need. You can also adjust the number from `4` to something else to pop out the desired kernel for removal.
+       2. At last, I removed the kernel as  `3.18.11-gentoo.old`
     4. `eclean-kernel` will update the grub menu automatically.
     5. **special note**: the kernel is manually compiled by `make, make modules_install, make install, ...` following the basic procedures of official handbook. But `initramfs` is built by `genkernel` resulting in file names different from conventional format. You can `ls -l /boot` finding that `initramfs`'s file name format is different from that of `vmlinuz, System.map`. Tough the file name format won't cause problems since `grub2-mkconfig` is smart enough to generate the correct boot parameters. However, `eclean-kernel` will remind you removing `-genkernel-x86_64-4.0.0-gentoo: vmlinuz does not exist` which is an undesired action. Details refer to [Bug 464576](https://bugs.gentoo.org/464576)
 49. Ref:
