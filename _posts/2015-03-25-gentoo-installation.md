@@ -271,16 +271,15 @@ title: Gentoo Installation
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 27. Compiling and installing
 
-    If this is not first time to make, then execute `make clean` first.
-
     1. make -j3
     2. make modules_install
     2. make install, this will copy the kernel image into */boot/* together with the System.map file and the kernel configuration file. Actually you can use a copy command instead.
     3. [deprecated] <s># mkdir -p /boot/efi/boot</s>
     4. [deprecated] <s># cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
     5. emerge -av genkernel
-    6. genkernel --install initramfs, The resulting file can be found by simply listing the files starting with initramfs.
+    6. genkernel --install initramfs
     7. ls /boot/initramfs*
+
 27. Kernel modules loading. Refer to handbook.
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
     1. emerge -avt sys-kernel/linux-firmware
@@ -522,12 +521,20 @@ menuentry "Microsoft Windows 8.1 x86_64" {
     2. For the kernel support part, already done in previous step.
     3. Add the following lines into `/etc/portage/make.conf`:
 
-        ```
-## (For mouse, keyboard, and Synaptics touchpad support)
-INPUT_DEVICES="evdev synaptics"
-## (For intel cards)
-VIDEO_CARDS="intel"
-        ```
+       ```
+       ## (For mouse, keyboard, and Synaptics touchpad support)
+       INPUT_DEVICES="evdev synaptics"
+       ## (For intel cards)
+       VIDEO_CARDS="intel i965"
+       or
+       VIDEO_CARDS="intel"
+       ```
+
+       Do NOT set to `VIDEO_CARDS="intel i915". The Wiki writes *Gen 2 and Gen 3* using *intel i915*. However, the *Gen* output of *lspci* does not reflect the real VGA generation.
+
+       *intel* alone will enable both *i915* and *i965* Intel video drivers for *media-libs/mesa*. Specifying *intel i965* will only build *i965* Intel drivers.
+
+       *ATTENTION*: this *i965* and *i915* split in this context is only at application (*media-libs/mesa*) level. The kernel side always enabled *i915* instead.
     4. \# emerge -avt --verbose --pretend x11-base/xorg-drivers, check the dependency.
     5. \# echo "x11-base/xorg-server udev" >> /etc/portage/package.use/xorg-server. Actually this step is unnecessary since `udev` is enabled by default when selecting the system profile in previous step.
     6. \# emerge -avt x11-base/xorg-server
@@ -615,44 +622,48 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     9. sda9 Gentoo swap
     10. sda10 Gentoo boot
     11. sda11 Gentoo home
-43. [OPTIONAL] Re-compiling current kernel when you need to modify some kernel configurations.
-    1. # mount /boot
-    1. # mount /boot/efi
-    1. # cd /usr/src/linux
-    2. # make menuconfig
-        1. You don't need to copy and convert the old kernel config file as specified on [Kernel/Upgrade](https://wiki.gentoo.org/wiki/Kernel/Upgrade) since we just re-compile the current working kernel and share the kernel source. So we share the basic `.config` file in `/usr/src/linux/.config`.
-        2. Just make some changes to the old config file.
-    3. # make clean
-        1. Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
-    3. # make modules_prepare
-    1. # echo 3 > /proc/sys/vm/drop_caches
-    3. # make -j3
-    4. # Backup /lib/modules/\`uname -r\`/ contents. Why? Since we are re-compiling the current kernel, *make modules_install* will override old modules. If the newly-compiled kernel and modules thereof are error-prone or even cannot boot, then you cannot boot into old kernel since its modules (some are crucial) are overriden.
-    4. # make modules_install
-    5. # make install
-        1. This is add `.old` to original kernel and copy the new kernel to `/boot`.
-        2. You mannually finish this by renaming and copying kernel files.
-    6. # genkernel --install initramfs, re-install `initramfs`.
-    7. # grub2-mkconfig -o /boot/grub/grub.cfg
-    8. # reboot
-    8. # emerge -av @module-rebuild
+43. Re-compiling current kernel when modifying kernel configurations.
+    1. \# mount /boot
+    1. \# mount /boot/efi
+    1. \# cd /usr/src/linux
+    2. \# make menuconfig
+       1. You don't need to copy and convert the old kernel config file as specified on [Kernel/Upgrade](https://wiki.gentoo.org/wiki/Kernel/Upgrade) since we just re-compile the current working kernel and share the kernel source. So we share the basic `.config` file in `/usr/src/linux/.config`.
+       2. Just make some changes to the old config file.
+    3. [optional] \# make clean
+       1. Whenever the kernel sources or `.config` is changed, or when you are re-compiling a previously compiled kernel, run `make clean`. Otherwise the compiling process might fail.
+    3. \# make modules_prepare
+    1. \# echo 3 > /proc/sys/vm/drop_caches
+    3. \# make -j3
+    4. \# Backup /lib/modules/\`uname -r\`/ contents. Why? Since we are re-compiling the current kernel, *make modules_install* will override old modules. If the newly-compiled kernel and modules thereof are error-prone or even cannot boot, then you cannot boot into old kernel since its modules (some are crucial) are overriden.
+    4. \# make modules_install
+    5. \# make install
+       1. This is add `.old` to backup current kernel and copy the new kernel to */boot*.
+       2. You can mannually finish this by renaming and copying kernel files.
+    5. \# cp /boot/initramfs-genkernel-x86_64-version-gentoo /boot/initramfs-genkernel-x86_64-version-gentoo.old
+       1. *initramfs* won't be renamed by `make install`. 
+    6. \# genkernel --install initramfs, re-install `initramfs`.
+    7. \# grub2-mkconfig -o /boot/grub/grub.cfg
+    8. \# reboot
+    8. \# emerge -av @module-rebuild
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 45. ALSA - sound.
-    1. # emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.
+    1. \# emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.
     2. [optional] # rc-update add alsasound boot
-    3. # speaker-test -t wav -c 2, test the speaker.
+    3. \# speaker-test -t wav -c 2, test the speaker.
 45. Applications:
-    1. Firefox
+    1. Firefox < 43
 
        ```
        www-client/firefox gstreamer
        media-plugins/gst-plugins-libav -libav
        # emerge -av firefox
+       # emerge -av1 gst-plugins-vaapi
        # emerge -av www-plugins/adobe-flash
        ```
 
        1. Enable `gstreamer` USE flag for Firefox to support more video codecs (like H264).
        2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
+       3. *gst-plugins-vaapi* supports *hardware acceleration* to reduce CPU overhead. However, Firefox failed to make use of *gst-plugins-vaapi*. Refer to [894372](https://bugzilla.mozilla.org/show_bug.cgi?id=894372), [56326](https://bugzilla.mozilla.org/show_bug.cgi?id=563206) and [1207429](https://bugzilla.mozilla.org/show_bug.cgi?id=1207429). From Firefox 43, it uses *ffmpeg* instead of *gstreamer*. To make use of *vaapi*, make sure *ffmpeg* and *hwaccel* USE is enabled. BTW, *ffmpeg* should enable *vaapi* USE too.
        3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
        4. Run `$ flash-player-properties` or from application menu to set flash player.
        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll*, *user agent switcher* etc. plugins.
@@ -662,8 +673,8 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
     2. Weechat for IRC.
     2. *xfce-extra/xfce4-screenshooter* for capture sreen image.
     2. fcitx install. Refer to [Install (Gentoo)](https://fcitx-im.org/wiki/Install_(Gentoo)).
-       1. # echo "app-i18n/fcitx gtk gtk3" >> /etc/portage/package.use/fcitx
-       2. # emerge -av fcitx
+       1. \# echo "app-i18n/fcitx gtk gtk3" >> /etc/portage/package.use/fcitx
+       2. \# emerge -av fcitx
        2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 
 	   ```
@@ -678,22 +689,30 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
           It's optional to install *fcitx-configtool* if you are OK to configure Fcitx on command line manually.
     3. mpv
 
-       By default, stable *mpv* is really old (0.9.2). We can install the recent 0.17.0 instead.
+       By default, stable *mpv* is really old (0.9.2). We can accpet the recent 0.17.0 or live 9999 instead.
 
-       >media-video/mpv vaapi
-
-       >~media-video/mpv-0.17.0
-
-       1. *mpv* depends on *ffmpeg* as dependency. Some playback features are not enabled by default. We should tune *ffmpeg* USE flags to enable them.
-       1. If *mpv* does not play videos after kernel upgrades, try to reinstall `emerge -av1 mpv xf86-video-intel` and reboot.
+       1. Add `vaapi` to */etc/portage/make.conf*.
+       1. *mpv* depends on *ffmpeg* as dependency. But some features need to tune *ffmpeg* USE flags instead of *mpv*'s. For example, `libv4l` and `gnutls`.
+       1. If *mpv* does not play videos, try to
+          1. \# emerge -av1 mpv
+          2. Bump to a *~arch* of *xf86-video-intel* / *x11-libs/libva-intel-driver*.
+          3. Reboot.
        2. Previously, I use `mplayer` which is inactive of development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
        3. The default *lua* USE flag of *mpv* brings along a *youtube-dl* hook script. `mpv url` (like live broadcast) will automatically invoke *youtube-dl* to download video cache while palying. Before that, install *youtube-dl*. And make sure *ffmpeg* is installed with `network` USE flag. If the url is *https*, then add `gnutls` or `openssl` USE flag to *ffmpeg*. Ether `gnutls` or `openssl` is fine and you don't need both.
        4. Though *youtube-dl* support many sites, it does play well with Chinese ones. We can try `mpv $(youtube-dl --get-url http://v.youku.com/v_show/id_XMTU2Mjc4MTc4NA==.html)`.
 
-          If *youtube-dl* sucks, try *livestreamer*.
+          If install *youtube-dl* in Python3 virtual environment:
+
+          ```bash
+          $ ln -sf /absolute/path/to/py3venv/youtube-dl ~/.config/mpv/youtue-dl
+          ```
+
+          If *youtube-dl* sucks, could try *livestreamer*.
        5. There is another tool tuned for Chinese sites, that is *you-get* written with Python3. It's brilliant like this `you-get -p mpv url`. I install this package in Python3 virtual environment (*pyvenv*). Of course, *you-get* can be used to download video directly from sites like youtube-dl.
        6. If the url is blocked, we should first enable *proxychains* or *torify*.
        7. If want to make use of *hardware decoding*, both *mpv* and *ffmpeg* should enable *vaapi* USE flag.
+
+          It's better to add `vaapi` USE flag to *make.conf*.
        8. Watching speed.
 
           When playing url videos, *mpv* might throtle/stuck a lot waiting for cache. This is due to ISP throtling; video provider streaming limit; network bandwidth etc.
@@ -709,15 +728,19 @@ KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
 	  ~/workspace/virtualenv3/bin/you-get -p /usr/bin/mpv --
           ```
 
-          Since using the *Open With* addon, save more CPU and memory.
+          The last two hypens means arguments afterwards are input files/urls. Since using the *Open With* addon, save more CPU and memory.
+       10. More refer to *intel vga bug* below.
     18. ffmpeg
         1. `ffmpeg` is emerged by some other packages, one of which might be `mplayer` or `mpv`.
-        2. However, the default installation does not support `v4l` (`video4linux`), thus webcamera not working. In order to add support `v4l`, add USE flags `v4l` and `libv4l`.
+        2. However, the default installation does not support `v4l` (mainly the webcamera). If want to support `v4l`, add USE flags `v4l` and/or `libv4l`.
         3. By default *mpv* use *software decoding*. To use *hardware decoding* of Intel GPU, enable *vaapi* for *ffmpeg*. When playing, add `--hwdec=auto` or `--hwdec=vaapi` argument. Of course, it can be added to configuration file (like *~/.config/mpv/mpv.conf*).
+        4. Add `-libav` to *make.conf* in favor of system-wide *ffmpeg*.
 
         Manually enabled USE flags are:
 
-        >media-video/ffmpeg gnutls v4l libv4l vaapi
+        >media-video/ffmpeg gnutls vaapi
+
+        Remove `vaapi` if it's already enabled in *make.conf* or *media-video/mpv*.
 
         ```
         # emerge -av1 ffmpeg
@@ -1158,30 +1181,31 @@ blacklist bluetooth
         5. Refer to [arch wiki blacklist](https://wiki.archlinux.org/index.php/Kernel_modules#Blacklisting); [changes to module blacklisting](https://www.archlinux.org/news/changes-to-module-blacklisting/).
         6. Similarly, some other rarely used modules can also be deactivated from startup:
 
-            Webcamera modules:
+           Webcamera modules:
 
-            ```
-# /etc/modprob.d/webcamear.conf
-# deactivate webcamera since rarely used.
-blacklist uvcvideo
-#install videobuf2_core /bin/false
-#install videobuf2_vmalloc /bin/false
-#install v4l2_common /bin/false
-#install videobuf2_memops /bin/false
-#install videodev /bin/false
-blacklist videobuf2_core
-blacklist videobuf2_vmalloc
-blacklist v4l2_common
-blacklist videobuf2_memops
-blacklist videodev
-            ```
-            thinkpad_acpi module:
+           ```
+           # /etc/modprob.d/webcamear.conf
+           # deactivate webcamera since rarely used.
+           blacklist uvcvideo
+           #install videobuf2_core /bin/false
+           #install videobuf2_vmalloc /bin/false
+           #install v4l2_common /bin/false
+           #install videobuf2_memops /bin/false
+           #install videodev /bin/false
+           blacklist videobuf2_core
+           blacklist videobuf2_vmalloc
+           blacklist v4l2_common
+           blacklist videobuf2_memops
+           blacklist videodev
+           ```
 
-            ```
-# /etc/modprobe.d/thinkpad_acpi.conf
-# thinkpad_acpi module does offer any useful function support.
-blacklist thinkpad_acpi
-            ```
+           thinkpad_acpi module:
+
+           ```
+           # /etc/modprobe.d/thinkpad_acpi.conf
+           # thinkpad_acpi module does offer any useful function support.
+           blacklist thinkpad_acpi
+           ```
     9. Intel Microcde
 
         ```
@@ -1219,6 +1243,44 @@ blacklist thinkpad_acpi
         5. Reboot and input username, then it reminds *wipe your finger ...*.
         6. Don't enroll fingerprint for *root* account. If the fingerprint authention failed (3 times), it fall back to normal password login automatically.
         7. Refer to [configuring fprint PAM for all authentications [solved]]( https://forums.gentoo.org/viewtopic-p-6952448.html); [arch fprint](https://wiki.archlinux.org/index.php/Fprint); [how to enable fingerprint](http://www.thinkwiki.org/wiki/How_to_enable_integrated_fingerbbprint_reader_with_fprint).
+    10. Intel VGA bug
+
+        My Intel VGA is HD3000 series. Refer to [Hangs on Sandy Bridge](https://forums.gentoo.org/viewtopic-p-7319152.html), [freedesktop 54226](https://bugs.freedesktop.org/show_bug.cgi?id=54226), [archwiki SNA](https://wiki.archlinux.org/index.php/intel_graphics#SNA_issues) and [gentoo intel](https://wiki.gentoo.org/wiki/Intel).
+
+        ```
+        # less /var/log/messages
+
+        May 13 15:47:12 zhtux kernel: [drm] stuck on blitter ring
+        May 13 15:47:12 zhtux kernel: [drm] GPU HANG: ecode 6:2:0x00fffff7, in X [5230], reason: Ring hung, action: reset
+        May 13 15:47:12 zhtux kernel: [drm] GPU hangs can indicate a bug anywhere in the entire gfx stack, including userspace.
+        May 13 15:47:12 zhtux kernel: [drm] Please file a _new_ bug report on bugs.freedesktop.org against DRI -> DRM/Intel
+        May 13 15:47:12 zhtux kernel: [drm] drm/i915 developers can then reassign to the right component if it's not a kernel issue.
+        May 13 15:47:12 zhtux kernel: [drm] The gpu crash dump is required to analyze gpu hangs, so please always attach it.
+        May 13 15:47:12 zhtux kernel: [drm] GPU crash dump saved to /sys/class/drm/card0/error
+        May 13 15:47:12 zhtux kernel: drm/i915: Resetting chip after gpu hang
+        May 13 15:47:12 zhtux kernel: [drm:i915_reset] *ERROR* Failed to reset chip: -110
+        ```
+
+        Basically create a Xorg configuration file (i.e. */etc/X11/xorg.conf.d/20-intel.conf*):
+
+        ```
+        Section "Device"
+        	Identifier	"Device0"
+        	Driver	"intel"
+        	Option	"AccelMethod"	"uxa"
+        EndSection
+        ```
+
+        Use *uxa* instead of *sna*. Then enable *uxa* USE for *xf86-video-intel*:
+
+        ```bash
+        # echo "x11-drivers/xf86-video-intel uxa" >> /etc/portage/package.use/xf86-video-intel
+        # emerge -av1 xf86-video-intel
+        ```
+
+        After reboot, the X looks much better. The *stuck on* kernel error does not occur up to now.
+
+        If that fails, then could bump to a *~arch* of *xf86-video-intel* and *libva-intel-driver*.
     10. swapfile
 
         ```bash
@@ -1300,14 +1362,15 @@ sys-kernel/e-sources:4.1::gentoo-zh -aufs -tuxonice
         ```
     4. During the `make` process, it reminds warning:
 
-        ```
-drivers/tty/vt/vt.c: In function ‘vc_do_resize’:
-drivers/tty/vt/vt.c:890:18: warning: ‘old_rows’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-  old_screen_size = old_rows * old_row_size;
-                  ^
-drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-        ```
-        We can look into the `/usr/src/e-sources/drivers/tty/vt/vt.c` at line 890, we do find that issue. Anyway currently the kernel works fine.
+       ```
+       drivers/tty/vt/vt.c: In function ‘vc_do_resize’:
+       drivers/tty/vt/vt.c:890:18: warning: ‘old_rows’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+	 old_screen_size = old_rows * old_row_size;
+			 ^
+       drivers/tty/vt/vt.c:890:18: warning: ‘old_row_size’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+       ```
+
+       We can look into the `/usr/src/e-sources/drivers/tty/vt/vt.c` at line 890, we do find that issue. Anyway currently the kernel works fine.
 48. Refer to [Version specifier](https://wiki.gentoo.org/wiki/Version_specifier) for specifying versions of packages as used when interacting with Portage via emerge or `/etc/portage`. These are also known as `DEPEND atoms` in Portage documentation.
 48. Apply `cjktty` patch for kernel `4.0.5`.
 

@@ -398,6 +398,8 @@ The above spoofing method assumes *dhcpcd + wpa\_supplicant* networking scheme. 
    > enable_network 7
    <3>CTRL-EVENT-CONNECTED - Connection to 00:00:00:00:00:00 completed (reauth) [id=7 id_str=]
 
+   >select_network 7       # optionally if the new added network is not associated with AP
+   
    >save_config		   # optionally if turned on 'update_config=1'
    OK
 
