@@ -407,9 +407,9 @@ title: Gentoo Installation
 
     Detail on logrotate for cron jobs refer to [Cronie and Anacron](/2015/07/19/cronie/).
 34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
-    1. # echo "sys-process/cronie anacron" > /etc/portage/package.use/cronie
-    2. # emerge -avt sys-process/cronie
-    2. # rc-update add cronie default
+    1. \# echo "sys-process/cronie anacron" > /etc/portage/package.use/cronie
+    2. \# emerge -avt sys-process/cronie
+    2. \# rc-update add cronie default
 
     Detail on running scheduled tasks based on input from the command `crontab`, refer to [Cronie and Anacron](/2015/07/19/cronie/).
 35. File indexing: emerge -avt sys-apps/mlocate
@@ -417,11 +417,11 @@ title: Gentoo Installation
 36. [optional] Remote access: rc-update add sshd default
 38. Configuring the bootloader. Refer to [GRUB2 Quick Start](https://wiki.gentoo.org/wiki/GRUB2_Quick_Start).
     1. Add `GRUB_PLATFORMS="efi-64"` to `/etc/portage/make.conf`. This step must occur before installing the grub package. Otherwise it would show `error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist`.
-    2. # emerge -avt sys-boot/grub:2, currently it is version 2.
-    3. # emerge -av sys-boot/os-prober
+    2. \# emerge -avt sys-boot/grub:2, currently it is version 2.
+    3. \# emerge -av sys-boot/os-prober
     3. Mount the EFI partition /dev/sda2 to /boot/efi directory. Because Gentoo, Ubuntu, Windows share the EFI partition, we should mount the shared EFI partion here. Not just create a private EFI environment in Gentoo's private boot partition. **This step is really important!**.
-        1. # mkdir /boot/efi
-        2. # mount /dev/sda2 /boot/efi
+        1. \# mkdir /boot/efi
+        2. \# mount /dev/sda2 /boot/efi
     4. To install GRUB2 to EFI system `grub2-install --target=x86_64-efi`.
 39. [deprecated, as long as the `/boot` and `/boot/efi` partitions are mounted, grub2-mkconfig will automatically detect the windows operating system in `/etc/grub.d/30_os_prober` through `sys-boot/os-prober`] Chainload Windows system `nano -w /etc/grub.d/40_custom`, add the code below.
     1. The traditional `chainloader +1` does work for UEFI boot.
@@ -438,10 +438,10 @@ title: Gentoo Installation
        ```
 
     2. The next is to replace the two parameters `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
-        1. # grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
-        2. # grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
-        3. Now replace the parameters with them real values in above `menuentry`.
-        4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
+       1. \# grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `$hints_string`.
+       2. \# grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi, this command will print the value `fs_uuid`.
+       3. Now replace the parameters with them real values in above `menuentry`.
+       4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB\#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
 40. Generate GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
 32. Edit `/etc/conf.d/hwclock` to set the clock options.
@@ -449,18 +449,18 @@ title: Gentoo Installation
     Set `clock=local`, this is important when dual boot with Windows.
 23. Set the timezone.
     1. I think this step should occur after `hwclock` thing. Otherwise the system time is usually ahead of locale time by 8 hours, thus resulting in portage tree time stamp issues. If possible, I recommend to leave the above two steps immediately before system reboot.
-    1. # ls /usr/share/zoneinfo
-    2. # echo "Asia/Shanghai" > /etc/timezone
-    3. # emerge --config sys-libs/timezone-data
+    1. \# ls /usr/share/zoneinfo
+    2. \# echo "Asia/Shanghai" > /etc/timezone
+    3. \# emerge --config sys-libs/timezone-data
     4. Check with `date` command.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
 
     ```
-    exit
-    umount -lv /mnt/gentoo/home
-    umount -lv /mnt/gentoo/boot{/efi,}
-    umount -lv /mnt/gentoo/dev{/shm,/pts,}
-    umount -lv /mnt/gentoo{/proc,/sys,}
+    # exit
+    # umount -lv /mnt/gentoo/home
+    # umount -lv /mnt/gentoo/boot{/efi,}
+    # umount -lv /mnt/gentoo/dev{/shm,/pts,}
+    # umount -lv /mnt/gentoo{/proc,/sys,}
     ```
 
     You may be reminded that `/mnt/gentoo` is busy, then you need to exit the current terminal, and opening a new one terminal will work. Just let it go. Then type in that one magical command that initiates the final, true test: `reboot` with your root account.
@@ -474,49 +474,49 @@ title: Gentoo Installation
        ```
 
     3. [OPTIONAL] Update the system. If no need, don't update your system, otherwise your whole world would be in a mess.
-        1.\ # eix-sync
-            1. For new portageq --version >=2.2.16, use `emaint sync` instead of `emerge --sync`.
-        2. \# emerge -avtuDN --with-bdeps=y @world
-        6. [optional] # dispatch-conf, if prompted, you just need to input `u`.
+       1. \# eix-sync
+          1. For new portageq --version >=2.2.16, use `emaint sync` instead of `emerge --sync`.
+       2. \# emerge -avtuDN --with-bdeps=y @world
+       6. [optional] # dispatch-conf, if prompted, you just need to input `u`.
 
-            This command will help update files in `/etc/portage` when needed as well. I would like to separate per-package settings by filenames. Simply input `u` will merge several package settings together, which is undesirable. Hence, first check the updates by `diff` the `._cfg*` in corresponding directory. And then rename `._cfg*` to relevant package name.
-        3. \# perl-cleaner --all
+          This command will help update files in `/etc/portage` when needed as well. I would like to separate per-package settings by filenames. Simply input `u` will merge several package settings together, which is undesirable. Hence, first check the updates by `diff` the `._cfg*` in corresponding directory. And then rename `._cfg*` to relevant package name.
+       3. \# perl-cleaner --all
 
-            If *perl* issues still occurs, replace *--all* with *--reallyall*.
-        4. [optional] # revdep-rebuild -pv
-            1. # revdep-rebuild -v
-            2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
-        5. [optional] # emerge @preserved-rebuild, if prompted.
-            1. _$_ emerge --info | grep FEATURES
-            2. In Gentoo profile, there might be `preserve-libs` enabled for `FEATURES`, which is usually the real case. This setting will cause `Portage` to preserve libraries when `soname`s change during upgrade or downgrade, only as necessary to satisfy shared library dependencies of installed consumers/packages. Preserved libraries are automatically removed when there are no remaining consumers, which occurs when consumer packages are rebuilt or uninstalled. Ideally, rebuilds are triggered automatically during updates, in order to satisfy slot-operator dependencies.
-            3. However, before emerge exits after installing updates, if there are remaining preserved libraries because slot-operator dependencies have not been used to trigger automatic rebuilds, then emerge will display a message like the following:
+          If *perl* issues still occurs, replace *--all* with *--reallyall*.
+       4. [optional] # revdep-rebuild -pv
+          1. \# revdep-rebuild -v
+          2. It is recommended to perform the 4th step. As a tool of `Gentoolkit`, `revdep-rebuild` is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find packages that have become broken as a result of an upgrade of a package they depend on. It can emerge those packages for users automatically but it can also happen that a given package does not work with the currently installed dependencies, in which case you should upgrade the broken package to a more recent version. revdep-rebuild will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
+       5. [optional] # emerge @preserved-rebuild, if prompted.
+          1. $ emerge --info \| grep FEATURES
+          2. In Gentoo profile, there might be `preserve-libs` enabled for `FEATURES`, which is usually the real case. This setting will cause `Portage` to preserve libraries when `soname`s change during upgrade or downgrade, only as necessary to satisfy shared library dependencies of installed consumers/packages. Preserved libraries are automatically removed when there are no remaining consumers, which occurs when consumer packages are rebuilt or uninstalled. Ideally, rebuilds are triggered automatically during updates, in order to satisfy slot-operator dependencies.
+          3. However, before emerge exits after installing updates, if there are remaining preserved libraries because slot-operator dependencies have not been used to trigger automatic rebuilds, then emerge will display a message like the following:
 
-	       ```
-	       !!! existing preserved libs:
-	       >>> package: sys-libs/libfoo-1
-		* - /lib/libfoo.so.1
-		*      used by /usr/bin/bar (app-foo/bar-1)
-	       Use emerge @preserved-rebuild to rebuild packages using these libraries
-	       ```
+             ```
+             !!! existing preserved libs:
+             >>> package: sys-libs/libfoo-1
+              * - /lib/libfoo.so.1
+              *      used by /usr/bin/bar (app-foo/bar-1)
+             Use emerge @preserved-rebuild to rebuild packages using these libraries
+             ```
 
-            4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
+          4. This is when `emerge @preserved-rebuild` come into effects. Refer to [preserve-libs](https://wiki.gentoo.org/wiki/Preserve-libs).
         3. \# emerge -av --depclean
-            1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
+           1. Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
     4.  From now on, a basic new gentoo system is installed. 
 42. Probably, the new system cannot connect to the Wifi network (lack in network manager). But if you configure WPA_supplicant and dhcpcd correctly, this is not a problem. If really no network, you can `chroot` again into the gentoo system when installing new package:
     1. Boot with LiveDVD
-    2. # swapon /dev/sda7
-    3. # mount /dev/sda12 /mnt/gentoo
-    4. # mount /dev/sda10 /mnt/gentoo/boot
-    5. # cp -L /etc/resolv.conf /mnt/gentoo/etc
-    6. # mount -t proc proc /mnt/gentoo/proc
-    7. # mount --rbind /sys /mnt/gentoo/sys
-    8. # mount --make-rslave /mnt/gentoo/sys 
-    9. # mount --rbind /dev /mnt/gentoo/dev 
-    10. # mount --make-rslave /mnt/gentoo/dev
-    11. # chroot /mnt/gentoo /bin/bash
-    12. # source /etc/profile
-    13. # export PS1="(chroot) $PS1"
+    2. \# swapon /dev/sda7
+    3. \# mount /dev/sda12 /mnt/gentoo
+    4. \# mount /dev/sda10 /mnt/gentoo/boot
+    5. \# cp -L /etc/resolv.conf /mnt/gentoo/etc
+    6. \# mount -t proc proc /mnt/gentoo/proc
+    7. \# mount --rbind /sys /mnt/gentoo/sys
+    8. \# mount --make-rslave /mnt/gentoo/sys 
+    9. \# mount --rbind /dev /mnt/gentoo/dev 
+    10. \# mount --make-rslave /mnt/gentoo/dev
+    11. \# chroot /mnt/gentoo /bin/bash
+    12. \# source /etc/profile
+    13. \# export PS1="(chroot) $PS1"
     14. Now you can install `xorg` and `xfce` for gentoo system with the help of LiveDVD KDE wifi connection.
 43. Xorg installaion.
     1. Refer to [Xorg/Configuration](https://wiki.gentoo.org/wiki/Xorg/Configuration).
@@ -546,11 +546,11 @@ title: Gentoo Installation
     11. For this command: echo XSESSION="Xfce4" > /etc/env.d/90xsession, we have not installed `xfce` yet. So leave it for the next step.
 44. Xfce installation & Configuration.
     1. Refer to [Xfce](https://wiki.gentoo.org/wiki/Xfce) for installation and [Xfce/HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO) for configuration.
-    2. # eselect profile list, you will find `…/desktop` is the default profile (not `…/gnome` or `…/kde`).
+    2. \# eselect profile list, you will find `…/desktop` is the default profile (not `…/gnome` or `…/kde`).
     3. [optional] # echo 'app-text/poppler -qt4' >> /etc/portage/package.use/poppler, since `-qt4` is already set globally in previous step when installing the basic gentoo system.
     4. [optional] # echo 'dev-util/cmake -qt4' >> /etc/portage/package.use/cmake
-    3. # echo 'gnome-base/gvfs -http' >> /etc/portage/package.use/gvfs
-    4. # echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
+    3. \# echo 'gnome-base/gvfs -http' >> /etc/portage/package.use/gvfs
+    4. \# echo 'XFCE_PLUGINS="brightness clock trash"' >> /etc/portage/make.conf
     5. **Attention** # emerge -avt xfce4-meta xfce4-notifyd; emerge --deselect y xfce4-notifyd, the 1st reference mixed this command order with step 4.
     6. \# emerge -avt x11-terms/xfce4-terminal
 
@@ -598,14 +598,14 @@ title: Gentoo Installation
         ```
 
     14. If you have a messed desktop setting, you can executing the following commands to have a default setting:
-        1.  #  rm -r ~/.cache/sessions
-        2.  # rm -r ~/.config/xfce*
-        3.  #  rm -r ~/.config/Thunar
+        1. \#  rm -r ~/.cache/sessions
+        2. \# rm -r ~/.config/xfce*
+        3. \#  rm -r ~/.config/Thunar
 45. [deprecated, replaced by method in fstab]
 
     When you get into the xfce desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
     
-    1. # nano -w /etc/udev/rules.d/99-hide-disks.rules
+    1. \# nano -w /etc/udev/rules.d/99-hide-disks.rules
     2. put the following code:
 
        ```
@@ -688,7 +688,7 @@ title: Gentoo Installation
 	  export XMODIFIERS=@im=fcitx
 	  ```
 
-       But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
+          But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
        3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
        4. \# emerge -av fcitx-configtool fcitx-sunpinyin or fcitx-googlepinyin
 
@@ -781,27 +781,27 @@ title: Gentoo Installation
 
           Chinese input with fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Up to now, in terminal `enamcs -nw` can input Chinese character. But the Window Emacs will not. The solution is to emerge two fonts: `media-fonts/font-adobe-100dpi` and `media-fonts/font-adobe-75dpi`. You can search with Google the following Ebuild message for Emacs:
 
-	  ```
-	  if use X; then
-	      elog "You need to install some fonts for Emacs."
-	      elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
-	      elog "machine would satisfy basic Emacs requirements under X11."
-	      elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
-	      elog "for how to enable anti-aliased fonts."
-	      elog
-	  fi
-	  ```
+          ```
+          if use X; then
+              elog "You need to install some fonts for Emacs."
+              elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
+              elog "machine would satisfy basic Emacs requirements under X11."
+              elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
+              elog "for how to enable anti-aliased fonts."
+              elog
+          fi
+          ```
 
     4. About setting default system-wide editor, refer to [gentoo over lvm luks](http://jimgray.tk/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](http://jimgray.tk/2014/09/14/emacs/installation/).
     5. Nano. We can tune some configs of Nano editor */etc/nanorc*: *set autoindent*, *set backup*, *set tabsize 4* etc. If need to totally disable an option, use *unset <option>*.
     6. WPS office.
        1. overlay support
            1. Refer to _New portage plug-in sync system_ below. If `portageq --version > 2.2.16`, install `layman >= 2.3.0`. The code below is for old layman version.
-           1. # echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
-           2. # emerge -av layman
-           2. # echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
-           3. # layman -f -a gentoo-zh
-           4. # layman -S
+           1. \# echo "app-portage/layman git subversion" > /etc/portage/package.use/layman
+           2. \# emerge -av layman
+           2. \# echo "source /var/lib/layman/make.conf" >> /etc/portage/make.conf
+           3. \# layman -f -a gentoo-zh
+           4. \# layman -S
 
            >The previous version (<= 9.1.0.4953\_alpha18) located in `gentoo-zh` overlay relies on a bundle of customized and pre-built `QT` packages. Use command `qlist wps-office | grep -i qt` or `equery files wps-office | grep -i qt` to list the bundled `QT` libs in wps-office installation directory (/opt/kingsoft/wps-office/).  Since version `9.1.0.4953_alpha18-r1` wps-office was published through official Gentoo portage as well. The coming new versions no longer use those prebuilt `QT` libs. Instead, they will draw in *qtwebkit*, *qtscript*, *qttranslate*, *qtcore*, etc as system-wide packages.
 
@@ -858,14 +858,14 @@ title: Gentoo Installation
 
        2. \# eix-sync
     14. Archive
-        1. # emerge -av file-roller
+        1. \# emerge -av file-roller
         2. \# emerge -av thunar-archive-plugin
 
            Steps below might be deprecated depending on related package version
 
            1. Up to now, this is a bug in that `thunar-archive-plugin` cannot find a suitable archive manager. This is due a filename convention difference. The solution:
-           2. # cd /usr/libexec/thunar-archive-plugin/
-           3. # ln -s file-roller.tap org.gnome.FileRoller.tap
+           2. \# cd /usr/libexec/thunar-archive-plugin/
+           3. \# ln -s file-roller.tap org.gnome.FileRoller.tap
            4. After that, `thunar-archive-plugin` can find `file-roller` correctly. Refer to [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
         3. \# echo "app-arch/unzip natspec" > /etc/portage/package.use/unzip, this command is to let `unzip` support `GBK` Chinese filenames.
             1. 使用 “natspec” USE Flag重新编译unzip（zip文件中没有保存压缩时使用的编码，故需将unzip打上编码探测的补丁）
@@ -954,8 +954,8 @@ title: Gentoo Installation
             3. \# chmod +x /usr/local/bin/obex_thunar.sh
             4. The last step is to change the line in Blueman tray icon > Local Services > Transfer > Advanced to `obex_thunar.sh %d`.
         6. No matter blueman or bluetoothctl command is used, the basic procedure:
-            1. # rc-service bluetooth start, start bluetooth daemon.
-            2. # modprobe btusb, load bluetooth related modules.
+            1. \# rc-service bluetooth start, start bluetooth daemon.
+            2. \# modprobe btusb, load bluetooth related modules.
             3. $ bluetoothctl OR blueman-applet OR by Bluetooth manager from App menu as a normal user account.
         7. Actually most of the time, we don't use bluetooth at all. So deactivate the bluetooth service and relevant modules at boot saves boot time and memory. Refer to *Module blacklist/install*.
         8. [gentoo bluetooth wiki](https://wiki.gentoo.org/wiki/Bluetooth); [archwiki bluetooth](https://wiki.archlinux.org/index.php/Bluetooth); [how to setup bluetooth](http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth); [Linux下访问蓝牙设备的几种办法](http://blog.simophin.net/?p=537).
@@ -1103,9 +1103,9 @@ title: Gentoo Installation
 
           9. To erase the duplicate updates incurred by `eix-sync` in new sync system, just remove `/etc/eix-sync.conf` or comment out `*` therein.
        10. Choose one of the follwing command for daily operation:
-           1. # emaint sync -a
-           2. # emerge --sync
-           3. # eix-sync
+           1. \# emaint sync -a
+           2. \# emerge --sync
+           3. \# eix-sync
 
            Although they all update portage and overlays. However, *eix-sync* will call *eix-update* (for *eix* query) and *eix-diff* (showing what has changed) as well. So for daily management and eix operation, you'd better use *eix-sync*.
        11. [sys-apps/portage-2.2.16 发布，支持多种同步方式](http://www.gentoo-cn.info/article/new-portage-plug-in-sync-system/); [Gentoo的portage已支持直接更新第三方源（overlay）](http://phpcj.org/portage-emerge-overlay-on-gentoo/).
@@ -1242,7 +1242,7 @@ title: Gentoo Installation
         ```
         My laptop fingerprint device *Upek 1473:2016*. Fingerprint don't need special device driver.
 
-        1. # emerge -av sys-auth/fprintd
+        1. \# emerge -av sys-auth/fprintd
         2. \# ect /etc/pam.d/system-local-login, add *auth sufficient pam_fprintd.so* to the beginning of the file.
 
            ```
@@ -1460,9 +1460,9 @@ title: Gentoo Installation
 
     `eclean-kernel` only remove files built when compiling kernels like libs, modules, etc. The kernel sources itself in `/usr/src/` will be managed by `portage` instead. So `eclean-kernel` don't remove sources itself! If you want to remove sources as well, use `emerge -ac gentoo-sources-version` and update `package.accept_keyword` and `package.use` files if need.
 
-    1. # emerge -av app-admin/eclean-kernel
-    2. # eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
-    3. # eclean-kernel -n 4 -avt
+    1. \# emerge -av app-admin/eclean-kernel
+    2. \# eclean-kernel -n 4 -p, the option `-p` is to pretend removal, just showing which kernels will be removed.
+    3. \# eclean-kernel -n 4 -avt
        1. Option `-avt` is very important, it will ask for your confirmation for each kernel to be removed by an interactive way. You can just remove the kernels you don't need. You can also adjust the number from `4` to something else to pop out the desired kernel for removal.
        2. At last, I removed the kernel as  `3.18.11-gentoo.old`
     4. `eclean-kernel` will update the grub menu automatically.
