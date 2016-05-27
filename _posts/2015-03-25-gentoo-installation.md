@@ -264,6 +264,7 @@ title: Gentoo Installation
     10. System log: `CONFIG_SECURITY_DMESG_RESTRICT` to Y. Refer to [Restrict unprivileged access to kernel syslog](https://lwn.net/Articles/414813/).
 
         More refer to *syslog-ng* below.
+    10. Filesystem. Set `CONFIG_UDF_FS=m` to mount ISO file.
     10. [optional] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
     10. [e-sources / cjktty patch specific options] `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display in tty (Ctrl + Alt + Fn).
     10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
