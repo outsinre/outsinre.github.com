@@ -669,7 +669,8 @@ title: Gentoo Installation
 
        1. Enable `gstreamer` USE flag for Firefox to support more video codecs (like H264).
        2. Disable `-libav` USE flag for *gst-plugins-libav* package to uses *ffmpeg* instead of *libav* for video codecs.
-       3. *gst-plugins-vaapi* supports *hardware acceleration* to reduce CPU overhead. However, Firefox failed to make use of *gst-plugins-vaapi*. Refer to [894372](https://bugzilla.mozilla.org/show_bug.cgi?id=894372), [56326](https://bugzilla.mozilla.org/show_bug.cgi?id=563206) and [1207429](https://bugzilla.mozilla.org/show_bug.cgi?id=1207429). From Firefox 43, it uses *ffmpeg* instead of *gstreamer*. To make use of *vaapi*, make sure *ffmpeg* and *hwaccel* USE is enabled. BTW, *ffmpeg* should enable *vaapi* USE too.
+       3. *gst-plugins-vaapi* supports *hardware acceleration* to reduce CPU overhead. However, Firefox failed to make use of *gst-plugins-vaapi*. Refer to [894372](https://bugzilla.mozilla.org/show_bug.cgi?id=894372), [56326](https://bugzilla.mozilla.org/show_bug.cgi?id=563206) and [1207429](https://bugzilla.mozilla.org/show_bug.cgi?id=1207429).
+       3. From Firefox 43 on, it uses *ffmpeg* instead of *gstreamer*. To make use of *vaapi*, make sure *ffmpeg* and *hwaccel* USE is enabled. BTW, *ffmpeg* should enable *vaapi* USE too.
        3. Now HTML5 H264 support is OK. But for *Media Source Extensions*, wee need to turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
        4. Run `$ flash-player-properties` or from application menu to set flash player.
        4. Add *FoxyProxy Standard*, *uBlock Origin*, *NoScript* (and/or *RefControl*), *DownThemAll*, *user agent switcher* etc. plugins.
