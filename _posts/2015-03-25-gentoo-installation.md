@@ -738,11 +738,13 @@ title: Gentoo Installation
 
           The last two hypens means arguments afterwards are input files/urls. Since using the *Open With* addon, save more CPU and memory.
        10. More refer to *intel vga bug* below.
+       11. Details on [*youtube-dl*](https://github.com/rg3/youtube-dl) and [*you-get*](https://github.com/soimort/you-get), refer to their Github pages.
     18. ffmpeg
         1. `ffmpeg` is emerged by some other packages, one of which might be `mplayer` or `mpv`.
         2. However, the default installation does not support `v4l` (mainly the webcamera). If want to support `v4l`, add USE flags `v4l` and/or `libv4l`.
         3. By default *mpv* use *software decoding*. To use *hardware decoding* of Intel GPU, enable *vaapi* for *ffmpeg*. When playing, add `--hwdec=auto` or `--hwdec=vaapi` argument. Of course, it can be added to configuration file (like *~/.config/mpv/mpv.conf*).
         4. Add `-libav` to *make.conf* in favor of system-wide *ffmpeg*.
+        5. If need to live streaming, sometimes need enable `librtmp` USE.
 
         Manually enabled USE flags are:
 
@@ -754,7 +756,6 @@ title: Gentoo Installation
         # emerge -av1 ffmpeg
         ```
 
-    4. Details on [*youtube-dl*](https://github.com/rg3/youtube-dl) and [*you-get*](https://github.com/soimort/you-get), refer to their Github pages.
     4. \# emerge -av guayadeque, make sure the `minimal` USE flag is enabled to install a very minimal build (disables, for example, plugins, fonts, most drivers, non-critical features). Then emerge plugins on demand.
 
        Since it is *minimal*, when playing songs, guayadeque reminds:
@@ -1289,10 +1290,10 @@ title: Gentoo Installation
         EndSection
         ```
 
-        Use *uxa* instead of *sna*. Then enable *uxa* USE for *xf86-video-intel*:
+        Though, *sna* is newser and faster, it's less compatible with Intel graphics. Use *uxa* instead of *sna*. Then enable *uxa* USE  and disable *sna* USE for *xf86-video-intel*. Don't enable *sna* and *uxa* USEs at the same time.
 
         ```bash
-        # echo "x11-drivers/xf86-video-intel uxa" >> /etc/portage/package.use/xf86-video-intel
+        # echo "x11-drivers/xf86-video-intel -sna uxa" >> /etc/portage/package.use/xf86-video-intel
         # emerge -av1 xf86-video-intel
         ```
 
