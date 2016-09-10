@@ -80,7 +80,7 @@ Though the problem was solved, I don't need the two sidebar items. So I removed 
 
 {% endraw %}
 
-Then paste the DISQUS universal code between the two lines. The *comments.html* should be placed under *_include* folder. After that, in *_layout/post.html* file, add a line `{% raw %}{% include comments.html %}{% endraw %}` to the end. Also in the header part add `comments: true`.
+Then paste the DISQUS universal code between the two lines. The *comments.html* should be placed under *_include* folder. After that, in *_layout/post.html*, *_layout/page.html*, *_layout/default.html* files, add a line `{% raw %}{% include comments.html %}{% endraw %}`. Also in the very front add `comments: true`.
 
 What is DISQUS universal code? First, in DISQUS setup, add a site identifier, i.e. *jekylldq*. Then, QISQUS will generate the universal code automatically for you. Lastly, just copy and paste it.
 
