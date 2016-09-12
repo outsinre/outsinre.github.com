@@ -11,15 +11,16 @@ encoding: utf-8
 
 permalink: pretty
 
+url: https://www.fxhu.tk
+paginate: 5
+
 # If not set custom url: if user pages, then use "/"; if project page, use "/project-name" (without trailing slash).
 baseurl: /
-url: http://www.fxhu.tk
-paginate: 5
 
 # Site info
 title: ZNHOO
 tagline: 'Whatever you are, be a good one!'
-description: 'Make yourself at home. Contact me at <a href="mailto:youwu@inventati.org">@email</a>.'
+description: 'Make yourself at home. Contact me at <a href="mailto:{{ site.author.email }}">@email</a>.'
 
 # About/contact
 author:

@@ -3,13 +3,14 @@ layout: post
 title: Enforce HTTPS to your site by Cloudflare
 ---
 
->By default, GitHub takes HTTPS protocol to user/project pages i.e. *username.github.io*. However, for a custiomized domain GitHub page, HTTPS is unsupported. This post tells us to enforce HTTPS to GitHub page through free Cloudflare services. Mainly, we just need to tune a few settings on Clouflare and you domain registrar.
+>By default, GitHub takes HTTPS protocol to user/project pages i.e. *username.github.io*. However, for a custiomized domain, HTTPS is unsupported. This post tells us to enforce HTTPS to GitHub page through free Cloudflare services. Mainly, we just need to tune a few settings on Clouflare and your domain registrar.
 
 # Cloudflare
 
 [Cloudflare](www.cloudflare.com) offers us free DNS and CDN services whilist concentrating on customer security. Those who would like to enforce HTTPS to his sites could take advantage of those services.
 
 The detailed free services are listed below. To achieve HTTPS, only the first three is a must.
+
 1. [Free automatic HTTPS](https://blog.cloudflare.com/introducing-universal-ssl/) for your domain - no need to buy a certificate;
 2. [Page Rules](https://support.cloudflare.com/hc/en-us/articles/200168306-Is-there-a-tutorial-for-Page-Rules-) - custom settings and redirects for URL patterns;
 3. [HTTP Strict Transport Security (HSTS)](https://blog.cloudflare.com/enforce-web-policy-with-hypertext-strict-transport-security-hsts/) - protection from MITM attacks;
@@ -27,19 +28,19 @@ We should register a Cloudflare account and then *add site*. Follow the *add sit
 
 We will basically do two things:
 
-1. Switch to Cloudflare DNS servers. Subsequently, DNS records will be managed on Cloudflare. You'd best delete the old DNS records.
-2. Turn off a few security settings on Cloudflare. That' all!
+1. Switch to Cloudflare DNS servers. Subsequently, DNS records will be imported to Cloudflare. You'd best delete DNS records on the old platforms.
+2. Turn on a few security settings on Cloudflare. That' all!
 
 # DNS switch
 
-1. After filling in your site url following *add site* procedure, Cloudflare will analyze and import the site's DNS records (set on other platforms).
+1. After filling in your site url following *add site* procedure, Cloudflare will analyze and import the site's DNS records (on your previous platforms).
 
    We can add, delete a new DNS records. Even, we can toggle Cloudflare per a record.
 2. Then continue, Cloudflare will give us two new Cloudflare DNS servers.
 3. Go to our domain registrar management interface, and replace all original DNS servers with the new ones.
 
    To make use of Cloudflare service, all other platforms' DNS servers must be deleted. Only Cloudflare ones are permitted.
-4. Up to now, our domain DNS servers are taken over by Cloudflare.
+4. Up to now, our domain DNS services are taken over by Cloudflare.
 
 # SSL settings
 
@@ -79,7 +80,7 @@ Unfortunately GitHub Pages doesn’t yet support SSL on GitHub Pages for custom 
    That's all.
 5. Test
 
-   Though we should wait for a while (hours maybe) to acccess GitHub pages over HTTPS, we can test above setting by `curl -I example.com`:
+   Though we should wait for a while (hours maybe) to acccess GitHub pages over HTTPS, we can test security settings by `curl -I example.com`:
 
    ```
    HTTP/1.1 301 Moved Permanently
@@ -111,6 +112,16 @@ When deploying your site you can use the Purge Cache option in the Cache tab on 
 If DNS is the phone book of the Internet, DNSSEC is the protocol that ensures that a number in the phone book actually belongs to the contact listed. DNSSEC uses cryptographic signatures to verify that the DNS records returned for a domain are untampered.
 
 If your domain registrar support DNSSEC, please turn on DNSSEC on Cloudflare DNS tab.
+
+# Last but trivial
+
+As shown above, to turn on HTTPS, we just tune a few settings, leaving the GitHub page sources untouched.
+
+But we should at least change the *url* variable in *_config.yml* to its HTTPS version.
+
+# GitHub CDN vs Cloudflare CDN
+
+Without Cloudflare, GitHub supports CDN as well and default GitHub page acces time is trivial. However, Cloudflare offers extra HTTPS service.
 
 # Refs
 
