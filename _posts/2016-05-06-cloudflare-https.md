@@ -7,7 +7,7 @@ title: Enforce HTTPS to your site by Cloudflare
 
 # Cloudflare
 
-[Cloudflare](www.cloudflare.com) offers us free DNS and CDN services whilist concentrating on customer security. Those who would like to enforce HTTPS to his sites could take advantage of those services.
+[Cloudflare](www.cloudflare.com) offers us free DNS and CDN services whilist concentrating on customer security. Those who would like to enforce HTTPS to his sites could take advantage of those services. For instance, Cloudflare will protect your site email address from web crawler.
 
 The detailed free services are listed below. To achieve HTTPS, only the first three is a must.
 
@@ -28,7 +28,7 @@ We should register a Cloudflare account and then *add site*. Follow the *add sit
 
 We will basically do two things:
 
-1. Switch to Cloudflare DNS servers. Subsequently, DNS records will be imported to Cloudflare. You'd best delete DNS records on the old platforms.
+1. Cloudflare imports DNS records and switch DNS servers to Cloudflare's.You'd best delete DNS records on the old platforms.
 2. Turn on a few security settings on Cloudflare. That' all!
 
 # DNS switch
