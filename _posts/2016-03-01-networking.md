@@ -11,20 +11,21 @@ title: Gentoo Networking
 
    For example, before the wireless interface request IP from DHCP server, it must first authenticate username and password with wireless router. Otherwise, it was not even attched to a physical link. This functionality can be achieved by tools like *wpa\_supplicant* and/or *wireless-tools*.
 2. The Gentoo traditional *net config* is */etc/init.d/net.\** and */etc/conf.d/net*.
-3. A functionality is not constrined to a specific tool.
+3. A functionality is not confined to a specific tool.
 
    For instance, the wireless authentication functionality can be also achieved by *wcid*, *networkmanager* etc. as they all draw in *wpa\_supplicant* package.
 4. A tool is not constrained to a specific funciontality. Most of the time, we only need a few of them.
 
    For example, *dhcpcd* can handle all networking functinalities.
 5. If using *net config* or *dhcpcd*, we should install *wpa\_supplicant* manually to satisfy wireless authentication.
+6. *net config* thing is Gentoo's own networking configuration scripts.
 
 # Simple config
 
 The simplest config on my system is *dhcpcd* + *wpa\_supplicant*, though *net config + wpa\_supplicant* is fine. For Ethernet, *dhcpcd* is enough! The extra *wpa\_supplicant* fullfils wireless authentication.
 
 1. Emerge both packages;
-2. Add *dhcpcd* to *default* runlevel; Don't add *wap\_supplicant* to any runlevel.
+2. Add *dhcpcd* to *default* runlevel; Don't add *wpa\_supplicant* to any runlevel.
 3. Conigure *wpa_\supplicant.conf* for authentication.
 
 Bingo~
@@ -198,7 +199,7 @@ We assume the networking scheme is *dhcpcd + wpa\_supplicant*.
 
 3. udev init script
 
-   Udev allows to perform MAC address spoofing by creating the udev rule. Use *address* attribute to match the interface by its original MAC address and change it using the *ifconfig/ip/macchanger* command:
+   Udev allows to perform MAC address spoofing by creating the udev rule. Use *address* attribute to match the permanent MAC address and change it using the *ifconfig/ip/macchanger* command:
 
    ```
    # /etc/udev/rules.d/75-mac-spoof.rules
@@ -223,7 +224,7 @@ How to release? If use *dhcpcd* to serve DHCP, add `release` option to *dhcpcd.c
 
 The above spoofing method assumes *dhcpcd + wpa\_supplicant* networking scheme. Actually the old *net config* now supports MAC spoofing with *macchanger*. This is new networking scheme:
 
-   Now *net config* + DHCP + *wpa\_supplicant* new networking scheme, where *dhcpcd* serves DHCP functionality.
+   Now *net config* + DHCP + *wpa\_supplicant* new networking scheme, where DHCP functionality is served by *dhcpcd* package.
 
 1. Symbolic
 

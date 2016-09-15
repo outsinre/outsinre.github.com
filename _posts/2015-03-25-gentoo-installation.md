@@ -239,7 +239,7 @@ title: Gentoo Installation
        4. Enable `EFI runtime service support, CONFIG_EFI` if UEFI is used to boot the system. Turn off `EFI stub support, CONFIG_EFI_STUB`, `EFI mixed-mode support, EFI_MIXED`, `CONFIG_CMDLINE_BOOL, Built-in kernel command line`, `CONFIG_CMDLINE, Built-in kernel command string` and `CONFIG_INITRAMFS_SOURCE, Initramfs source file(s)`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
     5. Set `INPUT_PCSPKR` as 'M' or 'Y' for the standard PC Speaker to be used for bells and whistles. Don't enable `SND_PCSP` (read the kernel help message)!
     5. Set `X86_X32, x32 ABI for 64-bit mode` to 'Y'. This option is useful for WIndows 32 bit binaries (under Wine support) to take advantage of the system 64-bit registers.
-    5. Set `IOMMU_SUPPORT` and `CALGARY_IOMMU` to 'N' since my laptop does not support this but VT-x. VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz).
+    5. Set `IOMMU_SUPPORT`, `INTEL_IOMMU`, and `INTEL_IOMMU_DEFAULT_ON` set to 'Y' though X220 does not support VT-d but VT-x. VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz). Without IOMMU enabled, HD3000 graphics will tear and corrupt.
     5. Watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
     6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
     7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
@@ -684,11 +684,11 @@ title: Gentoo Installation
        2. \# emerge -av fcitx
        2. According to fcitx wiki, the following lines should be added to `~/.xinitrc`:
 
-	  ```
-	  export GTK_IM_MODULE=fcitx
-	  export QT_IM_MODULE=xim
-	  export XMODIFIERS=@im=fcitx
-	  ```
+          ```
+          export GTK_IM_MODULE=fcitx
+          export QT_IM_MODULE=xim
+          export XMODIFIERS=@im=fcitx
+          ```
 
           But this will conflicts with `--with-ck-launch`. The solution is to remove the first line related to `dbus`. Details refer to steps below.
        3. **IMPORTANT**: these three lines should be put **AHEAD** of `exec startxfce4 --with-ck-launch`. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
@@ -703,7 +703,7 @@ title: Gentoo Installation
        1. *mpv* depends on *ffmpeg* as dependency. But some features need to tune *ffmpeg* USE flags instead of *mpv*'s. For example, `libv4l` and `gnutls`.
        1. If *mpv* does not play videos, try to
           1. \# emerge -av1 mpv
-          2. Bump to a *~arch* of *xf86-video-intel* / *x11-libs/libva-intel-driver*.
+          2. <s>Bump to a *~arch* of *xf86-video-intel* / *media-libs/mesa*</s>.
           3. Reboot.
        2. Previously, I use `mplayer` which is inactive of development. Now `mpv` is a good choice and has built-in simple GUI based on *lua* language. Under *xfce4*, you might need *reboot* to let *mpv* work.
        3. The default *lua* USE flag of *mpv* brings along a *youtube-dl* hook script. `mpv url` (like live broadcast) will automatically invoke *youtube-dl* to download video cache while palying. Before that, install *youtube-dl*. And make sure *ffmpeg* is installed with `network` USE flag. If the url is *https*, then add `gnutls` or `openssl` USE flag to *ffmpeg*. Ether `gnutls` or `openssl` is fine and you don't need both.
@@ -744,11 +744,11 @@ title: Gentoo Installation
         2. However, the default installation does not support `v4l` (mainly the webcamera). If want to support `v4l`, add USE flags `v4l` and/or `libv4l`.
         3. By default *mpv* use *software decoding*. To use *hardware decoding* of Intel GPU, enable *vaapi* for *ffmpeg*. When playing, add `--hwdec=auto` or `--hwdec=vaapi` argument. Of course, it can be added to configuration file (like *~/.config/mpv/mpv.conf*).
         4. Add `-libav` to *make.conf* in favor of system-wide *ffmpeg*.
-        5. If need to live streaming, sometimes need enable `librtmp` USE.
+        5. *ffmpeg* has native RTMP implementation. But if that sucks, enable `librtmp` USE to replace the native ones.
 
         Manually enabled USE flags are:
 
-        >media-video/ffmpeg gnutls vaapi
+        >media-video/ffmpeg openssl vaapi
 
         Remove `vaapi` if it's already enabled in *make.conf* or *media-video/mpv*.
 
@@ -1284,22 +1284,17 @@ title: Gentoo Installation
 
         ```
         Section "Device"
-        	Identifier	"Device0"
-        	Driver	"intel"
-        	Option	"AccelMethod"	"uxa"
+        	Identifier      "intel"
+        	Driver          "intel"
+        	Option          "AccelMethod"   "sna"
+        	Option          "TearFree"      "true"
         EndSection
         ```
 
-        Though, *sna* is newser and faster, it's less compatible with Intel graphics. Use *uxa* instead of *sna*. Then enable *uxa* USE  and disable *sna* USE for *xf86-video-intel*. Don't enable *sna* and *uxa* USEs at the same time.
-
-        ```bash
-        # echo "x11-drivers/xf86-video-intel -sna uxa" >> /etc/portage/package.use/xf86-video-intel
-        # emerge -av1 xf86-video-intel
-        ```
+        Though, *sna* is newser and faster than *uxa*. Must enable *TearFree*.
 
         After reboot, the X looks much better. The *stuck on* kernel error does not occur up to now.
 
-        If that fails, then could bump to a *~arch* of *xf86-video-intel* and *libva-intel-driver*.
     10. swapfile
 
         ```bash

@@ -20,7 +20,7 @@ baseurl: /
 # Site info
 title: ZNHOO
 tagline: 'Whatever you are, be a good one!'
-description: 'Make yourself at home. Contact me at <a href="mailto:{{ site.author.email }}">@email</a>.'
+description: 'Make yourself at home. Contact me at <a href="mailto:{{ site.author.email }}">Email</a>.'
 
 # About/contact
 author:
