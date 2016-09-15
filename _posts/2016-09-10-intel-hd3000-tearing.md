@@ -5,7 +5,7 @@ title: Intel HD3000 graphics corruption
 
 > It's long-lasting panic to handle Intel HD3000 graphics corruption, tearing, judder etc. Desktop GUI get stuck without any responding. MPV playback spreads dots all over...
 
-The key is to **turn on IOMMU support ** in kernel.
+The key is to **turn on IOMMU support** in kernel.
 
 1. Kernel options `IOMMU_SUPPORT`, `INTEL_IOMMU`, `INTEL_IOMMU_DEFAULT_ON` set to 'Y'.
 
@@ -14,12 +14,10 @@ The key is to **turn on IOMMU support ** in kernel.
 
    ```
    Section "Device"
-   #       Identifier      "Device0"
 	   Identifier      "intel"
 	   Driver          "intel"
 	   Option          "AccelMethod"   "sna"
 	   Option          "TearFree"      "true"
-   #       Option          "AccelMethod"   "uxa"
    EndSection
    ```
 
