@@ -649,8 +649,8 @@ title: Gentoo Installation
        1. *initramfs* won't be renamed by `make install`. 
     6. \# genkernel --install initramfs, re-install `initramfs`.
     7. \# grub2-mkconfig -o /boot/grub/grub.cfg
-    8. \# reboot
     8. \# emerge -av @module-rebuild
+    8. \# reboot
     9. If you need to compile a different kernel version, refer to the step below _Upgrade kernel_.
 45. ALSA - sound.
     1. \# emerge --search alsa, check whether `media-libs/alsa-lib` and `media-libs/alsa-utils` are installed or not. If not, `emerge -av media-libs/alsa-lib` to install `ALSA` support. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.
@@ -1344,20 +1344,23 @@ title: Gentoo Installation
 
         If Gentoo depends on LUKS and LVM for system mount points and booting, refer to [LVM LUKS LVM](http://jimgray.tk/2015/09/10/lvm-luks-lvm/).
     13. \# grub2-mkconfig -o /boot/grub/grub.cfg
-    15. \# reboot
     14. \# emerge -av @module-rebuild
 
-        Any external kernel modules, such as binary kernel modules, need to be rebuilt for each new kernel.
+        This should be ran **before reboot**.
 
-        For example, Virtualbox will bring along its external module by package *app-emulation/virtualbox-modules*. After getting into system with new kernel and load 'vboxdrv' module, you might get errors:
+        Any external kernel modules, such as binary kernel modules, need to be rebuilt for each new kernel. For example, Virtualbox will bring along its external module by package *app-emulation/virtualbox-modules*. After getting into system with new kernel and load 'vboxdrv' module, you might get errors:
 
         ```
         modprobe: FATAL: Module vboxdrv not found.
         ```
 
+        What's worse, you might fail to boot since OpenRC cannot load the external modules.
+
         `emerge -av @module-rebuild` is to re-install all external modules (*app-emulation/virtualbox-modules* inclusive). More read [VirtualBox](http://jimgray.tk/2015/08/21/virtualbox/).
 
         There is another command from wiki `make modules_prepare` is used when the kernel not built yet or cleaned. For example, you need to compile the external module first, just before the kernel building, then execute this command before `make -j3`.
+    15. \# reboot
+
 47. e-sources-4.1.1 kernel
 
     Except the official default kernel source, there are plenty of sources maintained by other authors like the `e-sources` in `gentoo-zh` overlay. `e-sources` offer many extra features, of which the most important is the `cjktty` patch enabling Chinese character display in virtual terminal.
