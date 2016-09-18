@@ -3,141 +3,165 @@ layout: post
 title: LVM over LUKS over LVM
 ---
 
-1. sad7 and sda8 are separated by other NTFS partitions in use.
+1. *sda7* and *sda8* are separated by other NTFS partitions in use.
 2. Merge them together as if they were a single partition/disk by LVM - our first LVM container.
-3. Encrypt the new single LVM volume DM-crypt LUKS - our LUKS container.
+3. Encrypt the new single LVM volume by DM-crypt LUKS - our LUKS container.
 4. Create LVM volumes in LUKS container as Gentoo / and /home - our second LVM container.
 5. LVM -> LUKS -> LVM.
 6. No swap partition. If possible, create a swapfile instead referring to [swapfile](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
-7. For boot and EFI, Gentoo resorts to USB stick. boot and EFI shares a single USB partition, say sdc1. This is different from traditional scheme, boot and EFI resides on different partitions no matter they are HDD or USB ones.
-   1. The shared USB partition should be formated as vfat (FAT32).
+7. BOOT and EFI partitions share and reside on a USB partition, say *sdc1*. This is different from traditional scheme.
+   1. The shared USB partition should be formated as vfat (FAT32) to satisfiy EFI filesystem requirement.
    2. It should be mounted on /boot if necessary.
    3. Make a directory 'EFI' at root of the shared parition.
    4. The shared USB partition is not encrypted.
-   5. You'd better use sdc2 for the shared partition to hide it from Windows. Deatils refer to *Hide in  Windows* next.
-8. Windows uses its own EFI partition on HDD, say sda2.
+   5. You'd better use *sdc2* for the shared partition to hide it from Windows. Deatils refer to *Hide in  Windows* next.
+   6. Encryption & decryption key-file is stored on USB partition as well.
+8. Windows uses its own EFI partition on HDD, say *sda2*.
 9. Why now share boot and EFI on USB stick?
    1. A single USB can now help boot many PCs and notebooks, as long as their boot information is located on the USB stick.
    2. Kernels now stored in USB, prevent from attack online. We can unplug the USB when booting into Gentoo.
-10. sda7,sda8 > pvcreate, vgcreate (vg), lvcreate (crypt), vg-crypt > cryptsetup, luksOpen (cryptroot) > pvcreate, vgcreate (cryptvg), lvcreate (root, home), cryptvg-root & cryptvg-home.
+10. sda7, sda8 > pvcreate, vgcreate (vg), lvcreate (crypt), vg-crypt > cryptsetup, luksOpen (cryptroot) > pvcreate, vgcreate (cryptvg), lvcreate (root, home), cryptvg-root & cryptvg-home.
 
 # USB preparation
 
-1. parted -a optimal /dev/sdc
+1. Create shared USB partition:
 
-   ```
-   mkpart primary fat32 0% 256MiB
-   set 1 boot on
-   quit
+   ```bash
+   # parted -a optimal /dev/sdc
+   # mkpart primary fat32 0% 256MiB
+   # set 1 boot on
+   # quit
    ```
    
-   EFI partition should be set 'boot' flag.
-2. mkfs.vfat -F32 /dev/sdc1
-3. USB shared partition is not encrypted. If you put the shared partition within the LVM-LUKS-LVM architecture, then you need add LUKS support to grub2.
+   EFI partition should be set *boot* flag.
+2. Create VFAT filesystem:
+
+   ```bash
+   # mkfs.vfat -F32 /dev/sdc1
+   ```
+   
+3. USB shared partition is not encrypted. If you put the shared partition within the LVM-LUKS-LVM architecture, then you need add LUKS support to *grub2*.
 
 # key-file
 
-1. mkdir /mnt/sdc1
-2. mount /dev/sdc1 /mnt/sdc1
-3. mkdir /mnt/sdc1/luks-gnupg-key
-4. $ dd if=/dev/urandom bs=8388607 count=1 | gpg --symmetric --cipher-algo AES256 --output ~/luks-gnupg-key.gpg
+1. Preparations
 
-   LiveCD root acount does not support this command as 'gpg 2*' command need GUI popup to input password. Switch to normal user terminal in LiveCD.
+   ```bash
+   # mkdir /mnt/sdc1
+   # mount /dev/sdc1 /mnt/sdc1
+   # mkdir /mnt/sdc1/luks-gnupg-key
+   ```
+   
+4. Generate GPG-encrypted key-file:
 
-   Without explicitly mark '$', all commands are executed in root account in LiveCD.
-5. $ gpg --decrypt /mnt/sdc1/key/luks-key.gpg > ~/luks-gnupg-key
+   ```bash
+   $ dd if=/dev/urandom bs=8388607 count=1 | gpg --symmetric --cipher-algo AES256 --output ~/luks-gnupg-key.gpg
+   ```
+
+   LiveCD *root* acount does not support this command as *gpg 2* need GUI popup to prompt password. Switch to normal user account in LiveCD.
+
+   Without explici mark '$', all commands are executed under *root* account in LiveCD.
+6. Save key-file to USB stick:
+
+   ```bash
+   # cp /home/gentoo/luks-gnupg-key.gpg /mnt/sdc1/luks-gnupg-key/
+   # umount /mnt/sdc1
+   ```
+   
+   The gpg-encrypted key-file is stored on the shared USB for booting. You can store it in other media though unnecessary and tedious.
+6. Decrypt key-file for temporal usage:
+
+   ```bash
+   $ gpg --decrypt ~/luks-gnupg-key.gpg > ~/luks-gnupg-key
+   # cp /home/gentoo/luks-gnupg-key .
+   ```
 
    This temporary decrypted key-file is used in root account. Don't expose decrypted key-file online or to anyone.
-6. cp /home/gentoo/luks-gnupg-key.gpg /mnt/sdc1/luks-gnupg-key/
 
-   The gpg-encrypted key-file is stored at the shared USB as well. You can store it in other media.
-7. umount /mnt/sdc1
+# *sda7* & *sda8* preparation
 
-# sda7 & sda8 preparation
+On *sda*, find the separated free space:
 
-On sda, find the separated free space:
-
-```
-parted -a optimal /dev/sda
-unit s
-mkpart primary start end
-name 7 'Gentoo partition'
-mkpart primary start end
-name 8 'Gentoo partition'
+```bash
+# parted -a optimal /dev/sda
+# unit s
+# mkpart primary START END
+# name 7 'Gentoo partition'
+# mkpart primary START END
+# name 8 'Gentoo partition'
 ```
 
-**start** and **end* should be exactly at the right *sector* edge. Otherwise, other partitions on sda would be ruined! If possible, resort to percentage like 0% or 100%.
+1. START and END should exactly be the right *sector*.
 
-We don't create filesystem 'ext4' on sda7 or sda8 directly since they are treated as underlying container under LVM -> LUKS -> LVM.
+   Otherwise, other partitions in use would be ruined! Take */dev/sda7* for example, its previous ancestor partition */dev/sda4*'s last sector/unit is *100000000s*. Then the START of */dev/sda7* must be *100000001s*. Remember to **PLUS ONE**. We can verify this by examine other successive partitions in use.
+
+   If possible, resort to percentage like 0% or 100%.
+
+2. We don't create filesystem *ext4* on *sda7* or *sda8* directly since they are treated as underlying container: LVM -> LUKS -> LVM.
 
 # 1st LVM container
 
-1. vgcreate vg /dev/sda7 /dev/sda8
+```bash
+# pvcreate /dev/sda7 /dev/sda8
+# vgcreate vg /dev/sda7 /dev/sda8
+# lvcreate -l +100%FREE vg -name crypt
+# pvdisplay / vgdisplay / lvdisplay / lvscan
+```
 
-   'pvcreate' is optional since 'vgcreate' will automatically create PVs on sda7 and sda8 if needed.
+1. *pvcreate* is optional since *vgcreate* will automatically create PVs on *sda7* and *sda8* if needed.
+2. We can find /*dev/vg* directory created.
+3. Now, *sda7* and *sda8* is merged as a single LVM device */dev/mapper/vg-crypt* or */dev/vg/crypt*.
 
-   We can find /dev/vg directory created.
-2. lvcreate -l +100%FREE  vg -name crypt
-
-   Now, sda7 and sda8 is merged as a single LVM device /dev/mapper/vg-crypt or /dev/vg/crypt.
-
-   Each time you create a LVM in VG, a new mapper device name will be in /dev/mapper/. The mapper device name will be 'VG name + LV name'. This mapper file is actually a simbolic link. Similarly, /dev/vg/crypt is also a symbolic linking to the same destination as /dev/mapper/vg-crypt.
+   Each time you create a LVM in VG, a new mapper device will be created */dev/mapper/*. The mapper device name will be 'VG name + LV name'. This mapper device is actually a simbolic link. Similarly, /*dev/vg/crypt* is also a symbolic linking to the same destination as */dev/mapper/vg-crypt*.
 
    However, when booting into Gentoo, these mapper device will be real device file.
-3. Try to use 'pvdisplay', 'vgdisplay', 'lvdisplay', 'lvscan' etc.
+4. Try to use *pvdisplay*, *vgdisplay*, *lvdisplay*, *lvscan* etc. anytime to get information.
 
 # LUKS container
 
-1. cryptsetup --cipher serpent-xts-plain64 --key-size 512 --hash sha512 --key-file /home/gentoo/luks-gnupg-key luksFormat /dev/mapper/vg-crypt
+```bash
+# cryptsetup --cipher serpent-xts-plain64 --key-size 512 --hash sha512 --key-file /home/gentoo/luks-gnupg-key luksFormat /dev/mapper/vg-crypt
+# cryptsetup --key-file /home/gentoo/luks-gnupg-key luksAddKey /dev/mapper/vg-crypt
+# cryptsetup luksOpen /dev/mapper/vg-crypt cryptroot
+# cryptsetup luksDump /dev/mapper/vg-crypt
+```
 
-   To test the LUKS container:
+1. Create LUKS container. Try `cryptsetup luksDump /dev/mapper/vg-crypt`.
+2. To add a fallback LUKS passphrase, just in case we lost the key-file. According to current experience, passphrase needs less time. This passphrase is different from the one used to encrypt key-file above.
 
+   We must provide the the previous key-file or passphrase before adding a LUKS key slot. Attention, we use the decrypted key-file instead of the encrypted one since *root* account cannot pop up box for decryption.
 
-      cryptsetup luksDump /dev/mapper/vg-crypt
-   
-2. cryptsetup --key-file /home/gentoo/luks-gnupg-key luksAddKey /dev/mapper/vg-crypt
+   Up to now, */dev/mapper/vg-crypt* is protected by both LUKS key-file (gpg-encrypted) and passphrase. We have achieved **full disk encrytion**. Try `cryptsetup luksDump /dev/mapper/vg-crypt`.
+3. Treat *vg-crypt* as a normal disk partition which is encrypted by DM-crypt LUKS. To make use of it, we have to decrypt it first. Here, we use the fallback passphrase to decrypt. It is faster.
 
-   To add a fallback LUKS passphrase, just in case we lost the key-file.
+   When *vg-crypt* is decrypted, we also get a mapper device */dev/mapper/cryptroot*. The device name can be set freely at your desire.
 
-   We must provide the the previous key-file or passphrase before adding a LUKS key slot. According to current experience, passphrase needs less time.
-
-   Up to now, /dev/mapper/vg-crypt is protected by both LUKS key-file and passphrase. We have achieved **full disk encrytion**.
-
-      cryptsetup luksDump /dev/mapper/vg-crypt
-3. cryptsetup luksOpen /dev/mapper/vg-crypt cryptroot
-
-   Treat vg-crypt as a normal disk partition which is encrypted by DM-crypt LUKS. To make use of it, we have to decrypt it first.
-
-   Here, we use the fallback passphrase to decrypt. It is faster.
-
-   When vg-crypt is decrypted, we also get a mapper device /dev/mapper/cryptroot. The device name can be set freely at your desire.
-
-   We can now treat the decrypted device as a normal disk partition, on which we will create our 2nd LVM container.
+   We can now treat the decrypted device as another normal disk partition, on which we will create our 2nd LVM container.
 
 # Why 2nd LVM container?
 
 This question can be narrowed down to: why need LVM over LUKS?
 
-A decrypted LUKS device like /dev/mapper/cryptroot should'd better be treated as a partition instead of a disk (like /dev/sda). So command like 'parted -a optimal /dev/mapper/cryptroot' is NOT encouraged. It is complicated to make use of partitions created directly over LUKS device.
+A decrypted LUKS device like */dev/mapper/cryptroot* should'd better be regarded as a partition instead of a disk (like */dev/sdb*). So command like `parted -a optimal /dev/mapper/cryptroot` is NOT encouraged. It is complicated to make use of partitions created directly over LUKS device.
 
-1. If I want to use only part of /dev/mapper/cryptroot storage for Gentoo, while leaving the remaining space for other usage like NTFS data or even another Arch Linux, use 2nd LVM.
-2. If I want to separate /home, /usr, /tmp etc. mount points, use 2nd LVM.
-3. etc.
+1. What if I take only part of */dev/mapper/cryptroot* to install Gentoo, while leaving the rest for NTFS data or even another system Arch Linux?
+2. What if I separate */home*, */usr*, */tmp* etc. mount points?
+3. What if I want to adjust Gentoo's storage?
 
-Actually, up to now, we can install Gentoo on this decrypted LUKS partition directly (single partition Gentoo; /home, /swap etc are just normal directories).
+Of course, we can prepare Gentoo installation on this decrypted LUKS partition directly if don't care above issues:
 
 ```bash
 mkfs -t ext4 /dev/mapper/cryptroot
 mount -t ext4 /dev/mapper/cryptroot /mnt/gentoo
 ```
 
-Afterwards, we can also re-format /dev/mapper/cryptroot for other usage like re-installing Gentoo.
+Sometime, we can also re-format */dev/mapper/cryptroot* for other usage like re-installing Gentoo.
 
-With LVM over LUKS you need only one key/password to unlock all the partitions (LVM volumes); and you can rearrange, resize etc. the partitions without the hassle of re-encrypt everything again. For example, you want to extend / size while reduce /home size.
+With LVM over LUKS we unlock all the partitions (LVM volumes) by one key-file / passphrase, and easily resize volums without the hassle work above. For example, you want to extend */* size while reducing */home* size.
 
-If you're going to simply dump everything on a single partition (which is totaly fine with some setups), there is no point in going for LVM. However, if you want to have several volumes, LVM will make it more convenient and easier to use, and this is why many people go after 'LVM over LUKS'.
+If you're going to simply dump everything on a single partition (which is totaly fine with some setups), there is no point of 2nd LVM container. However, if you want to have several volumes, LVM will make it more convenient and easier to use, and this is why many people go after 'LVM over LUKS'.
 
-If you really don't like the 2nd LVM and still need separate partitions for /, /home, etc. Please lvcreate LVM volumes for them in the 1st LVM container. After that, cryptsetup them repsectively with LUKS key-files or passphrases.
+If you really don't like the 2nd LVM but need separate */*, */home*, etc. Please *lvcreate* LVM volumes directly over the 1st LVM container. After that, *cryptsetup* them repsectively with LUKS key-files or passphrases. What a nightmare!
 
 Refer to:
 
@@ -147,46 +171,59 @@ Refer to:
 
 # 2nd LVM container
 
-1. pvcreate /dev/mapper/cryptroot
+```bash
+# pvcreate /dev/mapper/cryptroot
+# vgcreate cryptvg /dev/mapper/cryptroot
+# lvcreate --size 25G --name root cryptvg
+# lvcreate --extents 100%FREE --name home cryptvg
+# pvdisplay / vgdisplay / lvdisplay
+```
 
-   Like in the 1st LVM container, this step is optional.
-2. vgcreate cryptvg /dev/mapper/cryptroot
+1. Like in the 1st LVM container, this step is optional.
+2. */dev/cryptvg/* directory created.
+3. Create LVM *root* device as */* mount point.
+4. Create LVM *home* device as */home* mount point.
 
-   /dev/cryptvg/ directory created.
-3. lvcreate --size 25G --name root cryptvg
-4. lvcreate --extents 100%FREE --name home cryptvg
+   Wee will see *cryptvg-root* and *cryptvg-home* symbolic links under */dev/mapper*. Similarly, */dev/cryptvg{/root, /home}* links created as well.
 
-   Wee will see 'cryptvg-root' and 'cryptvg-home' symbolic links in /dev/mapper. Similarly, /dev/cryptvg{/root, /home} links created as well.
-
-   Up to now, we have finished the basic LVM -> LUKS -> LVM architecture. We will install Gentoo on top the newly created LVM volumes (cryptvg-root and cryptvg-home).
+   Up to now, we have finished the basic LVM -> LUKS -> LVM architecture. We will install Gentoo over the newly created devices of 2nd LVM.
 
 # Format Gentoo partitions
 
-1. mkfs.ext4 -L "root" /dev/mapper/cryptvg-root
-2. mkfs.ext4 -m 0 -L "home" /dev/mapper/cryptvg-home
-3. boot and EFI share USB partition /dev/sdc1.
+When we say *format sdxy as ext4*, we actually means *create ext4 filesystem on sdxy*.
+
+```bash
+# mkfs.ext4 -L "root" /dev/mapper/cryptvg-root
+# mkfs.ext4 -m 0 -L "home" /dev/mapper/cryptvg-home
+```
+
+BOOT and EFI share USB partition */dev/sdc1* (VFAT).
 
 # Mount Gentoo partitions
 
-When mount and umount, try 'lsblk', 'blkid' etc. commands.
+During *mount* and *umount*, try *lsblk*, *blkid* etc.
 
-1. mount -v -t ext4 /dev/mapper/cryptvg-root /mnt/gentoo
-2. mkdir -v /mnt/gentoo/{home,boot}
-3. mount -v -t ext4 /dev/mapper/cryptvg-home /mnt/gentoo/home
-4. umount -v /dev/sdc1
-4. mount -v -t vfat /dev/sdc1 /mnt/gentoo/boot
-5. mkdir /mnt/gentoo/boot/EFI
+```bash
+# mount -v -t ext4 /dev/mapper/cryptvg-root /mnt/gentoo
+# mkdir -v /mnt/gentoo/{home,boot}
+# mount -v -t ext4 /dev/mapper/cryptvg-home /mnt/gentoo/home
+# umount -v /dev/sdc1
+# mount -v -t vfat /dev/sdc1 /mnt/gentoo/boot
+# mkdir /mnt/gentoo/boot/EFI
+```
 
-   It might be upper case 'EFI' or lower case 'efi'. Currently, 'EFI' works fine.
+The directory name could be upper case 'EFI' or lower case 'efi'. Currently, 'EFI' works fine.
 
 # stage tarbar
 
-1. cd /mnt/gentoo
-2. tar xvjpf /path/to/stage3-amd64-20150319.tar.bz2
+```bash
+# cd /mnt/gentoo
+# tar xvjpf /path/to/stage3-amd64-20150319.tar.bz2
+```
 
 # Chroot
 
-```
+```bash
 vgchange -a y [vg], for '-a y', VG name can be ommited.
 cryptsetup luksOpen /dev/mapper/vg-crypt cryptroot, you could use key-file to decrypt vg-crypt as well.
 vgchange -a y [vgcryptvg]
