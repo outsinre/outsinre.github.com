@@ -224,24 +224,26 @@ The directory name could be upper case 'EFI' or lower case 'efi'. Currently, 'EF
 # Chroot
 
 ```bash
-vgchange -a y [vg], for '-a y', VG name can be ommited.
-cryptsetup luksOpen /dev/mapper/vg-crypt cryptroot, you could use key-file to decrypt vg-crypt as well.
-vgchange -a y [vgcryptvg]
-mount -v -t ext4 /dev/mapper/cryptvg-root /mnt/gentoo
-mount -v -t ext4 /dev/mapper/cryptvg-home /mnt/gentoo/home
-mount -v -t vfat /dev/sdc1 /mnt/gentoo/boot
+# vgchange -a y vg, VG name can be ommited.
+# cryptsetup luksOpen /dev/mapper/vg-crypt cryptroot, you could use key-file to decrypt vg-crypt as well.
+# vgchange -a y vgcryptvg
+# mount -v -t ext4 /dev/mapper/cryptvg-root /mnt/gentoo
+# mount -v -t ext4 /dev/mapper/cryptvg-home /mnt/gentoo/home
+# mount -v -t vfat /dev/sdc1 /mnt/gentoo/boot
 ```
 
-If you return to LiveCD and try to chroot again, please execute the above six commands first. Otherwise, follow steps below.
+If you return to LiveCD and try to chroot again, please execute the above six commands first. Then follow:
 
-1. cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
-2. mount -v -t proc proc /mnt/gentoo/proc2
-3. mount -v --rbind /sys /mnt/gentoo/sys
-4. mount -v --rbind /dev /mnt/gentoo/dev
-5. mount -v --make-rslave /mnt/gentoo/sys
-6. mount -v --make-rslave /mnt/gentoo/dev
-7. chroot /mnt/gentoo /bin/bash
-8. source /etc/profile && export PS1="(chroot) $PS1"
+```bash
+# cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
+# mount -v -t proc proc /mnt/gentoo/proc2
+# mount -v --rbind /sys /mnt/gentoo/sys
+# mount -v --rbind /dev /mnt/gentoo/dev
+# mount -v --make-rslave /mnt/gentoo/sys
+# mount -v --make-rslave /mnt/gentoo/dev
+# chroot /mnt/gentoo /bin/bash
+# source /etc/profile && export PS1="(chroot) $PS1"
+```
 
 # Installation
 
