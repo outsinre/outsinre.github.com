@@ -5,34 +5,44 @@ title: Gentoo Installation
 
 > Gentoo installation along with Windows 8.1 and Ubuntu 14.04 with UEFI booting.
 
-1. The official [handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64) is important but some items really out of date. If possible, refer to the corresponding *ArchWiki* part which is fairly detailed.
+# Tips
 
-   *Always read Wiki and handbook if not sure*.
-2. Download the `LiveDVD` like *livedvd-amd64-multilib-20140826.iso* instead of the so called `Minimal installation CD` like *install-amd64-minimal-20150319.iso*.
-   1. The minimal CD cannot generates UEFI bootable USB stick.
-   2. The LiveDVD support KDE desktop environment. Specially Wi-Fi connection setting is much easier during the installation. You can also surf the Internet while installing.
-2. Use `Rufus` to create an UEFI USB stick. Similar tools are:
+1. Follow [Handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64).
+2. For packages, you'd better ArchWiki. Always read Wiki and handbook if not sure.
+
+# LiveDVD USB stick
+
+2. Download the LiveDVD like *livedvd-amd64-multilib-20140826.iso* instead of Minimal installation CD like *install-amd64-minimal-20150319.iso*.
+   1. Minimal CD cannot generates UEFI bootable USB stick.
+   2. LiveDVD gives desktop environment to ease network connection and WWW surfing.
+2. Create UEFI USB stick. Similar tools are:
+   1. Rufus
    1. UNetbootin;
    2. Universal USB Installer;
    3. *diskpart* terminal command;
    4. Just copy the ISO contents into a FAT32 format USB stick;
    5. Use `dd` command.
    6. Ubuntu disk creater.
-3. Boot with the USB stick into the default KDE desktop environment. There will be screen ask for user name `gentoo`'s password for loggin. Just wait for a while. It will automatically log into the system.
+
+3. Boot into the KDE desktop environment with USB stick make above. By default, there is no password required for account *gentoo*.
    1. The very first thing is to connect to WIFI or Ethernet through networkmanager.
-   2. Use shortcut `F12` to Open/Retract Yakuake terminal in KDE destop.
-   3. Default user and password are both *gentoo*.
+   2. Use shortcut F12 to Open/Retract Yakuake terminal in KDE destop.
    4. Use `sudo su -` command to switch to `root`.
 
-      You can use `passwd USERNAME` to change the password for the user you are loggined into. As root, you can change ay user passworld by issuing the command `passwd username`. All the password issue within the LiveCD environment is not persistent for the new Gentoo system unless that is operated in `Chroot` environment.
+      You can use `passwd USERNAME` to change the password of *gentoo*. As root, you can change any account passworld by `passwd username`. All the password issue within the LiveCD environment is volatile.
    5. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
-4. `sudo su -`, switches to `root` account. The command prompt is *livecd ~ #* which is not the same as the handbook one *root #*. Maybe this is derived from not setting a temporary root password.
-5. `fdisk /dev/sda` or `parted -a optimal /dev/sda` (I use the later one), checks the current disk partition scheme. Choose and free the `/dev/sda10` NTFS partition for Gentoo.
+4. `sudo su -` to *root*.
 
-   **NOTE**: `parted` takes effect immediately for each command without final confirmation like `fdisk`. So pay attention to the partition start and end position. Before the following steps, read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
+   The command prompt is *livecd ~ #* different from the handbook one *root #*.
+
+# Disk preparation
+5. `parted -a optimal /dev/sda` or `fdisk /dev/sda`. Erase */dev/sda10* (NTFS partition) to install Gentoo on.
+
+   **NOTE**: `parted` takes effect immediately without final confirmation like *fdisk*. Read [Kali Linux Live USB Persistence](/2015/07/23/kali-usb-persistence/) first.
 
    ```bash
    1. # parted -a optimal /dev/sda
+   2. (parted) help
    2. (parted) p
    3. (parted) unit MiB
    3. (parted) rm 10
@@ -47,173 +57,274 @@ title: Gentoo Installation
    11. (parted) q
    ```
    
-   The annoying thing is that the partition *Type* is *Basic data partition* when checking with *fdisk /dev/sda*. We can change it by Disk GUI application in Ubuntu.
-6. New */dev/sda10* will be the boot partition while */dev/sda12* the root partition. We don't need to create *swap* or *efi* partition since we already created it when installing Ubuntu and Windows. Just share these two partitions. If possible, you can also create a separate home partition, say *sda13*.
-7. Up to now, only the boot and root partition is prepared. We share swap and EFI partitions with Ubuntu and Windows. Now format the new partition. It's better to format boot partition as `ext2`.
-   1. \# mkfs.ext2 /dev/sda10
-   2. \# mkfs.ext4 /dev/sda12
-   3. [*optional*] # mkfs.ext4 /dev/sda13, sda13 is home partition if created
-8. From step 5 we know the Ubuntu swap partition is */dev/sda7*. So we need to activate it:
-   1. If you need to create a new swap partition, use command `mkswap /dev/sdaXY` to format the partition.
-   2. \# swapon /dev/sda7
-9. Mount the ewnly created partitions into the LiveDVD USB stick. Make sure the `gentoo` directory exists in /mnt/gentoo, otherwise create one.
-   1. \# mount /dev/sda12 /mnt/gentoo
-   2. \# mkdir /mnt/gentoo/boot
-   3. \# mount /dev/sda10 /mnt/gentoo/boot
-   4. [*optional*] # mkdir /mnt/gentoo/home; mount /dev/sda13 /mnt/gentoo/home
-9. Setting the date and time using `date` command.
-10. Go to the Gentoo mountpoint where the root file system is mounted (most likely /mnt/gentoo)
+   The partition *Type* is *Basic data partition* when checking with *fdisk /dev/sda*. You change that through Disk GUI application under Ubuntu.
+6. Newly created */dev/sda10* will be the *boot* partition while */dev/sda12* the *root* partition.
+
+   We don't create *swap* or *efi* partition. Just share them with Ubuntu and Windows. You can also create a separate home partition, say *sda13*.
+7. Format the new partition. You are suggested to format boot partition as *ext2*.
+
+   ```bash
+   # mkfs.ext2 /dev/sda10
+   # mkfs.ext4 /dev/sda12
+   # mkfs.ext4 /dev/sda13
+   ```
+
+8. Ubuntu *swap* partition is */dev/sda7*. So we need to *activate* it:
+
+   ```bass
+   # mkswap /dev/sdaXY (opt)
+   # swapon /dev/sda7
+   ```
+
+   If you prefer an independent *swap* partition, `mkswap /dev/sdaXY` to format it firstly.
+9. Mount partitions.
+
+   ```bash
+   # mount /dev/sda12 /mnt/gentoo
+   # mkdir /mnt/gentoo/boot && mount /dev/sda10 /mnt/gentoo/boot
+   # mkdir /mnt/gentoo/home && mount /dev/sda13 /mnt/gentoo/home
+   ```
+
+# Install *stage3*
+
+9. Check date and time using `date` command. Set by `date MMDDhhmm` if it's incorrect.
+11. Downloading and verify *stage3* tarball. Usually, it's downloaded beforehand along with LiveDVD ISO.
+12. Now unpack the downloaded stage onto the system.
 
     ```bash
     # cd /mnt/gentoo
+    # tar xvjpf /mnt/cdrom/stage3-amd64-20150319.tar.bz2 --xattrs
     ```
     
-11. Downloading the stage tarball with Chrome application in LiveDVD.
+    1. `x` stands for Extract;
+    2. `v` for Verbose to see what happens during the extraction process (optional);
+    3. `j` to Decompress with *bzip2*;
+    4. `p` for Preserve permissions;
+    5. `f` denotes that we want to extract a File, not standard input;
+    5. `--xattrs` includes the extended attributes stored in the archive as well.
 
-    Go to [Installation media](https://www.gentoo.org/main/en/where.xml) and then to [amd64 multilib](http://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64/). You will find *stage3-amd64-20150319.tar.bz2*. Just download!
+# *make.conf*
 
-    Verify the tarball integrity and compare the output with the checksums provided by the *.DIGESTS* or *.DIGESTS.asc* file.
+2. `CFLAGS` == `CXXFLAGS`
 
-    ```bash
-    # sha512sum /home/gentoo/Download/stage3-amd64-20150319.tar.bz2
-    ```
+   Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). `grep -m1 -A3 "vendor_id" /proc/cpuinfo` offers CPU architecure. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two *.gcc* files.
 
-    Check the output with *.DIGEST.asc* or *.DIGEST*.
-13. Now unpack the downloaded stage onto the system.
+   1. CFALGS="-march=sandybridge -O2 -pipe"
+   2. CXXFLAGS="${CFLAGS}"
 
-    Attention: the current working directory is */mnt/gentoo*
+3. The `MAKEOPTS` variable defines how many parallel compilations should occur when emerging packages.
 
-    ```bash
-    # tar xvjpf /mnt/cdrom/stage3-amd64-20150319.tar.bz2
-    ```
-    
-    Make sure that the same options `xvjpf` are used. The x stands for Extract, the v for Verbose to see what happens during the extraction process (optional), the j for Decompress with bzip2, the p for Preserve permissions and the f to denote that we want to extract a File, not standard input.
-    
-15. Configuring compile options. To keep the settings, Portage reads in the /etc/portage/make.conf file, a configuration file for Portage.
-    1. \# nano -w /mnt/gentoo/etc/portage/make.conf
-    2. `CFLAGS` and `CXXFLAGS`. Check your CPU architecture to set `-march=` parameter. Refer to [Intel](https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel). Command `grep -m1 -A3 "vendor_id" /proc/cpuinfo` will show the current CPU architecure information. That link also teach you how to precisely detect `-march=` parameter by touching, compiling and comparing two *.gcc* files.
-       1. CFALGS="-march=corei7-avx -O2 -pipe"
-       2. CXXFLAGS="${CFLAGS}"
-    3. The `MAKEOPTS` variable defines how many parallel compilations should occur when emerging packages. The recommended value is the number of logical processors in the CPU plus 1. But this rule is outdated. I have 4GB memory and swap/swapfile enabled, *emerge* will make use of swap havily. *swap* naturally slow down application performance. So turn down to 2 or 3 to reduce usage of *swap* file.
-       1. Add a line `MAKEOPTS="-j3"`
-       2. The boot screen will show you several penguins, that is the number of logical hardware cores.
-       3. This value does not apply to *kernel compiling*. So when compiling a kernel, you need to explicitly specify *make -j3*.
-       4. Refer to [MAKEOPTS](https://wiki.gentoo.org/wiki/MAKEOPTS).
-    4. `CPU_FLAGS_X86`: The 'USE' flags corresponding to the CPU instruction sets and other features specific to the *x86* (and *amd64*) architecture are being moved into a separate USE flag group called *CPU\_FLAGS\_X86*.
-       1. Refer to [cpu\_flags\_x86 instruction](https://www.gentoo.org/support/news-items/2015-01-28-cpu_flags_x86-introduction.html).
-       2. emerge -av app-portage/cpuinfo2cpuflags
-       3. cpuinfo2cpuflags, the output is the flags specific to current CPU. Edit 'make.conf' to set *CPU\_FLAGS\_X86* variable to those flags.
-       4. Up to now, some packages in *portage* and overlays are not yet migrating those flags from 'USE' to 'CPU\_FLAGS\_X86'. So:
-       5. Remove the old CPU specific flags from 'USE'. Then add *${CPU\_FLAGS\_X86}* to 'USE' in *make.conf*.
-17. Selecting mirrors
-    1. \# mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf, choose the 3 fastest mirrors for kernal source code downloading.
-    2. \# mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf, selects the *rsync server* to use when updating the portage tree. It is recommended to choose a _rotation link_, such as _rsync.us.gentoo.org_, rather than choosing a single mirror. This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
-       1. The rotation link setting is changed to */etc/portage/repos.conf/gentoo.conf* for *portageq --version* >= 2.2.16. But don't worry since we can modify it when chrooting into the new Gentoo system. For now, remain this setting in */etc/portage/make.conf* since the LiveCD environment uses the old version of portage.
-18. \# cp -L /etc/resolv.conf /mnt/gentoo/etc/,  to ensure that networking still works even after entering the new sda12 (*/mnt/gentoo*) environment. */etc/resolv.conf* contains the name servers for the network. DON'T forget the `-L` parameter when copying.
+   The recommended value is the number of logical processors in the CPU plus 1. But this rule is outdated. I have 4GB memory and *swap/swapfile* enabled, *emerge* will make use of *swap* havily. *swap* naturally slow down application performance though support more parallel tasks. So turn down to 2 or 3 to reduce usage of *swap* file.
+
+   1. Add a line `MAKEOPTS="-j3"`.
+   2. The boot screen shows several penguins, that is the number of logical hardware cores.
+   3. This value does not apply to *kernel compiling*. So when compiling a kernel, you need to explicitly specify *make -j3*.
+   4. Refer to [MAKEOPTS](https://wiki.gentoo.org/wiki/MAKEOPTS).
+
+4. `CPU_FLAGS_X86`: The 'USE' flags corresponding to the CPU instruction sets and other features specific to the *x86/amd64* architecture are *being* moved into a separate USE flag group called *CPU\_FLAGS_X86*.
+   1. Refer to [cpu\_flags_x86 instruction](https://www.gentoo.org/support/news-items/2015-01-28-cpu_flags_x86-introduction.html).
+   2. Emerge *app-portage/cpuinfo2cpuflags* and run in LiveDVD. Edit 'make.conf' to set *CPU\_FLAGS_X86*.
+   4. Up to now, some packages in *portage* and overlays are not yet migrating those flags from 'USE' to 'CPU\_FLAGS\_X86'. So:
+   5. Remove the old CPU specific flags from 'USE'. Then add *${CPU\_FLAGS_X86}* to 'USE'.
+
+# Chrooting
+
+18. `cp -L /etc/resolv.conf /mnt/gentoo/etc/`,  to ensure that networking after chrooting.
 19. Mounting the necessary filesystems.
-    1. \# mount -t proc proc /mnt/gentoo/proc
-    2. \# mount --rbind /sys /mnt/gentoo/sys
-    3. \# mount --make-rslave /mnt/gentoo/sys
-    4. \# mount --rbind /dev /mnt/gentoo/dev
-    5. \# mount --make-rslave /mnt/gentoo/dev
-    1. \# **chroot /mnt/gentoo /bin/bash**, chrooting into the new environment.
-    2. \# source /etc/profile
-    3. \# export PS1="(chroot) $PS1", this create a new different command prompt for the new environment.
-21. Installing a portage snapshot:
-    1. \# emerge-webrsync, it might complain about a missing `/usr/portage/` location. This is to be expected and nothing to worry about - the tool will create the location.
-    2. Sometimes, `eix-sync`, `emaint sync -a` or `emerge --sync` fail, you can fetch a brand new portage.
-22. Choosing the right profile.
-    1. \# eselect profile list
-    2. \# eselect profile set 3, choose the `desktop` profile, **Not** the `desktop/gnome` or `desktop/kde`. We will install `xfce` later on.
-23. For `USE` flag, use command `emerge --info | grep ^USE` to check the default flags. The default flags change along with different profile selected and different USE update in *make.conf*. Xfce will be installed as desktop.
-    4. Refer to [xfce HOWTO](https://wiki.gentoo.org/wiki/Xfce/HOWTO#The_basics) about the USE flags:
 
-       ```
-       USE="-gnome -kde -minimal -qt4 dbus jpeg lock session startup-notification thunar udev X"
-       ```
-       
-       Append these flags into *make.conf* file. Actually, only *-qt3 -qt4 -qt5* and *thunar* need inserted for the others are already included in `emerge --info | grep ^USE`. I want to remove all QT things from system.
-    5. Check if *nls* is enabled by `emerge --info | grep ^USE`. If not, update *make.conf* file.
-    6. By default, *bindist* is enabled by *stage3*'s default *make.conf*. If we don't plan to distribute binary packages, disable it globally. Add `--bindist` USE to *make.conf*. Otherwise, this will eliminate those *bindist* USE conflicts when emerge pkgs, especially between *openssh* and *openssl*.
-24. Localization
-    1. \# cat /usr/share/i18n/SUPPORTED \| grep zh_CN >> /etc/locale.gen
-    2. Uncomment `en_US.UTF-8 UTF-8` in */etc/locale.gen*
-    3. \# locale-gen, if reminds *run ". /etc/profile"* to reload the variable in your shell. If you run it, you need to run `export PS1="(chroot) $PS1"` again to recover shell prompt.
-    5. \# locale -a, to see what locales are generated.
-    1. \# eselect locale list
-    2. \# eselect locale set 3, set system-wdie locale to `en_US.utf8`.
+    ```bash
+    # mount -t proc proc /mnt/gentoo/proc
+    # mount --rbind /sys /mnt/gentoo/sys
+    # mount --make-rslave /mnt/gentoo/sys
+    # mount --rbind /dev /mnt/gentoo/dev
+    # mount --make-rslave /mnt/gentoo/dev
+    # chroot /mnt/gentoo /bin/bash
+    # source /etc/profile && export PS1="(chroot) $PS1"
+    ```
+
+# Mirrors and Sync
+
+17. Selecting mirrors
     
-       As stated below, it is recommended to use `UTF-8` instead of `utf8`. How to achieve this? Use the *free form* of Gentoo *eselect*.
+    ```bash
+    # mirrorselect -s3 -b10 -o -D >> /mnt/gentoo/etc/portage/make.conf (opt)
+    ```
 
-       ```
-       # eselect locale set en_US.UTF-8
-       ```
-       
-    2. The following steps can also be done after entering the new Gentoo system.
-    3. \# nano -w /etc/env.d/02locale. This setting will keep the original English system while displaying Chinese fonts. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
+    Choose the 3 fastest mirrors for package sources downloading. This will takes around 10 minutes. So usually, we just manually choose 3 physically close servers.
+18. [deprecated] <s>Portage sync</s>
 
-       ```
-       LANG="en_US.UTF-8"
-       LC_CTYPE="zh_CN.UTF-8"
-       LC_COLLATE="C"
-       ```
+    ```bash
+    # mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf
+    ```
+
+    Selects the *rsync* server to use when synchronizing portage tree. It is recommended to choose a *rotation link*, such as *rsync.us.gentoo.org*, rather than choosing a single mirror (i.e. ftp). This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
+
+17. The new plug-in [sync system](https://wiki.gentoo.org/wiki/Project:Portage/Sync)
+
+    The new plug-in sync system supports currently support *rsync git svn websync webrsync cvs laymansync* synchronizing types. And configurations reside now under */etc/portage/repos.conf/*.
+
+    After installing *stage3*:
+
+    ```bash
+    # mkdir /mnt/gentoo/etc/portage/repos.conf
+    # cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+    ```
+
+# Portage tree
+
+21. Portage snapshot
+
+    ```bash
+    # emerge-webrsync
+    ```
+
+    It might complain about a missing */usr/portage/* location. This is to be expected and nothing to worry about - it will be created on demand.
+22. Profile
+
+    ```bash
+    # eselect profile list
+    # eselect profile set 3
+    ```
+
+    Choose the *desktop* profile instead of *desktop/gnome* or *desktop/kde*. We will install XFCE later on.
+23. USE flags
+
+    Try `emerge --info | grep ^USE` to check USEs set by profile and *make.conf*. Refer to [Xfce/Guide](https://wiki.gentoo.org/wiki/Xfce/Guide#The_basics).
+
+    ```
+    USE="${CPU_FLAGS_X86} -qt4"
+    ```
        
-    4. \# env-update && source /etc/profile
-    5. \# export PS1="(chroot) $PS1"
-    5. Use `xx_YY.UTF-8` (or `xx_YY.utf8`. But this one might not work for some packages). NOT `xx_YY.UTF8`.
-    5. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](http://jimgray.tk/2015/04/13/fontconfig/).
-    5. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53).
+    By default, *bindist* is enabled by *stage3*'s default *make.conf*. If we don't plan to distribute packages, remove it. *bindist* may cause conflicts, i.e. between *openssh* and *openssl*.
+
+# Location
+
+32. hwclock
+    1. Hardware Time resides on BIOS, which can be set manually and updated by operating system time. Both Windows and Linux get hardware time on startup.
+    2. Windows sets time identically to hardare time without timezone translation. Timezone set on Windows synchronizes time with remote time server. Upon shutdown, Windows writes back its time to hardware.
+    3. Linux adds timezone (i.e. UTC+8) to hardware time, which is called Local Time.
+    4. Windows and Linux dual-boot causes time conflicts. The key is to tell Linux that system time is Local Time *before* setting system timezone.
+
+       Set *clock=local* in */etc/conf.d/hwclock*. Afterwards, set timezone information.
+
+23. Timezone
+
+    This step should be after */etc/conf.d/hwclock* update. Otherwise the Linux system time is usually ahead of local time by 8 hours, thus resulting in portage tree time stamp issues.
+
+    ```bash
+    # ls /usr/share/zoneinfo
+    # echo "Asia/Shanghai" > /etc/timezone
+    # emerge --config sys-libs/timezone-data
+    ```
+
+    Check with `date` command.
+24. locale
+
+    ```bash
+    # cat /usr/share/i18n/SUPPORTED \| grep zh_CN >> /etc/locale.gen
+    # uncomment en_US.UTF-8 UTF-8
+    # locale-gen
+    # locale -a
+    # eselect locale list
+    ```
+
+    In the 3rd step, if reminded to run ". /etc/profile"* to reload the variable, just remember `export PS1="(chroot) $PS1"`.
+
+    Use `xx_YY.UTF-8` (or `xx_YY.utf8`. But this one might not work for some packages) instead of `xx_YY.UTF8`. How to achieve this? Use the *free form* of Gentoo *eselect*.
+
+    ```
+    # eselect locale set en_US.UTF-8
+    ```
+       
+25. Chinese display
+
+    */etc/env.d/02locale* offer fine-grained *locale* settings. We keep the original English system while displaying Chinese characters. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
+
+    ```
+    LANG="en_US.UTF-8"
+    LC_CTYPE="zh_CN.UTF-8"
+    LC_COLLATE="C"
+    ```
+       
+    Remember to
+
+    ```bash
+    # env-update && source /etc/profile && export PS1="(chroot) $PS1"
+    ```
+
+    after above two steps.
+
+    1. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](http://jimgray.tk/2015/04/13/fontconfig/).
+    2. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53) and [jinbuguo](http://jinbuguo.com).
+
+# Kernel building
+
 25. Install the kernel source
-    1. If you would like to install the newest >=4.0.0 kernel, then refer to _Upgrade kernel to unstable 4.0.0_.
-    1. If you want to install sources other than official `gentoo-sources`, like `e-sources`, please refer to *e-sources-4.1.1 kernel*.
-    1. \# emerge -avt sys-kernel/gentoo-sources
-    2. \# ls -l /usr/src/
-    3. If possible, apply kernel patches like 'cjktty.patch'.
+
+    ```bash
+    # emerge -avt sys-kernel/gentoo-sources
+    # ls -l /usr/src/
+    ```
+
+    If possible, apply kernel patches like *cjktty.patch*.
+
+    ```bash
+    # patch [--dry-run] -p1 < /path/to/cjktty.patch
+    ```
+
 26. Configuring the Linux kernel - Manual configuration
-    1. If you have a backup of kernel *.config* file, then this and the next step can be skipped. Refer to _Upgrade kernel to unstable 4.0.0_ below.
-    1. \# emerge -av sys-apps/pciutils sys-apps/usbutils sys-apps/hwinfo
-    2. \# cd /usr/src/linux
+    1. You'd best have a *.config* backup to start with.
+    2. If possible, try *sys-apps/pciutils, sys-apps/usbutils, and sys-apps/hwinfo* under LiveDVD. Don't emerge those packages in *chroot*, it's not necessary.
+
 26. Kernel configuration
 
-    Use the command `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives you the kernel modules needed in general. Then go to kernel configuration (e.g. `make menuconfig`) and press `/` to search the options like `e1000e`, find their locations and activate them.
-    
-    1. \# make menuconfig, if you have a backup of old gentoo kernel config file, then you can `cp /path/to/backup/config /usr/src/linux/.config` first.
+    ```bash
+    # cd /usr/src/linux
+    # make menuconfig
+    ```
 
-       Or you can refer to the LiveCD's kernel config directly.
-    1. Search with `/`. The *Prompt* part is the corresponding kernel option.
-
-       ```
-       Symbol:
-       Type:
-       Prompt:
-         Location:
-       ```
-
-    1. Usually there are several search options with prefix number (1, 2, 3 ...). Press the number to enter the kernel option. Then *exit* or two successive ESC to return to search.
-    1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`. These are the dirvers that needs activated. When search "snd-hda-intel", replace the hypen with dash.
+    1. You'd best have a *.config* backup to start with.
     2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the LiveCD's kernel config file to help clarify kernel options.
-    2. `IKCONFIG` as M and `IKCONFIG_PROC` as Y. This allows you to inspect the configuration of the kernel while it is running, without having to worry whether you've changed or cleaned the source directory after it was built. 
-    2. `NR_CPUS` set to *4* since my laptop has 2 cores and 4 threading. Maybe this value should be *2* for my laptop, but needs test. The smaller this value is, the smaller the kernel image is and the less memory is consumed by kernel.
-    3. `MICROCDE` and `MICROCDE_INTEL` are *Y* by default. Refer to *emerge -av microcode-ctl* below.
-    3. Graphics: `i915` = `Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915` uses the default 'Y'.
-    3. `CONFIG_X86_SYSFB, CONFIG_FB, CONFIG_FB_EFI, CONFIG_FB_SIMPLE, FRAMEBUFFER_CONSOLE` all set to *Y*.
-    4. Ethernet: `e1000e` = `Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support` set to 'M'.
-    4. Audio: `snd_hda_intel` = `Intel HD Audio, CONFIG_SND_HDA_INTEL`. The default value is 'Y', now **MUST** set to 'M'. Choose the audioi codec:
-       1. Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
-       2. \# cat /proc/asound/card0/codec#* \| grep -i codec`, the output is as follows:
-       
-          **Attension**: execute this command in LiveCD environment by opening a new terminal.
+    2. If possible, try *sys-apps/pciutils, sys-apps/usbutils, and sys-apps/hwinfo* under LiveDVD. Don't emerge those packages in *chroot*, it's not necessary.
+    1. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
+    1. Try `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives kernel options that must be enabled.
+    2. We can refer to the LiveDVD's kernel config directly.
+    1. Search with `/`. When search "snd-hda-intel", replace the hypen with dash.
+
+        Usually there are several search outputs numerated (1, 2, 3 ...). Press the number to enter the kernel option.
+    2. *exit* or two successive ESCs to get back.
+
+    Kernel options are as follows;
+
+    1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`.
+
+        Basic dirvers that needs activated.
+
+    2. `IKCONFIG` should be Y instead of M. `IKCONFIG_PROC` can be enabled as you wish. This allows you to inspect the configuration of the kernel while it is running, without having to worry whether you've changed or cleaned the source directory after it was built. 
+    2. `NR_CPUS` set to 4 since laptop has 2 cores and 4 threading. The smaller this value is, the smaller the kernel image is and the less memory is consumed by kernel.
+    3. `MICROCDE` and `MICROCDE_INTEL` are Y by default. Refer to *microcode-ctl* below.
+    3. Graphics. `i915` = *Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915* uses the default Y.
+    3. `FB FRAMEBUFFER_CONSOLE X86_SYSFB FB_SIMPLE` all set to Y.
+
+       Or `FB FRAMEBUFFER_CONSOLE FB_EFI` to Y.
+    4. Ethernet. `e1000e` = *Intel (R) PRO/1000 PCI-Express Gigabit Ethernet support* set to M.
+    4. Audio. `snd_hda_intel` = *Intel HD Audio, CONFIG_SND_HDA_INTEL*. The default value is Y, now MUST be M. Choose the audio codec:
+
+       Refer to [no sound](https://forums.gentoo.org/viewtopic-t-791967-start-0.html) for how to decide the audio cdoec support.
+
+       Execute `cat /proc/asound/card0/codec#* \| grep -i codec` in LiveDVD:
           
-          ```
-          Codec Conexant CX20590
-          Codec Intel CougarPoint HDMI
-          ```
+       ```
+       Codec Conexant CX20590
+       Codec Intel CougarPoint HDMI
+       ```
           
-        3. Then select those two codecs as modules 'M': `Build HDMI/DisplayPort HD-audio codec support, SND_HDA_CODEC_HDMI`, and `Conexant HD-audio support, SND_HDA_CODEC_CONEXANT`.
-        4. `Enable generic HD-audio codec parser, SND_HDA_GENERIC` must be selected (default) as well.
-        4. Set `Default time-out for HD-audio power-save mode, CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
-        5. Set `Pre-allocated buffer size for HD-audio driver` to 4096.
-        5. You notice these options are all set to 'M'! You can also set them all to 'Y'. But never set some to 'M' while set others to 'Y', othewise you would get no sound at all.
+       3. Then select those two codecs as M. *Build HDMI/DisplayPort HD-audio codec support* =` SND_HDA_CODEC_HDMI`. *Conexant HD-audio support* = `SND_HDA_CODEC_CONEXANT`.
+       4. *Enable generic HD-audio codec parser* = `SND_HDA_GENERIC` must be selected (default).
+       4. Set *Default time-out for HD-audio power-save mode* = `CONFIG_SND_HDA_POWER_SAVE_DEFAULT` to 10.
+       5. Set *Pre-allocated buffer size for HD-audio driver* to 4096.
+       5. You notice these options are ALL set to M! You can also set them all to Y. But never set some to M while set others to Y, othewise you would get no sound at all.
+
     5. Webcamera
        1. lsusb
 
@@ -229,57 +340,56 @@ title: Gentoo Installation
           ```
 
           The 3rd item is the integrated webcamera which is a multimedia USB device.
-       2. Enable `MEDIA_SUPPORT` = `Multimedia support`, `MEDIA_CAMERA_SUPPORT` = `Cameras/video grabbers support`, `CONFIG_MEDIA_USB_SUPPORT` = `Media USB Adapters`, and `USB_VIDEO_CLASS` = `USB Video Class (UVC)`. The 2nd and 4th items are the key to make webcamera to work.
-    5. Processor type and features
-       1. `Processor family (Intel Core 2nd Gen AVX)` select `Intel Core 2nd Gen AVX, CONFIG_MCOREI7AVX`. This optioin enables `-march=corei7-avx` which serves the same purpose as the `CFLAGS` value set in `make.conf` in previous step. We enable this option as failure fallback.
+       2. Enable `MEDIA_SUPPORT` = *Multimedia support*, `MEDIA_CAMERA_SUPPORT` = *Cameras/video grabbers support*, `MEDIA_USB_SUPPORT` = *Media USB Adapters*, and `USB_VIDEO_CLASS` = *USB Video Class (UVC)*. The 2nd and 4th items are the key to make webcamera to work.
 
-          <s> # lscpu | grep -i 'CPU family'. If the ouput is `6`, select the 3rd item as `Core 2/newer Xeon, CONFIG_MCORE2`, otherwise the output would be `15`, please select the 5th item</s>. This method is for the kernel <= 4.0.5.
-       2. Turn off `NUMA` = `Numa Memory Allocation and Scheduler Support`. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
-       3. Remove several `AMD` items under `Processor type and features` by searching 'AMD'. They are: `CONFIG_AGP_AMD64`, `CONFIG_X86_MCE_AMD`, `CONFIG_MICROCODE_AMD`, `AMD_NUMA`, and `CONFIG_AMD_IOMMU`.
-       4. Enable `EFI runtime service support, CONFIG_EFI` if UEFI is used to boot the system. Turn off `EFI stub support, CONFIG_EFI_STUB`, `EFI mixed-mode support, EFI_MIXED`, `CONFIG_CMDLINE_BOOL, Built-in kernel command line`, `CONFIG_CMDLINE, Built-in kernel command string` and `CONFIG_INITRAMFS_SOURCE, Initramfs source file(s)`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
-    5. Set `INPUT_PCSPKR` as 'M' or 'Y' for the standard PC Speaker to be used for bells and whistles. Don't enable `SND_PCSP` (read the kernel help message)!
-    5. Set `X86_X32, x32 ABI for 64-bit mode` to 'Y'. This option is useful for WIndows 32 bit binaries (under Wine support) to take advantage of the system 64-bit registers.
-    5. Set `IOMMU_SUPPORT`, `INTEL_IOMMU`, and `INTEL_IOMMU_DEFAULT_ON` set to 'Y' though X220 does not support VT-d but VT-x. VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz). Without IOMMU enabled, HD3000 graphics will tear and corrupt.
-    5. Watchdog:  `Intel TCO Timer/Watchdog, ITCO_WDT` set  to 'M'.
-    6. SATA: `ahci` = `AHCI SATA support, CONFIG_SATA_AHCI` for SATA disks selected 'Y' default. Disable `ATA SFF support (for legacy IDE and PATA), CONFIG_ATA_SFF` set to 'N' since disk is SATA series.
-    7. `Intel 82801 (ICH/PCH), I2C_I801` uses default 'Y'.
-    8. Wireless: `Intel Wireless WiFi Next Gen AGN - Wireless-N/Advanced-N/Ultimate-N (iwlwifi), CONFIG_IWLWIFI` set to 'M'. By the way, `wpa_supplicant` needs `nl80211` wifi driver. Actually relates to `cfg80211 - wireless configuration API, CONFIG_CFG80211` which is set to 'Y' default already.
-    9. Bluetooth: enable `CONFIG_BT, Bluetooth subsystem support` as 'M'. Enter and find `BT_RFCOMM, RFCOMM protocol support`. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `CONFIG_BT_HCIBTUSB, HCI USB driver` as 'M'. The sub-option `CONFIG_BT_HCIBTUSB_BCM turned on automatically` will be enabled as 'Y' by default. `BT_HIDP, HIDP protocol support` is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as 'N'. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Read more from *bluetooth - bluez obexfs*.
-    2. MMC: `sdhci_pci` = `SDHCI support on PCI bus, CONFIG_MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent `Secure Digital Host Controller Interface Support` is turned off by default. So turn this on first. By the way, set `Ricoh MMC Controller Disabler, CONFIG_MMC_RICOH_MMC` as 'Y'.
+    5. Processor type and features
+       1. `lscpu | grep -i 'CPU family'`. If the ouput is 6, select the 3rd item as *Core 2/newer Xeon* = `CONFIG_MCORE2`, otherwise the output would be 15, please select the 5th item.
+       2. Turn off `NUMA` = *Numa Memory Allocation and Scheduler Support*. Refer to [What Is NUMA?](https://forums.gentoo.org/viewtopic-t-911696-view-next.html?sid=7c550d5e3f0942fbfcbc9ad80df53c57).
+       3. Remove several `AMD` items under *Processor type and features* by searching AMD. They are `AGP_AMD64 X86_MCE_AMD MICROCODE_AMD AMD_NUMA AMD_IOMMU`.
+       4. Enable *EFI runtime service support* = `EFI` if UEFI is used to boot the system. Turn off *EFI stub support* = `EFI_STUB`, *EFI mixed-mode support* = `EFI_MIXED`, *Built-in kernel command line* = `CMDLINE_BOOL`, *Built-in kernel command string* = `CONFIG_CMDLINE` and *Initramfs source file(s)* = `INITRAMFS_SOURCE`. These options are closely related mainly for compiling kernel boot arguments and *initramfs* into kernel image. Then the system can boot and load kernel directly from EFI firmware instead of bootloader. Details refer to [efi stub kernel](https://wiki.gentoo.org/wiki/EFI_stub_kerne).
+
+    5. Set `INPUT_PCSPKR` as M or Y for the standard PC Speaker to be used for bells and whistles. Don't enable `SND_PCSP` (read the kernel help message)!
+    5. Set `X86_X32` = *x32 ABI for 64-bit mode* to Y. This option is useful for 32 bit binaries to take advantage of the system 64-bit registers.
+    5. Set `IOMMU_SUPPORT`, `INTEL_IOMMU`, and `INTEL_IOMMU_DEFAULT_ON` set to N since laptop lacks VT-d (but has VT-x). VT-d is what Intel calls their IOMMU implementation. Refer to [i5 2410M](http://ark.intel.com/products/52224/Intel-Core-i5-2410M-Processor-3M-Cache-up-to-2_90-GHz). Without IOMMU enabled, HD3000 graphics will tear and corrupt.
+    5. Watchdog. *Intel TCO Timer/Watchdog* = `ITCO_WDT` set  to M.
+    6. SATA. `ahci` = *AHCI SATA support*, `SATA_AHCI` for SATA disks selected 'Y' default. Disable *ATA SFF support (for legacy IDE and PATA)* = `ATA_SFF` set to N.
+    7. *Intel 82801 (ICH/PCH)* = `I2C_I801` uses default 'Y'.
+    8. Wireless. *Intel Wireless WiFi Next Gen AGN - Wireless-N/Advanced-N/Ultimate-N (iwlwifi), CONFIG_IWLWIFI* set to M. By the way, `wpa_supplicant` needs `nl80211` wifi driver. Actually relates to *cfg80211 - wireless configuration API* = `CFG80211` which is set to Y default already.
+    9. (opt) Bluetooth. `BT` = *Bluetooth subsystem support* to M. Enter and find `BT_RFCOMM` = *RFCOMM protocol support*. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `BT_HCIBTUSB* = *HCI USB driver* as M. The sub-option `BT_HCIBTUSB_BCM` turned on automatically. `BT_HIDP` = *HIDP protocol support* is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as N. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Read more from *bluetooth - bluez obexfs*.
+    2. MMC. `sdhci_pci` = *SDHCI support on PCI bus* = `MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent *Secure Digital Host Controller Interface Support* is turned off by default. So turn this on first. By the way, set *Ricoh MMC Controller Disabler* = MMC_RICOH_MMC` as Y.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
-    7. `NTFS` support: set `CONFIG_NTFS_FS` and `CONFIG_FUSE_FS` to 'M'. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need `emerge -avt sys-fs/ntfs3g` to install `ntfs3g` package later on. Since `ntfs-3g` already support NTFS write, **don't** enable `CONFIG_NTFS_RW`.
-    9. Turn on `CONFIG_PACKET` (default 'Y')  to support wireless tool `wpa_supplicant` which will be installed later on.
-    9. Turn off `NET_VENDOR_NVIDIA` to 'N' since no `NVIDIA` card in x220 laptop.
+    7. NTFS. `NTFS_FS` and `FUSE_FS` to M. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need to install `ntfs-3g` package later on. Since *ntfs-3g* embeds NTFS write, set`NTFS_RW` to N.
+    9. Turn on `PACKET` (default Y)  for wireless tool `wpa_supplicant` which will be installed later on.
+    9. Turn off `NET_VENDOR_NVIDIA` since no `NVIDIA` card in laptop.
     10. [Deprecated, use the default 437 and iso8859-1].
     
-        <s>Set `CONFIG_FAT_DEFAULT_CODEPAGE` to `936`, `CONFIG_FAT_DEFAULT_IOCHARSET` to `gb2312` for displaying NTFS partition Chinese file names correctly for `FAT` partition.
+        Set `FAT_DEFAULT_CODEPAGE` to 936, `FAT_DEFAULT_IOCHARSET` to *gb2312* for NTFS partition Chinese file names correctly for displayed on FAT partition. Don't use *gb18030*. It seems that kernel does not recognize *gb18030*.
 
-        Don't use `gb18030`. It seems that kernel does not recognize `gb18030`.
+        Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to M.
 
-        Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to 'M'.</s>
-
-        In windows system, `FAT` is now mainly used as USB bootable stick, EFI partition, etc. For file storage, `NTFS` is a better choice.
-    10. Dm-crypt. `Device mapper support, CONFIG_BLK_DEV_DM` is set as 'Y' by default. `Crypt target support, CONFIG_DM_CRYPT` must be enabled, set to 'M' (or 'Y'). `XTS support, CONFIG_CRYPTO_XTS` and `AES cipher algorithms (x86_64), CONFIG_CRYPTO_AES_X86_64` optionally set to 'M' (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below.
-    10. Iptables: `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (for Tor's `-m owner` support), `CONFIG_IP_NF_TARGET_REDIRECT` for `-j REDIRECT` which will enable `NF_NAT_REDIRECT` (in return, `NETFILTER_XT_TARGET_REDIRECT` be enabled as well). We only need `NETFILTER_XT_TARGET_REDIRECT` for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NF_NAT_IPV6` as dependency) to enable ip6tables nat table. Turn on `NETFILTER_XT_MATCH_MULTIPORT` for *-m multiport*
-    10. System log: `CONFIG_SECURITY_DMESG_RESTRICT` to Y. Refer to [Restrict unprivileged access to kernel syslog](https://lwn.net/Articles/414813/).
+        In windows system, FAT is now mainly used as USB bootable stick, EFI partition, etc. For file storage, NTFS is a better choice.
+    10. Dm-crypt. *Device mapper support* = `BLK_DEV_DM` is set Y by default. *Crypt target support* = `DM_CRYPT` must be M or Y. *XTS support* = `CRYPTO_XTS` and *AES cipher algorithms (x86_64)* = `CRYPTO_AES_X86_64` optionally set to M (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below.
+    10. Iptables. `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (*-m owner*). `IP_NF_TARGET_REDIRECT` (-j REDIRECT) which will enable `NF_NAT_REDIRECT` (in return, `NETFILTER_XT_TARGET_REDIRECT` be enabled as well). We only need `NETFILTER_XT_TARGET_REDIRECT` for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NF_NAT_IPV6` as dependency) to enable ip6tables *nat* table. Turn on `NETFILTER_XT_MATCH_MULTIPORT` for *-m multiport*
+    10. System log: `SECURITY_DMESG_RESTRICT` to Y. Refer to [Restrict unprivileged access to kernel syslog](https://lwn.net/Articles/414813/).
 
         More refer to *syslog-ng* below.
-    10. Filesystem. Set `CONFIG_UDF_FS=m` to mount ISO file.
-    10. [optional] Thinkpad-related: `ThinkPad ACPI Laptop Extras, THINKPAD_ACPI` set to `M`. Not necessary for my x220. For `Thinkpad Hard Drive Active Protection System (hdaps), SENSORS_HDAPS`, don't enable it. This module is obsolete and unreliable. If you need this,use the package `app-laptop/tp_smapi` instead, which provides another hdaps module implementing HDAPS support.
-    10. [e-sources / cjktty patch specific options] `Select compiled-in fonts, CONFIG_FONTS` and `VGA 8x16 font, CONFIG_FONT_8x16` set to 'Y'. Pay attention to `console 16x16 CJK font ( cover BMP ), CONFIG_FONT_16x16_CJK` which is enabled by default. These options are for Chinese characters display in tty (Ctrl + Alt + Fn).
-    10. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
-    10. This link [wlan0-no wireless extensions (Centrino Advanced-N)](https://forums.gentoo.org/viewtopic-t-883211.html) offer ideas on how to find out the driver information.
+    10. Filesystem. Set `UDF_FS` as M to mount ISO file.
+    10. (opt) Thinkpad-related. *ThinkPad ACPI Laptop Extras* = `THINKPAD_ACPI` set to M.
+    10. [e-sources / cjktty patch specific options].`FONTS` and `FONT_8x16` set to Y. And *console 16x16 CJK font ( cover BMP )* = `FONT_16x16_CJK` which is *cjktty* patch. These options are for Chinese characters display in TTY (Ctrl + Alt + Fn).
     11. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
+
 27. Compiling and installing
 
-    1. make -j3
-    2. make modules_install
-    2. make install, this will copy the kernel image into */boot/* together with the System.map file and the kernel configuration file. Actually you can use a copy command instead.
-    3. [deprecated] <s># mkdir -p /boot/efi/boot</s>
-    4. [deprecated] <s># cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
-    5. emerge -av genkernel
-    6. genkernel --install initramfs
-    7. ls /boot/initramfs*
+    ```bash
+    make -j3
+    make modules_install
+    make install, this will copy the kernel image into */boot/* together with the System.map file and the kernel configuration file. Actually you can use a copy command instead.
+    [deprecated] <s># mkdir -p /boot/efi/boot</s>
+    [deprecated] <s># cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
+    emerge -av genkernel
+    genkernel --install initramfs
+    ls /boot/initramfs*
+    ```
 
 27. Kernel modules loading. Refer to handbook.
 27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
@@ -445,15 +555,6 @@ title: Gentoo Installation
        4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB\#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
 40. Generate GRUB2 configuration: `grub2-mkconfig -o /boot/grub/grub.cfg`.
 41. [optional] You can install `xorg` and `xfce` now without reboot below. Reboot is just for basic system test.
-32. Edit `/etc/conf.d/hwclock` to set the clock options.
-
-    Set `clock=local`, this is important when dual boot with Windows.
-23. Set the timezone.
-    1. I think this step should occur after `hwclock` thing. Otherwise the system time is usually ahead of locale time by 8 hours, thus resulting in portage tree time stamp issues. If possible, I recommend to leave the above two steps immediately before system reboot.
-    1. \# ls /usr/share/zoneinfo
-    2. \# echo "Asia/Shanghai" > /etc/timezone
-    3. \# emerge --config sys-libs/timezone-data
-    4. Check with `date` command.
 41. Exit the chrooted environment: `exit` and unmount all mounted partitions:
 
     ```

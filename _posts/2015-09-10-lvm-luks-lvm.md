@@ -64,7 +64,7 @@ title: LVM over LUKS over LVM
 6. Save key-file to USB stick:
 
    ```bash
-   # cp /home/gentoo/luks-gnupg-key.gpg /mnt/sdc1/luks-gnupg-key/
+   $ cp ~/luks-gnupg-key.gpg /mnt/sdc1/luks-gnupg-key/
    # umount /mnt/sdc1
    ```
    
