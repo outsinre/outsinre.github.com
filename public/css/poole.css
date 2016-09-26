@@ -48,7 +48,7 @@ body {
 }
 
 html {
-  font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft YaHei", SimSun, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
 }
@@ -230,8 +230,7 @@ blockquote p:last-child {
 img {
   display: block;
   max-width: 100%;
-  height: auto;
-  margin: 0 0 0 0em; /*这个是设置图片四周的空隙的，最开始是0 0 1em 0，我改成0 0 0 0em，因为并不是每个图片都要在底部空格1em距离*/
+  margin: 0 0 1rem;
   border-radius: 5px;
 }
 

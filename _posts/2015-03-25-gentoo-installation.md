@@ -8,7 +8,7 @@ title: Gentoo Installation
 # Tips
 
 1. Follow [Handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64).
-2. For packages, you'd better ArchWiki. Always read Wiki and handbook if not sure.
+2. To *emerge* packages, you'd better read ArchWiki.
 
 # LiveDVD USB stick
 
@@ -16,24 +16,23 @@ title: Gentoo Installation
    1. Minimal CD cannot generates UEFI bootable USB stick.
    2. LiveDVD gives desktop environment to ease network connection and WWW surfing.
 2. Create UEFI USB stick. Similar tools are:
-   1. Rufus
+   1. Rufus;
    1. UNetbootin;
    2. Universal USB Installer;
    3. *diskpart* terminal command;
    4. Just copy the ISO contents into a FAT32 format USB stick;
-   5. Use `dd` command.
+   5. Use *dd* command; 
    6. Ubuntu disk creater.
 
-3. Boot into the KDE desktop environment with USB stick make above. By default, there is no password required for account *gentoo*.
+3. Boot into the KDE desktop environment with USB stick made before. By default, there is no password required for account *gentoo*.
    1. The very first thing is to connect to WIFI or Ethernet through networkmanager.
-   2. Use shortcut F12 to Open/Retract Yakuake terminal in KDE destop.
-   4. Use `sudo su -` command to switch to `root`.
-
-      You can use `passwd USERNAME` to change the password of *gentoo*. As root, you can change any account passworld by `passwd username`. All the password issue within the LiveCD environment is volatile.
-   5. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
+   2. Use shortcut F12 to Open/Retract Yakuake/Guake terminal in KDE destop.
+   3. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. `sudo su -` to *root*.
 
-   The command prompt is *livecd ~ #* different from the handbook one *root #*.
+   You can use `passwd USERNAME` to change the password of *gentoo*. As *root*, you can change any account passworld by `passwd username`. All the password thing within the LiveDVD environment is volatile.
+
+   The command prompt is *livecd ~ #* different from the handbook one - *root #*.
 
 # Disk preparation
 5. `parted -a optimal /dev/sda` or `fdisk /dev/sda`. Erase */dev/sda10* (NTFS partition) to install Gentoo on.
@@ -76,7 +75,7 @@ title: Gentoo Installation
    # swapon /dev/sda7
    ```
 
-   If you prefer an independent *swap* partition, `mkswap /dev/sdaXY` to format it firstly.
+   If you prefer an independent *swap* partition, *mkswap* to format it firstly.
 9. Mount partitions.
 
    ```bash
@@ -117,8 +116,8 @@ title: Gentoo Installation
    The recommended value is the number of logical processors in the CPU plus 1. But this rule is outdated. I have 4GB memory and *swap/swapfile* enabled, *emerge* will make use of *swap* havily. *swap* naturally slow down application performance though support more parallel tasks. So turn down to 2 or 3 to reduce usage of *swap* file.
 
    1. Add a line `MAKEOPTS="-j3"`.
-   2. The boot screen shows several penguins, that is the number of logical hardware cores.
-   3. This value does not apply to *kernel compiling*. So when compiling a kernel, you need to explicitly specify *make -j3*.
+   2. The boot screen shows several penguins, that is the number of logical hardware cores. If kernel `X86_SYSFB` and `FB_SIMPLE` were turned off, you could not see boot penguins.
+   3. This value does not apply to *kernel compiling*. We explicitly specify *make -j3*.
    4. Refer to [MAKEOPTS](https://wiki.gentoo.org/wiki/MAKEOPTS).
 
 4. `CPU_FLAGS_X86`: The 'USE' flags corresponding to the CPU instruction sets and other features specific to the *x86/amd64* architecture are *being* moved into a separate USE flag group called *CPU\_FLAGS_X86*.
@@ -157,11 +156,11 @@ title: Gentoo Installation
     # mirrorselect -i -r -o >> /mnt/gentoo/etc/portage/make.conf
     ```
 
-    Selects the *rsync* server to use when synchronizing portage tree. It is recommended to choose a *rotation link*, such as *rsync.us.gentoo.org*, rather than choosing a single mirror (i.e. ftp). This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
+    Selects the *rsync* server to use when synchronizing portage tree. It is recommended to choose a *rotation link*, such as *rsync.us.gentoo.org*, rather than choosing a single mirror (i.e. *ftp*). This helps spread out the load and provides a fail-safe in case a specific mirror is offline.
 
 17. The new plug-in [sync system](https://wiki.gentoo.org/wiki/Project:Portage/Sync)
 
-    The new plug-in sync system supports currently support *rsync git svn websync webrsync cvs laymansync* synchronizing types. And configurations reside now under */etc/portage/repos.conf/*.
+    The new *plug-in sync system* currently supports *rsync git svn websync webrsync cvs laymansync* synchronizing types. And configurations reside now under */etc/portage/repos.conf/*. More details are discusses after system installation.
 
     After installing *stage3*:
 
@@ -197,19 +196,32 @@ title: Gentoo Installation
        
     By default, *bindist* is enabled by *stage3*'s default *make.conf*. If we don't plan to distribute packages, remove it. *bindist* may cause conflicts, i.e. between *openssh* and *openssl*.
 
-# Location
+# Localization
+
+22. Time
+    1. UTC (Universal Time Coordinated) is absolute global time.
+    2. Local Time (UTC + Timezone) is what we use daily.
+
+       Setting operating Software Time equal correctly to Local Time is our goal.
+    3. Hardware Time resides on BIOS, which can be set manually and updated by operating system. Both Windows and Linux sets Software Time based on Hardware Time.
+
+       It's regarded as *permanent placeholder* to set Software Time.
+    4. Windows treats Hardware Time as Local Time and sets Software Time identically to Hardware Time without any translation on boot. Timezone is to synchronize time with time server. Upon shutdown, Windows writes back Software Time to Hardware Time.
+    3. Linux treats Hardware Time as UTC and adds Timezone (i.e. +8) to Hardware Time on boot. Similarly, Software Time is written back to Hardware Time.
+    4. Suppose Windows Software Time and Hardware Time are correctly synched to Local Time, Linux (dual boot installation afterwards) Software Time will be Hardware Time + Timezone = Windows Software Time + Timezone = Local Time + 2xTimezone. So usually Linux Software Time is ahead of Localtion for Timezone.
+
+       If we shutdown Linux and boot Windows, Windows Software Time will be ahead of Local Time too. Each time we switch back and forth, Software Time will increase linearly by Timezone step.
+    5. We must tell Linux that Hardware Time is Local Time instead of UTC *before* Software Timezone is configured.
 
 32. hwclock
-    1. Hardware Time resides on BIOS, which can be set manually and updated by operating system time. Both Windows and Linux get hardware time on startup.
-    2. Windows sets time identically to hardare time without timezone translation. Timezone set on Windows synchronizes time with remote time server. Upon shutdown, Windows writes back its time to hardware.
-    3. Linux adds timezone (i.e. UTC+8) to hardware time, which is called Local Time.
-    4. Windows and Linux dual-boot causes time conflicts. The key is to tell Linux that system time is Local Time *before* setting system timezone.
 
-       Set *clock=local* in */etc/conf.d/hwclock*. Afterwards, set timezone information.
+    Set *clock=local* in */etc/conf.d/hwclock*. We can find other options concerning reading/updating Hardware Time.
+
+    Afterwards, set timezone information.
 
 23. Timezone
 
-    This step should be after */etc/conf.d/hwclock* update. Otherwise the Linux system time is usually ahead of local time by 8 hours, thus resulting in portage tree time stamp issues.
+    This step should be after */etc/conf.d/hwclock* update. Otherwise the Linux Software Time is usually ahead of local time by 8 hours, thus resulting in portage tree time stamp issues.
 
     ```bash
     # ls /usr/share/zoneinfo
@@ -228,7 +240,7 @@ title: Gentoo Installation
     # eselect locale list
     ```
 
-    In the 3rd step, if reminded to run ". /etc/profile"* to reload the variable, just remember `export PS1="(chroot) $PS1"`.
+    In the 3rd step, if reminded to run "*. /etc/profile*" to reload the variable, just remember `export PS1="(chroot) $PS1"`.
 
     Use `xx_YY.UTF-8` (or `xx_YY.utf8`. But this one might not work for some packages) instead of `xx_YY.UTF8`. How to achieve this? Use the *free form* of Gentoo *eselect*.
 
@@ -238,7 +250,7 @@ title: Gentoo Installation
        
 25. Chinese display
 
-    */etc/env.d/02locale* offer fine-grained *locale* settings. We keep the original English system while displaying Chinese characters. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
+    */etc/env.d/02locale* offers fine-grained *locale* settings. We keep the original English system while displaying Chinese characters. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
 
     ```
     LANG="en_US.UTF-8"
@@ -252,10 +264,10 @@ title: Gentoo Installation
     # env-update && source /etc/profile && export PS1="(chroot) $PS1"
     ```
 
-    after above two steps.
+    in the end.
 
-    1. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](http://jimgray.tk/2015/04/13/fontconfig/).
-    2. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53) and [jinbuguo](http://jinbuguo.com).
+    1. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](/2015/04/13/fontconfig/).
+    2. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53) and [Jin Buguo](http://jinbuguo.com).
 
 # Kernel building
 
@@ -263,38 +275,46 @@ title: Gentoo Installation
 
     ```bash
     # emerge -avt sys-kernel/gentoo-sources
-    # ls -l /usr/src/
+    # ls -l /usr/src
+    # cd /usr/src/linu && patch [--dry-run] -p1 < /path/to/cjktty.patch (opt)
     ```
+
+    This is the first time we installIf kernel sources. Therefore, */etc/src/linux* symlink is created automatically.
 
     If possible, apply kernel patches like *cjktty.patch*.
+26. Tips
+    1. You'd best have a *.config* backup to start with.
+    2. If possible, try *sys-apps/pciutils, sys-apps/usbutils, and sys-apps/hwinfo* in LiveDVD. Don't emerge those packages in *chroot*, it's not necessary.
+    3. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and refer to LiveDVD's configuration.
+    5. Try `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives kernel options that must be enabled.
+    6. We can refer to the LiveDVD's kernel config directly.
+    7. Search with `/`. When search "snd-hda-intel", replace the hypen with dash.
+
+        Usually there are several search outputs numerated (1, 2, 3 ...). Press the number to enter the kernel option.
+    8. *exit* or two successive ESCs to get back.
+    4. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
+
+    Suppose we have an old *.config* backup:
 
     ```bash
-    # patch [--dry-run] -p1 < /path/to/cjktty.patch
+    # cd /usr/src/linux
+    # cp /path/to/.config-backup .
+    # make help
+    # make silentoldconfig
     ```
 
-26. Configuring the Linux kernel - Manual configuration
-    1. You'd best have a *.config* backup to start with.
-    2. If possible, try *sys-apps/pciutils, sys-apps/usbutils, and sys-apps/hwinfo* under LiveDVD. Don't emerge those packages in *chroot*, it's not necessary.
+    6. If the *.config* backup belongs to the same kernel version, we omit *make silentoldconfig*.
+    7. *oldconfig* asks for both new and old options.
+    8. *silentoldconfig* only asks for NEW options while preserving old ones. Press ENTER to choose default setting.
+    9. *olddefconfig* is similar but sets NEW options to default without confirmation.
 
-26. Kernel configuration
+    We might tune kernel options by graphical interface *make menuconfig* below.
+26. Menuconfig
 
     ```bash
     # cd /usr/src/linux
     # make menuconfig
     ```
-
-    1. You'd best have a *.config* backup to start with.
-    2. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and the LiveCD's kernel config file to help clarify kernel options.
-    2. If possible, try *sys-apps/pciutils, sys-apps/usbutils, and sys-apps/hwinfo* under LiveDVD. Don't emerge those packages in *chroot*, it's not necessary.
-    1. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
-    1. Try `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives kernel options that must be enabled.
-    2. We can refer to the LiveDVD's kernel config directly.
-    1. Search with `/`. When search "snd-hda-intel", replace the hypen with dash.
-
-        Usually there are several search outputs numerated (1, 2, 3 ...). Press the number to enter the kernel option.
-    2. *exit* or two successive ESCs to get back.
-
-    Kernel options are as follows;
 
     1. `i915 e100e snd-hda-intel iTCO-wdt ahci i2c-i801 iwlwifi sdhci-pci`.
 
@@ -355,7 +375,7 @@ title: Gentoo Installation
     6. SATA. `ahci` = *AHCI SATA support*, `SATA_AHCI` for SATA disks selected 'Y' default. Disable *ATA SFF support (for legacy IDE and PATA)* = `ATA_SFF` set to N.
     7. *Intel 82801 (ICH/PCH)* = `I2C_I801` uses default 'Y'.
     8. Wireless. *Intel Wireless WiFi Next Gen AGN - Wireless-N/Advanced-N/Ultimate-N (iwlwifi), CONFIG_IWLWIFI* set to M. By the way, `wpa_supplicant` needs `nl80211` wifi driver. Actually relates to *cfg80211 - wireless configuration API* = `CFG80211` which is set to Y default already.
-    9. (opt) Bluetooth. `BT` = *Bluetooth subsystem support* to M. Enter and find `BT_RFCOMM` = *RFCOMM protocol support*. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `BT_HCIBTUSB* = *HCI USB driver* as M. The sub-option `BT_HCIBTUSB_BCM` turned on automatically. `BT_HIDP` = *HIDP protocol support* is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as N. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Read more from *bluetooth - bluez obexfs*.
+    9. (opt) Bluetooth. `BT` = *Bluetooth subsystem support* to M. Enter and find `BT_RFCOMM` = *RFCOMM protocol support*. I think this should be 'M', otherwise package like `obexfs` or `obexftp` did not work. Choose USB driver `BT_HCIBTUSB` = *HCI USB driver* as M. The sub-option `BT_HCIBTUSB_BCM` turned on automatically. `BT_HIDP` = *HIDP protocol support* is for human interface device like bluetooth mouse, bluetooth headset, bluetooth keyboard etc. Since I dont' use them, so leave it as N. My bluetooth *Logitech mouse* works perfectly even when turnning off all the related bluetooth kernel options. That is due to the extra `LOGITECH` related kernel drivers. Read more from *bluetooth - bluez obexfs*.
     2. MMC. `sdhci_pci` = *SDHCI support on PCI bus* = `MMC_SDHCI_PCI`, but you cannot positioninig the item since its parent *Secure Digital Host Controller Interface Support* is turned off by default. So turn this on first. By the way, set *Ricoh MMC Controller Disabler* = MMC_RICOH_MMC` as Y.
     5. Refer to [Xorg configruation](https://wiki.gentoo.org/wiki/Xorg/Configuration#Installing_Xorg) to enable Xorg kernel support. However, according to this reference, nothing needs updated.
     7. NTFS. `NTFS_FS` and `FUSE_FS` to M. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need to install `ntfs-3g` package later on. Since *ntfs-3g* embeds NTFS write, set`NTFS_RW` to N.
@@ -367,8 +387,8 @@ title: Gentoo Installation
 
         Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to M.
 
-        In windows system, FAT is now mainly used as USB bootable stick, EFI partition, etc. For file storage, NTFS is a better choice.
-    10. Dm-crypt. *Device mapper support* = `BLK_DEV_DM` is set Y by default. *Crypt target support* = `DM_CRYPT` must be M or Y. *XTS support* = `CRYPTO_XTS` and *AES cipher algorithms (x86_64)* = `CRYPTO_AES_X86_64` optionally set to M (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below.
+        On windows, FAT is now mainly used as USB bootable stick, EFI partition, etc. For file storage, NTFS is a better choice.
+    10. Dm-crypt. *Device mapper support* = `BLK_DEV_DM` is set Y by default. *Crypt target support* = `DM_CRYPT` must be M or Y. *XTS support* = `CRYPTO_XTS` and *AES cipher algorithms (x86_64)* = `CRYPTO_AES_X86_64` optionally set to M (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below. `CRYPTO_SERPENT` and `CRYPTO_SHA512` must be Y instead of M if relevant LUKS algorithms are used. Refer to [gentoo over lvm luks](2015/08/15/gentoo-over-lvm-luks/).
     10. Iptables. `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (*-m owner*). `IP_NF_TARGET_REDIRECT` (-j REDIRECT) which will enable `NF_NAT_REDIRECT` (in return, `NETFILTER_XT_TARGET_REDIRECT` be enabled as well). We only need `NETFILTER_XT_TARGET_REDIRECT` for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NF_NAT_IPV6` as dependency) to enable ip6tables *nat* table. Turn on `NETFILTER_XT_MATCH_MULTIPORT` for *-m multiport*
     10. System log: `SECURITY_DMESG_RESTRICT` to Y. Refer to [Restrict unprivileged access to kernel syslog](https://lwn.net/Articles/414813/).
 
@@ -381,151 +401,249 @@ title: Gentoo Installation
 27. Compiling and installing
 
     ```bash
-    make -j3
-    make modules_install
-    make install, this will copy the kernel image into */boot/* together with the System.map file and the kernel configuration file. Actually you can use a copy command instead.
-    [deprecated] <s># mkdir -p /boot/efi/boot</s>
-    [deprecated] <s># cp /boot/vmlinuz-3.18.9-gentoo /boot/efi/boot/bootx64.efi</s>
-    emerge -av genkernel
-    genkernel --install initramfs
-    ls /boot/initramfs*
+    # cd /usr/src/linux
+    # mount /boot; /boot/efi (opt)
+    # make clean/mrproper/distclean; echo 3 > /proc/sys/vm/drop_caches (opt)
+    # make -j3 && make modules_install && make install
+    # emerge -avt genkernel; genkernel --install initramfs
+    # emerge -avt @module-rebuild
+    # reboot
     ```
 
-27. Kernel modules loading. Refer to handbook.
-27. Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
-    1. emerge -avt sys-kernel/linux-firmware
-28. Creating the fstab file. The default `/etc/fstab` file provided by Gentoo is not a valid fstab file but instead more of a template. Use backup fstab file is possible.
+    1. Get into kernel sources tree.
+    2. For kernel upgrading/re-compiling.
+    3. Clean previous building leftovers.
+       1. *clean* removes most generated files but keep the *.config* and enough build support to build external modules (such that we overlook *make modules_prepare*).
+       2. *mrproper* removes all generated files + *.config* + various backup files.
+       3. *distclean* = *mrproper* + remove editor backup and patch files.
+       4. *drop_caches* is set to 3.
+
+       They are chosen if we re-compile kernel sources in case of compiling error. What's worse, a successful re-compiling generates unworkable kernel binaries.
+
+       Please be noted that *mrproper* and *disclean* will remove backup files, especially the *.config*.
+
+    4. Compiling.
+       1. Compiles the kernel. Keep `-j3` since MAKEOPTS in *make.conf* does not apply to kernel compiling.
+       2. Install kernel modules into */lib/modules/\`uname -r\`*. If we are re-compiling the kernel, old modules will be overriden. Ether backup the old modules or install modules to a new location (by `INSTALL_MOD_PATH`) when we want the old kernel be bootable (i.e. we remove a module from kernel).
+       3. Install kernel binaries *System.map, config, initramfs, vmlinuz* into */boot* and rename old identical version kernel binaries on demand. We can copy and even rename those binaries manually as long as filenames are kept consistent.
+    5. For LVM/LUKS containers, emerge *genkernel* with *cryptsetup* USE.
+
+       Extra arguments `--lvm --luks --gpg --busybox` should be supplied upon generates *initramfs*. Refer to [Gentoo rootfs over LVM encrypted in LUKS container](/2015/08/15/gentoo-over-lvm-luks/) and [lvm luks lvm](/2015/09/10/lvm-luks-lvm/).
+
+       Like modules, *genkernel* does not backup *initramfs* automatically when re-compiling the kernel. We are responsible for bakcuping manually, especially when the *genkernel* arguments are different.
+    6. Although we are running system with old kernel, *@module-rebuild* knows how to re-install external kernel module as long as */usr/src/linux* symlink pointing the new kernel (seee *eselect kernel list*).
+    7. *make modules_prepare* is somewhat complicated.
+
+       External kernel modules (i.e. self-written codes; VirtualBox binary kernel modules) are built against kernel tree (*/usr/src/linux/*). That's because external modules building need support from kernel sources support (i.e. kernel sources' head file).
+    
+       So the kernel tree should be prepared to support external kernel modules building, which can be achieve by several ways:
+
+       1. If the kernel tree is brand new (i.e. just unpacked) and we will build external kernel modules before kernel building, we should prepare by *make modules_prepare* under */usr/src/linux/*.
+       2. If the kernel have already been built (i.e. *make -j3*), it's already prepared. Need to prepare.
+
+27. Linux firmware
+
+    Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
+
+    ```bash
+    # emerge -avt --fechonly sys-kernel/linux-firmware
+    ```
+
+    Firstly just fetch the package sources. If network failed connect after booting into new kernel, emerge it then.
+
+#  System configuration
+
+28. *fstab*
+
+    Creating the */etc/fstab* file. Use backup at best. The default */etc/fstab* file provided by Gentoo is not a valid fstab file but instead more of a template.
 
     ```
     /dev/sda10   /boot		ext2    defaults,noatime	1 2
     /dev/sda12   /   		ext4    noatime	       0 1
     /dev/sda7    none	  	swap	sw	       0 0
+    proc         /proc          proc    nosuid,nodev,noexec,hidepid=2,gid=wheel 0 0
+    none         /tmp           tmpfs   nodev,nosuid,noexec     0 0
     ```
 
-    This needs modified in the steps later on.
-29. Set hostname and local domain
-    1. nano -w /etc/conf.d/hostname
+    Double-check the */etc/fstab* file, save and quit to continue. Fault *fstab* results in boot failure.
+29. *hostname* and *domain*
+    1. nano -w */etc/conf.d/hostname*
 
-       > hostname="zhtux"
-    2. On login, usually get message like *This is zhtux.unkown_domain ...* which is not a error, but annoying. There are two ways to get rid of it.
+       ```
+       hostname="myhost"
+       ```
+
+    2. On login, usually get message like *This is myhost.unkown_domain ...* which is not a error, but annoying. There are two ways to get rid of it.
 
        The first way is to set a fake domain for localhost, edit */etc/hosts*. Add fake *hostname.domain* to *localhost*.
        
        ```
        # <ip address>	<fully qualified hostname>	<aliases>
-       127.0.0.1       zhtux.jiantu.boxes      zhtux   localhost
-       ::1             zhtux.jiantu.boxes      zhtux   localhost
+       127.0.0.1       myhost.jiantu.boxes      myhost   localhost
+       ::1             myhost.jiantu.boxes      myhost   localhost
        ```
        
-       Now try to `ping zhtux.jiantu.boxes/zhtux/localhost` to test.
+       Now try `ping myhost.jiantu.boxes/myhost/localhost` to test.
 
        Another method is edit */etc/issue*, remove `.\O`.
-30. Configuring the network - More refer to *post - Gentoo Networking*.
-    1. **Do NOT follow the handbook guide for network during installation**. We don't need `net-misc/netifrc` at all. `net-misc/netifrc` needs support from `dhcp`, while `net-misc/dhcpcd` can handle network configuration alone.
-    2. emerge -avt net-misc/dhcpcd
-    3. rc-update add dhcpcd default
-    4. From now, the Ethernet part is OK. Nothing special needs configured. `dhcpcd` will manage Ethernet connection when startup. But for the Wireless part, we need to install another tool `net-wireless/wpa_supplicant`.
-    5. emerge -avt net-wireless/wpa_supplicant
-    6. wpa\_configuration: Wifi parameters should be put in `/etc/wpa_supplicant/wpa_supplicant.conf` file:
-    
-       ```
-       # This command is to show the default configuration:
-       # bzcat /usr/share/doc/wpa_supplicant-2.2-r1/wpa_supplicant.conf.bz2 | less
-       # or http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
-       # Except eap and phase2 arguments, the rest are default values. 'phase1' must be 0 NOT 1.
-       # This command is to test the wpa_supplicant configuration:
-       # wpa_supplicant -i wlp3s0 -D nl80211 -c /etc/wpa_supplicant/wpa_supplicant.conf -d
-       ctrl_interface=DIR=/var/run/wpa_supplicant
-       ctrl_interface_group=0
-       eapol_version=1
-       ap_scan=1
-       fast_reauth=1
-       network={
-           ssid="sMobileNet"
-           proto=WPA RSN
-           key_mgmt=WPA-EAP
-           pairwise=CCMP TKIP
-           group=CCMP TKIP 
-           eap=PEAP
-           identity="XXXXXX"
-           password="YYYYYY"
-           ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
-           phase1="peaplabel=0"
-           phase2="auth=MSCHAPV2"
-       }
-       ```
-       
-    7. Remove the recommended options from wiki `GROUP=wheel` and `update_config=1` for security reason. After configuration below it is a good idea change the permissions to ensure that WiFi passwords can not be viewed in *psk* or *passphrase* by anyone using the computer: `chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf`.
-    7. For home wireless connection, usuaully you just need to specify *ssid* and *psk* arguments. *psk* can be a normal wifi password (call *passphrase*) or a 256-character string. When use normal password, need quotes, while 256-character string does not. How to generate the long string?
-    
-       ```
-       wpa_passphrase wifi-ssid wifi-password
-       ```
-       
-       The long string will show on *stdout*.
-    7. When `wpa_configuration` is configured as above, `dhcpcd` will automatically connect to the `sMobileNet` through `/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant` hook. No need to create so called `/etc/conf.d/net` file as the handbook.
+30. Enable OpenRC log
 
-       From 'dhcpcd-6.10.0' onward, '10-wpa_supplicant' hook is no longer supplied by default. We should copy '/usr/share/dhcpcd/hooks/10-wpa_supplicant' to '/lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant'.
-    8. `lspci -k` shows wireless driver in use is *iwlwifi*. However if specify `-D iwlwifi`, *wpa\_supplicant* will fail with error:
-    
-       >Unsupported driver 'iwlwifi'
-       
-       Either do not speicfy the driver or set to `-D nl80211`.
-    8. If you have installed `net-misc/netifrc` (by default from *stage3*) and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
-    9. In case the network interface card should be configured with a static IP address, entries can also be manually added to `/etc/dhcpcd.conf`.
-    10. wpa_supplicant 2.4 might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](/2015/05/11/gentoo-downgrade-package/)
-    10. If need Gui tool, use `networkmanager` instead of `wicd` since the later one don't support `nl80211` driver. Also `networkmanager` depends on `wpa_supplicant` and `dhcpcd or dhcpclient`.
-    10. Once get an error like this:
+   ```bash
+   # nano -w /etc/rc.conf
+   ```
 
-        ```
-        Aug 14 14:12:42 zhtux dhcpcd-run-hooks[4327]: wlp3s0: starting wpa_supplicant
-        Aug 14 14:12:42 zhtux dhcpcd-run-hooks[4330]: wlp3s0: failed to start wpa_supplicant
-        Aug 14 14:12:42 zhtux dhcpcd-run-hooks[4331]: wlp3s0: Successfully initialized wpa_supplicant
-        Line 48: Invalid passphrase length 6 (expected: 8..63) 'YYYYYY"'.
-        Line 48: failed to parse psk '"YYYYYY"'.
-        Line 50: failed to parse network block.
-        Line 54: Invalid passphrase length 6 (expected: 8..63) 'YYYYYY"'.
-        Line 54: failed to parse psk '"YYYYYY"'.
-        Line 56: failed to parse network block.
-        Failed to read or parse configuration '/etc/wpa_supplicant/wpa_supplicant.conf'.
-        Aug 14 14:12:42 zhtux dhcpcd[4312]: no interfaces have a carrier
-        Aug 14 14:12:42 zhtux dhcpcd[4312]: forked to background, child pid 4338
-        Aug 14 14:12:42 zhtux dhcpcd[4338]: enp0s25: waiting for carrier
-        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: L1 Enabled - LTR Disabled
-        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: Radio type=0x1-0x2-0x0
-        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: L1 Enabled - LTR Disabled
-        Aug 14 14:12:42 zhtux kernel: iwlwifi 0000:03:00.0: Radio type=0x1-0x2-0x0
-        Aug 14 14:12:42 zhtux dhcpcd[4338]: wlp3s0: waiting for carrier
-        Aug 14 14:12:42 zhtux kernel: IPv6: ADDRCONF(NETDEV_UP): wlp3s0: link is not ready
-        ```
-	
-        This error was caused by the passphrase template in *wpa_\supplicant.conf*. You notice *Invalid passphrase length 6 (expected: 8..63) 'YYYYYY"'*.
-
-        Just change 'YYYYYY' to 'YYYYYYYY'!
-    10. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 31. Set root password
 
     ```bash
     # passwd
     ```
 
+# [Networking](/2016/03/01/networking/)
+
+30. *dhcpcd*
+
+    We don't follow [Handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64)'s *net config*. *net-misc/netifrc* requires support from DHCP, while *net-misc/dhcpcd* can handle network configuration alone.
+
+    ```bash
+    # emerge -avt net-misc/dhcpcd
+    # rc-update add dhcpcd default
+    # emerge -avt net-wireless/wpa_supplicant
+    ```
+
+    2. In case of the network interface card should be configured with a static IP address, entries can also be manually added to */etc/dhcpcd.conf*.
+    3. If need GUI tool, use *networkmanager* instead of *wicd* since the later one don't support *nl80211* driver. Also *Networkmanager* depends on *wpa_supplicant* and *dhcpcd* or *dhcpclient*.
+    4. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
+
+31. *wpa_supplicant*
+
+    1. *dhcpcd* manages Ethernet connection on boot while revoking *wpa_supplicant* hook script to initiate wireless networking.
+    2. Remove the recommended options  `GROUP=wheel` and `update_config=1` from Wiki for security reason.
+
+    */etc/wpa_supplicant/wpa_supplicant.conf*.
+
+    ```
+    ctrl_interface=DIR=/var/run/wpa_supplicant
+    ctrl_interface_group=0
+    fast_reauth=1
+    eapol_version=1
+    ap_scan=1
+
+    network={
+	    disabled=0
+	    ssid="public-wifi"
+	    key_mgmt=NONE
+	    priority=-999
+    }
+
+    network={
+	    disabled=1
+	    ssid="Network1"
+	    proto=WPA RSN
+	    key_mgmt=WPA-EAP
+	    pairwise=CCMP TKIP
+	    group=CCMP TKIP 
+	    eap=PEAP
+	    identity="XXXXXXXX"
+	    password="YYYYYYYY"
+	    ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
+	    phase1="peaplabel=0"
+	    phase2="auth=MSCHAPV2"
+	    priority=10
+    }
+
+    network={
+	    disabled=1
+	    ssid="Network2"
+	    proto=WPA RSN
+	    key_mgmt=WPA-EAP
+	    pairwise=CCMP TKIP
+	    group=CCMP TKIP 
+	    eap=PEAP
+	    identity="XXXXXXXX"
+	    password="YYYYYYYY"
+    # Don't need certificate
+    #       ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
+    # If use the latest wpa_supplicant, try 'tls_disable_tls_v1_2=1'
+    #       phase1="tls_disable_tlsv1_2=1"
+	    phase1="peaplabel=0"
+	    phase2="auth=MSCHAPV2"
+	    priority=20
+    }
+
+    network={
+	    disabled=0
+	    ssid="Network3"
+	    #psk="12345678"
+	    psk=aaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbccccccccccccccccccc
+	    priority=30
+    }
+    ```
+
+    For home wireless connection, usuaully you just need to specify *ssid* and *psk* arguments. *psk* can be a normal wifi password (call *passphrase*) or a 256-character string. When use normal password, need quotes, while 256-character string does not. How to generate the long string?
+
+    ```bash
+    # wpa_passphrase wifi-ssid wifi-password >> /etc/wpa_supplicant/wpa_supplicant.conf
+    ```
+
+    We'd better change the permissions to ensure that WiFi passwords can not be viewed in *psk* or *passphrase* by normal user account.
+
+    ```bash
+    # chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf`.
+    ```
+
+    *dhcpcd* revokes *wpa_supplicant* through */lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant* hook. From *dhcpcd-6.10.0* onward, *10-wpa_supplicant* hook is no longer there by default. We should copy */usr/share/dhcpcd/hooks/10-wpa_supplicant* to */lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant*.
+
+    `lspci -k` shows wireless driver in use is *iwlwifi*. However if specify `-D iwlwifi` on command line, *wpa_supplicant* will fail:
+
+    >Unsupported driver 'iwlwifi'
+
+    The actual driver in use was *nl80211*.
+
+    1. If you have installed `net-misc/netifrc` (by default from *stage3*) and created `/etc/ini.d/net.*` and `/etc/conf.d/net` files, refer to [Migration from Gentoo net.* scripts](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD#Migration_from_Gentoo_net..2A_scripts).
+    3. *wpa_supplicant-2.4* might cause authentication problem for PEAP Wifi. Refer to [Downgrade Package && wpa_supplicant && local overlay](/2015/05/11/gentoo-downgrade-package/)
+
+# System tools
+
 33. System logger.
-    1. \# emerge -avt app-admin/syslog-ng
 
-        By default, there is a line `log { source(src); destination(console_all); };` in */etc/syslog-ng/syslog-ng.conf*, which outputs system logs to */dev/tty12*. That's to say, any users can read system logs by switching to the 12th virtual terminal. For security reason, comment out that line if there are multiple users.
-    2. \# rc-update add syslog-ng default
-    3. \# emerge -avt app-admin/logrotate
+    ```bash
+    # emerge -avt app-admin/syslog-ng app-admin/logrotate
+    # rc-update add syslog-ng default
+    ```
 
-    Detail on logrotate for cron jobs refer to [Cronie and Anacron](/2015/07/19/cronie/).
-34. Cron daemon. A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
-    1. \# echo "sys-process/cronie anacron" > /etc/portage/package.use/cronie
-    2. \# emerge -avt sys-process/cronie
-    2. \# rc-update add cronie default
+    By default, there is a line
 
-    Detail on running scheduled tasks based on input from the command `crontab`, refer to [Cronie and Anacron](/2015/07/19/cronie/).
-35. File indexing: emerge -avt sys-apps/mlocate
-36. NTFS: emerge -avt sys-fs/ntfs3g
-36. [optional] Remote access: rc-update add sshd default
+    ```
+    log { source(src); destination(console_all); };
+    ```
+
+    in */etc/syslog-ng/syslog-ng.conf*, which outputs system logs to */dev/tty12*. That's to say, any users can read system logs by switching to the 12th virtual terminal. For security reason, comment out that line if there are multiple users.
+
+    Details on logrotate for cron jobs refer to [Cronie and Anacron](/2015/07/19/cronie/).
+34. Cron daemon
+
+    A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
+
+    ```bash
+    # echo "sys-process/cronie anacron" > /etc/portage/package.use/cronie (opt)
+    # emerge -avt sys-process/cronie
+    # rc-update add cronie default
+    ```
+
+    1. *anaron* USE is not must if no rigid shechuled tasks.
+    2. *cronie* must be in a runlevel to shedule *logrotate*.
+    1. Details on running scheduled tasks based on input from the command *crontab*, refer to [Cronie and Anacron](/2015/07/19/cronie/).
+
+35. More tools
+
+    ```bash
+    # emerge -avt sys-apps/mlocate, file indexing
+    # emerge -avt sys-fs/ntfs3g, mounting NTFS filesystem
+    # rc-update add sshd default, incoming SSH connection (opt)
+    ```
+
+# Bootloader - Grub2
+
 38. Configuring the bootloader. Refer to [GRUB2 Quick Start](https://wiki.gentoo.org/wiki/GRUB2_Quick_Start).
     1. Add `GRUB_PLATFORMS="efi-64"` to `/etc/portage/make.conf`. This step must occur before installing the grub package. Otherwise it would show `error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist`.
     2. \# emerge -avt sys-boot/grub:2, currently it is version 2.
@@ -1338,7 +1456,7 @@ title: Gentoo Installation
        CPU的微代码更新支持,建议选中.CPU的微代码更新就像是给CPU打补丁,用于纠正CPU的行为.更新微代码的常规方法是升级BIOS,但是也可以在Linux启动后更新.比如在Gentoo下,可以使用"emerge microcode-ctl"安装microcode-ctl服务,再把这个服务加入boot运行级即可在每次开机时自动更新CPU微代码.
     10. Fingerprint. Fingerprint login is a bad idea since your fingerprint is left anywhere anytime around, like on bottles, cups, books etc. It easy for hackers to get a copy of it. So don't use it!!!
 
-        Here, I just have a try and test the function. That's all of it. BTW, my current system is locked by [lvm luks lvm](http://jimgray.tk/2015/09/10/lvm-luks-lvm/). So it's relatively safe.
+        Here, I just have a try and test the function. That's all of it. BTW, my current system is locked by [lvm luks lvm](/2015/09/10/lvm-luks-lvm/). So it's relatively safe.
 
         ```bash
         # lsusb | grep -i upek
@@ -1370,15 +1488,15 @@ title: Gentoo Installation
         ```
         # less /var/log/messages
 
-        May 13 15:47:12 zhtux kernel: [drm] stuck on blitter ring
-        May 13 15:47:12 zhtux kernel: [drm] GPU HANG: ecode 6:2:0x00fffff7, in X [5230], reason: Ring hung, action: reset
-        May 13 15:47:12 zhtux kernel: [drm] GPU hangs can indicate a bug anywhere in the entire gfx stack, including userspace.
-        May 13 15:47:12 zhtux kernel: [drm] Please file a _new_ bug report on bugs.freedesktop.org against DRI -> DRM/Intel
-        May 13 15:47:12 zhtux kernel: [drm] drm/i915 developers can then reassign to the right component if it's not a kernel issue.
-        May 13 15:47:12 zhtux kernel: [drm] The gpu crash dump is required to analyze gpu hangs, so please always attach it.
-        May 13 15:47:12 zhtux kernel: [drm] GPU crash dump saved to /sys/class/drm/card0/error
-        May 13 15:47:12 zhtux kernel: drm/i915: Resetting chip after gpu hang
-        May 13 15:47:12 zhtux kernel: [drm:i915_reset] *ERROR* Failed to reset chip: -110
+        May 13 15:47:12 myhost kernel: [drm] stuck on blitter ring
+        May 13 15:47:12 myhost kernel: [drm] GPU HANG: ecode 6:2:0x00fffff7, in X [5230], reason: Ring hung, action: reset
+        May 13 15:47:12 myhost kernel: [drm] GPU hangs can indicate a bug anywhere in the entire gfx stack, including userspace.
+        May 13 15:47:12 myhost kernel: [drm] Please file a _new_ bug report on bugs.freedesktop.org against DRI -> DRM/Intel
+        May 13 15:47:12 myhost kernel: [drm] drm/i915 developers can then reassign to the right component if it's not a kernel issue.
+        May 13 15:47:12 myhost kernel: [drm] The gpu crash dump is required to analyze gpu hangs, so please always attach it.
+        May 13 15:47:12 myhost kernel: [drm] GPU crash dump saved to /sys/class/drm/card0/error
+        May 13 15:47:12 myhost kernel: drm/i915: Resetting chip after gpu hang
+        May 13 15:47:12 myhost kernel: [drm:i915_reset] *ERROR* Failed to reset chip: -110
         ```
 
         Basically create a Xorg configuration file (i.e. */etc/X11/xorg.conf.d/20-intel.conf*):
