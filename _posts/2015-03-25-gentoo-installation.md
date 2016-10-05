@@ -297,7 +297,7 @@ title: Gentoo Installation
 
        Usually there are several search outputs numerated (1, 2, 3 ...). Press the number to enter the kernel option.
    7. *exit* or two successive ESCs to get back.
-   8. When confronted with issues related to kernel options, we can choose 'M' instead of 'Y' which might be a solution.
+   8. When confronted with issues related to kernel options, we can choose M instead of Y which might be a solution.
 
    Suppose we have an old *.config* backup:
 
@@ -353,18 +353,18 @@ title: Gentoo Installation
    5. Webcamera
       1. lsusb
 
-	 ```
-	 Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-	 Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-	 Bus 001 Device 006: ID 04f2:b217 Chicony Electronics Co., Ltd Lenovo Integrated Camera (0.3MP)
-	 Bus 001 Device 005: ID 0a5c:217f Broadcom Corp. BCM2045B (BDC-2.1)
-	 Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
-	 Bus 001 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver
-	 Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-	 Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-	 ```
+         ```
+         Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+         Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+         Bus 001 Device 006: ID 04f2:b217 Chicony Electronics Co., Ltd Lenovo Integrated Camera (0.3MP)
+         Bus 001 Device 005: ID 0a5c:217f Broadcom Corp. BCM2045B (BDC-2.1)
+         Bus 001 Device 004: ID 147e:2016 Upek Biometric Touchchip/Touchstrip Fingerprint Sensor
+         Bus 001 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver
+         Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+         Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+         ```
 
-	 The 3rd item is the integrated webcamera which is a multimedia USB device.
+         The 3rd item is the integrated webcamera which is a multimedia USB device.
       2. Enable `MEDIA_SUPPORT` = *Multimedia support*, `MEDIA_CAMERA_SUPPORT` = *Cameras/video grabbers support*, `MEDIA_USB_SUPPORT` = *Media USB Adapters*, and `USB_VIDEO_CLASS` = *USB Video Class (UVC)*. The 2nd and 4th items are the key to make webcamera to work.
 
    5. Processor type and features
@@ -493,9 +493,7 @@ title: Gentoo Installation
       Another method is edit */etc/issue*, remove `.\O`.
 1. Enable OpenRC log
 
-  ```bash
-  # nano -w /etc/rc.conf
-  ```
+   Edit */etc/rc.conf* and set *rc_logger="YES"*.
 
 1. Set root password
 
@@ -534,53 +532,53 @@ title: Gentoo Installation
    ap_scan=1
 
    network={
-	   disabled=0
-	   ssid="public-wifi"
-	   key_mgmt=NONE
-	   priority=-999
+           disabled=0
+           ssid="public-wifi"
+           key_mgmt=NONE
+           priority=-999
    }
 
    network={
-	   disabled=1
-	   ssid="Network1"
-	   proto=WPA RSN
-	   key_mgmt=WPA-EAP
-	   pairwise=CCMP TKIP
-	   group=CCMP TKIP 
-	   eap=PEAP
-	   identity="XXXXXXXX"
-	   password="YYYYYYYY"
-	   ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
-	   phase1="peaplabel=0"
-	   phase2="auth=MSCHAPV2"
-	   priority=10
+           disabled=1
+           ssid="Network1"
+           proto=WPA RSN
+           key_mgmt=WPA-EAP
+           pairwise=CCMP TKIP
+           group=CCMP TKIP 
+           eap=PEAP
+           identity="XXXXXXXX"
+           password="YYYYYYYY"
+           ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
+           phase1="peaplabel=0"
+           phase2="auth=MSCHAPV2"
+           priority=10
    }
 
    network={
-	   disabled=1
-	   ssid="Network2"
-	   proto=WPA RSN
-	   key_mgmt=WPA-EAP
-	   pairwise=CCMP TKIP
-	   group=CCMP TKIP 
-	   eap=PEAP
-	   identity="XXXXXXXX"
-	   password="YYYYYYYY"
+           disabled=1
+           ssid="Network2"
+           proto=WPA RSN
+           key_mgmt=WPA-EAP
+           pairwise=CCMP TKIP
+           group=CCMP TKIP 
+           eap=PEAP
+           identity="XXXXXXXX"
+           password="YYYYYYYY"
    # Don't need certificate
    #       ca_cert="/etc/ssl/certs/Thawte_Premium_Server_CA.pem"
    # If use the latest wpa_supplicant, try 'tls_disable_tls_v1_2=1'
    #       phase1="tls_disable_tlsv1_2=1"
-	   phase1="peaplabel=0"
-	   phase2="auth=MSCHAPV2"
-	   priority=20
+           phase1="peaplabel=0"
+           phase2="auth=MSCHAPV2"
+           priority=20
    }
 
    network={
-	   disabled=0
-	   ssid="Network3"
-	   #psk="12345678"
-	   psk=aaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbccccccccccccccccccc
-	   priority=30
+           disabled=0
+           ssid="Network3"
+           #psk="12345678"
+           psk=aaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbccccccccccccccccccc
+           priority=30
    }
    ```
 
@@ -872,7 +870,7 @@ Boot with LiveDVD, then
    # This file is sourced by bash for login shells.  The following line
    # runs your .bashrc and is recommended by the bash info pages.
    if [[ -f ~/.bashrc ]] ; then
-	   . ~/.bashrc
+           . ~/.bashrc
    fi
 
    # If ~/.xinitrc does not exist, startx takes it as a fallback
@@ -882,10 +880,11 @@ Boot with LiveDVD, then
    #unset -v HOME
 
    if shopt -q login_shell; then
-	   [[ -t 0 && $(tty) == /dev/tty1 && ${USER} == "outsinre" && ! $DISPLAY ]] && exec startx -- -nolisten tcp
+           [[ -t 0 && $(tty) == /dev/tty1 && ${USER} == "outsinre" && ! $DISPLAY ]] && exec startx -- -nolisten tcp
    fi
    ```
 
+   Attention, *-- -nolisten tcp* is to disallow TCP connection to X server.
 4. Clear Xfce configuration
 
    ```bash
@@ -993,9 +992,9 @@ Boot with LiveDVD, then
 1. Xfce4 goodies
 
    xfce4-power-manager; xfce4-mixer; xfce4-screenshooter; thunar-dropbox (qtcore); 
-2 Miscs
+2. Miscs
 
-   wgetpaste; weechat; wps-office; evince; [TeXLive](/2015/08/29/texlive-gentoo/);
+   guake; wgetpaste; weechat; wps-office; evince; [TeXLive](/2015/08/29/texlive-gentoo/);
 3. ALSA
 
    Check if *alsa-lib* and *alsa-utils* are installed or not. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.
@@ -1009,7 +1008,7 @@ Boot with LiveDVD, then
    1. To make use of *vaapi*, make sure *ffmpeg* and *hwaccel* USEs are enabled. BTW, *ffmpeg* should enable *vaapi* USE too.
    2. For Media Source Extensions, turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
    3. Add FoxyProxy Standard, uBlock Origin, NoScript (and/or RefControl), User Agent Switcher, HTTPS Everywhere, DISCONNECT, Open With etc. add-ons. Remove unecessary default whitelist of NoScript plugin.
-   4. *privacy.trackingprotection.enabled* to TRUE.
+   4. *privacy.trackingprotection.enabled*, *Network.proxy.socks_remote_dns* to TRUE.
    5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
 
 5. [Fcitx](https://wiki.gentoo.org/wiki/Fcitx)
@@ -1092,12 +1091,12 @@ Boot with LiveDVD, then
 
       ```
       if use X; then
-	  elog "You need to install some fonts for Emacs."
-	  elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
-	  elog "machine would satisfy basic Emacs requirements under X11."
-	  elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
-	  elog "for how to enable anti-aliased fonts."
-	  elog
+          elog "You need to install some fonts for Emacs."
+          elog "Installing media-fonts/font-adobe-{75,100}dpi on the X server's"
+          elog "machine would satisfy basic Emacs requirements under X11."
+          elog "See also http://www.gentoo.org/proj/en/lisp/emacs/xft.xml"
+          elog "for how to enable anti-aliased fonts."
+          elog
       fi
       ```
 

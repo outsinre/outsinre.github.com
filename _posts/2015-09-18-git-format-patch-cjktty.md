@@ -1,25 +1,25 @@
 ---
 layout: post
-title: git diff to get cjktty.patch
+title: cjktty.patch
 ---
 
 In this post, we will show how to extract *cjktty.patch* from a patched kernel. Afterwards, we will apply the extracted patch to our own kernel. During the process, we might look into several additional relevant commands.
 
 1. Suppose our current system kernel is 4.0.5. We will generate a *cjktty.patch* suitable for this kernel.
-2. The patched kernel is [linux cjktty](https://github.com/Gentoo-zh/linux-cjktty) from which we will extract the desired patch.
+2. The patched kernel is [linux-cjktty](https://github.com/Gentoo-zh/linux-cjktty) from which we will extract the desired patch.
 
    According to past experience, *cjktty.patch* for kernel *3.18 ~ 3.19* fits *4.0* as well. We will choose the branch *3.19-utf8*.
 3. Clone the chosen branch locally.
 
    ```bash
    $ cd ~/workspace
-   $ git clone --single-branch --branch 3.19-utf8 --depth 4 https://github.com/Gentoo-zh/linux-cjktty.git
+   $ git clone --branch 3.19-utf8 --depth 4 https://github.com/Gentoo-zh/linux-cjktty.git
    ```
    
-   1. *--single-branch*: combined with *--branch*.
-   2. *--branch*: we only need branch 3.19-utf8. If not specified, git will clone all the branches, spending a day maybe depending on your network performance.
-   3. *--depth*: from the GitHub repository, we find the the top 3 commits are enough to extract our *cjktty.patch*. We only need to clone the top 4 commits (3 is OK). By only cloning the latest 4 commits, we save time and network load.
-4. git log
+   1. *--branch*: we only need branch 3.19-utf8. If not specified, git will clone all the branches, spending a day maybe depending on your network performance.
+   2. *--depth*: from the GitHub repository, we find the the top 3 commits are enough to extract our *cjktty.patch*. We MUST clone at least the top 4 commits.
+
+4. *git log*
 
    ```
    commit 9a5a7d3215307e28df3aea6ac09931a4d55e151e
@@ -47,7 +47,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
        Linux 3.19.3
    ```
    
-   From the output, we can see only 4 commits history are cloned. We will extract the patch from the top 3 commits authored by *microcai*.
+   From the output, we can see only 4 commits history. We will extract the patch from the top 3 commits authored by *microcai*.
 5. Extract the patch
 
    ```bash
@@ -64,7 +64,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    2. HEAD~3 means extract patch from top to 3rd commits (inclusive). The latest ID (HEAD) precedes the 3rd one.
    3. *format-patch* is similar to *git diff*. *-n <commit-ID>* means patch from *n* commits leading up to <commit-ID> (inclusive) of current branch. However, the patch file orgnization is a little different from *git diff*.
 
-      If you use the *git diff* command to compare the 3rd patch with the 1st, you will find them the same patch but with different patch format. Specially, *format-patch* contains mail information.
+   If you use the *git diff* command to compare the 3rd patch with the 1st, you will find them the same patch but with different patch format. Specially, *format-patch* contains mail information.
    4. We recommend to use *format-patch* to include commit messages, making it more appropriate for most scenarios involving exchanging patches over the Internet. Details refer to reference 1.
 6. Test the patch
 
@@ -85,9 +85,9 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    error: drivers/video/console/fbcon.c: patch does not apply
    ```
    
-   The line number (2708 or 2689) remind is where error occurs in source files (portage *gentoo-sources* and/or microcai *linux-cjktty*). Search *2708* or *2689* in patch file and compare it with source files to see what causes the error. You might go to line *2708* or *2689* directly in source files. However it might not locate error precisely.
-
-   *git apply* has a alternative of *git am*.
+   1. Error number 2708 (reported by *patch*) refers to line in Linux-cjktty kernel sources, while 2689 in Gentoo-sources. Search 2708 or 2689 in patch file and check sources.
+   2. Some error are caused by extra whitespaces, especially those on *blank* lines.
+   
 7. Apply the patch
 
    ```bash
