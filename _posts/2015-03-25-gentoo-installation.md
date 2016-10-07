@@ -1014,9 +1014,11 @@ Boot with LiveDVD, then
 5. [Fcitx](https://wiki.gentoo.org/wiki/Fcitx)
 
    ```bash
-   # echo "app-i18n/fcitx gtk gtk3" >> /etc/portage/package.use/fcitx
+   # echo "app-i18n/fcitx gtk gtk3 -table" >> /etc/portage/package.use/fcitx
    # emerge -av fcitx fcitx-rime fcitx-configtool
    ```
+   
+   *table* USE will draw several built-in input methods (i.e. Wubi) which fail to meet my requirement. *rime* will be installed instead.
    
    Insert to head of *~/.xinitrc*:
 
