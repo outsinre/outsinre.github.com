@@ -85,7 +85,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    error: drivers/video/console/fbcon.c: patch does not apply
    ```
    
-   1. Error number 2708 (reported by *patch*) refers to line in Linux-cjktty kernel sources, while 2689 in Gentoo-sources. Search 2708 or 2689 in patch file and check sources.
+   1. Error number 2708 (reported by *patch*) refers to line in Linux-cjktty sources, while 2689 (reported by *git apply*) in Gentoo-sources. Search 2708 or 2689 in patch file and check either/both kernel sources.
    2. Some error are caused by extra whitespaces, especially those on *blank* lines.
    
 7. Apply the patch

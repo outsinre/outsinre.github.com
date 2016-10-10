@@ -281,10 +281,11 @@ title: Gentoo Installation
    ```bash
    # emerge -avt sys-kernel/gentoo-sources
    # ls -l /usr/src
+   # eselect kernel list/set
    # cd /usr/src/linu && patch [--dry-run] -p1 < /path/to/cjktty.patch (opt)
    ```
 
-   This is the first time we installIf kernel sources. Therefore, */etc/src/linux* symlink is created automatically.
+   For the first time we install kernel sources, */etc/src/linux* symlink is created automatically.
 
    If possible, apply kernel patches like *cjktty.patch*.
 2. Tips
@@ -298,6 +299,7 @@ title: Gentoo Installation
        Usually there are several search outputs numerated (1, 2, 3 ...). Press the number to enter the kernel option.
    7. *exit* or two successive ESCs to get back.
    8. When confronted with issues related to kernel options, we can choose M instead of Y which might be a solution.
+3. *.config* backup
 
    Suppose we have an old *.config* backup:
 
@@ -314,7 +316,7 @@ title: Gentoo Installation
    4. *olddefconfig* is similar but sets NEW options to default without confirmation.
 
    We might tune kernel options by graphical interface *make menuconfig* below.
-3. Menuconfig
+4. Menuconfig
 
    ```bash
    # cd /usr/src/linux
@@ -403,19 +405,20 @@ title: Gentoo Installation
    7. [e-sources / cjktty patch specific options].`FONTS` and `FONT_8x16` set to Y. And *console 16x16 CJK font ( cover BMP )* = `FONT_16x16_CJK` which is *cjktty* patch. These options are for Chinese characters display in TTY (Ctrl + Alt + Fn).
    8. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 
-3. Compiling and installing
+5. Compiling and installing
 
    ```bash
    # cd /usr/src/linux
    # mount /dev/sda10 /boot; mount /dev/sda2 /boot/efi (opt)
    # make clean/mrproper/distclean; echo 3 > /proc/sys/vm/drop_caches (opt)
+   # make modules_prepare (opt)
    # make -j3 && make modules_install && make install
    # emerge -avt genkernel; genkernel --install initramfs
    # emerge -avt @module-rebuild
    # reboot
    ```
 
-   1. Get into kernel sources tree.
+   1. Make sure we are in kernel sources directory.
    2. This is usually done before chrooting.
    3. Clean previous building leftovers.
       1. *clean* removes most generated files but keep the *.config* and enough build support to build external modules (such that we overlook *make modules_prepare*).
@@ -426,18 +429,7 @@ title: Gentoo Installation
       They are chosen if we re-compile kernel sources in case of compiling error. What's worse, a successful re-compiling generates unworkable kernel binaries.
 
       Please be noted that *mrproper* and *disclean* will remove backup files, especially the *.config*.
-
-   4. Compiling.
-      1. Compiles the kernel. Keep `-j3` since MAKEOPTS in *make.conf* does not apply to kernel compiling.
-      2. Install kernel modules into */lib/modules/\`uname -r\`*. If we are re-compiling the kernel, old modules will be overriden. Ether backup the old modules or install modules to a new location (by `INSTALL_MOD_PATH`) when we want the old kernel be bootable (i.e. we remove a module from kernel).
-      3. Install kernel binaries *System.map, config, initramfs, vmlinuz* into */boot* and rename old identical version kernel binaries on demand. We can copy and even rename those binaries manually as long as filenames are kept consistent.
-   5. For LVM/LUKS containers, emerge *genkernel* with *cryptsetup* USE.
-
-      Extra arguments `--lvm --luks --gpg --busybox` should be supplied upon generates *initramfs*. Refer to [Gentoo rootfs over LVM encrypted in LUKS container](/2015/08/15/gentoo-over-lvm-luks/) and [lvm luks lvm](/2015/09/10/lvm-luks-lvm/).
-
-      Like modules, *genkernel* does not backup *initramfs* automatically when re-compiling the kernel. We are responsible for bakcuping manually, especially when the *genkernel* arguments are different.
-   6. Although we are running system with old kernel, *@module-rebuild* knows how to re-install external kernel module as long as */usr/src/linux* symlink pointing the new kernel (seee *eselect kernel list*).
-   7. *make modules_prepare* is somewhat complicated.
+   4. *make modules_prepare* is somewhat complicated.
 
       External kernel modules (i.e. self-written codes; VirtualBox binary kernel modules) are built against kernel tree (*/usr/src/linux/*). That's because external modules building need support from kernel sources support (i.e. kernel sources' head file).
 
@@ -445,7 +437,16 @@ title: Gentoo Installation
 
       1. If the kernel tree is brand new (i.e. just unpacked) and we will build external kernel modules before kernel building, we should prepare by *make modules_prepare* under */usr/src/linux/*.
       2. If the kernel have already been built (i.e. *make -j3*), it's already prepared. Need to prepare.
+   5. Compiling.
+      1. Compiles the kernel. Keep `-j3` since MAKEOPTS in *make.conf* does not apply to kernel compiling.
+      2. Install kernel modules into */lib/modules/\`uname -r\`*. If we are re-compiling the kernel, old modules will be overriden. Ether backup the old modules or install modules to a new location (by `INSTALL_MOD_PATH`) when we want the old kernel be bootable (i.e. we remove a module from kernel).
+      3. Install kernel binaries *System.map, config, initramfs, vmlinuz* into */boot* and rename old identical version kernel binaries on demand. We can copy and even rename those binaries manually as long as filenames are kept consistent.
+   6. For LVM/LUKS containers, emerge *genkernel* with *cryptsetup* USE.
 
+      Extra arguments `--lvm --luks --gpg --busybox` should be supplied upon generates *initramfs*. Refer to [Gentoo rootfs over LVM encrypted in LUKS container](/2015/08/15/gentoo-over-lvm-luks/) and [lvm luks lvm](/2015/09/10/lvm-luks-lvm/).
+
+      Like modules, *genkernel* does not backup *initramfs* automatically when re-compiling the kernel. We are responsible for bakcuping manually, especially when the *genkernel* arguments are different.
+   7. Although we are on the old kernel, *@module-rebuild* knows how to re-install external kernel modules for the new kernel as long as */usr/src/linux* symlink pointing the new kernelsource tree (see *eselect kernel list*).
 7. Linux firmware
 
    Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
@@ -743,7 +744,7 @@ title: Gentoo Installation
 
 ```bash
 # eix-sync
-# emerge -avtuDN @world
+# emerge -avtuDN --with-bdeps=y @world
 # dispatch-conf (opt)
 # revdep-rebuild -pv (opt)
 # emerge -avt @preserved-rebuild
@@ -751,7 +752,7 @@ title: Gentoo Installation
 ```
 
 1. For *>=portageq-2.2.16*, *emaint sync* replaces original *emerge --sync* to sync Portage tree.
-2. We may append `--with-bdeps=y` argument.
+2. *--with-bdeps=y* will calculate build time dependencies for updates.
 3. If configuration needs updated, there will be a corresponding *._cfg\** file.
 4. As a tool of *gentoolkit*, *revdep-rebuild* is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find broken packages as a result of an upgrade of their dependencies. Those packages will be re-merged. However, it can also happen that a given package does not work with the currently upgraded dependencies, in which case you should upgrade the broken package to a more recent version. *revdep-rebuild* will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
 5. `emerge --info \| grep FEATURES` prints *preserve-libs* FEATURE is enabledby default. It tells Portage to preserve libraries when *soname*'s change during upgrade or downgrade, only as necessary to satisfy shared library dependencies of installed consumers/packages. Preserved libraries are automatically removed when there are no remaining consumers, which occurs when consumer packages are rebuilt or uninstalled. Ideally, rebuilds are triggered automatically during updates, in order to satisfy slot-operator dependencies.

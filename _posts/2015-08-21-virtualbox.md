@@ -22,20 +22,20 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 
       Since VirtualBox 5, this USE is removed and install it manually.
 
-   Why do I need this extension binary package? Mostly, it supports:
+   Why do I need this *extension* binary package? Mostly, it supports:
 
    1. Virtual USB 2.0 (EHCI) device;
    2. VirtualBox Remote Desktop Protocol (VRDP) support.
-    
-   Refer to [Installing VirtualBox and extension packs](https://www.virtualbox.org/manual/ch01.html#intro-installing).
 
-   *Windows XP 32bit* VM won't even start without QT GUI support. But VRDP helps! VRDP is a replacement of QT GUI!
+      Actually *vnc* USE is an alternative to VRDP but sucks.
+   4. Refer to [Installing VirtualBox and extension packs](https://www.virtualbox.org/manual/ch01.html#intro-installing).
+
+   Windows XP 32-bit VM won't even start without QT GUI support. But VRDP helps! VRDP is a replacement of QT GUI!
 
    1. First create VM with VirtualBox CLI;
    2. Enable VRDP support for VM;
    3. Connect to VM by VRDP.
 
-   Actually *vnc* USE is an alternative to VRDP but sucks.
 3. Install
 
    ```bash
@@ -43,6 +43,8 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    ```
 
    It reminds accepting PUEL licence. Refer to [VirtualBox wiki](https://wiki.gentoo.org/wiki/VirtualBox).
+
+   If fail to emerge VirtualBox, then probably you should bump tp a newer version. Lastest Linux kernel usually requires lastest VirtualBox.
 4. Group - vboxusers
 
    ```bash
@@ -66,36 +68,46 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    1. $ VBoxManage list ostypes
 
       To find the supported OSes. I am going to install *Windows XP 32-bit*. The corresponding *--ostype* is *WindowsXP*.
-   2. $ VBoxManage createvm --name WinXP --ostype WindowsXP --basefolder ${HOME}/.config/VirtualBox/Machines --register
+   2. $ VBoxManage createvm --name WinXP32 --ostype WindowsXP --register
 
       *--name* should be enclosed by double quotes if containing white spaces.
 
-      *--basefoler* is to specify the VM related files location. If not set, it will default to *${HOME}/.VirtualBox/Machines*, which violate the new configuration file location. Refer to [XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html).
+      *--register* to register the VM instantly, or run *VBoxManage registervm* afterwards. Attention: *registervm* only accepts *full* path. If you are using an existing virutal machine disk files (instead of fresh installation), *registervm* after the *.vdi* file is specified.
 
-      *--register* to register the VM instantly, or run *VBoxManage registervm* afterwards. Attention: *registervm* only accepts *full* path.
-   3. $ VBoxManage modifyvm WinXP --memory 512 --acpi on --nic1 nat --audio alsa --audiocontroller ac97 --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5000,5010-5012 --clipboard bidirectional
+      *--basefoler* can be used to specify this VM's files location (i.e. set to NTFS partition). If not set, it will default to *${HOME}/.VirtualBox/Machines* which is different from VirtualBox confiuration file.
+
+   2. $ VBoxManage registervm ~/.VirtualBox/Machines/WinXP32/WinXP32.vbox
+
+      Supply the full path of *.vbox* file.
+   3. $ VBoxManage modifyvm WinXP32 --memory 384 --acpi on --nic1 nat --nictype1 Am79C973 --audio alsa --audiocontroller ac97 --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5000,5010-5012 --clipboard bidirectional
+
+      *--nictype1 Am79C973* sets virtual Ethernet hardware to AMD PCNet FAST III (Am79C973). VirtualBox 5 now use Intel PRO/1000 T Server (82543GC) as default, which requires extra drivers installed.
 
       *--vrde on* is to enable VRDP support thus I can connect to the VM GUI by RDP client.
 
       *--vrdeaddress* set to 127.0.0.1 loopback address. If unset, it defaults to 0.0.0.0 which means other hosts on the network can connect to this virtual machine too. Refer to [127.0.0.1 vs 0.0.0.0](http://fangxiang.tk/2015/09/14/0000-127001-localhost/).
 
       *--draganddrop* option is useful if you need it. However, it is vunerable to security issue.
-   4. $ VBoxManage storagectl WinXP --name "IDE Controller" --add ide --controller PIIX4
+   4. $ VBoxManage storagectl WinXP32 --name "IDE Controller" --add ide --controller PIIX4
 
       Set disk controller for VM. Don't use SATA related controller for *WindowsXP*.
-   5. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium "/media/Misc/VMs/WinXP/WinXP.vdi"
+   5. $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium "/media/Misc/VMs//WinXP32.vdi"
 
-      *WinXP.vdi* is copied from some guy in QQ group. So I don't need a installation ISO to install VM from scratch. For ISO from scratch, refer those references listed.
-   6. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso
+      *WinXP32.vdi* is copied from some guy in QQ group. So I don't need a installation ISO to install VM from scratch. For ISO from scratch, refer those references listed.
+   6. $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso
 
       *VBoxGuestAddiontions.iso* support file sharing, mouse switch etc between *host* and *guest*. We will install this tool after entering *Windows XP 32-bit* VM.
 
       Up to now, the VM is created! But VirtualBox does not have QT GUI. We need RDP client, i.e. FreeRDP.
-7. emerge -av net-misc/freerdp
+   7. Folder share. First, create the folder that will be shared in *host*. Then in *guest*, mount the shared folder.
+
+      1. $ VBoxManage sharedfolder add WinXP32 --name "WLshare" --hostpath "/media/Misc/VMs/WLshare"
+      2. Open Windows Explorer and look for it under "My Networking Places" -> "Entire Network" -> "VirtualBox Shared Folders" -> "\\\Vboxsvr". By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder. If don't assign a drive letter, each time to access the shared, we have to find it under "\\\Vboxsvr".
+7. \# emerge -av net-misc/freerdp
 8. Magic
 
    ```bash
-   $ VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001,5010-5012"
+   $ VBoxHeadless --startvm WinXP32 --vrdeproperty "TCP/Ports=5001,5010-5012"
    ```
 
    *VBoxHeadless* is a tool the launch VM as a server mode instead of traditional GUI mode. If you guy a VPS, say from Linode, your VPS VM mostly runs as a similar mode (maybe through web protocol for your control in brower).
@@ -107,14 +119,14 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 
     Attention: the server IP is the IP address of *host*, NOT IP of *guest*. Since I connect to VM locally, so it *127.0.0.1*.
 
-    *xfreerdp* can add many parameters except *clipboard*, like window size, audio, video etc.
+    *xfreerdp* can add many other parameters, like window size, audio, video etc.
 
     Now get into *Windows XP 32-bit*. If cannot see the Windows start menu, just enter 'Ctrl + Alt + Enter'.
 
     You might found there are two mouse pointers, one for *host* while another for *guest*. Also the screen resolution is not correctly set. To solve issues like this, to install *VBoxGuestAdditions*. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions* -> *VBoxWindowsAdditions.exe*. Before issues got solved, you can use keyboard shortcuts and TAB, ENTER etc keys.
 
     During *VBoxGuestAddtions* installation, there is a option *Direct3D* which should NOT be enabled.
-10. $ VBoxManage controlvm WinXP savestate/acpipowerbutton/poweroff/pause
+10. $ VBoxManage controlvm WinXP32 savestate/acpipowerbutton/poweroff/pause
 
     *pause*: temporarily puts a virtual machine on hold, without changing its state for good. The VM window will be painted in gray to indicate that the VM is currently paused. 
 
@@ -127,17 +139,9 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     1. If some jobs in VM not yet finished (like editing a file), use *savestate*;
     2. If every jobs completed, use *acpipoweroff* (as long as ACPI is enabled for VM) or *poweroff*;
     3. If still want to leave the VM running remotely, just close the RDP window.
-11. $ VBoxManage storageattach WinXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
+11. $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 
     Since *VBoxGuestAddtions* is installed. So unmount this ISO file. Other ISO files can also be mounted like step *6.6*.
-12. Folder share
-
-    First, create the folder that will be shared in *host*. Then in *guest*, mount the shared folder.
-
-    1. $ VBoxManage sharedfolder add WinXP --name "WLshare" --hostpath "/media/misc/VMs/WLshare"
-    2. Open Windows Explorer and look for it under "My Networking Places" -> "Entire Network" -> "VirtualBox Shared Folders" -> "\\\Vboxsvr". By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder.
-
-       If don't assign a drive letter, each time to access the shared, we have to find it under "\\\Vboxsvr".
 12. Launch scripts.
     1. */usr/local/sbin/vboxmodule*
 
@@ -147,40 +151,40 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
        echo 'VirtualBox modules loaded!'
        ```
 
-    2. *${HOME}/bin/vboxWinXP*
+    2. *${HOME}/bin/vboxWinXP32*
 
        ```bash
        #!/bin/bash
        # Bash Menu Script Example
 
-       PS3='Please enter your choice on VM WinXP: '
+       PS3='Please enter your choice on VM WinXP32: '
        options=("startvm" "rdp" "poweroff" "acpipowerbutton" "savestate" "quit")
        select opt in "${options[@]}"
        do
            case $opt in
                "startvm")
-                   echo "you choose to launch WinXP"
-                   VBoxHeadless --startvm WinXP --vrdeproperty "TCP/Ports=5001,5010-5012"
+                   echo "you choose to launch WinXP32"
+                   VBoxHeadless --startvm WinXP32 --vrdeproperty "TCP/Ports=5001,5010-5012"
                    break
                    ;;
                "rdp")
-                   echo "you choose to connect WinXP"
+                   echo "you choose to connect WinXP32"
                    xfreerdp +clipboard /sound /f /v:127.0.0.1:5001
                    break
                    ;;
                "acpipowerbutton")
-                   echo "you chose to acpipowerbuttion WinXP"
-                   VBoxManage controlvm WinXP poweroff
+                   echo "you chose to acpipowerbuttion WinXP32"
+                   VBoxManage controlvm WinXP32 poweroff
                    break
                    ;;
                "savestate")
-                   echo "you chose to save WinXPstate"
-                   VBoxManage controlvm WinXP savestate
+                   echo "you chose to save WinXP32state"
+                   VBoxManage controlvm WinXP32 savestate
                    break
                    ;;
                "poweroff")
-                   echo "you chose to poweroff WinXP"
-                   VBoxManage controlvm WinXP poweroff
+                   echo "you chose to poweroff WinXP32"
+                   VBoxManage controlvm WinXP32 poweroff
                    break
                    ;;
                "quit")
