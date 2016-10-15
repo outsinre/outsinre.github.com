@@ -446,7 +446,7 @@ title: Gentoo Installation
       Extra arguments `--lvm --luks --gpg --busybox` should be supplied upon generates *initramfs*. Refer to [Gentoo rootfs over LVM encrypted in LUKS container](/2015/08/15/gentoo-over-lvm-luks/) and [lvm luks lvm](/2015/09/10/lvm-luks-lvm/).
 
       Like modules, *genkernel* does not backup *initramfs* automatically when re-compiling the kernel. We are responsible for bakcuping manually, especially when the *genkernel* arguments are different.
-   7. Although we are on the old kernel, *@module-rebuild* knows how to re-install external kernel modules for the new kernel as long as */usr/src/linux* symlink pointing the new kernelsource tree (see *eselect kernel list*).
+   7. Although we are on the old kernel, *@module-rebuild* knows how to re-install external kernel modules for the new kernel as long as */usr/src/linux* symlink pointing the new kernel source tree (see *eselect kernel list*).
 7. Linux firmware
 
    Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
@@ -992,7 +992,9 @@ Boot with LiveDVD, then
 
 1. Xfce4 goodies
 
-   xfce4-power-manager; xfce4-mixer; xfce4-screenshooter; thunar-dropbox (qtcore); 
+   xfce4-power-manager; xfce4-mixer; xfce4-screenshooter; thunar-dropbox (qtcore);
+
+   1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
 2. Miscs
 
    guake; wgetpaste; weechat; wps-office; evince; [TeXLive](/2015/08/29/texlive-gentoo/);

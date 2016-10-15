@@ -58,9 +58,9 @@ title: LVM over LUKS over LVM
    $ dd if=/dev/urandom bs=8388607 count=1 | gpg --symmetric --cipher-algo AES256 --output ~/luks-gnupg-key.gpg
    ```
 
-   LiveCD *root* acount does not support this command as *gpg 2* need GUI popup to prompt password. Switch to normal user account in LiveCD.
+   LiveDVD *root* acount does not support this command as *gpg 2* need GUI popup to prompt password. Switch to normal user account in LiveDVD.
 
-   Without explici mark '$', all commands are executed under *root* account in LiveCD.
+   Without explici mark '$', all commands are executed under *root* account in LiveDVD.
 6. Save key-file to USB stick:
 
    ```bash
@@ -232,7 +232,7 @@ The directory name could be upper case 'EFI' or lower case 'efi'. Currently, 'EF
 # mount -v -t vfat /dev/sdc1 /mnt/gentoo/boot
 ```
 
-If you return to LiveCD and try to chroot again, please execute the above six commands first. Then follow:
+If you return to LiveDVD and try to chroot again, please execute the above six commands first. Then follow:
 
 ```bash
 # cp -v -L /etc/resolv.conf /mnt/gentoo/etc/
@@ -258,20 +258,25 @@ Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo ov
 
 ## initramfs
 
-1. echo "sys-kernel/genkernel cryptsetup" > /etc/portage/package.use/genkernel
-2. emerge -av genkernel
-3. genkernel --lvm --luks --gpg --busybox --install initramfs
+```bash
+# echo "sys-kernel/genkernel cryptsetup" > /etc/portage/package.use/genkernel
+# emerge -av genkernel
+# genkernel --lvm --luks --gpg --busybox --install initramfs
+```
 
-   Don't worry about '--gpg' problem occured in LiveCD above. genkernell will compile GnuPG 1 instead of 2.
+Don't worry about *--gpg* problem occured in LiveDVD above. genkernell will compile GnuPG 1 instead of 2.
 
 ## grub2
 
-1. grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part\_gpt
-   - '--bootloader-id=grub2' and '/dev/sdc' (USB stick) might be optional.
-   - '--efi-directory' specifies the mountpoint of the ESP (i.e. the USB sdc1 is mounted at /boot). It replaces '--root-directory' which is deprecated.
-   -  No need to append '/dev/sdc' since '--efi-directory=' is enough. The 'INSTALL_DEVICE' parameter of 'grub2-install' is mainly for BIOS boot.
+```bash
+# grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part\_gpt
+```
 
-   Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://forums.gentoo.org/viewtopic-p-7011836.html) and [grub2 zh-CN](https://wiki.gentoo.org/wiki/GRUB2/zh-CN).
+- '--bootloader-id=grub2' and '/dev/sdc' (USB stick) might be optional.
+- '--efi-directory' specifies the mountpoint of the ESP (i.e. the USB sdc1 is mounted at /boot). It replaces '--root-directory' which is deprecated.
+-  No need to append '/dev/sdc' since '--efi-directory=' is enough. The 'INSTALL_DEVICE' parameter of 'grub2-install' is mainly for BIOS boot.
+
+Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://forums.gentoo.org/viewtopic-p-7011836.html) and [grub2 zh-CN](https://wiki.gentoo.org/wiki/GRUB2/zh-CN).
 2. Kernel and init arguments '/etc/default/grub'
 
    ```
@@ -309,10 +314,26 @@ Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo ov
 7. vgchange -a n vg
 8. reboot
 
-# boot & EFI image backup
+# boot & EFI image backup/restore
 
-1. dd if=/dev/sdb2 | xz > boot-image-backup.xz, backup of boot and EFI shared partition
-2. xzcat image-file.xz | dd of=/dev/sdb2, restore from backup
+## *dd*
+
+1. *dd* copies bit by bit, free space included.
+2. Be careful on *if* and *of* argument.
+
+```bash
+# dd if=/dev/sdb2 | xz > boot-image-backup.xz
+# xzcat image-file.xz | dd of=/dev/sdb2, restore from backup
+```
+
+## *tar*
+
+```bash
+# tar -cvjpf /media/Misc/boot-image-backup.tar.bz2 /boot
+# tar -xvjpf /media/Misc/boot-image-backup.tar.bz2 -C /boot
+```
+
+*j* can be replaced with *z* or *J*to create *.gz* or *.xz* backup.
 
 # Operations to USB sdc1
 

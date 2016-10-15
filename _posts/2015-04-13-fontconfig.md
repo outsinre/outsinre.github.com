@@ -51,6 +51,7 @@ Install system-wide fonts are similar except that the fonts directories are diff
 # chmod -R 644 ./*
 # fc-cache -fv ./*
 # mkfontscale ./ && mkfontdir ./ (opt)
+```
 
 # Xserver support (opt)
 
