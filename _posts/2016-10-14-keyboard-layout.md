@@ -1,6 +1,6 @@
 ---
 layout: post
-title: layout
+title: Keyboard layout
 comments: true
 ---
 
@@ -21,30 +21,37 @@ comments: true
    For Intel QWERTY keyboard, the default keymap is *i386/qwerty/us.map.gz*.
 
    Among other keymaps, there is a special *include* directory offer supplemental keymap *extensions*.
-2. There are two import parameters in */etc/conf.d/keymaps*, namely *keymap=* and *extended_keymaps=*.
+2. There are two import parameters in */etc/conf.d/keymaps*, namely *keymap* and *extended_keymaps*.
 
-   *keymap=us* sets keyboard layout to *us.map.gz* while *extended_keymaps=* is a comma-listed *extension*s.
+   *keymap=us* sets keyboard layout to *us.map.gz* while *extended_keymaps* is a comma-listed *extension*s.
 
-   In this post, we will ignore *extended_keymaps=*.
+   In this post, we will ignore *extended_keymaps*.
 3 .To switch Caps/Ctrl or turn off Caps, we can modiy the *keycode* in keymap (decompressed). Before that, let's examine the *us.map* format:
 
-   >include "linux-with-alt-and-altgr"
-   >keycode  29 = Control
-   >keycode  58 = Caps_Lock
-   >keycode  97 = Control
-
+   ```
+   include "linux-with-alt-and-altgr"
+   keycode  29 = Control
+   keycode  58 = Caps_Lock
+   keycode  97 = Control
+   ```
+   
    1. *include* *extend*s the current keymap.
    2. *keycode 29 = Control* means the Ctrl key is pressed which also applies to 58 and 97.
    3. Specially 97 means the right Ctrl key while 29 is left Ctrl key.
 4. Switch Caps and left Ctrl:
 
-   >keycode  29 = Caps_Lock
-   >keycode  58 = Control
-
+   ```
+   keycode  29 = Caps_Lock
+   keycode  58 = Control
+   ```
+   
    Just swap the keycode for Control and Caps_Lock. Yeah, right, you can swap 29 and 97 (right Control) as well.
 5. Turn off Caps:
 
-   >keycode  58 = Control
+   ```
+   keycode  58 = Control
+   ```
+
 6. Although modification the original default *us.map.gz* is handy, create a new keymap is preferrable.
 
    Create *caps-off.map*:
@@ -98,10 +105,12 @@ comments: true
 4. XKB command line tool *x11-apps/setxkbmap* is a relativelly high level tool. If present, it resets */etc/conf.d/keymap* and *xmodmap* settings.
 
    Edit *~/.xinitrc* (or whatever) and call *setxkbmap* from there.
-   
-   >/usr/bin/setxkbmap -option "ctrl:swapcaps"
+
+   ```
+   /usr/bin/setxkbmap -option "ctrl:swapcaps"
    or
-   >/usr/bin/setxkbmap -option "ctrl:nocaps"
+   /usr/bin/setxkbmap -option "ctrl:nocaps"
+   ```
 
 5. XKB in Xorg configuration
 
