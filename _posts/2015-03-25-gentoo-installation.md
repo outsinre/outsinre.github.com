@@ -29,7 +29,7 @@ title: Gentoo Installation
    6. Ubuntu disk creater.
 
 3. Boot into the KDE desktop environment with USB stick made before. By default, there is no password required for account *gentoo*.
-   1. The very first thing is to connect to WIFI or Ethernet through networkmanager.
+   1. The very first thing is to connect to Wi-Fi or Ethernet through networkmanager.
    2. Use shortcut F12 to Open/Retract Yakuake/Guake terminal in KDE destop.
    3. Refer to [Gentoo Ten LiveDVD Frequently Asked Questions](https://www.gentoo.org/proj/en/pr/releases/10.0/faq.xml).
 4. `sudo su -` to *root*.
@@ -276,7 +276,7 @@ title: Gentoo Installation
 
 # Kernel building
 
-1. Install the kernel source
+1. Kernel sources tree
 
    ```bash
    # emerge -avt sys-kernel/gentoo-sources
@@ -405,7 +405,7 @@ title: Gentoo Installation
    7. [e-sources / cjktty patch specific options].`FONTS` and `FONT_8x16` set to Y. And *console 16x16 CJK font ( cover BMP )* = `FONT_16x16_CJK` which is *cjktty* patch. These options are for Chinese characters display in TTY (Ctrl + Alt + Fn).
    8. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 
-5. Compiling and installing
+5. Compiling
 
    ```bash
    # cd /usr/src/linux
@@ -414,8 +414,8 @@ title: Gentoo Installation
    # make modules_prepare (opt)
    # make -j3 && make modules_install && make install
    # emerge -avt genkernel; genkernel --install initramfs
-   # emerge -avt @module-rebuild
-   # reboot
+   # emerge -avt @module-rebuild (opt)
+   # reboot (opt)
    ```
 
    1. Make sure we are in kernel sources directory.
@@ -459,7 +459,7 @@ title: Gentoo Installation
 
 #  System configuration
 
-8. *fstab*
+1. *fstab*
 
    Creating the */etc/fstab* file. Use backup at best. The default */etc/fstab* file provided by Gentoo is not a valid fstab file but instead more of a template.
 
@@ -752,7 +752,7 @@ title: Gentoo Installation
 ```
 
 1. For *>=portageq-2.2.16*, *emaint sync* replaces original *emerge --sync* to sync Portage tree.
-2. *--with-bdeps=y* will calculate build time dependencies for updates.
+2. *--with-bdeps=y* will calculate build time dependencies for updates. Append this argument occasionally.
 3. If configuration needs updated, there will be a corresponding *._cfg\** file.
 4. As a tool of *gentoolkit*, *revdep-rebuild* is Gentoo's Reverse Dependency rebuilder. It will scan the installed ebuilds to find broken packages as a result of an upgrade of their dependencies. Those packages will be re-merged. However, it can also happen that a given package does not work with the currently upgraded dependencies, in which case you should upgrade the broken package to a more recent version. *revdep-rebuild* will pass flags to emerge which lets you use the --pretend flag to see what is going to be emerged again before going any further. 
 5. `emerge --info \| grep FEATURES` prints *preserve-libs* FEATURE is enabledby default. It tells Portage to preserve libraries when *soname*'s change during upgrade or downgrade, only as necessary to satisfy shared library dependencies of installed consumers/packages. Preserved libraries are automatically removed when there are no remaining consumers, which occurs when consumer packages are rebuilt or uninstalled. Ideally, rebuilds are triggered automatically during updates, in order to satisfy slot-operator dependencies.
@@ -799,12 +799,15 @@ Boot with LiveDVD, then
 4. Globally USEs:
 
    ```
-   USE="${CPU_FLAGS_X86} -bindist -qt4 -libav vaapi"
+   USE="${CPU_FLAGS_X86} -bindist -qt4 -qt5 -libav vaapi"
    ```
-5. Try to to *--with-bdeps=y* on system update.
+   
+5. Try to to *--with-bdeps=y* occasionally on system update.
 
-   Usually some fundamental dependency packages are pulled in like *git* and *ffmpeg*.
+   Updates fundamental dependencies like *git* and *ffmpeg*.
 6. Try *--oneshot -1* when re-merging dependencies.
+
+   This option should only be used for packages that are reachable from the @world package set (those that would NOT be removed by --depclean).
 
 # X
 
