@@ -92,10 +92,10 @@ Manually means change MAC address on command line. Pior to spoofing, we should m
 
    ```
    emerge -avt macchanger
-   emerge -avt --oneshot >=netifrc-0.2.3
+   emerge -avt --oneshot >=netifrc-0.2.3 (opt)
    ```
 
-   *macchanger* has bumped to verion 1.7.0 which returns different string on exit. However, *<netifrc-0.2.3* still examines the old exit string, error-prone.
+   *macchanger* has bumped to verion 1.7.0 which returns different string on exit. However, *<netifrc-0.2.3* still examines the old exit string, error-prone. If you manage networking by OpenRC *net config*, then bump to *>=netifrc-0.2.3*.
 
    ```
    ip link set dev wlan0 down
@@ -209,10 +209,18 @@ We assume the networking scheme is *dhcpcd + wpa\_supplicant*.
    ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="XX:XX:XX:XX:XX:XX", RUN+="/usr/bin/macchanger -A %k"
    ```
 
-   Make sure Udev is added to a init runlevel. On Gentoo, it's by default at *sysinit* runlevel.
+   Make sure Udev is added to a init runlevel. On Gentoo, it's by default at *sysinit* runlevel. Udev is a low level but powerful device control module, we can do more. For example, create another rule file to rename device interface.
 
-   Udev is a low level but powerful device control module, we can do more. For example, create another rule file to rename the interface.
+   If you'd like, set Udev log to *err* (default), *info* or *debug* through:
+
+   ```
+   # udevadm control --log-priority=info
+   ```
+
+   Alternatively, edit */etc/udev/udev.conf* manually.
 4. net config - discusses later
+
+   Must bump to *>=netifrc-0.2.3*.
 
 ## Release
 

@@ -409,13 +409,14 @@ title: Gentoo Installation
 
    ```bash
    # cd /usr/src/linux
-   # mount /dev/sda10 /boot; mount /dev/sda2 /boot/efi (opt)
-   # make clean/mrproper/distclean; echo 3 > /proc/sys/vm/drop_caches (opt)
-   # make modules_prepare (opt)
+   # mount /dev/sda10 /boot; mount /dev/sda2 /boot/efi
+   # make clean/mrproper/distclean; echo 3 > /proc/sys/vm/drop_caches
+   # make modules_prepare
    # make -j3 && make modules_install && make install
-   # emerge -avt genkernel; genkernel --install initramfs
-   # emerge -avt @module-rebuild (opt)
-   # reboot (opt)
+   # genkernel --install initramfs
+   # grub-mkconfig -o /boot/grub/grub.cfg
+   # emerge -avt @module-rebuild
+   # reboot
    ```
 
    1. Make sure we are in kernel sources directory.
@@ -446,7 +447,8 @@ title: Gentoo Installation
       Extra arguments `--lvm --luks --gpg --busybox` should be supplied upon generates *initramfs*. Refer to [Gentoo rootfs over LVM encrypted in LUKS container](/2015/08/15/gentoo-over-lvm-luks/) and [lvm luks lvm](/2015/09/10/lvm-luks-lvm/).
 
       Like modules, *genkernel* does not backup *initramfs* automatically when re-compiling the kernel. We are responsible for bakcuping manually, especially when the *genkernel* arguments are different.
-   7. Although we are on the old kernel, *@module-rebuild* knows how to re-install external kernel modules for the new kernel as long as */usr/src/linux* symlink pointing the new kernel source tree (see *eselect kernel list*).
+   7. Append current kernel to Grub menu.
+   8. Although we are on the old kernel, *@module-rebuild* knows how to re-install external kernel modules for the new kernel as long as */usr/src/linux* symlink pointing the new kernel source tree (see *eselect kernel list*).
 7. Linux firmware
 
    Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
@@ -658,8 +660,8 @@ title: Gentoo Installation
 1. Installation
 
    ```bash
-   # echo 'GRUB_PLATFORMS="efi-64"' >> */etc/portage/make.conf*.
-   # emerge -avt grub os-prober
+   # echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
+   # emerge -avt grub:2 os-prober
    # mount /dev/sda10 /boot; mount /dev/sda2 /boot/efi
    # grub-install --target=x86_64-efi
    ```

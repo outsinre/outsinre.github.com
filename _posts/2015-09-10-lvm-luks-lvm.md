@@ -279,16 +279,15 @@ Don't worry about *--gpg* problem occured in LiveDVD above. genkernell will comp
 Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://forums.gentoo.org/viewtopic-p-7011836.html) and [grub2 zh-CN](https://wiki.gentoo.org/wiki/GRUB2/zh-CN).
 2. Kernel and init arguments '/etc/default/grub'
 
-   ```
-   GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/dev/mapper/cryptvg-root rootfstype=ext4 root_keydev=UUID='uuid of boot and EFI shared partition' root_key=/relative/path/to/luks-gnupg-key-file"
-   ```
+   
+   >GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/dev/mapper/cryptvg-root rootfstype=ext4 root_keydev=UUID='uuid of boot and EFI shared partition' root_key=/relative/path/to/luks-gnupg-key-file"
    
    1. crypt_root: the UUID of the partition which is encrypted by DM-crypt LUKS. In our case, this is LVM volume /dev/mapper/vg-crypt or /dev/vg/crypt.
    2. dolvm: activate LVM volumes on bootup. This needs support from LVM support in initramfs.
    3. root: the real / mount point for Gentoo. In our case, it is /dev/mapper/cryptvg-root or /dev/cryptvg/root.
    4. rootfstype: Gentoo root filesystem.
    5. root_keydev: the device where DM-crypt LUKS key-file is stored. In our case, it is boot and EFI partition on USB stick.
-   6. root\_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
+   6. root_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
    7. You can use device file name or use UUID instead for those arguments. It's free choince.
    8. The 2nd reference adds a parameter 'target=cryptroot' whose usage is unclear. Don't try this if not sure.
 2. rc-service lvmetad start
