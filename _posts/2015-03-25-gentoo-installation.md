@@ -819,7 +819,7 @@ Boot with LiveDVD, then
    2. *vaapi* USE is enabled to utilize hardware acceleration.
    3. The *i965* and *i915* drivers split at system application (*media-libs/mesa*) level. The kernel always enable *i915* instead.
 
-   It's unnecessary to
+   Avoid
 
    ```bash
    # echo XSESSION="Xfce4" > /etc/env.d/90xsession
@@ -828,7 +828,7 @@ Boot with LiveDVD, then
    since *root* does not launch X. If really need, set in *~/.bash_profile* (detailed below).
 3. Display Manager; GDM; LightDM; SDDM.
 
-   We will use *startx* to read *~/.xinitrc* instead of Displayer Manager.
+   We will use *startx* to read *~/.xinitrc* instead of Displayer Manager. Refer to */etc/X11/xinit/*.
 4. Window Manager; Awesome; OpenBox; Xfwm4.
 5. Desktop; [Xfce](https://wiki.gentoo.org/wiki/Xfce) and [Xfce/Guide](https://wiki.gentoo.org/wiki/Xfce/HOWTO) ; KDE; Gnome.
    1. Refer to [XFCE_PLUGINS](https://gitweb.gentoo.org/repo/gentoo.git/tree/profiles/desc/xfce_plugins.desc).
@@ -940,6 +940,15 @@ Boot with LiveDVD, then
    ```
 
    You can also set a temporary config at command line. Check command line *synclient*.
+7. Icons
+
+   *xfce-base/xfce4-meta* depends on *virtual/freedesktop-icon-theme*. The lastest *virtual/freedesktop-icon-theme* ebuild has been changed to prefer *x11-themes/adwaita-icon-theme* over *x11-themes/gnome-icon-theme*. But the former does not contain icons for Xfce4 Desktop.
+
+   ```bash
+   # emerge -avtn x11-themes/adwaita-icon-theme
+   ```
+
+   Explicitly add *x11-themes/gnome-icon-theme* to world set.
 
 # New *plug-in sync system* - Layman/Overlay
 
