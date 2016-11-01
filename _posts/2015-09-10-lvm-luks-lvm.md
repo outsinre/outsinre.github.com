@@ -38,6 +38,8 @@ title: LVM over LUKS over LVM
 
    ```bash
    # mkfs.vfat -F32 /dev/sdc1
+   or
+   # busybox mkfs.vfat /dev/sdc1
    ```
    
 3. USB shared partition is not encrypted. If you put the shared partition within the LVM-LUKS-LVM architecture, then you need add LUKS support to *grub2*.
@@ -280,16 +282,17 @@ Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://for
 2. Kernel and init arguments '/etc/default/grub'
 
    
-   >GRUB_CMDLINE_LINUX="crypt_root=UUID='uuid of /dev/mapper/vg-crypt' dolvm root=/dev/mapper/cryptvg-root rootfstype=ext4 root_keydev=UUID='uuid of boot and EFI shared partition' root_key=/relative/path/to/luks-gnupg-key-file"
+   >GRUB_CMDLINE_LINUX="crypt_root=UUID='of /dev/mapper/vg-crypt' dolvm root=UUID='of /dev/mapper/cryptvg-root' rootfstype=ext4 root_keydev=PARTUUID='of boot and EFI shared partition' root_key=/relative/path/to/luks-gnupg-key-file"
    
    1. crypt_root: the UUID of the partition which is encrypted by DM-crypt LUKS. In our case, this is LVM volume /dev/mapper/vg-crypt or /dev/vg/crypt.
    2. dolvm: activate LVM volumes on bootup. This needs support from LVM support in initramfs.
    3. root: the real / mount point for Gentoo. In our case, it is /dev/mapper/cryptvg-root or /dev/cryptvg/root.
    4. rootfstype: Gentoo root filesystem.
-   5. root_keydev: the device where DM-crypt LUKS key-file is stored. In our case, it is boot and EFI partition on USB stick.
+   5. root_keydev: the device where DM-crypt LUKS key-file is stored. In our case, it is boot and EFI partition on USB stick. Always prefer PARTUUID over UUID on a GPT disk.
    6. root_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
    7. You can use device file name or use UUID instead for those arguments. It's free choince.
    8. The 2nd reference adds a parameter 'target=cryptroot' whose usage is unclear. Don't try this if not sure.
+   9. Refer to man page of *genkernel* for those parameters. They can be set to device name or the device UUID/PARTUUID.
 2. rc-service lvmetad start
 
    After getting into new Gentoo system, *grub2-mkconfig* might complain about *lvmetad* issue which does NO harm. If you really want to get rid of the warning, just run *rc-service lvmetad start* before *grub2-mkconfig* and remember to stop afterwards.
@@ -332,7 +335,8 @@ Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://for
 # tar -xvjpf /media/Misc/boot-image-backup.tar.bz2 -C /boot
 ```
 
-*j* can be replaced with *z* or *J*to create *.gz* or *.xz* backup.
+1. *j* can be replaced with *z* or *J*to create *.gz* or *.xz* backup.
+2. Avoid `/' after *boot*, namely */boot* instead of */boot/*.
 
 # Operations to USB sdc1
 

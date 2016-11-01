@@ -449,6 +449,8 @@ title: Gentoo Installation
       Like modules, *genkernel* does not backup *initramfs* automatically when re-compiling the kernel. We are responsible for bakcuping manually, especially when the *genkernel* arguments are different.
    7. Append current kernel to Grub menu.
    8. Although we are on the old kernel, *@module-rebuild* knows how to re-install external kernel modules for the new kernel as long as */usr/src/linux* symlink pointing the new kernel source tree (see *eselect kernel list*).
+
+      If we are re-compiling the kernel, this is not a requirement.
 7. Linux firmware
 
    Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
@@ -794,7 +796,9 @@ Boot with LiveDVD, then
 # System notes
 
 1. Use *ffmpeg* instead of *libav* including the USEs.
-2. Prefer *openssl/ssl* USE to *gnutls* USE.
+2. Prefer *openssl/ssl* USE (*dev-libs/openssl*) to *gnutls* USE (*net-libs/gnutls*) for SSL/TLS secure connection. Please Google *openssl vs gnutls*. Gnutls seems to suffer library bug.
+   1. *dev-libs/openssl*: full-strength general purpose cryptography library (including SSL and TLS).
+   2. *net-libs/gnutls*: a TLS 1.2 and SSL 3.0 implementation for the GNU project.
 3. Vaapi
 
    *ffmpeg*, *mesa*, *mpv*, and *firefox* enable *vaapi* USE.
@@ -810,6 +814,8 @@ Boot with LiveDVD, then
 6. Try *--oneshot -1* when re-merging dependencies.
 
    This option should only be used for packages that are reachable from the @world package set (those that would NOT be removed by --depclean).
+7. Use UUID to identify a partition instead of */dev/sdaxy*.
+8. Press 'Alt + [Fn + (SysRq)] PrtSc', then press *reisub* keys respectively. Not sure if '[Fn +]' is required.
 
 # X
 
@@ -832,8 +838,9 @@ Boot with LiveDVD, then
 4. Window Manager; Awesome; OpenBox; Xfwm4.
 5. Desktop; [Xfce](https://wiki.gentoo.org/wiki/Xfce) and [Xfce/Guide](https://wiki.gentoo.org/wiki/Xfce/HOWTO) ; KDE; Gnome.
    1. Refer to [XFCE_PLUGINS](https://gitweb.gentoo.org/repo/gentoo.git/tree/profiles/desc/xfce_plugins.desc).
-   2. Add *-qt4* to *make.conf*.
-
+   2. Similar to *xfce-extra/xfce4-notifyd*, *x11-themes/gnome-icon-theme* can be explicitly emerged along with *xfce-base/xfce4-meta*. Details refer to Missing icons in *Xfce4 configuration* below.
+   3. Add *-qt4* to *make.conf*.
+   
 # Xfce4 configuration
 
 1. GTK+3 consistent theme
@@ -899,19 +906,30 @@ Boot with LiveDVD, then
    # rm -r ~/.config/Thunar
    ```
 
-5. [deprecated] Replaced by method in *fstab*
+5. Hide unmounted partitions from user interface (opt)
 
-    When you get into the Xfce4 desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use `udev, udisks` utility.
-    
-    Edit */etc/udev/rules.d/99-hide-disks.rules*:
+   When you get into the Xfce4 desktop, you may found many unnecessary disk icons on the desktop or thunar sidebar. It's annoying. Use *udev/udisks* utility.
 
-    ```
-    KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
-    ```
+   Edit */etc/udev/rules.d/80-hide-disks.rules*:
 
-    `XY` is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
+   ```
+   ENV{ID_FS_UUID}=="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXX", ENV{UDISKS_IGNORE}="1"
+   or
+   KERNEL=="sdaXY", ENV{UDISKS_IGNORE}="1"
+   ```
 
-    Refer to [udev 99-hide-disks.rules is no longer working](https://superuser.com/q/695791).
+   To load the new rules without reboot:
+
+   ```bash
+   # udevadm control --reload
+   # udevadm trigger
+   ```
+
+   1. XY is the disk partition number you would like to hide. As noted in the reference below, `UDISKS_PRESENTATION_HIDE` is deprecated and replaced by `UDISKS_IGNORE`.
+   2. Refer to */lib64/udev/rules.d/80-udisks2.rules*, read section:
+
+      >Devices which should not be display in the user interface
+   3. Refer to [udev 99-hide-disks.rules is no longer working](https://superuser.com/q/695791) and [udisks on archwiki](https://wiki.archlinux.org/index.php/Udisks).
 6. Touchpad
 
    If Touchpad does not support *tap click*. As long as *x11-drivers/xf86-input-synaptics* is installed, a default configuration is located at */usr/share/X11/xorg.conf.d/50-synaptics.conf*. Copy it to */etc/X11/xorg.conf.d/* and edit:
@@ -940,12 +958,12 @@ Boot with LiveDVD, then
    ```
 
    You can also set a temporary config at command line. Check command line *synclient*.
-7. Icons
+7. Missing icons
 
-   *xfce-base/xfce4-meta* depends on *virtual/freedesktop-icon-theme*. The lastest *virtual/freedesktop-icon-theme* ebuild has been changed to prefer *x11-themes/adwaita-icon-theme* over *x11-themes/gnome-icon-theme*. But the former does not contain icons for Xfce4 Desktop.
+   *xfce-base/xfce4-meta* depends on *virtual/freedesktop-icon-theme*. The lastest *virtual/freedesktop-icon-theme* ebuild has been changed to prefer *x11-themes/adwaita-icon-theme* (by default) over *x11-themes/gnome-icon-theme*. But the former does not contain icons for Xfce4 Desktop.
 
    ```bash
-   # emerge -avtn x11-themes/adwaita-icon-theme
+   # emerge -avtn x11-themes/gnome-icon-theme
    ```
 
    Explicitly add *x11-themes/gnome-icon-theme* to world set.
@@ -1175,7 +1193,7 @@ Boot with LiveDVD, then
 3. (opt) swapfile
 
    ```bash
-   # fallocate -l 1G /mnt/1GB-swapfile
+   # dd if=/dev/zero of=/mnt/1GB-swapfile bs=1M count=1024
    # chmod 600 /mnt/1GB-swapfile
    # mkswap /mnt/1GB-swapfile
    # swapon /mnt/1GB-swapfile
@@ -1184,4 +1202,5 @@ Boot with LiveDVD, then
    /mnt/1GB-swapfile none swap defaults 0 0
    ```
 
-    Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).
+   1. Use *dd* to create a file occupying continuing disk space instead of a *sparse file*. Refer to [swap partition vs file for performance?](https://serverfault.com/a/25708).
+   2. Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).

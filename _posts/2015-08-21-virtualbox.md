@@ -39,7 +39,9 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 3. Install
 
    ```bash
-   # emerge -av app-emulation/virtualbox
+   # emerge -avt app-emulation/virtualbox
+   # emerge -avt app-emulation/virtualbox-additions (>=5)
+   # emerge -avt app-emulation/virtualbox-extpack-oracle (>=5)
    ```
 
    It reminds accepting PUEL licence. Refer to [VirtualBox wiki](https://wiki.gentoo.org/wiki/VirtualBox).
