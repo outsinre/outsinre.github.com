@@ -851,7 +851,7 @@ Boot with LiveDVD, then
    # emerge -avt x11-themes/gtk-engines-xfce
    ```
 
-1. *consolekit* is emerged as dependency during X installation. But *Shutdown*, *Suspend* etc. does not work after getting into Xfce4.
+1. *consolekit* is emerged as dependency during X installation. But *Shutdown*, *Suspend* etc. are greyed after getting into Xfce4.
 
    ```bash
    # echo "sys-auth/consolekit pm-utils" >> /etc/portage/package.use/consolekit
@@ -859,9 +859,13 @@ Boot with LiveDVD, then
    # rc-update add consolekit default
    ```
 
-2. *.xinitrc*
+2. Xinit
 
+   The default Xinit conguration is located under */etc/X11/xinit*. Customization:
+   
    ```
+   # ~/.xinitrc
+   
    export XMODIFIERS="@im=fcitx"
    export QT_IM_MODULE="fcitx"
    export GTK_IM_MODULE="fcitx"
@@ -872,7 +876,13 @@ Boot with LiveDVD, then
    ck-launch-session dbus-launch --sh-syntax --exit-with-session xfce4-session
    ```
 
-   Now login and `startx` gets into Xfce4.
+   Now login and *startx -- vt7 -nolisten tcp* gets into Xfce4.
+   
+   1. Attention, *-- -nolisten tcp* is to disallow TCP connection to X server.
+   2. *vt7* must be appended, otherwise switches between X and virtual terminal would freeze the whole X seesion to death. Refer to Intel HD3000 Tearing/Corruption/Glitch post.
+
+      The default Xinit configuration fails to set the correct virtual terminal to start X.
+
 3. Automatic Xfce4 on login
 
    Edit *~/.bash_profile*:
@@ -889,15 +899,11 @@ Boot with LiveDVD, then
    # If ~/.xinitrc does not exist, startx takes it as a fallback
    XSESSION="Xfce4"
 
-   # Force bash to obtain its value for HOME from getpwent(3) on first use, so tilde-expansion is sane.
-   #unset -v HOME
-
    if shopt -q login_shell; then
-           [[ -t 0 && $(tty) == /dev/tty1 && ${USER} == "outsinre" && ! $DISPLAY ]] && exec startx -- -nolisten tcp
+           [[ -t 0 && $(tty) == /dev/tty1 && "$USER" == "username" && ! $DISPLAY ]] && exec startx -- vt7 -nolisten tcp
    fi
    ```
 
-   Attention, *-- -nolisten tcp* is to disallow TCP connection to X server.
 4. Clear Xfce configuration
 
    ```bash
@@ -1030,6 +1036,9 @@ Boot with LiveDVD, then
 2. Miscs
 
    guake; wgetpaste; weechat; wps-office; evince; [TeXLive](/2015/08/29/texlive-gentoo/);
+
+   1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/).
+
 3. ALSA
 
    Check if *alsa-lib* and *alsa-utils* are installed or not. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.

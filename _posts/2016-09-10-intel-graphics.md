@@ -20,7 +20,12 @@ title: Intel HD3000 Tearing/Corruption/Glitch
    ```
 
    Turn on *TearFree* for *sna*.
-2. *DON'T* bump to lastest (even 9999).
+2. Bump to lastest (even 9999).
 
-   *xf86-video-intel*, *mesa*, *xorg-server* *xorg-drivers* etc.
+   *xf86-video-intel* and *mesa* (even *xorg-server* and *xorg-drivers*) etc.
 3. Upgrade kernel to lastest.
+4. *startx -- vt7*
+
+   The default Xinit configuration fails to set the correct virtual terminal to start X, resulting in X freezes upon switches between X and virtual terminal.
+
+   
