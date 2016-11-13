@@ -734,6 +734,7 @@ title: Gentoo Installation
    # passwd myUser
    ```
 
+   Compared to *useradd*, *adduser* has a nice interactive mode.
 2. Check wireless network.
 
    If fail to connect,
@@ -834,12 +835,12 @@ Boot with LiveDVD, then
    since *root* does not launch X. If really need, set in *~/.bash_profile* (detailed below).
 3. Display Manager; GDM; LightDM; SDDM.
 
-   We will use *startx* to read *~/.xinitrc* instead of Displayer Manager. Refer to */etc/X11/xinit/*.
+   We will use *startx* (wrapper of *xinit* binary) to read *~/.xinitrc* (the default is */etc/X11/xinit/xinitrc* or */etc/xdg/xfce4/xinitrc*). One of the main functions of *~/.xinitrc* is to dictate which client (i.e. Xfce4) for the X Window System is invoked with *startx* or *xinit* programs on a per-user basis.
 4. Window Manager; Awesome; OpenBox; Xfwm4.
 5. Desktop; [Xfce](https://wiki.gentoo.org/wiki/Xfce) and [Xfce/Guide](https://wiki.gentoo.org/wiki/Xfce/HOWTO) ; KDE; Gnome.
    1. Refer to [XFCE_PLUGINS](https://gitweb.gentoo.org/repo/gentoo.git/tree/profiles/desc/xfce_plugins.desc).
    2. Similar to *xfce-extra/xfce4-notifyd*, *x11-themes/gnome-icon-theme* can be explicitly emerged along with *xfce-base/xfce4-meta*. Details refer to Missing icons in *Xfce4 configuration* below.
-   3. Add *-qt4* to *make.conf*.
+   3. Add *-qt4 -qt5* to *make.conf*.
    
 # Xfce4 configuration
 
@@ -851,7 +852,7 @@ Boot with LiveDVD, then
    # emerge -avt x11-themes/gtk-engines-xfce
    ```
 
-1. *consolekit* is emerged as dependency during X installation. But *Shutdown*, *Suspend* etc. are greyed after getting into Xfce4.
+2. *consolekit* is emerged as dependency during X installation. But *Shutdown*, *Suspend* etc. are greyed after getting into Xfce4.
 
    ```bash
    # echo "sys-auth/consolekit pm-utils" >> /etc/portage/package.use/consolekit
@@ -859,29 +860,65 @@ Boot with LiveDVD, then
    # rc-update add consolekit default
    ```
 
-2. Xinit
+3. [Xinit](https://wiki.archlinux.org/index.php/Xinitrc) (Dispaly Manager)
 
-   The default Xinit conguration is located under */etc/X11/xinit*. Customization:
+   The default OpenRC Xinit conguration is located under */etc/X11/xinit*. Customization:
+
+   First get a copy of the default. The reason of doing this (instead of creating one from scratch) is to preserve some desired default behaviour in the original file, such as sourcing shell scripts from */etc/X11/xinit/xinitrc.d*.
    
+   ```bash
+   # cp /etc/X11/xinit/xinitrc ~/.xinitrc
    ```
-   # ~/.xinitrc
-   
+
+   The default Xinitrc examines Xresources and Xmodmap and prepares Consolekit and Dbus. The last section either tries *twm* and *xterm* or lanuches XSESSION. We can change *exec $command* to *echo $command* and test the script within virtual terminal (console). It looks like:
+
+   >ck-launch-session dbus-launch --sh-syntax --exit-with-session /etc/X11/Sessions/Xfce4
+
+   The default is enough to launch Xfce4 desktop. However we might require extra stuff like:
+
+   ```
    export XMODIFIERS="@im=fcitx"
    export QT_IM_MODULE="fcitx"
    export GTK_IM_MODULE="fcitx"
 
-   [[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
-
-   #exec startxfce4
-   ck-launch-session dbus-launch --sh-syntax --exit-with-session xfce4-session
+   # Refer to /etc/X11/xinit/xinitrc
+   # or replace 'startxfce4' with 'xfce4-session':
+   #exec ck-launch-session dbus-launch --sh-syntax --exit-with-session xfce4-session
+   exec $command
    ```
 
-   Now login and *startx -- vt7 -nolisten tcp* gets into Xfce4.
-   
-   1. Attention, *-- -nolisten tcp* is to disallow TCP connection to X server.
-   2. *vt7* must be appended, otherwise switches between X and virtual terminal would freeze the whole X seesion to death. Refer to Intel HD3000 Tearing/Corruption/Glitch post.
+4. *startx*
 
-      The default Xinit configuration fails to set the correct virtual terminal to start X.
+   ```bash
+   # startx -- vt7 -nolisten tcp
+   ```
+
+   Arguments after two bashes are passed to Xorg server.
+
+   1. The *xserverrc* file is a shell script responsible for starting up the Xorg server. Both *startx* and *xinit* execute *~/.xserverrc* if it exists, *startx* will use default */etc/X11/xinit/xserverrc* otherwise.
+   2. Attention, *-nolisten tcp* is to disallow TCP connection to X server.
+   3. *vt7* must be appended, otherwise switches between X and virtual terminal would freeze the whole X seesion to death. Refer to [Intel HD3000 Tearing/Corruption/Glitch](/2016/09/10/intel-graphics/).
+
+   The default */etc/X11/xinit/xserverrc* fails to set the correct virtual terminal to start X server. It depends on `$XDG_VTNR` which is not available on OpenRC but Systemd.
+
+   An alternative is:
+
+   ```bash
+   # cp /etc/X11/xinit/xserverrc ~/.xserverrc
+   ```
+   
+   Modify a little bit:
+
+   ```
+   #!/bin/sh
+   if [ -z "$XDG_VTNR" ]; then
+     exec /usr/bin/X -nolisten tcp "$@" vt7
+   else
+     exec /usr/bin/X -nolisten tcp "$@" vt$XDG_VTNR
+   fi
+   ```
+
+   If a Display Manager is used, those arguments would be handled correctly without user concern.
 
 3. Automatic Xfce4 on login
 
@@ -904,6 +941,7 @@ Boot with LiveDVD, then
    fi
    ```
 
+   If *~/.xserverrc* exists, remove *vt7 -nolisten tcp*.
 4. Clear Xfce configuration
 
    ```bash
@@ -1064,7 +1102,7 @@ Boot with LiveDVD, then
    
    *table* USE will draw several built-in input methods (i.e. Wubi) which fail to meet my requirement. *rime* will be installed instead.
    
-   Insert to head of *~/.xinitrc*:
+   Make sure the following code resides before *exec* of *~/.xinitrc*.
 
    ```
    export GTK_IM_MODULE=fcitx

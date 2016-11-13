@@ -24,8 +24,14 @@ title: Intel HD3000 Tearing/Corruption/Glitch
 
    *xf86-video-intel* and *mesa* (even *xorg-server* and *xorg-drivers*) etc.
 3. Upgrade kernel to lastest.
-4. *startx -- vt7*
+4. Extra Xorg arguments
 
-   The default Xinit configuration fails to set the correct virtual terminal to start X, resulting in X freezes upon switches between X and virtual terminal.
-
+   ```bash
+   # startx -- vt7
+   ```
    
+   Arguments after the two dashes are passed to Xorg server. Default OpenRC Xinit configuration is located under */etc/X11/xinit*. However it fails to set the correct virtual terminal (i.e. vt7) to start X, resulting in X freezes upon switches between X and virtual terminal.
+
+   Alternatively, *vt7* can be passed to X server directly in *~/.xserverrc*:
+
+   >exec /usr/bin/X -nolisten tcp "$@" vt7
