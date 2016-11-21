@@ -223,16 +223,11 @@ This adding/re-adding happens ad infinitum. It takes a little getting used to, b
 1. [(emacs)Undo](http://www.cs.cmu.edu/cgi-bin/info2www?%28emacs%29Undo)
 2. [How do you 'redo' changes after 'undo' with Emacs?](http://stackoverflow.com/q/3527142)
 
-## file and buffer Encoding
+## Changing encoding
 
-有时候同一个文件在不同的系统下编码不一样，导致乱码的问题。这时，就要用到 Emacs 的一些M-x命令来临时改变编码。
-
-1. `M-x revert-buffer-with-coding-system` 这是改变 buffer 的编码，并不是真正的改变文件的编码，可以起到临时的查阅作用。
-2. `M-x set-buffer-file-coding-system`这是设置 buffer 所对应的文件的编码，表示彻底改变编码了。
-
-*reference*:
-
-1. [How to switch back text encoding to UTF-8 with emacs?](http://superuser.com/q/549497)
+1. C-x C-m/RET r (M-x: revert-buffer-with-coding-system): if Emacs fails to display file contents.
+2. C-x C-m/RET f (M-x: set-buffer-file-coding-system): changing file's encoding when C-x C-s
+3. C-x C-m/TET c <encoding> C-x C-w (M-x: universal-coding-system-argument): changing file's encoding immediately by saving as a new file.
 
 # Configuration
 

@@ -203,8 +203,10 @@ title: Gentoo Installation
 
 # Localization
 
-1. Time
-   1. UTC (Universal Time Coordinated) is absolute global time.
+1. [Time](https://unix4lyfe.org/time/)
+   1. Prime Meridian was (arbitrarily) chosen to pass through the Royal Observatory in Greenwich.
+   1. UTC (previously called Greenwich Mean Time GMT): time at zero degrees longitude (the Prime Meridian) is called Coordinated Universal Time.
+   1. Unix time: Measured as the number of seconds since epoch (the beginning of 1970 in UTC). Unix time is not affected by time zones or daylight saving.
    2. Local Time (UTC + Timezone) is what we use daily.
 
       Setting operating Software Time equal correctly to Local Time is our goal.
@@ -232,10 +234,14 @@ title: Gentoo Installation
    # ls /usr/share/zoneinfo
    # echo "Asia/Shanghai" > /etc/timezone
    # emerge --config sys-libs/timezone-data
+   # date
    ```
 
-   Check with `date` command.
 4. locale
+
+   The *locale* format is like *xx_YY.ZZ*, where *xx* and *YY* denote lanugage code and country code respectively. *ZZ* stands for charset (encoding/decoding). *xx* and *YY* mainly affects GUI (DE, app menus etc.), while *ZZ* takes care of encoding/decoding.
+
+   *eselect locale set* defines all locale settings at once by *LANG* varaible while allowing further individual customization via the *LC_\** sub-options (i.e. *LC_CTYPE*).
 
    ```bash
    # cat /usr/share/i18n/SUPPORTED \| grep zh_CN >> /etc/locale.gen
@@ -247,32 +253,57 @@ title: Gentoo Installation
 
    In the 3rd step, if reminded to run "*. /etc/profile*" to reload the variable, just remember `export PS1="(chroot) $PS1"`.
 
-   Use `xx_YY.UTF-8` (or `xx_YY.utf8`. But this one might not work for some packages) instead of `xx_YY.UTF8`. How to achieve this? Use the *free form* of Gentoo *eselect*.
+   Use *xx_YY.UTF-8* (some applications does NOT recognize *xx_YY.utf8*) instead of the illegal format *xx_YY.UTF8*. How to achieve this? Use the *free form* of Gentoo *eselect*.
 
    ```
    # eselect locale set en_US.UTF-8
+   # locale
    ```
 
-5. Chinese display
-
-   */etc/env.d/02locale* offers fine-grained *locale* settings. We keep the original English system while displaying Chinese characters. If you set LANG="zh_CN.xxx", then the system will be Chinese. Try `UTF-8` first otherwise many Chinese filenames not displaying correctly.
+   *LC_\** sub-options can be further set in */etc/env.d/02locale*:
 
    ```
    LANG="en_US.UTF-8"
-   LC_CTYPE="zh_CN.UTF-8"
    LC_COLLATE="C"
    ```
+
+   If you don't have privileged access, *export* them in shell RC file like *.bashrc*.
 
    Remember to
 
    ```bash
    # env-update && source /etc/profile && export PS1="(chroot) $PS1"
+   # locale
    ```
 
-   in the end.
+5. Chinese
 
-   1. In order to display Chinese characters, we need to install Chinese fonts, refer to [fontconfig](/2015/04/13/fontconfig/).
-   2. Refer to [Gentoo本地化设置](http://www.jianshu.com/p/9411ab947f96); [Locale系统介绍](http://www.jianshu.com/p/86358b185e53) and [Jin Buguo](http://jinbuguo.com).
+   Why English display is not a concern? You may say that English is the mostly used accross the world and hence mostly used by programmers and the applications thereof. Yep, that's right but superficial. The underlying core is that ASCII table (English characters) is covered by nearly all encoding schemes present, GB2312/GBK/GB18030 included! No matter which encoding scheme is chosen, English is always correctly displayed.
+
+   To be specific, language display is divided into two aspects:
+
+   1. GUI (i.e. file name, menu, popup box, botton, log etc.) through *xx_YY* part.
+   2. File content which is what we refer to without explicit explanation (i.e. a HTML page). May be default to *ZZ* part.
+
+   Let's talk about GUI first. You may be confused. Most applications GUI use ASCII characters (i.e. popup error dialog), thus correctly displayed no matter what system locale is set. But applications written for Chinese like QQ use Chinese GUI by default. What if the author could not be bothered to offer English GUI? Then we have to tune system locale to Chinese.
+
+   What if you would like more Chinese on your system GUI, which looks confortable? That's where *nls* and *l10n_\** (*linguas_\** will be deprecated) USEs play a role. Many applications supports either *nls* or *l10n*, which is the part users can control. The localized/translated GUI messages is stored in */usr/share/locale/<locale>/LC_MESSAGES/<package>.mo* files. *nls* installs all possible locale messages, while *l10n_\** only installs the locale message specified by USE. The system locale must be *LANG=zh_CN.ZZ* to let installed locale messages displayed. If you only set sub-option *LC_CTYPE=zh_CN.ZZ*, then GUI sticks to English.
+
+   When it comes to file content display/updating, it depends on the context. Client browser decodes HTM page by the *charset* tag. Emacs is smtart at detecting file encoding. Mousepad is stupid and always decode by system locale. And will ask for user confirmation upon failure. However, for Unicode-based encoding, it's easy to guess the encoding through BOM. Modern applications is smart at detection. If the application fails to detect file encoding, it may default to *ZZ* part of locale, to which many comand line tools belongs. 
+
+   Let's go on details of *ZZ* part. For Chinese, it should be one of GB2312, GBK, GB18030 and UTF-8. Apart from the fallback decoding role, it mainly determine encoding of user generated contents (i.e. default encoding of new file).
+
+   Remember that:
+
+   1. Chinese characters are encoded and stored. Upon display, the encoding scheme should be found (by GTK/QT, text editor, browser, even by user involvement).
+   2. The advantage of setting *ZZ* to UTF-8 is that it's widely used and reduces mojibak.
+   3. UTF-8 requires more disk space (50% higher) for CJK characters.
+
+   It's not over yet. Up to now, only character encoding is detected. In order to display the character, relevant font should be matched (i.e. by Fontconfig). Translation between the character encoding and *glyph* is done through font's intermediate *charmap/cmap/bmp* files. *cmap* is  a table mapping character encoding to glyph's *internal index*. Each font may include multiple *cmap* files corresponding to different character encodings (i.e. GBK, UTF-8). Then font engine (i.e. FreeType2) renders the returned *glyph*.
+
+   Attention, *cmap* itself is encoded as well, mostly by Unicode (namely UTF-16/UCS-2, NOT UTF-8).
+
+   Details on XFT, refer to [fontconfig](/2015/04/13/fontconfig/).
 
 # Kernel building
 
@@ -280,9 +311,11 @@ title: Gentoo Installation
 
    ```bash
    # emerge -avt sys-kernel/gentoo-sources
-   # ls -l /usr/src
+   # ls -l /usr/src && cd /usr/src/linux;
    # eselect kernel list/set
-   # cd /usr/src/linu && patch [--dry-run] -p1 < /path/to/cjktty.patch (opt)
+   # git apply --whitespace=warn [--numstat] [--check] < /path/to/cjktty.patch
+   or
+   # patch [--dry-run] -p1 < /path/to/cjktty.patch (opt)
    ```
 
    For the first time we install kernel sources, */etc/src/linux* symlink is created automatically.
@@ -1114,7 +1147,7 @@ Boot with LiveDVD, then
 6. FFmpeg
 
    ```
-   # echo "media-video/ffmpeg vaapi librtmp openssl" >> /etc/portage/package.use/ffmpeg
+   # echo "media-video/ffmpeg vaapi librtmp openssl vpx" >> /etc/portage/package.use/ffmpeg
    # emerge -avt ffmpeg
    ```
 
