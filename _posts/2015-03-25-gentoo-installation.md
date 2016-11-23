@@ -237,7 +237,7 @@ title: Gentoo Installation
    # date
    ```
 
-4. locale
+4. [locale](https://www.ibm.com/developerworks/cn/linux/l-cn-linuxglb/)
 
    The *locale* format is like *xx_YY.ZZ*, where *xx* and *YY* denote lanugage code and country code respectively. *ZZ* stands for charset (encoding/decoding). *xx* and *YY* mainly affects GUI (DE, app menus etc.), while *ZZ* takes care of encoding/decoding.
 
@@ -282,12 +282,12 @@ title: Gentoo Installation
 
    To be specific, language display is divided into two aspects:
 
-   1. GUI (i.e. file name, menu, popup box, botton, log etc.) through *xx_YY* part.
-   2. File content which is what we refer to without explicit explanation (i.e. a HTML page). May be default to *ZZ* part.
+   1. GUI (i.e. menu, popup box, botton, log etc.).
+   2. File content which is what we refer to without explicit explanation (i.e. a HTML page).
 
    Let's talk about GUI first. You may be confused. Most applications GUI use ASCII characters (i.e. popup error dialog), thus correctly displayed no matter what system locale is set. But applications written for Chinese like QQ use Chinese GUI by default. What if the author could not be bothered to offer English GUI? Then we have to tune system locale to Chinese.
 
-   What if you would like more Chinese on your system GUI, which looks confortable? That's where *nls* and *l10n_\** (*linguas_\** will be deprecated) USEs play a role. Many applications supports either *nls* or *l10n*, which is the part users can control. The localized/translated GUI messages is stored in */usr/share/locale/<locale>/LC_MESSAGES/<package>.mo* files. *nls* installs all possible locale messages, while *l10n_\** only installs the locale message specified by USE. The system locale must be *LANG=zh_CN.ZZ* to let installed locale messages displayed. If you only set sub-option *LC_CTYPE=zh_CN.ZZ*, then GUI sticks to English.
+   What if you would like more Chinese on your system GUI, which looks confortable? That's where *nls* and *l10n_\** (*linguas_\** will be deprecated) USEs play a role. Many applications supports either *nls* or *l10n*, which is the part users can control. The localized/translated GUI messages is stored in */usr/share/locale/<locale>/LC_MESSAGES/<package>.mo* files. *nls* installs all possible locale messages, while *l10n_\** only installs the locale message specified by USE. The system locale must be *LANG=zh_CN.ZZ* to let installed locale messages displayed, where ZZ charset must covers zh_CN characters (GB2312 GBK GB18030). If you only set sub-option *LC_CTYPE=zh_CN.ZZ*, then GUI sticks to English.
 
    When it comes to file content display/updating, it depends on the context. Client browser decodes HTM page by the *charset* tag. Emacs is smtart at detecting file encoding. Mousepad is stupid and always decode by system locale. And will ask for user confirmation upon failure. However, for Unicode-based encoding, it's easy to guess the encoding through BOM. Modern applications is smart at detection. If the application fails to detect file encoding, it may default to *ZZ* part of locale, to which many comand line tools belongs. 
 
@@ -338,7 +338,7 @@ title: Gentoo Installation
 
    ```bash
    # cd /usr/src/linux
-   # cp /path/to/.config-backup .
+   # cp /path/to/.config-backup .config && chmod -x .config
    # make help
    # make silentoldconfig
    ```
@@ -421,13 +421,9 @@ title: Gentoo Installation
    7. NTFS. `NTFS_FS` and `FUSE_FS` to M. Refer to [NTFS wiki](https://wiki.gentoo.org/wiki/NTFS). You need to install `ntfs-3g` package later on. Since *ntfs-3g* embeds NTFS write, set`NTFS_RW` to N.
    9. Turn on `PACKET` (default Y)  for wireless tool `wpa_supplicant` which will be installed later on.
    9. Turn off `NET_VENDOR_NVIDIA` since no `NVIDIA` card in laptop.
-   1. [Deprecated, use the default 437 and iso8859-1].
-    
-      Set `FAT_DEFAULT_CODEPAGE` to 936, `FAT_DEFAULT_IOCHARSET` to *gb2312* for NTFS partition Chinese file names correctly for displayed on FAT partition. Don't use *gb18030*. It seems that kernel does not recognize *gb18030*.
+   1. Set `FAT_DEFAULT_CODEPAGE` to 936 (without prefix *cp*), `FAT_DEFAULT_IOCHARSET` uses default *iso8859-1* (this value should include the prefix *cp* such as *cp936*) but turn on it's sub-option `FAT_DEFAULT_UTF8`.
 
-      Set `NLS_CODEPAGE_936` and `NLS_CODEPAGE_950` to M.
-
-      On windows, FAT is now mainly used as USB bootable stick, EFI partition, etc. For file storage, NTFS is a better choice.
+      Enable `NLS_CODEPAGE_936` to Y or M. Turn off `NLS_CODEPAGE_437` and `NLS_ASCII` since we either use UTF-8 or GBK system. Keep `NLS_ISO8859_1` since it's the default value of `FAT_DEFAULT_IOCHARSET`.
    2. Dm-crypt. *Device mapper support* = `BLK_DEV_DM` is set Y by default. *Crypt target support* = `DM_CRYPT` must be M or Y. *XTS support* = `CRYPTO_XTS` and *AES cipher algorithms (x86_64)* = `CRYPTO_AES_X86_64` optionally set to M (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below. `CRYPTO_SERPENT` and `CRYPTO_SHA512` must be Y instead of M if relevant LUKS algorithms are used. Refer to [gentoo over lvm luks](2015/08/15/gentoo-over-lvm-luks/).
    3. Iptables. `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (*-m owner*). `IP_NF_TARGET_REDIRECT` (-j REDIRECT) which will enable `NF_NAT_REDIRECT` (in return, `NETFILTER_XT_TARGET_REDIRECT` be enabled as well). We only need `NETFILTER_XT_TARGET_REDIRECT` for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NF_NAT_IPV6` as dependency) to enable ip6tables *nat* table. Turn on `NETFILTER_XT_MATCH_MULTIPORT` for *-m multiport*
    4. System log: `SECURITY_DMESG_RESTRICT` to Y. Refer to [Restrict unprivileged access to kernel syslog](https://lwn.net/Articles/414813/).
