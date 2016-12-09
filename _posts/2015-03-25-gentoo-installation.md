@@ -423,7 +423,9 @@ title: Gentoo Installation
    9. Turn off `NET_VENDOR_NVIDIA` since no `NVIDIA` card in laptop.
    1. Set `FAT_DEFAULT_CODEPAGE` to 936 (without prefix *cp*), `FAT_DEFAULT_IOCHARSET` uses default *iso8859-1* (this value should include the prefix *cp* such as *cp936*) but turn on it's sub-option `FAT_DEFAULT_UTF8`.
 
-      Enable `NLS_CODEPAGE_936` to Y or M. Turn off `NLS_CODEPAGE_437` and `NLS_ASCII` since we either use UTF-8 or GBK system. Keep `NLS_ISO8859_1` since it's the default value of `FAT_DEFAULT_IOCHARSET`.
+      Enable `NLS_CODEPAGE_936` to Y or M. Current *initramfs* reads LUKS key from VFAT USB partition on boot, MUST set to be Y, otherwise it would fail to find (mount) the key device.
+
+      Turn off `NLS_CODEPAGE_437` and `NLS_ASCII` since we either use UTF-8 or GBK system. Keep `NLS_ISO8859_1` since it's the default value of `FAT_DEFAULT_IOCHARSET`.
    2. Dm-crypt. *Device mapper support* = `BLK_DEV_DM` is set Y by default. *Crypt target support* = `DM_CRYPT` must be M or Y. *XTS support* = `CRYPTO_XTS` and *AES cipher algorithms (x86_64)* = `CRYPTO_AES_X86_64` optionally set to M (recommended). Refer to [Dm-crypt](https://wiki.gentoo.org/wiki/Dm-crypt). Refer to *Cryptsetup* step below. `CRYPTO_SERPENT` and `CRYPTO_SHA512` must be Y instead of M if relevant LUKS algorithms are used. Refer to [gentoo over lvm luks](2015/08/15/gentoo-over-lvm-luks/).
    3. Iptables. `NETFILTER_ADVANCED` & `XT_MATCH_OWNER` (*-m owner*). `IP_NF_TARGET_REDIRECT` (-j REDIRECT) which will enable `NF_NAT_REDIRECT` (in return, `NETFILTER_XT_TARGET_REDIRECT` be enabled as well). We only need `NETFILTER_XT_TARGET_REDIRECT` for iptables REDIRECT, so to simplify kernel, just enable it alone. If necessary, turn on `IP6_NF_NAT` (`NF_NAT_IPV6` as dependency) to enable ip6tables *nat* table. Turn on `NETFILTER_XT_MATCH_MULTIPORT` for *-m multiport*
    4. System log: `SECURITY_DMESG_RESTRICT` to Y. Refer to [Restrict unprivileged access to kernel syslog](https://lwn.net/Articles/414813/).
@@ -847,11 +849,13 @@ Boot with LiveDVD, then
 7. Use UUID to identify a partition instead of */dev/sdaxy*.
 8. Press 'Alt + [Fn + (SysRq)] PrtSc', then press *reisub* keys respectively. Not sure if '[Fn +]' is required.
 
-# X
+# [X Window System](https://en.wikipedia.org/wiki/X_Window_System)
 
-1. X Window System; X.org Server; X.org driver.
-2. [Xorg](https://wiki.gentoo.org/wiki/Xorg/Configuration).
-   1. Mainly *x11-base/xorg-server* (*x11-base/xorg-drivers* and *x11-libs/mesa* as dependencies).
+1. X Window System, X11, and X (shortname) are used interchangebly.
+
+   X originated at the Massachusetts Institute of Technology (MIT) in 1984. The protocol has been version 11 (hence "X11") since September 1987.
+2. [Xorg](https://wiki.gentoo.org/wiki/Xorg/Configuration) Server.
+   1. Mainly *x11-base/xorg-server* (depending on *x11-base/xorg-drivers* and *x11-libs/mesa*).
    2. *vaapi* USE is enabled to utilize hardware acceleration.
    3. The *i965* and *i915* drivers split at system application (*media-libs/mesa*) level. The kernel always enable *i915* instead.
 
@@ -862,25 +866,21 @@ Boot with LiveDVD, then
    ```
 
    since *root* does not launch X. If really need, set in *~/.bash_profile* (detailed below).
-3. Display Manager; GDM; LightDM; SDDM.
+3. Display Manager: GDM, LightDM, SDDM etc.
 
    We will use *startx* (wrapper of *xinit* binary) to read *~/.xinitrc* (the default is */etc/X11/xinit/xinitrc* or */etc/xdg/xfce4/xinitrc*). One of the main functions of *~/.xinitrc* is to dictate which client (i.e. Xfce4) for the X Window System is invoked with *startx* or *xinit* programs on a per-user basis.
-4. Window Manager; Awesome; OpenBox; Xfwm4.
-5. Desktop; [Xfce](https://wiki.gentoo.org/wiki/Xfce) and [Xfce/Guide](https://wiki.gentoo.org/wiki/Xfce/HOWTO) ; KDE; Gnome.
+4. Window Manager: Awesome, OpenBox, Xfwm4 etc.
+5. Desktop: [Xfce](https://wiki.gentoo.org/wiki/Xfce) and [Xfce/Guide](https://wiki.gentoo.org/wiki/Xfce/HOWTO), KDE, Gnome etc.
    1. Refer to [XFCE_PLUGINS](https://gitweb.gentoo.org/repo/gentoo.git/tree/profiles/desc/xfce_plugins.desc).
    2. Similar to *xfce-extra/xfce4-notifyd*, *x11-themes/gnome-icon-theme* can be explicitly emerged along with *xfce-base/xfce4-meta*. Details refer to Missing icons in *Xfce4 configuration* below.
    3. Add *-qt4 -qt5* to *make.conf*.
    
-# Xfce4 configuration
+# X Configuration
 
-1. GTK+3 consistent theme
-
-   By default, *x11-themes/gtk-engines-xfce* slot 0 (for GTK+2) is pulled. We emerge it explicitly to pull in GTK+3 theme.
-
-   ```bash
-   # emerge -avt x11-themes/gtk-engines-xfce
-   ```
-
+1. Per-user [Theming](/2016/11/23/theme/) locations:
+   1. *\*.desktop* file should be placed in *~/.local/share/applications/*.
+   2. Themes are placed in *~/.local/share/themes/*.
+   3. Icons are placed in *~/.local/share/icons/*.
 2. *consolekit* is emerged as dependency during X installation. But *Shutdown*, *Suspend* etc. are greyed after getting into Xfce4.
 
    ```bash
@@ -1031,15 +1031,6 @@ Boot with LiveDVD, then
    ```
 
    You can also set a temporary config at command line. Check command line *synclient*.
-7. Missing icons
-
-   *xfce-base/xfce4-meta* depends on *virtual/freedesktop-icon-theme*. The lastest *virtual/freedesktop-icon-theme* ebuild has been changed to prefer *x11-themes/adwaita-icon-theme* (by default) over *x11-themes/gnome-icon-theme*. But the former does not contain icons for Xfce4 Desktop.
-
-   ```bash
-   # emerge -avtn x11-themes/gnome-icon-theme
-   ```
-
-   Explicitly add *x11-themes/gnome-icon-theme* to world set.
 
 # New *plug-in sync system* - Layman/Overlay
 
@@ -1196,11 +1187,8 @@ Boot with LiveDVD, then
 8. Emacs
    1. Use *athena Xaw3d -gtk -gtk3 -motif*  USEs to replace GTK toolkit if multiple monitors are used. Refer to *daemon mode* bug [reddit](https://www.reddit.com/r/emacs/comments/2ans0z/have_you_encountered_that_gtk_bug_in_daemon_mode/?ref=share&ref_source=link) and [wiki](https://wiki.gentoo.org/wiki/GNU_Emacs).
    2. *xft* support non-western characters. *libxml2* support *shr* enables *eww* HTML viewer. *gnutls/ssl* supports Gnus IMAP connection.
-   3. Chinese input.
-
-      Input Chinese with Fcitx. First, you need to set `LC_CTYPE=zh_CN.utf8`. Second, change the Fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`. Restart X.
-
-      Up to now, in terminal *emacs -nw* can input Chinese character. If GUI frame does not, emerge two fonts: *font-adobe-100dpi* and *font-adobe-75dpi*. You can read post-emerge message:
+   3. Chinese input with Fcitx. Change the Fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`.
+   4. (opt) If X frame does not input Chinese, emerge two fonts: *font-adobe-100dpi* and *font-adobe-75dpi*. You can read post-emerge message:
 
       ```
       if use X; then
@@ -1213,14 +1201,27 @@ Boot with LiveDVD, then
       fi
       ```
 
-    4. More refer to [gentoo over lvm luks](/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](/2014/09/14/emacs/installation/).
-    5. Turn on a few Nano options in */etc/nanorc*: *set autoindent*, *set backup*, *set tabsize 4* etc. If need to totally disable an option, use *unset <option>*.
+   5. *emacs-daemon*
 
-       ```bash
-       # emerge -avt --noreplace nano
-       ```
+      ```bash
+      # emerge -avt emacs-daemon
+      # cd /etc/init.d/
+      # ln -sv emacs emacs.usernmae
+      # rc-update add emacs.username default, (do NOT add */etc/init.d/emacs* to default runlevel directly)
+      # rc-service emacs.username start
+      ```
+      
+   6. More refer to [gentoo over lvm luks](/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](/2014/09/14/emacs/installation/).
+9. Nano
 
-9. Archive
+   After installing Emacs, *nano* will be removed on next *emerge -avc* (check package *virtual/editor*). To keep *nano*:
+
+    ```bash
+    # emerge -avt --noreplace nano
+    ```
+
+   Turn on a few Nano options in */etc/nanorc*: *set autoindent*, *set backup*, *set tabsize 4* etc. If need to totally disable an option, use *unset <option>*.
+1. Archive
 
    ```bash
    # emerge -av file-roller
@@ -1277,6 +1278,8 @@ Boot with LiveDVD, then
    # ect /etc/fstab
    /mnt/1GB-swapfile none swap defaults 0 0
    ```
+
+   >Since OpenRC-0.22, please enable *rc_need="localmount"* in */etc/conf.d/swap*.
 
    1. Use *dd* to create a file occupying continuing disk space instead of a *sparse file*. Refer to [swap partition vs file for performance?](https://serverfault.com/a/25708).
    2. Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).

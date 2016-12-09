@@ -47,7 +47,7 @@ title: Filesystem
 1. *codepage* option. Kernel uses it to decode shortname and then translates it into Unicode. Longname is Unicode by default.
 2. *iocharset* option. Kernel uses it to encode the Unicode shortname (MSDOS) or longname (VFAT). Then the encoded stream is passed to use space.
 
-   There is a special *iocharset* value *utf8*. You should set it in a different way (discussed next).
+   There is a special *iocharset* value *utf8*. You should set it in a separate way (discussed next).
 3. Upon receiving the stream, application decodes it with the system locale (*nls* in user space).
 
 ## Set the correct value
@@ -56,7 +56,7 @@ title: Filesystem
 
    Shortname's codepage is cp936 while longname is Unicode.
 2. Set *codepage=936* mount option (without prefix *cp*).
-   1. If you want to see the shortname, use *-t msdos* instead of *-t vfat*.
+   1. If you want to see the shortname, use *-t msdos* instead of *-t vfat*. Meanwhile, *iocharset* is ignored.
    2. Actually, we rarely use MSDOS nowadays. If you don't care, just leave it the default (in kernel).
 3. *iocharset=* depends on system locale *xx_YY.ZZ*:
    1. If ZZ is Chinese encoding like GB2312, GBK, GB18030, then set *iocharset=cp936* (with prefix *cp*).
