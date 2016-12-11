@@ -63,7 +63,7 @@ Obviously, the 3rd method simple and effective. In reality, I prefer the 3rd met
    5. \# cp /usr/portage/net-wireless/wpa\_supplicant/metadata.xml .
 
        *metadata.xml* is a XML file denoting package information. Usually just a few lines.
-   6. \# repoman manifest (pay attention to: the current directory)
+   6. \# repoman manifest (pay attention to: the current directory) or ebuild wpa_supplicant-2.3-r2.ebuild digest
 
       Calculate the package source (download from `GENTOO_MIRROR` or `SRC_URI`) checksum and put into `Manifest`.
    5. \# repoman scan -d
