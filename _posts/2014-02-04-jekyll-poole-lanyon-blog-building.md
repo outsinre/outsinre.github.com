@@ -123,12 +123,12 @@ but now replaced by:
 **baseurl** in `_config.yml` file. Please refer to [GitHub Pages](http://jekyllrb.com/docs/github-pages/). Basically, pay attention to the *leading slash* and *trailing slash* issue when writing post. It is better to include the `site.baseurl` when accessing files. Don't use `/`. Because the blog might be migrated to some other places or to a project github pages in the future, which causes compatibility issue. For example, to include an image in post:
 {% highlight html linenos %}
 {% raw %}
-<img src="{{site.baseurl}}assets/hknight.jpg">
+<img src="{{ site.baseurl }}assets/hknight.jpg">
 {% endraw %}
 {% endhighlight %}
 If you replace:
 `{% raw %}
-{{site.baseurl}}
+{{ site.baseurl }}
 {% endraw %}`
 with `/`, it is fine with user github page. But if the blog is migrated to project github page, then it does not work. You have to change `/` to `/project-name/` in your post. If you have many such posts, it is a big trouble. However, `site.baseurl` works fine. The only place you need to change is the `_config.yml` file.
 

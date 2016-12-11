@@ -13,7 +13,7 @@ title: Linux Distributions
 	
 	    >RHEL (commercial use), CentOS (Community ENTerprise OS).
 	
-	    ![Relationship]({{site.baseurl}}assets/fedora.png "distrio diff")
+	    ![Relationship]({{ site.baseurl }}/assets/fedora.png "distrio diff")
 
         CentOS derives from reverse engineering of RHEL, which takes away part of RHEL customers.
     3. OpenSUSE: `.rpm` built **specialy** for openSUSE.

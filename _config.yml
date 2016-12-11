@@ -1,7 +1,7 @@
 # engine
 markdown: kramdown
 kramdown:
-    input: GFM
+  input: GFM
 
 highlighter: rouge
 encoding: utf-8
