@@ -7,9 +7,6 @@ highlighter: rouge
 encoding: utf-8
 
 url: http://www.fxhu.tk
-# If no custom url:
-#  For user page, "/";
-#  For project page, "/project-name" (without trailing slash).
 baseurl: ''
 permalink: pretty
 paginate: 5
