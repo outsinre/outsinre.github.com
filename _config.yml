@@ -1,21 +1,18 @@
-# Engine
+# engine
 markdown: kramdown
-
-# kramdown:
-#   input: GFM
-#   hard_wrap: false
+kramdown:
+    input: GFM
 
 highlighter: rouge
-
 encoding: utf-8
 
+url: http://www.fxhu.tk
+# If no custom url:
+#  For user page, "/";
+#  For project page, "/project-name" (without trailing slash).
+baseurl: ''
 permalink: pretty
-
-url: https://www.fxhu.tk
 paginate: 5
-
-# If not set custom url: if user pages, then use "/"; if project page, use "/project-name" (without trailing slash).
-baseurl: /
 
 # Site info
 title: ZNHOO
