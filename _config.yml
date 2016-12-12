@@ -1,22 +1,18 @@
-# engine
-markdown: kramdown
-kramdown:
-  input: GFM
+# https://help.github.com/articles/configuring-jekyll/
 
-highlighter: rouge
 encoding: utf-8
 
 url: http://www.fxhu.tk
 baseurl: ''
+
 permalink: pretty
+
 paginate: 5
 
-# Site info
 title: ZNHOO
 tagline: 'Whatever you are, be a good one!'
 description: 'Make yourself at home. Contact me at <a href="mailto:{{ site.author.email }}">@email</a>.'
 
-# About/contact
 author:
   name: ZNHOO
   email: youwu@inventati.org
