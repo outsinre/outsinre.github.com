@@ -6,7 +6,7 @@ title: TeXLive in Gentoo
 1. Installation
 
    1. If you are upgrading TeXLive, follow [Tex Live Migration Guide](https://wiki.gentoo.org/wiki/Project:TeX/Tex_Live_Migration_Guide) first.
-   2. TeXLive 2015 ebuild bug. Read [cjk-latex-4.8.3-r1 econf failed](https://bugs.gentoo.org/show_bug.cgi?id=596938).   My current solution is bumping to *cjk-latex-4.8.4* (i.e. create a local ebuild with *>=cjk-latex-4.8.4*).
+   2. TeXLive 2015 ebuild bug. Read [cjk-latex-4.8.3-r1 econf failed](https://bugs.gentoo.org/show_bug.cgi?id=596938).   My current solution is bumping to *cjk-latex-4.8.4* (i.e. create a local ebuild with *>=cjk-latex-4.8.4*). *already fixed in upstream*
    3. *app-text/texlive* handles basic configuration while *app-text/texlive-core* consists of real sources. Some important basic TeXLive macro pckages are split from *app-text/texlive-core* and are built separately, like *dev-libs/ptexenc*, *app-text/ps2pkm*, *dev-libs/kpathsea*, etc. This allows for more unitary upgrades or security fixes.
 
    ```
@@ -17,10 +17,13 @@ title: TeXLive in Gentoo
    1. *xetex* makes use of system Fontconfig fonts directly besides those shipped with TeXLive.
 
       By default, XeTeX pulls xeCJK macro package.
-   2. *cjk* draws in CJK which supports Chinese TeX documents though need extra efforts.
+   2. *cjk* draws in CJK which supports Chinese TeX documents though it requires extra efforts.
    3. *l10n_zh* draws in CTeX macro package which is based on CJK/xeCJK, thus compiling Chinese docs easier.
+   4. xeCJK extends CJK for XeTeX.
 
 2. USE flags like *extra* and *science* draws in a bundle of packages many of which are not necessary.
+
+   - Even disable *extra* USE, *dev-texlive/texlive-latexextra* is installed as dependency.
 
    - (obsolete) Package *dev-tex/texmfind* returns what *portage package* you need for specific *TeXLive package*.
 

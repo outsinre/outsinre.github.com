@@ -425,7 +425,7 @@ The above spoofing method assumes *dhcpcd + wpa\_supplicant* networking scheme. 
    
 ## Refs
 
-1. [arch wiki]9https://wiki.archlinux.org/index.php/Wpa_supplicant#Connecting_with_wpa_cli)
+1. [arch wiki](https://wiki.archlinux.org/index.php/Wpa_supplicant#Connecting_with_wpa_cli)
 2. [gists](https://gist.github.com/buhman/7162560)
 
 # Other functionality

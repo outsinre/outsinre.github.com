@@ -550,7 +550,7 @@ title: Gentoo Installation
    ```
 
    2. In case of the network interface card should be configured with a static IP address, entries can also be manually added to */etc/dhcpcd.conf*.
-   3. If need GUI tool, use *networkmanager* instead of *wicd* since the later one don't support *nl80211* driver. Also *Networkmanager* depends on *wpa_supplicant* and *dhcpcd* or *dhcpclient*.
+   3. If need GUI tool, use NetworkManager instead of *wicd* since the later one don't support *nl80211* driver. Also Networkmanager depends on *wpa_supplicant* and *dhcpcd* or *dhcpclient*.
    4. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
 
 2. *wpa_supplicant*
@@ -630,7 +630,7 @@ title: Gentoo Installation
    # chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf`.
    ```
 
-   *dhcpcd* revokes *wpa_supplicant* through */lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant* hook. From *dhcpcd-6.10.0* onward, *10-wpa_supplicant* hook is no longer there by default. We should copy */usr/share/dhcpcd/hooks/10-wpa_supplicant* to */lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant*.
+   *dhcpcd* invokes *wpa_supplicant* through */lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant* hook. From *dhcpcd-6.10.0* onward, *10-wpa_supplicant* hook is no longer there by default. We should copy */usr/share/dhcpcd/hooks/10-wpa_supplicant* to */lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant*.
 
    `lspci -k` shows wireless driver in use is *iwlwifi*. However if specify `-D iwlwifi` on command line, *wpa_supplicant* will fail:
 
@@ -1091,11 +1091,11 @@ Boot with LiveDVD, then
    xfce4-power-manager; xfce4-mixer; xfce4-screenshooter; thunar-dropbox (qtcore);
 
    1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
-2. Miscs
+2. Recommendations
 
    guake; wgetpaste; weechat; wps-office; evince; [TeXLive](/2015/08/29/texlive-gentoo/);
 
-   1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/).
+   1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/). Those fonts are essential to display formulas. However, WPS-linux does not have built-in formula creation function due to copyright.
 
 3. ALSA
 
@@ -1186,7 +1186,7 @@ Boot with LiveDVD, then
    9. Details on [*youtube-dl*](https://github.com/rg3/youtube-dl) and [*you-get*](https://github.com/soimort/you-get), refer to their Github pages.
 8. Emacs
    1. Use *athena Xaw3d -gtk -gtk3 -motif*  USEs to replace GTK toolkit if multiple monitors are used. Refer to *daemon mode* bug [reddit](https://www.reddit.com/r/emacs/comments/2ans0z/have_you_encountered_that_gtk_bug_in_daemon_mode/?ref=share&ref_source=link) and [wiki](https://wiki.gentoo.org/wiki/GNU_Emacs).
-   2. *xft* support non-western characters. *libxml2* support *shr* enables *eww* HTML viewer. *gnutls/ssl* supports Gnus IMAP connection.
+   2. *xft* for Fontconfig. *libxml2* support *shr* enables *eww* HTML viewer. *gnutls/ssl* supports Gnus IMAP connection.
    3. Chinese input with Fcitx. Change the Fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`.
    4. (opt) If X frame does not input Chinese, emerge two fonts: *font-adobe-100dpi* and *font-adobe-75dpi*. You can read post-emerge message:
 
@@ -1210,8 +1210,28 @@ Boot with LiveDVD, then
       # rc-update add emacs.username default, (do NOT add */etc/init.d/emacs* to default runlevel directly)
       # rc-service emacs.username start
       ```
-      
-   6. More refer to [gentoo over lvm luks](/2015/08/15/gentoo-over-lvm-luks/) and [emacs configuration](/2014/09/14/emacs/installation/).
+
+   6. Since *emacs-daemon* is launched before (OpenRC init) setting variable (XMODIFIERS="@im=fcitx"), *emacsclient -c* cannot find external Fcitx's XIM server. Solutions:
+
+      ```bash
+      #/etc/init.d/emacs.username
+      export SHELL EMACS EMACS_TIMEOUT EMACS_DEBUG
+      export XMODIFIERS=@im=fcitx
+      ```
+
+      We set the variable in init *start()* function. Alternatively,
+
+      ```bash
+      start-stop-daemon --start \
+        --user "${USER}" --pidfile "${PIDFILE}" --chdir "${home}" \
+        --env XMODIFIERS="@im=fcitx" --exec "${EMACS_START}" \
+	-- ${EMACS_OPTS}
+      ```
+
+      Set XMODIFIERS through `--env` argument of *start-stop-daemon*.
+
+      Emacs uses XIM to support external input method instead of GTK/QT toolkit. More details on XMODIFIERS/XIM, refer to Fcitx's official page.
+
 9. Nano
 
    After installing Emacs, *nano* will be removed on next *emerge -avc* (check package *virtual/editor*). To keep *nano*:
