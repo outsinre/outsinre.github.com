@@ -928,7 +928,7 @@ Boot with LiveDVD, then
    2. Attention, *-nolisten tcp* is to disallow TCP connection to X server.
    3. *vt7* must be appended, otherwise switches between X and virtual terminal would freeze the whole X seesion to death. Refer to [Intel HD3000 Tearing/Corruption/Glitch](/2016/09/10/intel-graphics/).
 
-   The default */etc/X11/xinit/xserverrc* fails to set the correct virtual terminal to start X server. It depends on `$XDG_VTNR` which is not available on OpenRC but Systemd.
+   The default */etc/X11/xinit/xserverrc* fails to set the correct virtual terminal to start X server. It depends on `$XDG_VTNR` which is not available on OpenRC [but Systemd](https://www.freedesktop.org/wiki/Software/systemd/writing-display-managers/).
 
    An alternative is:
 
@@ -1211,7 +1211,9 @@ Boot with LiveDVD, then
       # rc-service emacs.username start
       ```
 
-   6. Since *emacs-daemon* is launched before (OpenRC init) setting variable (XMODIFIERS="@im=fcitx"), *emacsclient -c* cannot find external Fcitx's XIM server. Solutions:
+   6. XIM
+
+      Since *emacs-daemon* is launched before (OpenRC init) setting variable (XMODIFIERS="@im=fcitx" by *startx* in *~/.xinitrc*), *emacsclient -c* cannot find external Fcitx's XIM server. Possible solutions:
 
       ```bash
       #/etc/init.d/emacs.username
@@ -1219,7 +1221,7 @@ Boot with LiveDVD, then
       export XMODIFIERS=@im=fcitx
       ```
 
-      We set the variable in init *start()* function. Alternatively,
+      We set the variable in init *start()* function. Alternatively, set XMODIFIERS through `--env` argument of *start-stop-daemon*.
 
       ```bash
       start-stop-daemon --start \
@@ -1228,9 +1230,20 @@ Boot with LiveDVD, then
 	-- ${EMACS_OPTS}
       ```
 
-      Set XMODIFIERS through `--env` argument of *start-stop-daemon*.
+      However, direct modification init script is discouraged (suppose you are on a multiple user accounts system). *emacs-daemon* has a wrraper script (*/usr/libexec/emacs/emacs-wrapper.sh*) to start the daemon *with a login shell*. We can set XMODIFIERS in bash startup script (*~/.bashrc* or *~/.bash_profile*).
 
-      Emacs uses XIM to support external input method instead of GTK/QT toolkit. More details on XMODIFIERS/XIM, refer to Fcitx's official page.
+      A more elegant way is to create a new copy of */etc/conf.d/emacs* and do update there:
+
+      ```bash
+      # pushd /etc/conf.d
+      # cp emacs emacs.username
+      # nano -w emacs.username
+      export XMODIFIERS="@im=fcitx"
+      ```
+
+      Don't worry! *openrc-run* looks for both */etc/conf.d/emacs* and */etc/conf.d/emacs.username*.
+      
+      Emacs uses XIM to support external input method instead of GTK/QT toolkit. Details on XMODIFIERS/XIM, refer to Fcitx's official page. Read more at [fcitx not work on *emacsclient --create-frame*](https://stackoverflow.com/a/34852916) and [app-emacs/emacs-daemon should allow for setting up a proper environment](https://bugs.gentoo.org/show_bug.cgi?id=246460).
 
 9. Nano
 
