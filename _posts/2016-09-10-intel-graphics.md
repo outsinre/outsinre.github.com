@@ -22,7 +22,7 @@ title: Intel HD3000 Tearing/Corruption/Glitch
    Turn on *TearFree* for *sna*.
 2. Bump to lastest (even 9999).
 
-   *xf86-video-intel* and *mesa* (even *xorg-server* and *xorg-drivers*) etc.
+   *xf86-video-intel*, *mesa*, *libdrm*, *libva*, and *libva-intel-driver* (even *xorg-server* and *xorg-drivers*) etc.
 3. Upgrade kernel to lastest.
 4. Extra Xorg arguments
 

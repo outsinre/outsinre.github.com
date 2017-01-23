@@ -1140,7 +1140,7 @@ Boot with LiveDVD, then
 
    1. *ffmpeg* is emerged by some other packages, one of which might be Firefox or Mpv.
    4. Add *-libav* to *make.conf* in favor of system-wide *ffmpeg*.
-   2. *v4l* USE for the webcamera.
+   2. *v4l* and *libv4l*USE for the webcamera.
    3. *vaapi* USE for hardware decoding.
    5. *librtmp* USE to replace the native RTMP implementation (bad performance).
    6. *network* (default) and *openssl* to support HTTP/HTTPS streaming.
@@ -1184,6 +1184,11 @@ Boot with LiveDVD, then
 
       The last two hypens means arguments afterwards are input files/urls. Since using the *Open With* addon, save more CPU and memory than Firfox.
    9. Details on [*youtube-dl*](https://github.com/rg3/youtube-dl) and [*you-get*](https://github.com/soimort/you-get), refer to their Github pages.
+   9. Some videos with *aac* audio track won't show video (only audio). `-v --no-config` gives:
+
+      >[lavf] Edit lists are not correctly supported (FFmpeg issue).
+
+      Before *ffmpeg* fixes the *edit list* parsing, add `--demuxer-lavf-o=ignore_editlist=1` option.
 8. Emacs
    1. Use *athena Xaw3d -gtk -gtk3 -motif*  USEs to replace GTK toolkit if multiple monitors are used. Refer to *daemon mode* bug [reddit](https://www.reddit.com/r/emacs/comments/2ans0z/have_you_encountered_that_gtk_bug_in_daemon_mode/?ref=share&ref_source=link) and [wiki](https://wiki.gentoo.org/wiki/GNU_Emacs).
    2. *xft* for Fontconfig. *libxml2* support *shr* enables *eww* HTML viewer. *gnutls/ssl* supports Gnus IMAP connection.
