@@ -311,9 +311,9 @@ title: Gentoo Installation
 
    ```bash
    # emerge -avt sys-kernel/gentoo-sources
-   # ls -l /usr/src && cd /usr/src/linux;
    # eselect kernel list/set
-   # git apply --whitespace=warn [--numstat] [--check] < /path/to/cjktty.patch
+   # ls -l /usr/src && cd /usr/src/linux;
+   # git apply [--whitespace=warn] [--numstat] [--check] < /path/to/cjktty.patch
    or
    # patch [--dry-run] -p1 < /path/to/cjktty.patch (opt)
    ```
@@ -1035,7 +1035,7 @@ Boot with LiveDVD, then
 # New *plug-in sync system* - Layman/Overlay
 
 1. Layman adds, removes, syncs etc. Overlays on system.
-2. With the help of Portage new *plug-in sync system*, Overlays can be easily synced by Portage *emaint*. Therefore, Layman is purely an Overlay add/remove too.
+2. With the help of Portage new *plug-in sync system*, Overlays can be easily synced by Portage *emaint*. Therefore, Layman is purely used to add/remove Overlays.
 3. From *2.3.0* onwards, Layman supports the new *plug-in sync system* naturally. But current stable version is *2.0.0*. Ether accept *2.3.0* or manually write new *plug-in sync* configurations for newly added Overlays.
 
    ```bash
@@ -1093,9 +1093,10 @@ Boot with LiveDVD, then
    1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
 2. Recommendations
 
-   guake; wgetpaste; weechat; wps-office; evince; [TeXLive](/2015/08/29/texlive-gentoo/);
+   guake; wgetpaste; weechat; wps-office; evince; [TeXLive](/2015/08/29/texlive-gentoo/); Telegram;
 
    1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/). Those fonts are essential to display formulas. However, WPS-linux does not have built-in formula creation function due to copyright.
+   2. [Telegram 1.0.5] crashes with *segmentation fault* on startup. A possible workaround is to *put mouse over* GUI immediately upon its appearance.
 
 3. ALSA
 
