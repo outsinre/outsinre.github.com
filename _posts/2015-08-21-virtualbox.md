@@ -81,11 +81,13 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    2. $ VBoxManage registervm ~/.VirtualBox/Machines/WinXP32/WinXP32.vbox
 
       Supply the full path of *.vbox* file.
-   3. $ VBoxManage modifyvm WinXP32 --memory 384 --acpi on --nic1 nat --nictype1 Am79C973 --audio alsa --audiocontroller ac97 --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5000,5010-5012 --clipboard bidirectional
+   3. $ VBoxManage modifyvm WinXP32 --memory 384 --acpi on --nic1 nat --nictype1 Am79C973 --audio alsa --audiocontroller ac97 --usb on --usbehci on --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5000,5010-5012 --clipboard bidirectional
 
       *--nictype1 Am79C973* sets virtual Ethernet hardware to AMD PCNet FAST III (Am79C973). VirtualBox 5 now use Intel PRO/1000 T Server (82543GC) as default, which requires extra drivers installed.
 
       *--vrde on* is to enable VRDP support thus I can connect to the VM GUI by RDP client.
+
+      * --usb on --usbehci on* enables USB 1.0 and 2.0. To enable 3.0, use *--usbxhci on*.
 
       *--vrdeaddress* set to 127.0.0.1 loopback address. If unset, it defaults to 0.0.0.0 which means other hosts on the network can connect to this virtual machine too. Refer to [127.0.0.1 vs 0.0.0.0](http://fangxiang.tk/2015/09/14/0000-127001-localhost/).
 
@@ -217,7 +219,25 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     ```
     
     The solution is to reinstall VirtualBox external modules `emerge -av app-emulation/virtualbox-modules`. More read [Upgrade kernel to unstable 4.0.0](/2015/03/25/gentoo-installation/).
-14. References
+14. USB
+
+   Attach plugged in USB device to VM. First make sure USB 1.0/2.0/3.0 is enabled for VM. Then:
+
+   ```bash
+   $ vboxmanage list usbhost
+   $ vboxmanage controlvm WinXP32 usbattach USB-UUID
+   $ vboxmanage list usbhost
+   $ vboxmanage controlvm WinXP32 usbdetach USB-UUID
+   ```
+
+   1. Find the USB device UUID by checking the Manufacture and Product field. Make sure the Current State field is Available.
+   2. Attach the USB to VM.
+   3. The Current State field becomes Captured (by VM).
+   4. Detach from VM.
+   5. *Attention*: get UUID from *vboxmanage list usbhost* instead of *blkid*.
+
+   We can also make this attachment permanent by creating a *usbfilter*.
+15. References
     1. [gentoo wiki](https://wiki.gentoo.org/wiki/VirtualBox)
     2. http://baige5117.github.io/blog/install_virtualbox_in_gentoo.html
     3. https://github.com/rustymyers/scripts/blob/master/shell/createVBoxVM.sh

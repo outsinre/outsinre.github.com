@@ -35,19 +35,20 @@ Gonna buy a mobile phone? Ha, you are probably trapped by vendor *inspiring* pre
    2. ARM Mali;
    3. PowerVR SGX (used by many Apple product);
    4. NVIDIA Tegra;
-7. BP is built-in or external one? Support LTE user equipment category 6 (CAT6) / CAT7?
+7. BP is built-in or external? Support LTE user equipment category 6 (CAT6) / CAT7?
 
 # RAM/ROM
 
 1. RAM - memory.
-   1. eMMc5.0/5.1 and UFS 2.0.
-   2. LPDDR3 and LPDDR4.
+   1. LPDDR3/4
 2. ROM - flash disk where OS resides.
-3. SD card extension.
+   1. eMMc5.0/5.1/UFS 2.0
+3. micro-SD card extension.
 
 # Battery
 
-1. Charger. QC3.0/2.0 and VOOC.
+1. Charger. QC3.0/2.0/VOOC
+2. 1/2/3A
 
 # Wireless
 
@@ -55,9 +56,16 @@ Gonna buy a mobile phone? Ha, you are probably trapped by vendor *inspiring* pre
 
 # Camera
 
-1. f/1.8, 2.0, 2.2.
+1. f/1.8, 2.0, 2.2
+2. Optical Image Stabilization (OIS)
+3. Phase Detection Auto Focus (PDAF)
 
 # Sensor
 
-1. NFC.
-2. Ultra-red.
+1. NFC
+2. Ultra-red
+
+# Socket
+
+1. Type-C USB 2.0/3.0/3.1
+2. OTG
