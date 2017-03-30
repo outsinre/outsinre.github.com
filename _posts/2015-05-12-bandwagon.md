@@ -115,6 +115,7 @@ pip install shadowsocks
         ```
 3. Shadowsocks server `ssserver`并没有加入到开机启动，如果需要则要创建一个启动脚本，使其开机启动。
 3. Refer to [shadowsocks 2.6.8](https://pypi.python.org/pypi/shadowsocks); [VPS之自建shadowsocks服务器（Centos及Ubuntu方法）](http://www.vtestvps.tk/?p=18)
+4. 特别要注意：CentOS 6的*/etc/rc.local*里的命令必须要提供全路径，仅仅提供命令名重启时不运行。如要用*/usr/bin/ssserver*，而不是*ssserver*.
 
 ## ss client
 
