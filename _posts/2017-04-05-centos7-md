@@ -1,0 +1,172 @@
+---
+layout: post
+title: CentOS 7
+---
+
+# SSH
+
+```bash
+~ # ssh-add
+~ # ssh-copy-id -p 12345 root@12.23.56.78
+# add an entry to ~/.ssh/config
+```
+
+# Create User Account
+
+```bash
+~ # useradd -m username
+~ # passwd username
+~ # ssh-copy-id -p 12345 username@12.34.56.78
+# add an entry to ~/.ssh/config
+```
+
+# EPEL Repository
+
+```bash
+~ # yum search epel-release
+~ # yum info epel-release
+~ # yum --enablerepo=extras install epel-release
+~ # yum repolist enabled
+```
+
+# Tmux
+
+```bash
+~ # yum install tmux
+```
+
+# Pip/Virtualenv
+
+```bash
+~ # yum install python-pip python-virtualenv
+~ # pip install -U pip
+```
+
+# SS
+
+```bash
+~ # mkdir -p ~/opt/pyvenv2.6
+~ # virtualenv --system-site-packages ~/opt/pyvenv2.6
+~ # pip install git+https://github.com/shadowsocks/shadowsocks.git@master
+# or
+~ # wget https://github.com/shadowsocks/shadowsocks/archive/master.zip
+~ # pip install master.zip
+```
+
+## Server Json
+
+```bash
+mkdir -p /etc/shadowsocks
+vi /etc/shadowsocks/server.json
+```
+
+Fill in the fileds without any comments:
+
+```json
+{
+    "server":"::0",
+    "server_port":3900,
+    "local_address":"127.0.0.1",
+    "local_port":1080,
+    "password":"mypassword",
+    "timeout":300,
+    "method":"aes-256-cfb",
+    "fast_open":true,
+    "workers":2
+}
+```
+
+## TCP Fast Open
+
+```bash
+~ # vi /etc/sysctl.d/10-tcp-fast-open.conf
+# net.ipv4.tcp_fastopen = 3
+~ # sysctl -p /etc/sysctl.d/10-tcp-fast-open.conf
+```
+
+1. Unfortunately CentOS 7 does not satisfy lower kernel bound - 3.7.1.
+2. It should be enabled on cleint and server simutaneously.
+
+### A quick test
+
+```bash
+~ # ssserver -c /etc/shadowsocks/server.json --user nobody -d start -vv
+```
+
+## [Server Systemd service](https://yuyii.com/2015/12/28/shadowsocks-systemd/)
+
+>Please reinstall Shadowsocks into system-wide location. The above *virtualenv* version was a test.
+
+This is another useful reference [compiling shadowsocks-libev on CentOS 6](http://www.leyar.me/Compile-shadowsocks-libev-in-CentOS7/).
+
+```bash
+~ # vi /etc/systemd/system/shadowsocks.service
+```
+
+### simple Type
+
+```
+[Unit]
+Description=Shadowsocks Server
+After=network.target
+
+[Service]
+Type=simple
+PermissionsStartOnly=true
+ExecStartPre=/usr/bin/mkdir -p /run/shadowsocks
+ExecStartPre=/usr/bin/chown nobody:nobody /run/shadowsocks
+ExecStartPre=/usr/bin/su - -s /bin/bash -c "/usr/local/bin/kcptun-server -c /etc/shadowsocks/kcptun.json &" nobody
+ExecStart=/usr/bin/ssserver -c /etc/shadowsocks/server.json
+Restart=on-abort
+User=nobody
+Group=nobody
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Please be noted that:
+
+1. *simple* Type is used so that Shadowsocks does not *forking* itself for daemon mode which is handed over to *systemd*.
+   1. Do *not* add `-d start/stop/restart` arguments to ExecStart
+   2. No PIDFile and `--pid-file`  required.
+2. You may find a special line with *kcptun*. Neglect it now for it will be discussed later on.
+
+### forking Type
+
+```
+[Unit]
+Description=Shadowsocks Server
+After=network.target
+
+[Service]
+Type=forking
+PermissionsStartOnly=true
+PIDFile=/run/shadowsocks/ss.pid
+ExecStartPre=/usr/bin/mkdir -p /run/shadowsocks
+ExecStartPre=/usr/bin/chown nobody:nobody /run/shadowsocks
+ExecStartPre=/usr/bin/su - -s /bin/bash -c "/usr/local/bin/kcptun-server -c /etc/shadowsocks/kcptun.json &" nobody
+ExecStart=/usr/bin/ssserver -d start -c /etc/shadowsocks/ss.json --pid-file /run/shadowsocks/ss.pid --log-file /run/shadowsocks/ss.log
+Restart=on-abort
+User=nobody
+Group=nobody
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Read more on [doesn't make sense to set PIDFile= by simple services](https://bugzilla.redhat.com/show_bug.cgi?id=723942#c4).
+
+## [kcptun](https://github.com/xtaci/kcptun)
+
+*kcptun* estabilishs a KCP tunnel to speed up TCP connection by encapsulating TC packets within UDP flooding. It may introduce twice or even triple traffic depending on arguments choosen. You are advised to use it only in WI-FI environment.
+
+To add *kcptun* support, just insert a line into Systemd service file:
+
+```
+ExecStartPre=/usr/bin/su - -s /bin/bash -c "/usr/local/bin/kcptun-server -c /etc/shadowsocks/kcptun.json &" nobody
+```
+
+That's enough!

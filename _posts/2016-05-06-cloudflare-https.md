@@ -7,7 +7,7 @@ title: Enforce HTTPS to your site by Cloudflare
 
 # Cloudflare
 
-[Cloudflare](www.cloudflare.com) offers us free DNS and CDN services whilist concentrating on customer security. Those who would like to enforce HTTPS to his sites could take advantage of those services. For instance, Cloudflare will protect your site email address from web crawler.
+[Cloudflare](https://www.cloudflare.com) offers us free DNS and CDN services whilist concentrating on customer security. Those who would like to enforce HTTPS to his sites could take advantage of those services. For instance, Cloudflare will protect your site email address from web crawler.
 
 The detailed free services are listed below. To achieve HTTPS, only the first three is a must.
 
@@ -33,18 +33,18 @@ We will basically do two things:
 
 # DNS switch
 
-1. After filling in your site url following *add site* procedure, Cloudflare will analyze and import the site's DNS records (on your previous platforms).
+1. After filling in your site url following *add site* procedure, Cloudflare will analyze and import the site's DNS records (from your previous platforms).
 
    We can add, delete a new DNS records. Even, we can toggle Cloudflare per a record.
 2. Then continue, Cloudflare will give us two new Cloudflare DNS servers.
 3. Go to our domain registrar management interface, and replace all original DNS servers with the new ones.
 
    To make use of Cloudflare service, all other platforms' DNS servers must be deleted. Only Cloudflare ones are permitted.
-4. Up to now, our domain DNS services are taken over by Cloudflare.
+4. Up to now, Cloudflare takes over DNS servers and DNS records management.
 
 # SSL settings
 
-Unfortunately GitHub Pages doesn’t yet support SSL on GitHub Pages for custom domains which would ordinarily rule out using HTTP/2. Whilst the HTTP/2 specification (RFC 7540) allows for HTTP/2 over plain-text HTTP/2, all popular browsers require HTTP/2 to run on top of Transport Layer Security; meaning HTTP/2 only being able to run over HTTPS is the de-facto standard.
+Unfortunately GitHub doesn't yet support SSL for custom domains which would ordinarily rule out using HTTP/2. Whilst the HTTP/2 specification (RFC 7540) allows for HTTP/2 over plain-text HTTP/2, all popular browsers require HTTP/2 to run on top of Transport Layer Security; meaning HTTP/2 only being able to run over HTTPS is the de facto standard.
 
 1. In the Crypto tab of your CloudFlare site you should ensure your SSL mode is set to *Full* but not *Full (strict)*.
 2. We can now add a Page Rule to enforce HTTPS, as you add other Page Rules make sure this is the primary Page Rule:
@@ -58,11 +58,11 @@ Unfortunately GitHub Pages doesn’t yet support SSL on GitHub Pages for custom 
 3. We can also create a Page Rule to ensure that non-www is redirected to www securely when using HTTPS:
 
    ```
-   https://fxhu.tk
+   https://fxhu.tk/*
 
    Forwarding URL (Status Code: 301 - Permanent Redirect)
 
-   https://www.fxhu.tk
+   https://www.fxhu.tk/$1
    ```
 
 4. Back to the Crypto tab, enable and set HTTP Strict Transport Security (HSTS) service. HSTS (RFC 6797) is a header which allows a website to specify and enforce security policy in client web browsers.
