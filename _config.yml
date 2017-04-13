@@ -1,5 +1,11 @@
 # https://help.github.com/articles/configuring-jekyll/
 
+markdown: kramdown
+
+# https://stackoverflow.com/a/25597026
+kramdown:
+  smart_quotes: ["apos", "apos", "quot", "quot"]
+
 encoding: utf-8
 
 url: http://www.fxhu.tk
