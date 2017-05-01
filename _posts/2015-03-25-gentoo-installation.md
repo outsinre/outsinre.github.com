@@ -643,14 +643,14 @@ title: Gentoo Installation
 
 # System tools
 
-4. Portage tools
+1. Portage tools
 
    ```bash
    # emerge -avt eix; eix-update
    # emerge -avt gentoolkit
    ```
 
-3. System logger.
+2. System logger.
 
    ```bash
    # emerge -avt app-admin/syslog-ng app-admin/logrotate
@@ -666,7 +666,7 @@ title: Gentoo Installation
    in */etc/syslog-ng/syslog-ng.conf*, which outputs system logs to */dev/tty12*. That's to say, any users can read system logs by switching to the 12th virtual terminal. For security reason, comment out that line if there are multiple users.
 
    Details on logrotate for cron jobs refer to [Cronie and Anacron](/2015/07/19/cronie/).
-4. Cron daemon
+3. Cron daemon
 
    A cron daemon executes scheduled commands. It is very handy if some command needs to be executed regularly (for instance daily, weekly or monthly).
 
@@ -680,7 +680,7 @@ title: Gentoo Installation
    2. *cronie* must be in a runlevel to shedule *logrotate*.
    1. Details on running scheduled tasks based on input from the command *crontab*, refer to [Cronie and Anacron](/2015/07/19/cronie/).
 
-5. More
+4. More
 
    ```bash
    # emerge -avt sys-apps/mlocate, file indexing
@@ -848,6 +848,26 @@ Boot with LiveDVD, then
    This option should only be used for packages that are reachable from the @world package set (those that would NOT be removed by --depclean).
 7. Use UUID to identify a partition instead of */dev/sdaxy*.
 8. Press 'Alt + [Fn + (SysRq)] PrtSc', then press *reisub* keys respectively. Not sure if '[Fn +]' is required.
+9. Python
+
+   Since python-exec-2.3 / eselect-python-20160207, the preferred method of altering Python configuration is to use the *edit* mode that opens *python-exec.conf* in an editor
+
+   ```bash
+   # eselect python list/edit`.
+   ```
+
+   The previous *set* mode is deprecated.
+1. [Perl update](https://wiki.gentoo.org/wiki/Perl)
+
+   The official way of upgrading Perl, e.g. from Perl 5.22 to Perl 5.24, is upgrading your entire *world* set, and upgrading Perl with it.
+
+   ```bash
+   # emerge -avtuDN --with-bdeps=y --backtrack 30 @world
+   # perl-cleaner --all
+   ```
+
+   1. If 30 does not help, try 100 instead.
+   2. Attention: both `--with-bdeps=y` and `--backtrack 30` are required.
 
 # [X Window System](https://en.wikipedia.org/wiki/X_Window_System)
 
@@ -1111,7 +1131,8 @@ Boot with LiveDVD, then
    1. To make use of *vaapi*, make sure *ffmpeg* and *hwaccel* USEs are enabled. BTW, *ffmpeg* should enable *vaapi* USE too.
    2. For Media Source Extensions, turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
    3. Add FoxyProxy Standard, uBlock Origin, NoScript (and/or RefControl), User Agent Switcher, HTTPS Everywhere, DISCONNECT, Open With etc. add-ons. Remove unecessary default whitelist of NoScript plugin.
-   4. *privacy.trackingprotection.enabled*, *Network.proxy.socks_remote_dns* to TRUE.
+   4. *privacy.trackingprotection.enabled*, *Network.proxy.socks_remote_dns* to True.
+   5. *network.IDN_show_punycode* to be True.
    5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
 
 5. [Fcitx](https://wiki.gentoo.org/wiki/Fcitx)
@@ -1273,6 +1294,35 @@ Boot with LiveDVD, then
    4. (opt) *p7zip* has a higher data compression ratio.
 
       *p7zip* brings 3 archive binaries, namely *7z*, *7za* and *7zr*. Only *7zr* can extract non-ascii *zip* files. However *file-roller* will take *7z* and *7za* primarily. Rename */usr/bin/7z* and */usr/bin/7za* to something else.
+2. [NetEase-MusicBox](https://github.com/darknessomi/musicbox)
+
+   ```bash
+   # emerge -avt media-sound/mpg123
+   $ source ~/opt/pyvenv3/bin/activate
+   $ pip(3) install NetEase-MusicBox
+   $ pip(3) install lxml
+   ```
+
+   If encountered error during installing NetEase-MusicBox,
+
+   ```
+   running build_ext
+   running build_configure
+   checking for gcc... gcc
+   checking whether the C compiler works... yes
+   checking for C compiler default output file name... a.out
+   checking for suffix of executables...
+   checking whether we are cross compiling... configure: error: in `/tmp/pip-build-y5q1g0ib/pycrypto':
+   configure: error: cannot run C compiled programs.
+   ```
+
+   The reason is that */tmp* is mounted as *noexec*. To temporarily solve it,
+
+   ```bash
+   $ TMPDIR=~/tmp pip(3) install NetEase-MusicBox
+   ```
+
+   Read more on [Won't install python 2.7.4 if /tmp is mounted noexec](https://github.com/pyenv/pyenv/issues/13) and [pip install pycrypto fails on centos 6.4](https://bugs.launchpad.net/pycrypto/+bug/1294670/comments/7).
 
 # Sphere
 

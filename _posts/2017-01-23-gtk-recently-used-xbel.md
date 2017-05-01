@@ -12,7 +12,7 @@ GTK2/3 library creates *~/.local/share/recently-used.xbel* for applications to k
    ~ $ mkdir .local/share/recently-used.xbel
    ```
 
-   This is enough! The next configurations are alternatives to use GTK2/3 configurations.
+   This is enough! The next configurations are alternatives by changing GTK2/3 configurations.
 
 2. GTK3 *setting.ini*
 

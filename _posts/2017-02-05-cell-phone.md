@@ -42,7 +42,7 @@ Gonna buy a mobile phone? Ha, you are probably trapped by vendor *inspiring* pre
 1. RAM - memory.
    1. LPDDR3/4
 2. ROM - flash disk where OS resides.
-   1. eMMc5.0/5.1/UFS 2.0
+   1. eMMc5.0/5.1/UFS 2.0/UFS 2.1
 3. micro-SD card extension.
 
 # Battery
