@@ -3,6 +3,8 @@ layout: post
 title: cjktty.patch
 ---
 
+>An alternative is Univt patch.
+
 In this post, we will show how to extract *cjktty.patch* from a patched kernel. Afterwards, we will apply the extracted patch to our own kernel. During the process, we might look into several additional relevant commands.
 
 1. Suppose our current system kernel is 4.0.5. We will generate a *cjktty.patch* suitable for this kernel.

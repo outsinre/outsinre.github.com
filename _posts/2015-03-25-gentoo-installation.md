@@ -806,6 +806,8 @@ title: Gentoo Installation
 
    Cleans the system by removing packages that are  not  associated with  explicitly merged packages. Depclean works by creating the full dependency tree from the @world set, then comparing it to installed packages. Packages installed, but not part of the dependency tree, will be uninstalled by depclean.
 
+   *depclean* is the last stage of system update.
+
 # Chroot - a complete routine
 
 Boot with LiveDVD, then
