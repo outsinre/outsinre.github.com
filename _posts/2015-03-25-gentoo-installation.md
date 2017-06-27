@@ -1180,7 +1180,7 @@ Boot with LiveDVD, then
    1. You are recommended to accpet *mpv* live build.
    2. Rely on *ffmpeg* and *youtube-dl*.
    3. Enable *vaapi* USE for *mpv* and *ffmpeg to utilize hardware acceleration.
-   4. You may *reboot* to let *mpv* work in case.
+   4. Re-merge *mpv* if [*ffmpeg* is upgraded](https://wiki.gentoo.org/wiki/Mpv#Broken_playback.2Fcrashes_after_updating_FFmpeg.2FLibav.2Flibass.2Fetc.)
    5. The default *lua* USE flag of *mpv* brings along a *youtube-dl* hook script. *mpv url* revokes *youtube-dl* to stream video playback.
 
       And make sure *ffmpeg* is installed with *network* USE flag. To stream HTTPS url, enable either *openssl* or *gnutls* USE of *ffmpeg*. Ether *openssl* is fine and you don't need both.

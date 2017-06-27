@@ -94,7 +94,7 @@ pip install shadowsocks
 “workers”: 2
 }
         ```
-    4. Support multiple users:
+    4. [multiple users](https://github.com/shadowsocks/shadowsocks/wiki/Configure-Multiple-Users):
 	
         ```
 {
