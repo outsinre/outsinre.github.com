@@ -32,45 +32,47 @@ This post introduces making a bootable Kali USB stick while making changes persi
 
       This is my system output:
 
-	 zhtux ~ # parted -a optimal /dev/sdb                                      
-	 GNU Parted 3.2
-	 Using /dev/sdb
-	 Welcome to GNU Parted! Type 'help' to view a list of commands.
-	 (parted) unit MiB                                                         
-	 (parted) print free                                                       
-	 Model: SanDisk Cruzer Edge (scsi)
-	 Disk /dev/sdb: 15267MiB
-	 Sector size (logical/physical): 512B/512B
-	 Partition Table: msdos
-	 Disk Flags: 
+      zhtux ~ # parted -a optimal /dev/sdb                                      
+      GNU Parted 3.2
+      Using /dev/sdb
+      Welcome to GNU Parted! Type 'help' to view a list of commands.
+      (parted) unit MiB                                                         
+      (parted) print free                                                       
+      Model: SanDisk Cruzer Edge (scsi)
+      Disk /dev/sdb: 15267MiB
+      Sector size (logical/physical): 512B/512B
+      Partition Table: msdos
+      Disk Flags: 
 
-	 Number  Start    End       Size      Type     File system  Flags
-		 0.02MiB  0.03MiB   0.02MiB            Free Space
-	  1      0.03MiB  2858MiB   2858MiB   primary               boot, hidden
-	  2      2858MiB  2921MiB   63.0MiB   primary  fat16
-		 2921MiB  15267MiB  12346MiB           Free Space
+      Number  Start    End       Size      Type     File system  Flags
+	      0.02MiB  0.03MiB   0.02MiB            Free Space
+       1      0.03MiB  2858MiB   2858MiB   primary               boot, hidden
+       2      2858MiB  2921MiB   63.0MiB   primary  fat16
+	      2921MiB  15267MiB  12346MiB           Free Space
+
    7. Several points from the output.
       1. `unit MiB` instead `unit MB`. `MiB` shows you the exact value (at Bytes) at the exact disk position, while `MB` might round up and the actual position might be 500KB ahead or 500KB after the `MB` value. Similarly, we have `GiB` and `TiB`. Read `parted` manual and [arch wiki rounding][3].
-      2. You can find dd creates two primary partitions *1* (2858MiB, with *boot* flag) and *2* (63.0 MiB). Why `dd` creates two partitions? This is due to *kali-linux-1.1.0a-amd64.iso* itself a copy of two partitions. This is different from `Ubuntu` or `Gentoo` images which has only one partition.
+      2. You can find dd creates two primary partitions *1* (2858MiB, with *boot* flag) and *2* (63.0 MiB). Why `dd` creates two partitions? This is due to *kali-linux-1.1.0a-amd64.iso* itself a copy of two partitions.
 
-	 ```bash
-	 # fdisk -l /path/to/kali-linux-1.1.0a-amd64.iso
-	 or
-	 # parted /path/to/kali-linux-1.1.0a-amd64.iso print
-	 ```
+         ```bash
+         # fdisk -l /path/to/kali-linux-1.1.0a-amd64.iso
+         or
+         # parted /path/to/kali-linux-1.1.0a-amd64.iso print
+         ```
 
          This is the ouput of from *parted*:
 
-	    zhtux mnt # parted /media/WLShare/kali-linux-1.1.0a-amd64/kali-linux-1.1.0a-amd64.iso print
-	    Model:  (file)
-	    Disk /media/WLShare/kali-linux-1.1.0a-amd64/kali-linux-1.1.0a-amd64.iso: 3063MB
-	    Sector size (logical/physical): 512B/512B
-	    Partition Table: msdos
-	    Disk Flags: 
+         zhtux mnt # parted /media/WLShare/kali-linux-1.1.0a-amd64/kali-linux-1.1.0a-amd64.iso print
+         Model:  (file)
+         Disk /media/WLShare/kali-linux-1.1.0a-amd64/kali-linux-1.1.0a-amd64.iso: 3063MB
+         Sector size (logical/physical): 512B/512B
+         Partition Table: msdos
+         Disk Flags: 
 
-	    Number  Start   End     Size    Type     File system  Flags
-	     1      32.8kB  2997MB  2997MB  primary               boot, hidden
-	     2      2997MB  3063MB  66.1MB  primary  fat16
+         Number  Start   End     Size    Type     File system  Flags
+          1      32.8kB  2997MB  2997MB  primary               boot, hidden
+          2      2997MB  3063MB  66.1MB  primary  fat16
+
       3. `dd` is a stupid command only copy bytes by bytes fromm `if` to `of`. We can find there are a lot of free space untouched after partition *2*. We can make use of the reamaining free space. My *Gentoo* Live USB has only one partion consuming the whole flash storage.
 3. Adding USB Persistence with `LUKS` Encryption, refer to [Kali persistence USB][4].
    1. *persistence* means changes to Kali system on Live USB remains accross reboots. Basically just create an extra primary partition on Live USB to store persistent files.
@@ -86,7 +88,7 @@ This post introduces making a bootable Kali USB stick while making changes persi
       Ignore/Cancel?
       ```
 
-      The [Kali Doc][4] recommends *Ignore*. Here I want to try the disk alignment for better performance. Refer to [arch wiki warnings][5]. This alignment means the *start* position is not aligned. The *end* position *100%* will align itself automatically.
+      The [Kali Doc][4] recommends *Ignore*. Here I want to try the disk alignment for better performance. Refer to [arch wiki warnings][5]. This alignment means the *start* position is not aligned. The *end* position *100%* or *-1s* will align itself automatically.
    3. Enter *Ignore* to go ahead anyway, print the partition table in sectors to see where it starts, and remove/recreate the partition with the start sector rounded up to increasing powers of 2 until the warning stops.
 
       I have tried  2^8, 2^9, 2^10, 2^11. Finally, *2^11* works.
@@ -105,7 +107,7 @@ This post introduces making a bootable Kali USB stick while making changes persi
       Disk Flags: 
 
       Number  Start     End        Size       Type     File system  Flags
-	      32s       63s        32s                 Free Space
+              32s       63s        32s                 Free Space
        1      64s       5854015s   5853952s   primary               boot, hidden
        2      5854016s  5983103s   129088s    primary  fat16
        3      5983104s  31266815s  25283712s  primary               lba
@@ -123,10 +125,10 @@ This post introduces making a bootable Kali USB stick while making changes persi
       Disk Flags: 
 
       Number  Start     End        Size       Type     File system  Flags
-	      32s       63s        32s                 Free Space
+              32s       63s        32s                 Free Space
        1      64s       5854015s   5853952s   primary               boot, hidden
        2      5854016s  5983103s   129088s    primary  fat16
-	      5983104s  5984255s   1152s               Free Space
+              5983104s  5984255s   1152s               Free Space
        3      5984256s  31266815s  25282560s  primary               lba
 
       (parted) q                                                                
