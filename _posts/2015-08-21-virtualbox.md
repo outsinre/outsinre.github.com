@@ -77,7 +77,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    $ VBoxManage modifyvm WinXP32 --memory 384 --acpi on --nic1 nat --nictype1 Am79C973 --audio alsa --audiocontroller ac97 --usb on --usbehci on --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5001,5010-5012 --clipboard bidirectional
    $ VBoxManage storagectl WinXP32 --name "IDE Controller" --add ide --controller PIIX4
    $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium ~/Documents/VirtualBox/Machines/WinXP32/WinXP32.vdi
-   $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso (or --device 1 --medium additions)
+   $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso (or --device 1 --medium additions)
    $ VBoxManage sharedfolder add WinXP32 --name WLshare --hostpath /media/Misc/VMs/WLshare
    ```
 
@@ -321,7 +321,6 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     - User Interface, untick 'Help', 'Microsoft Speech API', and 'Accessibility'.
     - Resolve Dependencies. Choose 'Unbranded Startup Screens', 'Windows Boot Environment', 'Standard Windows USB Stack' and 'Windows Explorer Shell' (a MSUT). Some previously unticked feature might be ticked again as a dependency of some other features.
     
-    >XGY72-BRBBT-FF8MH-2GG8H-W7KCW, MPMVY-PP762-WWVBC-83RXJ-2H7RH, GJVTR-C4WQ6-BKRH3-DRFFH-J83DM
 17. Troublshooting.
     1. Re-install VirtualBox. `emerge -av1 $(qlist -IC virtualbox)`.
     2. Check *VBoxSVC.log* and *VBox.log*.
@@ -349,15 +348,25 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
        1. Find the feature package *cabinet* file from ISO, like *DS/Packages/FeaturePack/x86~winemb-ie-explorer~~~~6.1.7600.16385~1.0/WinEmb-IE-Explorer.cab*.
        2. Use *Pkgmr* or [DISM](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism-operating-system-package-servicing-command-line-options) command line to install the cabinet file. *dism* is far more powerful than what you think. For example, you can use it to check a cabinet file information.
 
-      ```
-      # Do it in an elevated command prompt.
-      DISM /?
-      Pkgmgr /?
-      DISM /Online /Add-Package /PackagePath:"C:\Users\Brink\Desktop\WinEmb-IE-Explorer.cab"
-      Pkgmgr /ip /m:C:\Users\Brink\Desktop\WinEmb-IE-Explorer.cab
-      # restart system as requested
-      ```
+       ```
+       # Do it in an elevated command prompt.
+       DISM /?
+       Pkgmgr /?
+       DISM /Online /Add-Package /PackagePath:"C:\Users\Brink\Desktop\WinEmb-IE-Explorer.cab"
+       Pkgmgr /ip /m:C:\Users\Brink\Desktop\WinEmb-IE-Explorer.cab
+       # restart system as requested
+       ```
 
+    8. Windows XP `--port 2 --device 0` refuses to attach extra ISO:
+
+       >VBoxManage: error: No drive attached to device slot 0 on port 2 of controller 'IDE Controller'
+
+       Windows XP guest uses IDE PIIX4 disk drive that supports at most 2 ports. Each port supports two devices , namely (0, 0), (0, 1), (1, 0) and (1, 1). If you have a strong reason to use port 2, then create SATA disk drive like Win 7 guest.
+
+       Especially, each port of SATA disk drive only supports one device, namely (0, 0), (1, 0), (2, 0) etc.
+
+    9. Windows XP Professional VOL SP3 x86: W733W-GWPGB-37X4T-BRD7P-JVT2D.
+    10. Windows Emebedded 7 Standard x86: XGY72-BRBBT-FF8MH-2GG8H-W7KCW, MPMVY-PP762-WWVBC-83RXJ-2H7RH, GJVTR-C4WQ6-BKRH3-DRFFH-J83DM
 18. References
     1. [gentoo wiki](https://wiki.gentoo.org/wiki/VirtualBox)
     2. [install_virtualbox_in_gentoo](http://baige5117.github.io/blog/install_virtualbox_in_gentoo.html)
