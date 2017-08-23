@@ -307,8 +307,8 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     - Data Access and Storage, untick 'Windows Data Access Components - SQL'.
     - Data Integrity, leave everything unticked.
     - Devices and Printers, untick 'Printing Utilities and Management'.
-    - Diagnostics, leave 'Common Diagnostics Tools' and 'User' ticked (Windows Task Manager).
-    - Embedded Enabling Features, untick everything and tick 'Registry Filter' (for *regedit*).
+    - Diagnostics, leave 'Common Diagnostics Tools' and optionally 'User' ticked (Windows Task Manager).
+    - Embedded Enabling Features, untick everything and optionally tick 'Registry Filter' (for *regedit*).
     - Fonts, tick 'Simplified Chinese Fonts'.
     - Graphics and Multimedia, untick 'Windows Media Player 12'.
     - International, leave everything unticked.
