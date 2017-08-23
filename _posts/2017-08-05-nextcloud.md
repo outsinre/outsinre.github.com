@@ -465,6 +465,7 @@ During configuration, some variables deserve special attention: Php *memory_limi
 7. Email notification.
 
    >TLS (STARTTLS) with 587, SSL (SSL/TLS) with 465.
+
    ```
    # /usr/share/nginx/html/nextcloud/config/personal.config.php
 
@@ -524,6 +525,22 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
    >Obviously, the 2nd method is favorable.
 
+# Notes
+
+Evernote has now gone too far, leaving its users behind. I want to just abandon it. But by far, neither [Nextcloud official Notes app](https://apps.nextcloud.com/apps/notes) (I use this one) nor [unofficial Nextnotes](https://github.com/janis91/nextnotes) support importing Evernote notes.
+
+However, we have [QOwnNotes](https://github.com/pbek/QOwnNotes) as provisional tool to transmitting Evernotes to Nextloud.
+
+1. Install QOwnNotes and Nextcloud on your system.
+2. Install and enable [QOwnNotesAPI](https://github.com/pbek/qownnotesapi) (optional)
+3. Add Nextcloud account to QOwnNotes client. (optional)
+4. IMPORTANT! Set QOwnNotes *note folder path* to be that of Nextcloud.
+5. [Export Evernote](http://www.qownnotes.org/Blog/Evernote-import) notebook to ENEX format *.enex*.
+6. Import the *.enex* in QOwnNotes.
+7. Sync the notes in Nextcloud client.
+
+>The 2nd and 3rd steps are unneccessary since we won't use QOwnNotes after the transmission. Pay attention to the [role of QOwnNotesAPI](http://www.qownnotes.org/Knowledge-base/Why-isn-t-QOwnNotesAPI-syncing-my-notes). Normal note files are handled by Nextloud while note transhes and versions (on the server side) are handled by QOwnNotesAPI separately.
+
 # [CLI Upgrading](https://docs.nextcloud.com/server/12/admin_manual/maintenance/update.html#using-the-command-line-based-updater)
 
 ```
@@ -541,6 +558,7 @@ For the last step, if 'y' selected, upgrading would be done in command line. If 
 
 ```bash
 # config.php is updated based on the commands executed.
+~ # su -s /bin/bash -c "php ./occ list" nginx
 ~ # su -s /bin/bash -c "php ./occ maintenance:mode" nginx
 ~ # su -s /bin/bash -c "php ./occ maintenance:mode --on " nginx
 ```

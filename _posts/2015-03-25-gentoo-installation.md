@@ -870,6 +870,21 @@ Boot with LiveDVD, then
 
    1. If 30 does not help, try 100 instead.
    2. Attention: both `--with-bdeps=y` and `--backtrack 30` are required.
+2. [upgrading Gcc](https://wiki.gentoo.org/wiki/Upgrading_GCC)
+
+   After upgrading from 4.9 to 5.4, I encountered [librime-1.2.9 bug](https://forums.gentoo.org/viewtopic-t-1049882-start-0.html).
+
+   ```bash
+   ~ # gcc-config --list-profiles
+   ~ # gcc-config 2
+   ~ # env-update && source /etc/profile
+   ~ # emerge -av1 sys-devel/libtool
+   ~ # gcc --version
+   ~ # emerge -avc =sys-devel/gcc-4.9.4
+   ~ # revdep-rebuild --library 'libstdc++.so.6' -- --exclude gcc (opt)
+   ```
+
+   The last comman triggers over 60 packages rebuild.
 
 # [X Window System](https://en.wikipedia.org/wiki/X_Window_System)
 

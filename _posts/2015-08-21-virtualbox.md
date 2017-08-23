@@ -279,19 +279,19 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 16. Windows Embedded Standard 7 x86
 
     ```bash
-    $ VBoxManage list ostypes (Windows7)
-    $ VBoxManage createvm --name WES7x86 --ostype Windows7 --register --basefolder ~/Documents/VirtualBox/Machines
-    $ VBoxManage registervm ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vbox (opt)
-    $ VBoxManage modifyvm WES7x86 --memory 700 --audio alsa --audiocontroller hda --acpi on --vrde on --vrdeproperty "TCP/Ports=5001,5010-5012" --vrdeproperty "TCP/Address=127.0.0.1" --clipboard bidirectional (--draganddrop bidirectional --usb on --usbehci on, --nic1 bridged --bridgeadapter1 wlp3s0, --nic1 nat, --boot1 dvd --boot2 disk --boot3 none --boot4 none)
-    $ VBoxManage createmedium --filename ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vdi --size 7000 (createhd)
-    $ VBoxManage storagectl WES7x86 --name "SATA Controller" --add sata --controller IntelAHCI (SATA and Intel AHCI)
-    $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vdi
-    $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium /media/Misc/WLshare/en_windows_embedded_standard_7_runtime_x86_dvd_521803.iso
-    $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 2 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso
-    $ VBoxManage sharedfolder add WES7x86 --name WLshare --hostpath /media/Misc/WLshare
+    ~ $ VBoxManage list ostypes (Windows7)
+    ~ $ VBoxManage createvm --name WES7x86 --ostype Windows7 --register --basefolder ~/Documents/VirtualBox/Machines
+    ~ $ VBoxManage registervm ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vbox (opt)
+    ~ $ VBoxManage modifyvm WES7x86 --memory 700 --audio alsa --audiocontroller hda --acpi on --vrde on --vrdeproperty "TCP/Ports=5001,5010-5012" --vrdeproperty "TCP/Address=127.0.0.1" --clipboard bidirectional (--draganddrop bidirectional --usb on --usbehci on, --nic1 bridged --bridgeadapter1 wlp3s0, --nic1 nat, --boot1 dvd --boot2 disk --boot3 none --boot4 none)
+    ~ $ VBoxManage createmedium --filename ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vdi --size 7000 (createhd)
+    ~ $ VBoxManage storagectl WES7x86 --name "SATA Controller" --add sata --controller IntelAHCI (SATA and Intel AHCI)
+    ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vdi
+    ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso
+    ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 2 --device 0 --type dvddrive --medium /media/Misc/WLshare/en_windows_embedded_standard_7_runtime_x86_dvd_521803.iso
+    ~ $ VBoxManage sharedfolder add WES7x86 --name WLshare --hostpath /media/Misc/WLshare
     # Installation processing ...
-    VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
-    $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 2 --device 0 --type dvddrive --medium none
+    ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
+    ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 2 --device 0 --type dvddrive --medium none
     ```
 
     Installation tips:
@@ -300,7 +300,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     - Modify Drivers & Modify Features.
     - Automatically detect devices.
     - Untick 'Resolve optional dependencies' otherwise final OS Footprint would be 3.4G around. Leave 'Resolve Dependencies' to the last step of package selection, which otherwise would pulls uncessary leftover.
-    - .Net Framework, only 2.0 and its profile.
+    - .Net Framework, tick 2.0, 3.0, 3.5 and their profiles. Many miscellaneous applications depends on .NET framwork.
     - Application Support, untick 'MSMQ'.
     - Boot Environments, 'Enhanced write filter boot Environment' to 'Windows Boot Environment'.
     - Browsers, keep IE 8.
