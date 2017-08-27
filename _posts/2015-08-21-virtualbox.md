@@ -284,7 +284,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     ~ $ VBoxManage registervm ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vbox (opt)
     ~ $ VBoxManage modifyvm WES7x86 --memory 700 --audio alsa --audiocontroller hda --acpi on --vrde on --vrdeproperty "TCP/Ports=5001,5010-5012" --vrdeproperty "TCP/Address=127.0.0.1" --clipboard bidirectional (--draganddrop bidirectional --usb on --usbehci on, --nic1 bridged --bridgeadapter1 wlp3s0, --nic1 nat, --boot1 dvd --boot2 disk --boot3 none --boot4 none)
     ~ $ VBoxManage createmedium --filename ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vdi --size 7000 (createhd)
-    ~ $ VBoxManage storagectl WES7x86 --name "SATA Controller" --add sata --controller IntelAHCI (SATA and Intel AHCI)
+    ~ $ VBoxManage storagectl WES7x86 --name "SATA Controller" --add sata --controller IntelAHCI --portcount 3 (SATA and Intel AHCI)
     ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium ~/Documents/VirtualBox/Machines/WES7x86/WES7x86.vdi
     ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium /media/Misc/WLshare/en_windows_embedded_standard_7_runtime_x86_dvd_521803.iso
     ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 2 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso
@@ -321,8 +321,42 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     - System Services, leave it alone.
     - User Interface, untick 'Help', 'Microsoft Speech API', and 'Accessibility'.
     - Resolve Dependencies. Choose 'Unbranded Startup Screens', 'Windows Boot Environment', 'Standard Windows USB Stack' and 'Windows Explorer Shell' (a MSUT). Some previously unticked feature might be ticked again as a dependency of some other features.
-    
-17. Troublshooting.
+
+    >Since the IOS image is till attached to SATA Controller, booting will be directed to installation process again. Either update VM boot order or F12 at early phase.
+17. Android-x86
+
+    ```bash
+    ~ $ VBoxManage createvm --name cm13x86 --ostype Linux26 --register --basefolder /media/Misc/VirtualBox/Machines
+    ~ $ VBoxManage modifyvm cm13x86 --memory 700  --acpi on --mouse usbtablet --vrde on --vrdeproperty "TCP/Ports=5001,5010-5012" --vrdeproperty "TCP/Address=127.0.0.1" --clipboard bidirectional
+    ~ $ VBoxManage createmedium --filename /media/Misc/VirtualBox/Machines/cm13x86/cm13x86.vdi --size 6000
+    ~ $ VBoxManage storagectl cm13x86  --name "IDE Controller" --add ide --controller PIIX4
+    ~ $ VBoxManage storageattach cm13x86 --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium /media/Misc/VirtualBox/Machines/cm13x86/cm13x86.vdi
+    ~ $ VBoxManage storageattach cm13x86 --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium ~/Downloads/cm-x86-13.0-r1.iso
+    ~ $ VBoxManage list vms
+    ```
+
+    1. Installation - Install Android-x86 to harddisk.
+    2. Create/Modify partitions.
+    3. Do you want to use GPT? No!
+    4. New - Primary - Bootable - Write - *yes* - Quit.
+    5. *sda1* unkown VBOX HARDDISK.
+    6. *ext4*.
+    7. Format *sda1* to *ext4*? Yes.
+    8. Do you want to install boot loader GRUB? Yes.
+    9. Do you want to install */system* directory as read-write? Yes.
+    1. Run Android-x86.
+
+    >If you choose GPT at 3rd step, then install EFI and GRUB2 instead of GRUB.
+
+    First boot takes several minutes to initialize system preparation.
+
+   The first time Android starts up, you might fail to bypass Google account setup even Wi-Fi setup is skipped. This was the VM NAT does connect to the Internet but Android think it's Wi-Fi, and meanwhile Google was blocked, which make Android try to connect to the *fake* Wi-Fi endlessly. The solution:
+
+    ```bash
+    ~ $ vboxmanage controlvm Android44 setlinkstate1 off
+    ```
+
+18. Troublshooting.
     1. Re-install VirtualBox. `emerge -av1 $(qlist -IC virtualbox)`.
     2. Check *VBoxSVC.log* and *VBox.log*.
     3. Avoid quotes on bash symbols `~` and `$`.

@@ -360,7 +360,7 @@ title: Gentoo Installation
 
        Basic dirvers that needs activated.
 
-   1. `IKCONFIG` should be Y instead of M. `IKCONFIG_PROC` can be enabled as you wish. This allows you to inspect the configuration of the kernel while it is running, without having to worry whether you've changed or cleaned the source directory after it was built. 
+   1. `IKCONFIG` should be Y instead of M. This allows you to inspect (by `./scripts/extract-ikconfig /path/to/vmlinuz`)the configuration of the kernel while it is running, without having to worry whether you've changed or cleaned the source directory after it was built. `IKCONFIG_PROC` stores kernel config at */proc/config.gz*.
    2. `NR_CPUS` set to 4 since laptop has 2 cores and 4 threading. The smaller this value is, the smaller the kernel image is and the less memory is consumed by kernel.
    2. `MICROCDE` and `MICROCDE_INTEL` are Y by default. Refer to *microcode-ctl* below.
    3. Graphics. `i915` = *Intel 8xx/9xx/G3x/G4x/HD Graphics, DRM_I915* uses the default Y.
@@ -432,9 +432,12 @@ title: Gentoo Installation
 
       More refer to *syslog-ng* below.
    5. Filesystem. Set `UDF_FS` as M to mount ISO file.
-   6. (opt) Thinkpad-related. *ThinkPad ACPI Laptop Extras* = `THINKPAD_ACPI` set to M.
-   7. [e-sources / cjktty patch specific options].`FONTS` and `FONT_8x16` set to Y. And *console 16x16 CJK font ( cover BMP )* = `FONT_16x16_CJK` which is *cjktty* patch. These options are for Chinese characters display in TTY (Ctrl + Alt + Fn).
-   8. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
+   6. SquashFS. `CONFIG_SQUASHFS` as M; `CONFIG_SQUASHFS_XATTR` and `CONFIG_SQUASHFS_XZ` as Y. (*sys-fs/squashfs-tools*).
+   7. IO scheduler - BFQ: `IOSCHED_BFQ`, `BLK_CGROUP` and `BFQ_GROUP_IOSCHED` as Y.
+   8. Magic SysRq key `CONFIG_MAGIC_SYSRQ` as Y. `CONFIG_MAGIC_SYSRQ_DEFAULT_ENABLE` configure default value of */proc/sys/kernel/sysrq*.
+   1. (opt) Thinkpad-related. *ThinkPad ACPI Laptop Extras* = `THINKPAD_ACPI` set to M.
+   2. [e-sources / cjktty patch specific options].`FONTS` and `FONT_8x16` set to Y. And *console 16x16 CJK font ( cover BMP )* = `FONT_16x16_CJK` which is *cjktty* patch. These options are for Chinese characters display in TTY (Ctrl + Alt + Fn).
+   3. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
 
 5. Compiling
 
@@ -761,7 +764,7 @@ title: Gentoo Installation
    The very first thing after getis to create a regular user account:
 
    ```
-   # useradd -G wheel,audio,video -m myUser
+   # useradd -G wheel,video -m myUser
    # passwd myUser
    ```
 
@@ -849,8 +852,7 @@ Boot with LiveDVD, then
 
    This option should only be used for packages that are reachable from the @world package set (those that would NOT be removed by --depclean).
 7. Use UUID to identify a partition instead of */dev/sdaxy*.
-8. Press 'Alt + [Fn + (SysRq)] PrtSc', then press *reisub* keys respectively. Not sure if '[Fn +]' is required.
-9. Python
+8. Python
 
    Since python-exec-2.3 / eselect-python-20160207, the preferred method of altering Python configuration is to use the *edit* mode that opens *python-exec.conf* in an editor
 
@@ -885,6 +887,11 @@ Boot with LiveDVD, then
    ```
 
    The last comman triggers over 60 packages rebuild.
+3. SysRq
+   1. `Alt - SysRq - arguments` simutaneously; ThinkPad Fn is not required.
+   2. Or press the key one by one: `Alt`, `[Fn] - SysRq`, and `arguments`.
+   3. Irrespective of pressing methods, the *arguments* part should be pressed one by one.
+   2. The detailed *arguments* can be found at [kernel sysrq](https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html).
 
 # [X Window System](https://en.wikipedia.org/wiki/X_Window_System)
 
@@ -1125,7 +1132,7 @@ Boot with LiveDVD, then
 
 1. Xfce4 goodies
 
-   xfce4-power-manager; xfce4-mixer; xfce4-screenshooter; thunar-dropbox (qtcore);
+   xfce4-power-manager; xfce-extra/xfce4-pulseaudio-plugin and media-sound/pavucontrol; xfce4-screenshooter.
 
    1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
 2. Recommendations
@@ -1134,13 +1141,38 @@ Boot with LiveDVD, then
 
    1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/). Those fonts are essential to display formulas. However, WPS-linux does not have built-in formula creation function due to copyright.
 
-3. ALSA
+3. Sound - ALSA/[PulseAudio](https://wiki.gentoo.org/wiki/PulseAudio)
+   1. PulseAudio depends on (both kernel and package parts) of ALSA - they coexist instead of excluding each other. It serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS.
+   2. ALSA includes both kernel sound card drivers and userspace package *media-libs/alsa-lib*, while PulseAudio builds on top of ALSA kernel part while offering userspace package *media-sound/pulseaudio*.
+   3. PulseAudio is configured to automatically detect all sound cards and manage them. It takes control of all detected ALSA devices and redirect all audio streams to itself, making the PulseAudio daemon the central configuration point. 
 
    Check if *alsa-lib* and *alsa-utils* are installed or not. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.
 
    ```bash
    # speaker-test -t wav -c 2
    ```
+
+   Enable global *pulseaudio* USE:
+
+   ```bash
+   # /etc/portage/make.conf
+   ~ # euse -E pulseaudio
+   # remove all users from *audio* group
+   ~ # gpasswd -d username audio
+   ~ # emerge -avtuDN --with-bdeps=y @world
+   ```
+
+   1. Enabling *pulseaudio* USE flag will pull in *media-sound/pulseaudio* automatically.
+   2. If you plan running *pulseaudio* in the [system-wide mode](https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/PerfectSetup/), then the special user *pulse* should still be in the *audio* group in order to have access to the sound card.
+
+   GStreamer support:
+
+   ```bash
+   ~ $ gconftool-2 -t string --set /system/gstreamer/0.10/default/audiosink pulsesink
+   ~ $ gconftool-2 -t string --set /system/gstreamer/0.10/default/audiosrc pulsesrc
+   ```
+
+   >From what we've done, you know *enabling pulseaudio* is quite easy as no kernel options required like ALSA.
 
 4. Firefox
 
