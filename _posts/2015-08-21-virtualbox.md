@@ -323,15 +323,15 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     - Resolve Dependencies. Choose 'Unbranded Startup Screens', 'Windows Boot Environment', 'Standard Windows USB Stack' and 'Windows Explorer Shell' (a MSUT). Some previously unticked feature might be ticked again as a dependency of some other features.
 
     >Since the IOS image is till attached to SATA Controller, booting will be directed to installation process again. Either update VM boot order or F12 at early phase.
-17. Android-x86
+17. 32-bit Android-x86
 
     ```bash
-    ~ $ VBoxManage createvm --name cm13x86 --ostype Linux26 --register --basefolder /media/Misc/VirtualBox/Machines
-    ~ $ VBoxManage modifyvm cm13x86 --memory 700  --acpi on --mouse usbtablet --vrde on --vrdeproperty "TCP/Ports=5001,5010-5012" --vrdeproperty "TCP/Address=127.0.0.1" --clipboard bidirectional
-    ~ $ VBoxManage createmedium --filename /media/Misc/VirtualBox/Machines/cm13x86/cm13x86.vdi --size 6000
-    ~ $ VBoxManage storagectl cm13x86  --name "IDE Controller" --add ide --controller PIIX4
-    ~ $ VBoxManage storageattach cm13x86 --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium /media/Misc/VirtualBox/Machines/cm13x86/cm13x86.vdi
-    ~ $ VBoxManage storageattach cm13x86 --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium ~/Downloads/cm-x86-13.0-r1.iso
+    ~ $ VBoxManage createvm --name Android51 --ostype Linux26 --register --basefolder /media/Misc/VirtualBox/Machines
+    ~ $ VBoxManage modifyvm Android51 --memory 700 --acpi on --mouse usbtablet --usb on --usbehci on --vrde on --vrdeproperty "TCP/Ports=5001,5010-5012" --vrdeproperty "TCP/Address=127.0.0.1" --clipboard bidirectional
+    ~ $ VBoxManage createmedium --filename /media/Misc/VirtualBox/Machines/Android51/Android51.vdi --size 4000
+    ~ $ VBoxManage storagectl Android51  --name "IDE Controller" --add ide --controller PIIX4
+    ~ $ VBoxManage storageattach Android51 --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium /media/Misc/VirtualBox/Machines/Android51/Android51.vdi
+    ~ $ VBoxManage storageattach Android51 --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium ~/Downloads/cm-x86-13.0-r1.iso
     ~ $ VBoxManage list vms
     ```
 
@@ -340,7 +340,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     3. Do you want to use GPT? No!
     4. New - Primary - Bootable - Write - *yes* - Quit.
     5. *sda1* unkown VBOX HARDDISK.
-    6. *ext4*.
+    6. *ext3/ext4*.
     7. Format *sda1* to *ext4*? Yes.
     8. Do you want to install boot loader GRUB? Yes.
     9. Do you want to install */system* directory as read-write? Yes.
@@ -353,7 +353,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    The first time Android starts up, you might fail to bypass Google account setup even Wi-Fi setup is skipped. This was the VM NAT does connect to the Internet but Android think it's Wi-Fi, and meanwhile Google was blocked, which make Android try to connect to the *fake* Wi-Fi endlessly. The solution:
 
     ```bash
-    ~ $ vboxmanage controlvm Android44 setlinkstate1 off
+    ~ $ vboxmanage controlvm Android51 setlinkstate1 off
     ```
 
 18. Troublshooting.
