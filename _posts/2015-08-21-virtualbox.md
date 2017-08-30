@@ -268,7 +268,23 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     5. Get UUID from *vboxmanage list usbhost* instead of *blkid*.
 
     We can also make this attachment permanent by creating a *usbfilter*.
-15. Delete VM
+15 Host-only networking
+
+   ```bash
+   ~ $ VBoxManage hostonlyif create (remove vboxnet0)
+   ~ $ ip link
+   ~ $ VBoxManage list hostonlyifs
+   ~ $ VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
+   ~ $ VBoxManage modifyvm Android51 --nic2 hostonly --hostonlyadapter2 vboxnet0
+   ~ $ VBoxManage dhcpserver add/modify --ifname vboxnet0 (--netname HostInterfaceNetworking-vboxnet0) --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.150 --enable
+   ~ $ VBoxManage list dhcpservers
+   # boot VM
+   ~ # netcfg eth1 dhcp
+   ```
+
+   >You may check if *vboxnet0* state is up or down.
+
+16. Delete VM
 
     ```bash
     $ vboxmanage list vms
@@ -276,7 +292,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     ```
 
     Amost everything related to the VM is deleted, especially the virtual disk image file (*.vdi*), snapshots, saved state files, VM xml file etc.
-16. Windows Embedded Standard 7 x86
+17. Windows Embedded Standard 7 x86
 
     ```bash
     ~ $ VBoxManage list ostypes (Windows7)
@@ -323,7 +339,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     - Resolve Dependencies. Choose 'Unbranded Startup Screens', 'Windows Boot Environment', 'Standard Windows USB Stack' and 'Windows Explorer Shell' (a MSUT). Some previously unticked feature might be ticked again as a dependency of some other features.
 
     >Since the IOS image is till attached to SATA Controller, booting will be directed to installation process again. Either update VM boot order or F12 at early phase.
-17. 32-bit Android-x86
+18. 32-bit Android-x86
 
     ```bash
     ~ $ VBoxManage createvm --name Android51 --ostype Linux26 --register --basefolder /media/Misc/VirtualBox/Machines
@@ -350,13 +366,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 
     First boot takes several minutes to initialize system preparation.
 
-   The first time Android starts up, you might fail to bypass Google account setup even Wi-Fi setup is skipped. This was the VM NAT does connect to the Internet but Android think it's Wi-Fi, and meanwhile Google was blocked, which make Android try to connect to the *fake* Wi-Fi endlessly. The solution:
-
-    ```bash
-    ~ $ vboxmanage controlvm Android51 setlinkstate1 off
-    ```
-
-18. Troublshooting.
+19. Troublshooting.
     1. Re-install VirtualBox. `emerge -av1 $(qlist -IC virtualbox)`.
     2. Check *VBoxSVC.log* and *VBox.log*.
     3. Avoid quotes on bash symbols `~` and `$`.
@@ -402,7 +412,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 
     9. Windows XP Professional VOL SP3 x86: W733W-GWPGB-37X4T-BRD7P-JVT2D.
     10. Windows Emebedded 7 Standard x86: XGY72-BRBBT-FF8MH-2GG8H-W7KCW, MPMVY-PP762-WWVBC-83RXJ-2H7RH, GJVTR-C4WQ6-BKRH3-DRFFH-J83DM
-18. References
+20. References
     1. [gentoo wiki](https://wiki.gentoo.org/wiki/VirtualBox)
     2. [install_virtualbox_in_gentoo](http://baige5117.github.io/blog/install_virtualbox_in_gentoo.html)
     3. [createVBoxVM.sh](https://github.com/rustymyers/scripts/blob/master/shell/createVBoxVM.sh)
