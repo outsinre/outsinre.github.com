@@ -30,7 +30,7 @@ The key is to set a `CNAME` record for your github page `username.github.io`. Fo
 </table>
 This means subdomain address `www.example.com` will be redirected to `username.github.io`.  
 3. *CNAME* and *Top domain*  
-`CNAME` does not support top domain. The following three lines are all illegal though some DNS provider does not give you alert.
+`CNAME` does not support top domain. The following three lines are all illegal unless your DNS provider [supports CNAME flattening](https://support.cloudflare.com/hc/en-us/articles/200169056-CNAME-Flattening-RFC-compliant-support-for-CNAME-at-the-root) (i.e. Clouflare)
 
 <table>
  <thead>
@@ -64,7 +64,7 @@ If you set `CNAME` like this, it will direct all your other subdomains like mail
 Can I use my top domain for acceleration? Yes, but not easy! First, your DNS provider must support `Alias DNS Record` which is not a standard DNS record. Only a few DNS provider support this with fees, like **dnssimple**. Refer to [What is an ALIAS record?](http://support.dnsimple.com/articles/alias-record/) and [Pointing the Domain Apex to Heroku](http://support.dnsimple.com/articles/domain-apex-heroku/).  
 4. *Procedures*  
 
-* Add a `CNAME` file at the root directory of github pages. You may find it uncessary at first. If you don't add this file, only the first time you enter the custom domain url works as you wish. If you further click some other links in the blog (i.e. a post), you will find the url changes to original *username.github.io*. This looks ugly. What was worse, The webbrower tab will not show the blog title.  
+* Add a `CNAME` file (or [by Github setting](https://help.github.com/articles/adding-or-removing-a-custom-domain-for-your-github-pages-site/)) at the root directory of github pages. You may find it uncessary at first. If you don't add this file, only the first time you enter the custom domain url works as you wish. If you further click some other links in the blog (i.e. a post), you will find the url changes to original *username.github.io*. This looks ugly. What was worse, The webbrower tab will not show the blog title.  
 * In the `CNAME` file, you can put only one line namely *www.example.com* there. Now Github handles everything in your jekyll blog with address *www.example.com* not the original *username.github.io*. Attention! Put bare address. Don't add `http://`.  
 * Next need DNS support. I choose **freenom** to register my top domain *example.tk*. Why top domain? Not subdomain? Don't worry! *Freenom* supports top domain, why not get one? Yes, get the top domain. Then we can set a *CNAME* DNS record! Refer to [How to setup A, MX, CNAME...](https://my.freenom.com/knowledgebase.php?action=displayarticle&id=4).  
 * The `CNAME` record is to transfer `WWW` subdomain of *example.tk* (namely *www.example.tk*) to *username.github.io*. Now wait for a while, it will be fine. Use `dig www.example.tk` to test your result. Refer to [use the dig command](https://help.github.com/articles/tips-for-configuring-a-cname-record-with-your-dns-provider/#configuring-a-custom-subdomain-with-your-dns-provider).

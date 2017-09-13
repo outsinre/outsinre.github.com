@@ -28,7 +28,7 @@ We should register a Cloudflare account and then *add site*. Follow the *add sit
 
 We will basically do two things:
 
-1. Cloudflare imports DNS records and switch DNS servers to Cloudflare's.You'd best delete DNS records on the old platforms.
+1. Cloudflare imports DNS records and switch DNS servers to Cloudflare's.You may delete imported DNS records from *freenom*, *namecheap* etc.
 2. Turn on a few security settings on Cloudflare. That' all!
 
 # DNS switch
