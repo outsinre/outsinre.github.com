@@ -53,13 +53,13 @@ Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 MariaDB [(none)]> help
 ```
 
-Now [creating](How To Create and Manage Databases in MySQL and MariaDB on a Cloud Server ) database and user with SQL within SQL shell:
+Now [creating](https://www.digitalocean.com/community/tutorials/how-to-create-and-manage-databases-in-mysql-and-mariadb-on-a-cloud-server) database and user with SQL within SQL shell:
 
 ```
 create database nc-db;
 show databases;
-create user nc-user@localhost identified by 'nc-user@';
-grant all privileges on nc-db.* to nc-user@localhost identified by 'nc-user@';
+create user nc-user@localhost identified by 'password';
+grant all privileges on nc-db.* to nc-user@localhost identified by 'password';
 flush privileges;
 select user,host from mysql.user;
 show grants for nc-user@localhost
@@ -158,9 +158,9 @@ kernel.shmmax = 67108864
 # Install Nextcloud tarball
 
 ```bash
-~ # yum install unzip
-~ # wget https://download.nextcloud.com/server/releases/nextcloud-12.0.0.zip
-~ # unzip nextcloud-12.0.0.zip -d /usr/share/nginx/html/
+~ # wget https://download.nextcloud.com/server/releases/nextcloud-12.0.1.tar.bz2
+~ # yum install bzip2
+~ # tar -xjpvf nextcloud-12.0.1.tar.bz2 -C /usr/share/nginx/html/
 ~ # chown nginx:nginx -R /usr/share/nginx/html/nextcloud/
 ```
 
