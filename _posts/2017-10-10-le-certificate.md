@@ -8,7 +8,7 @@ title: Let's Encrypt Certificate
 ```bash
 ~ # yum search certbot
 ~ # yum install certbot python-certbot-nginx (optional `--nginx` plugin)
-~ # certbot -h/--help all
+~ # certbot -h [all]
 ~ # certbot certificates
 ```
 
@@ -36,7 +36,7 @@ title: Let's Encrypt Certificate
 1. To be conservative, *certonly* **authenticate**s but does not **install** (modify) web server configurations automatically.
 
    Default **run** subcommand combines both *certonly* and *install*.
-2. Use *standalone* plugin to obtain a certificate if you don’t want to use (or don’t currently have) existing server software. The *standalone* plugin does not rely on any other server software running on the machine where you obtain the certificate.
+2. Use *standalone* plugin to obtain a certificate if you don't want to use (or don't currently have) existing server software. The *standalone* plugin does not rely on any other server software running on the machine where you obtain the certificate.
 
 # expand
 

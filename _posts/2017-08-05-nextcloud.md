@@ -548,10 +548,8 @@ However, we have [QOwnNotes](https://github.com/pbek/QOwnNotes) as provisional t
 # if errors like "The following extra files have been found: .user.ini.bak", remove those files. Re-run:
 ~ # su -s /bin/bash -c 'php updater.phar' nginx
 # Should the "occ upgrade" command be executed? [Y/n] y
-# Keep maintenance mode active? [y/N] y
+# Keep maintenance mode active? [y/N] N
 ```
-
-For the last step, if 'y' selected, upgrading would be done in command line. If 'N', then *occ upgrade* would be ignored and you should go to web interface for upgrading.
 
 *maintenance:mode* locks the sessions of logged-in users and prevents new logins. This is the mode to use for upgrades. Check the mode by:
 
@@ -559,7 +557,7 @@ For the last step, if 'y' selected, upgrading would be done in command line. If 
 # config.php is updated based on the commands executed.
 ~ # su -s /bin/bash -c "php ./occ list" nginx
 ~ # su -s /bin/bash -c "php ./occ maintenance:mode" nginx
-~ # su -s /bin/bash -c "php ./occ maintenance:mode --on " nginx
+~ # su -s /bin/bash -c "php ./occ maintenance:mode --on/off " nginx
 ```
 
 # Domain switch
