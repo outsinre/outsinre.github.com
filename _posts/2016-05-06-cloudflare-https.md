@@ -50,21 +50,23 @@ Unfortunately GitHub doesn't yet support SSL for custom domains which would ordi
 2. We can now add a Page Rule to enforce HTTPS, as you add other Page Rules make sure this is the primary Page Rule:
 
    ```
-   http://*fxhu.tk/*
+   http://*example.tk/*
 
    Always Use HTTPS
    ```
 
+   Page rule happens *before* DNS record resolving.
 3. We can also create a Page Rule to ensure that non-www is redirected to www securely when using HTTPS:
 
    ```
-   https://fxhu.tk/*
+   https://example.tk/*
 
    Forwarding URL (Status Code: 301 - Permanent Redirect)
 
-   https://www.fxhu.tk/$1
+   https://www.example.tk/$1
    ```
 
+   This rule should sit [before the previous one](https://support.cloudflare.com/hc/en-us/articles/218411427#overview) since it's more *specific*.
 4. Back to the Crypto tab, enable and set HTTP Strict Transport Security (HSTS) service. HSTS (RFC 6797) is a header which allows a website to specify and enforce security policy in client web browsers.
 
    The recommended settings are:
@@ -92,7 +94,10 @@ Unfortunately GitHub doesn't yet support SSL for custom domains which would ordi
    Server: cloudflare-nginx
    CF-RAY: 3fien1q9ehpen-HKG
    ```
-   
+
+6. Disable SSL
+
+   **Attention**: if you decide to disable SSL for whatever causes, please disable HSTS **before** HTTPS.
 # Cache all the things
 
 CloudFlare has a “Cache Everything” option in Page Rules. For static sites, it allows your HTML to be cached and served directly from CloudFlare's CDN. This will significantly accelerate your site access time.
@@ -100,7 +105,7 @@ CloudFlare has a “Cache Everything” option in Page Rules. For static sites, 
 Add a last rule as:
 
 ```
-https://*fxhu.tk/*
+https://*example.tk/*
 
 Cache Level: Cache Everything
 ```

@@ -326,6 +326,16 @@ server {
 }
 ```
 
+## [Let's Encrypt Certificate](/2017/10/10/le-certificate.md)
+
+We should has SSL certificate to domain *cloud.example.com*.
+
+```bash
+~ # certbot certonly --cert-name cloud.example.com --webroot -w /usr/share/nginx/html/ -d cloud.example.com --dry-run
+```
+
+## Launch Nextcloud
+
 After uploading the configuration to */etc/nginx/conf.d/nextcloud.conf*, check syntax and reload *nginx*:
 
 ```bash
@@ -334,17 +344,6 @@ After uploading the configuration to */etc/nginx/conf.d/nextcloud.conf*, check s
 # or
 ~ # nginx -s reload
 ```
-
-## SSL
-
-1. You should has SSL certificate to domain *cloud.example.com*. For example, you own a *standalone* Let's Encrypt certificate for *blog.example.com*, and we can `--expand` that certificate to enclosing *cloud.example.com*.
-
-   ```bash
-   ~ # certbot certonly --standalone --expand -d blog.example.com,cloud.example.com --preferred-challenges tls-sni-01,http --dry-run
-   ~ # certbot certonly --standalone --expand -d blog.example.com,cloud.example.com --preferred-challenges tls-sni-01,http
-   ```
-
-   Add *cloud.example.com* to the `-d` list. The original *blog.example.com* **must** be there as well.
 
 # Enhancements
 
@@ -561,6 +560,28 @@ For the last step, if 'y' selected, upgrading would be done in command line. If 
 ~ # su -s /bin/bash -c "php ./occ list" nginx
 ~ # su -s /bin/bash -c "php ./occ maintenance:mode" nginx
 ~ # su -s /bin/bash -c "php ./occ maintenance:mode --on " nginx
+```
+
+# Domain switch
+
+Suppose you would moving from *cloud.old.com* to *cloud.new.com*, then remember to modify *trusted_domains* and *overwrite.cli.url* in *config/config.php*.
+
+```
+   'trusted_domains' =>
+   array (
+     0 => '192.168.0.29',
+     1 => 'cloud.new.com',
+   ),
+   'overwrite.cli.url' => 'https://cloud.new.com',
+```
+
+This can be done by *occ* as well:
+
+```bash
+~ # su -s /bin/bash -c "php ./occ config:system:get trusted_domains" nginx
+~ # su -s /bin/bash -c "php ./occ config:system:set trusted_domains 1 --value=cloud.new.com" nginx
+~ # su -s /bin/bash -c "php ./occ config:system:get overwrite.cli.url" nginx
+~ # su -s /bin/bash -c "php ./occ config:system:set overwrite.cli.url --value=https://cloud.new.com" nginx
 ```
 
 # Refs
