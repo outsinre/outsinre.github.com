@@ -42,6 +42,8 @@ We will basically do two things:
    To make use of Cloudflare service, all other platforms' DNS servers must be deleted. Only Cloudflare ones are permitted.
 4. Up to now, Cloudflare takes over DNS servers and DNS records management.
 
+>By default, Cloudflare caches web contents (i.e. files) of (there is a cloud symbol at the end of DNS record) website. You may want to disable caching for some domains like *irc.example.com*.
+
 # SSL settings
 
 Unfortunately GitHub doesn't yet support SSL for custom domains which would ordinarily rule out using HTTP/2. Whilst the HTTP/2 specification (RFC 7540) allows for HTTP/2 over plain-text HTTP/2, all popular browsers require HTTP/2 to run on top of Transport Layer Security; meaning HTTP/2 only being able to run over HTTPS is the de facto standard.
