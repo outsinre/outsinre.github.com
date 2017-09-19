@@ -23,7 +23,7 @@ title: Nextcloud
 
 ## MariaDB configuration
 
-Firstly create MariaDB root password:
+Create password for MariaDB *root* user:
 
 ```
 ~ # mysql_secure_installation
@@ -37,10 +37,10 @@ Remove test database and access to it? [Y/n] Y
 Reload privilege tables now? [Y/n] Y
 ```
 
-With the MariaDB root password just set, now we can login to the *mysql* shell to create a new database and a new user for Nextcloud.
+With the MariaDB root password just set, now we can login to the *mysql* shell to create a database and a user for Nextcloud.
 
 ```
-~ # mysql -u root -p
+~ # mysql -u root -pPassword
 Enter password: 
 Welcome to the MariaDB monitor.  Commands end with ; or \g.
 Your MariaDB connection id is 14
@@ -56,14 +56,23 @@ MariaDB [(none)]> help
 Now [creating](https://www.digitalocean.com/community/tutorials/how-to-create-and-manage-databases-in-mysql-and-mariadb-on-a-cloud-server) database and user with SQL within SQL shell:
 
 ```
-create database nc-db;
-show databases;
-create user nc-user@localhost identified by 'password';
-grant all privileges on nc-db.* to nc-user@localhost identified by 'password';
+create database nc_db
+# or
+create database nc_db default character set utf8mb4 collate utf8mb4_unicode_ci;
+create user nc_user@localhost identified by 'password';
+grant all privileges on nc_db.* to nc_user@localhost identified by 'password';
 flush privileges;
-select user,host from mysql.user;
-show grants for nc-user@localhost
+show databases;
+show tables from nc_db;
+select user,host,password,plugin from mysql.user;
+show grants for nc_user@localhost;
+quit;
 ```
+
+1. Create a database and user for Nextcloud service. Grant all privileges of the database to the user.
+2. If the user account does exist and you provide the IDENTIFIED BY clause, the user's password will be changed.
+
+   So use the same 'password' value in case of losing it.
 
 # Php-fpm
 
@@ -400,12 +409,15 @@ During configuration, some variables deserve special attention: Php *memory_limi
    `memory_limit` in default */etc/php.ini* is 128M. However per-site value of Nextcloud in */opt/nextcloud/.user.ini* is 512M that is the whole available amount. To prevent Php from exhausting too much memory, set to 128M instead.
 
    ```
-   # /opt/nextcloud/.user.ini
+   # /usr/share/nginx/html/nextcloud/.user.ini
+   upload_max_filesize=100M
+   post_max_size=100M
    memory_limit=128M
    ```
 
    1. Per-site Php setting overrides that of global under */etc*.
    2. It does not require *php-fpm* reloading.
+   3. Make sure *upload_max_filesize* and *post_max_size* value is smaller than *memory_limit*.
 5. Local user (APCu) and Distributed cache (Redis)
 
    Php APCu module is installed previously, then enable it in *config.php*:
@@ -461,7 +473,7 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
    >No media files found
 
-7. Email notification.
+8. Email notification.
 
    >TLS (STARTTLS) with 587, SSL (SSL/TLS) with 465.
 
@@ -483,7 +495,98 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
    1. Outlook only accept valid `mail_from_address` owned by `mail_smtpname`. Fake `mail_from_address` or `mail_domain` cannot authenticate to the Outlook SMTP server.
    2. If a malware or SPAM scanner is running on the SMTP server it might be necessary that you increase the `mail_smtptimeout` value.
-8. Many administration work can be done through tool [*occ* command](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/occ_command.html) - ownCloud Console.
+9. Many administration work can be done through tool [*occ* command](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/occ_command.html) - ownCloud Console.
+
+## [4-byte UTF-8 support](https://docs.nextcloud.com/server/12/admin_manual/configuration_database/mysql_4byte_support.html)
+
+>Be careful on [No FILE_FORMAT](https://github.com/nextcloud/documentation/issues/513). This is just a trial.
+
+**backup** database before going on!
+
+1. maintenance mode
+
+   ```bash
+   ~ # su -s /bin/bash -c "php ./occ maintenance:mode --on" nginx
+   ```
+
+2. InnoDB
+
+   ```
+   /etc/my.cnf.d/4-byte.cnf
+   [client]
+   default-character-set = utf8mb4
+
+   [mysql]
+   default-character-set = utf8mb4
+
+   [mysqld]
+   innodb_large_prefix = 1
+   innodb_file_format = barracuda
+   innodb_file_per_table = 1
+   character-set-client-handshake = 0
+   character-set-server = utf8mb4
+   collation-server = utf8mb4_unicode_ci
+   ```
+
+3. Restart Mariadb
+
+   ```bash
+   ~ # systemctl restart mariadb
+   ```
+
+4. 4-byte UTF-8
+
+   ```
+   ~ # mysql -u nc_db -pPassword
+   ```
+
+   [Modify database](https://stackoverflow.com/a/9531221):
+
+   ```
+   ALTER DATABASE nc_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   use nc_db;
+   # For each table in nc_db:
+   ALTER TABLE <table_name> CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   # For each column in <table_name>:
+   ALTER TABLE <table_name> MODIFY <column_name> VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+   ```
+
+5. *mysql.utf8mb4* in *config.php*
+
+   ```
+   su -s /bin/bash -c "php ./occ config:system:set mysql.utf8mb4 --type boolean --value=true" nginx
+   su -s /bin/bash -c "php ./occ maintenance:mode --off" nginx
+   su -s /bin/bash -c "php ./occ maintenance:repair" nginx
+   su -s /bin/bash -c "php ./occ maintenance:mode --on" nginx
+   ```
+
+   Attention: turn off *maintenace* mode before *repair* since it requires apps be loaded.
+
+## Data folder
+
+The previous setup use a separate data directory */opt/nextcloud-data* for files. If you'd like to switch to another location (i.e. */usr/local/data*), use `php ./occ files:scan --all`.
+
+Firstly, move data folder to the new location:
+
+```bash
+~ # mv /opt/nextcloud-data /usr/local/data
+~ # chown -R nginx:nginx /usr/local/data
+```
+
+Afterwards, tell Nextcloud where the new location is:
+
+```
+# vi /usr/share/nginx/html/nextcloud/config/personal.config.php
+'datadirectory' => '/usr/local/data',
+```
+
+Finally, refresh Nextcloud by *occ*:
+
+```bash
+~ # su -s /bin/bash -c "php ./occ files:scan --all" nginx
+```
+
+**Attention**: with the help of `occ files:scan --all`, we can modify (add, remove files) data directory directly without the interfence of Nextcloud web or clients. For example, you have a big video file on server, and have to fetch the video file to local PC and then synchronize through Nextcloud client. Alternatively, just copy the video file to */opt/nextcloud-data/tina/files/Documents* and run the *occ* command above.
 
 # DAV
 
@@ -514,7 +617,8 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
 4. [Davdroid does not sync at all](https://forums.bitfire.at/topic/1508/zte-nubia-requires-autostart). For synchronization, must turn on [*autostart*](https://davdroid.bitfire.at/faq/entry/miui-no-synchronization/) for Davdroid in system setting.
 5. If Davdroid address book or calendar does not show up stock Contacts/Calendar apps, try *True Contacts* and *Etar* instead.
-6. Add or subscribe to [中国农历](https://github.com/infinet/lunar-calendar).
+6. Calendar app may remind incompatible *ics* format, then import without specifying a calendar and use *New Calendar* instead.
+7. Add or subscribe to [中国农历](https://github.com/infinet/lunar-calendar).
 
    Currently (as of Nextcloud 12), subscribed *iCal* web link [would not](https://github.com/nextcloud/server/issues/1497) be synced to mobile (i.e. Davdroid).
 
@@ -539,6 +643,57 @@ However, we have [QOwnNotes](https://github.com/pbek/QOwnNotes) as provisional t
 7. Sync the notes in Nextcloud client.
 
 >The 2nd and 3rd steps are unneccessary since we won't use QOwnNotes after the transmission. Pay attention to the [role of QOwnNotesAPI](http://www.qownnotes.org/Knowledge-base/Why-isn-t-QOwnNotesAPI-syncing-my-notes). Normal note files are handled by Nextloud while note transhes and versions (on the server side) are handled by QOwnNotesAPI separately.
+
+## Bug
+
+[A bug of Notes app in web interface](https://github.com/nextcloud/notes/issues/133)
+
+By default, the first line of a note will be the filename. Maybe, the Notes app in web interface cannot create the right file name with full shape (or Chinese) punctuators.
+
+The current solution is to:
+
+1. Disable Notes app;
+2. Backup and remove the Files - Notes folder;
+
+   Specifically remove the *troublesome* new note file.
+3. Re-enable Notes app;
+4. Apply [No. 125](https://github.com/nextcloud/notes/pull/125) patch.
+5. Move back the Notes folder
+6. Do a `occ files:scan --all` and reload Notes app.
+
+To further fix broken activity app, we should remove the troublesome activity records:
+
+```
+mysql -u nc_db -pPassword
+select activity_id,type,app,subject,subjectparams,file,link from nc_db.oc_activity order by activity_id DESC limit 10;
+delete from nextcloud.oc_activity where activity_id>2300;
+```
+
+Adjust the *activity_id* range.
+
+# [Backup](https://docs.nextcloud.com/server/12/admin_manual/maintenance/backup.html)
+
+>Do it before upgrading.
+
+Mainly, we should backup
+
+1. The config folder, i.e. *config.php*, *personal.config.php* etc.
+2. The data folder. As I've set up separate data folder, so it's not a must here.
+3. During upgrading, the Nextcloud installation folder is backed up automatically. If you trust it, that's fine.
+4. **Database**.
+
+   ```
+   # backup
+   mysqldump --single-transaction -h localhost -u nc_user -pPassword nc_db > nextcloud-sqlbkp_`date +"%Y%m%d"`.bak
+   # restore
+   drop database nc_db
+   create database nc_db
+   # or
+   create database nc_db default character set utf8mb4 collate utf8mb4_unicode_ci";
+   ~ # mysql -h localhost -u nc_user -pPassword nc_db < nextcloud-sqlbkp.bak
+   ```
+
+There is no space between `-p` and Password.
 
 # [CLI Upgrading](https://docs.nextcloud.com/server/12/admin_manual/maintenance/update.html#using-the-command-line-based-updater)
 

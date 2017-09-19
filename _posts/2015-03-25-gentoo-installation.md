@@ -1137,7 +1137,7 @@ Boot with LiveDVD, then
    1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
 2. Recommendations
 
-   guake, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/).
+   apg, guake, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/).
 
    1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/). Those fonts are essential to display formulas. However, WPS-linux does not have built-in formula creation function due to copyright.
 
@@ -1181,6 +1181,7 @@ Boot with LiveDVD, then
    3. Add FoxyProxy Standard, uBlock Origin, NoScript (and/or RefControl), User Agent Switcher, HTTPS Everywhere, DISCONNECT, Open With etc. add-ons. Remove unecessary default whitelist of NoScript plugin.
    4. *privacy.trackingprotection.enabled*, *Network.proxy.socks_remote_dns* to True.
    5. *network.IDN_show_punycode* to be True.
+   6. *browser.cache.check_doc_frequency* set to [0/1/2/3](https://superuser.com/a/411826); Ctrl + Shift + I, Gear, Advanced Settings, Disable Cache (when toolbox is open).
    5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
 
 5. [Fcitx](https://wiki.gentoo.org/wiki/Fcitx)
