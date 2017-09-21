@@ -17,7 +17,7 @@ paginate: 5
 
 title: ZNHOO
 tagline: 'Whatever you are, be a good one!'
-description: 'Make yourself at home. Contact me at <a href="mailto:{{ site.author.email }}">@email</a>.'
+description: 'Make yourself at home. Contact me at <a href="mailto:{{ site.author.email }}">(youwu at inventati dot org)</a>.'
 
 author:
   name: ZNHOO
