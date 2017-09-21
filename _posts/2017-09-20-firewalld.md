@@ -9,7 +9,7 @@ title: firewalld
 
    1. firewalld/iptables service -> iptables command -> kernel packet filter (netfilter).
    2. We should know the difference between a *service* and shell *command* in terms of *iptables*.
-   3. *firewalld* still requires *iptables* command underneath.
+   3. *firewalld* still requires *iptables command* underneath.
 
    Hence, no matter which service you prefer, *iptables command* is essential.
 
@@ -44,16 +44,17 @@ Switch to firewalld.
 ~ # systemctl start firewalld
 ```
 
->Don't break SSH connection as the default SSH in default zone is 22 that is usually changed by administrator, otherwise you could no longer SSH into server.
+>Don't break SSH connection as the default SSH port in default zone is 22 that is usually changed by administrator, otherwise you could no longer SSH into server.
 
 # Status
 
 ```bash
 ~ # systemctl status firewalld (or firewall-cmd --state)
-~ # firewall-cmd --get-zones/get-services
-~ # firewall-cmd --list-all/list-ports/list-services
+~ # firewall-cmd --get-zones/get-services/--list-all-zones
+~ # firewall-cmd [--zone=public/drop/work] --list-all/list-ports/list-services
 ~ # firewall-cmd --get-default-zone/get-active-zones
 ~ # firewall-cmd --reload
+~ # iptables -S [-t nat]
 ```
 
 1. Default zone is *public* to which unmatched traffic would be directed.
@@ -61,12 +62,15 @@ Switch to firewalld.
    For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted. 
 2. You activate a zone by binding a network interface or source IP address range(s) to it. Any firewall rules in the zone then apply to that network interface or IP address range(s).
 
+   We can have 0 active zone.
+3. We can examine *firewalld* settings by *iptables* command.
+
 # service and port
 
 1. service is pre-defined well-known ports like http, https etc.
 
-   Check */usr/lib/firewalld/services* XML definitions. You shouldn't edit these.
-2. If we want a different service (i.e. ssh) port other than default (22), try:
+   Check */usr/lib/firewalld/services* XML definitions. You shouldn't edit those files.
+2. To edit a servce (i.e. change ssh port):
    1. Copy */usr/lib/firewalld/services/ssh.xml* to */etc/firewalld/services*; change port there.
    2. Adding port directly to default zone.
 
@@ -141,5 +145,5 @@ Then access to port 12345 would be dropped.
 
 # Refs
 
-1. [firewalld](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7)
+1. [firewalld centos 7](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7)
 2. [Understanding Firewalld in Multi-Zone Configurations](https://www.linuxjournal.com/content/understanding-firewalld-multi-zone-configurations)
