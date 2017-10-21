@@ -23,6 +23,7 @@ title: Let's Encrypt Certificate
    Use [Let's Encrypt template](/2017/04/11/nginx) at first.
 2. *run*, *certonly*, *install* are subcommands.
 3. `--nginx`, `--webroot`, `--standalone` are plugins.
+4. Use *fullchain.pem* instead of *cert.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
 
 # webroot/standalone
 

@@ -1178,11 +1178,12 @@ Boot with LiveDVD, then
 
    1. To make use of *vaapi*, make sure *ffmpeg* and *hwaccel* USEs are enabled. BTW, *ffmpeg* should enable *vaapi* USE too.
    2. For Media Source Extensions, turn on *media.fragmented-mp4.exposed*, *media.fragmented-mp4.ffmpeg.enabled*, *media.mediasource.enabled*, *media.mediasource.mp4.enabled* and *media.mediasource.webm.enabled* in *about:config*, while disabling *media.fragmented-mp4.use-blank-decoder*.
-   3. Add FoxyProxy Standard, uBlock Origin, NoScript (and/or RefControl), User Agent Switcher, HTTPS Everywhere, DISCONNECT, Open With etc. add-ons. Remove unecessary default whitelist of NoScript plugin.
+   3. Add FoxyProxy Standard, uBlock Origin, NoScript (and/or RefControl), HTTPS Everywhere, DISCONNECT, Open With etc. add-ons. Remove unecessary default whitelist of NoScript plugin.
    4. *privacy.trackingprotection.enabled*, *Network.proxy.socks_remote_dns* to True.
    5. *network.IDN_show_punycode* to be True.
    6. *browser.cache.check_doc_frequency* set to [0/1/2/3](https://superuser.com/a/411826); Ctrl + Shift + I, Gear, Advanced Settings, Disable Cache (when toolbox is open).
    5. [Harden Firefox security](https://vikingvpn.com/cybersecurity-wiki/browser-security/guide-hardening-mozilla-firefox-for-privacy-and-security) and [disable useragent](http://www.howtogeek.com/113439/how-to-change-your-browsers-user-agent-without-installing-any-extensions/). Like *general.useragent.vendor/override*.
+   8. [fingerprint test](https://panopticlick.eff.org).
 
 5. [Fcitx](https://wiki.gentoo.org/wiki/Fcitx)
 
