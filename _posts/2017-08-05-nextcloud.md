@@ -335,7 +335,7 @@ server {
 }
 ```
 
-## [Let's Encrypt Certificate](/2017/10/10/le-certificate.md)
+## [Let's Encrypt Certificate](/2017/10/10/le-certificate)
 
 We should has SSL certificate to domain *cloud.example.com*.
 
@@ -473,6 +473,7 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
    >No media files found
 
+   Why not disable Gallery as well?
 8. Email notification.
 
    >TLS (STARTTLS) with 587, SSL (SSL/TLS) with 465.
@@ -586,11 +587,11 @@ Finally, refresh Nextcloud by *occ*:
 ~ # su -s /bin/bash -c "php ./occ files:scan --all" nginx
 ```
 
-**Attention**: with the help of `occ files:scan --all`, we can modify (add, remove files) data directory directly without the interfence of Nextcloud web or clients. For example, you have a big video file on server, and have to fetch the video file to local PC and then synchronize through Nextcloud client. Alternatively, just copy the video file to */opt/nextcloud-data/tina/files/Documents* and run the *occ* command above.
+**Attention**: with the help of `occ files:scan --all`, we can modify (add, remove files) data directory directly without the interfence of Nextcloud web or clients. For example, you have a big video file on server, and have to fetch the video file to local PC and then synchronize through Nextcloud client. Alternatively, just copy the video file to */opt/nextcloud-data/username/files/Documents* and run the *occ* command above.
 
 # DAV
 
-1. App Contacts 1.5.3 by does not create default address-book upon installation. Before creating or importing any contacts, an address-book must be created at first.
+1. App Contacts 1.5.3 by default does not create default address-book upon installation. Before creating or importing any contacts, an address-book must be created at first.
 2. [Importing address book from file works only partially because import breaks process limit in shared hosting environment](https://github.com/nextcloud/contacts/issues/235).
 
    >Contact could not be created.
@@ -617,7 +618,7 @@ Finally, refresh Nextcloud by *occ*:
 
 4. [Davdroid does not sync at all](https://forums.bitfire.at/topic/1508/zte-nubia-requires-autostart). For synchronization, must turn on [*autostart*](https://davdroid.bitfire.at/faq/entry/miui-no-synchronization/) for Davdroid in system setting.
 5. If Davdroid address book or calendar does not show up stock Contacts/Calendar apps, try *True Contacts* and *Etar* instead.
-6. Calendar app may remind incompatible *ics* format, then import without specifying a calendar and use *New Calendar* instead.
+6. Calendar app may remind incompatible *ics* format, then import without specifying an existing calendar and use *New Calendar* instead.
 7. Add or subscribe to [中国农历](https://github.com/infinet/lunar-calendar).
 
    Currently (as of Nextcloud 12), subscribed *iCal* web link [would not](https://github.com/nextcloud/server/issues/1497) be synced to mobile (i.e. Davdroid).
@@ -648,7 +649,7 @@ However, we have [QOwnNotes](https://github.com/pbek/QOwnNotes) as provisional t
 
 [A bug of Notes app in web interface](https://github.com/nextcloud/notes/issues/133)
 
-By default, the first line of a note will be the filename. Maybe, the Notes app in web interface cannot create the right file name with full shape (or Chinese) punctuators.
+By default, the first line of a note will be the filename. Maybe, the Notes app in web interface cannot create the right file name with full shape punctuators or Chinese characters.
 
 The current solution is to:
 
@@ -675,27 +676,48 @@ Adjust the *activity_id* range.
 
 >Do it before upgrading.
 
-Mainly, we should backup
+Mainly, we should backup *folders* and *database*.
+
+## folders
 
 1. The config folder, i.e. *config.php*, *personal.config.php* etc.
-2. The data folder. As I've set up separate data folder, so it's not a must here.
+2. The data folder. The most important part.
+3. The theme folder.
 3. During upgrading, the Nextcloud installation folder is backed up automatically. If you trust it, that's fine.
-4. **Database**.
 
-   ```
-   # backup
-   mysqldump --single-transaction -h localhost -u nc_user -pPassword nc_db > nextcloud-sqlbkp_`date +"%Y%m%d"`.bak
-   # restore
-   drop database nc_db
-   create database nc_db
-   # or
-   create database nc_db default character set utf8mb4 collate utf8mb4_unicode_ci";
-   ~ # mysql -h localhost -u nc_user -pPassword nc_db < nextcloud-sqlbkp.bak
-   ```
+```bash
+~ # rsync -aAx nextcloud/ nextcloud-dirbkp_`date +"%Y%m%d"`/ 
+~ # rsync -aAx nextcloud-data/ nextcloud-data-dirbkp_`date +"%Y%m%d"`/ 
+```
+
+Optionally, we can synchroize data to PC just in case.
+
+## database
+
+```
+# backup
+mysqldump --single-transaction -h localhost -u nc_user -pPassword nc_db > nextcloud-sqlbkp_`date +"%Y%m%d"`.bak
+# restore
+drop database nc_db
+create database nc_db
+# or
+create database nc_db default character set utf8mb4 collate utf8mb4_unicode_ci";
+~ # mysql -h localhost -u nc_user -pPassword nc_db < nextcloud-sqlbkp.bak
+```
 
 There is no space between `-p` and Password.
 
-# [CLI Upgrading](https://docs.nextcloud.com/server/12/admin_manual/maintenance/update.html#using-the-command-line-based-updater)
+# [Update](https://docs.nextcloud.com/server/12/admin_manual/maintenance/update.html)
+
+1. Firstly, *updater* checks environment.
+
+   *updater* enables *maintenance* mode automatically.
+2. Secondly, *upgrade*' does the real update.
+3. Both tools could be executed through the web interface and/or command line.
+
+   Web-based *updater* would ask you if *Keep maintenance mode active*. Command line *upgrade* and web-based *upgrade* require *active* (enabled) and *inactive* (disabled) maintenance mode respectively.
+
+Here, I use command line for the whole update process.
 
 ```
 ~ # cd /usr/share/nginx/html/nextcloud/updater
@@ -703,13 +725,20 @@ There is no space between `-p` and Password.
 # if errors like "The following extra files have been found: .user.ini.bak", remove those files. Re-run:
 ~ # su -s /bin/bash -c 'php updater.phar' nginx
 # Should the "occ upgrade" command be executed? [Y/n] y
-# Keep maintenance mode active? [y/N] N
+# Keep maintenance mode active? [y/N] y
+~ # cd ..
+~ # su -s /bin/bash -c 'php occ upgrade ' nginx
+~ # su -s /bin/bash -c 'php occ status ' nginx
 ```
+
+Dunno why *occ upgrade* is not ran automatically even I typed 'y'. Maybe I should type 'Y'?
+
+## miantenance mode
 
 *maintenance:mode* locks the sessions of logged-in users and prevents new logins. This is the mode to use for upgrades. Check the mode by:
 
 ```bash
-# config.php is updated based on the commands executed.
+# "maintenance" value in 'config.php' is updated accordingly
 ~ # su -s /bin/bash -c "php ./occ list" nginx
 ~ # su -s /bin/bash -c "php ./occ maintenance:mode" nginx
 ~ # su -s /bin/bash -c "php ./occ maintenance:mode --on/off " nginx
