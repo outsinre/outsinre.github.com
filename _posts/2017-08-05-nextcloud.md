@@ -502,6 +502,8 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
 >Be careful on [No FILE_FORMAT](https://github.com/nextcloud/documentation/issues/513). This is just a trial.
 
+Read [How to easily convert utf8 tables to utf8mb4 in MySQL 5.5](https://dba.stackexchange.com/a/21684) first.
+
 **backup** database before going on!
 
 1. maintenance mode
@@ -672,6 +674,40 @@ delete from nextcloud.oc_activity where activity_id>2300;
 
 Adjust the *activity_id* range.
 
+# News
+
+After enabling News app, you receives warnings like:
+
+>Ajax or Web cron mode detected! Your feeds will not updated!
+
+By default, [Nexcloud Ajax](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/background_jobs_configuration.html) is used. For news to be updated automatically, we should use system cron service. If you don't care about automatic news fetch, just ignore that.
+
+Firstly, install *cronie* service:
+
+```bash
+~ # yum install cronie
+~ # systemctl enable crond
+~ # systemctl start crond
+~ # cat /etc/crontab
+```
+
+Then, we add cron job for user *nginx*:
+
+```bash
+~ # crontab -u nginx -e
+*/15  *  *  *  * php -f /var/www/nextcloud/cron.php
+~ # crontab -u nginx -l
+~ # cat /var/spool/cron/nginx
+```
+
+Finally, select the option Cron in the admin menu for background jobs. If left on AJAX it would execute the AJAX job on every page load. 
+
+As the reference pointed out, we can use *systemd timer* as well. It's all your choice.
+
+## Tips
+
+1. The Android app requires *autostart* and *storage* permissions to sync feeds.
+
 # [Backup](https://docs.nextcloud.com/server/12/admin_manual/maintenance/backup.html)
 
 >Do it before upgrading.
@@ -712,7 +748,7 @@ There is no space between `-p` and Password.
 1. Firstly, *updater* checks environment.
 
    *updater* enables *maintenance* mode automatically.
-2. Secondly, *upgrade*' does the real update.
+2. Secondly, *upgrade* does the real update.
 3. Both tools could be executed through the web interface and/or command line.
 
    Web-based *updater* would ask you if *Keep maintenance mode active*. Command line *upgrade* and web-based *upgrade* require *active* (enabled) and *inactive* (disabled) maintenance mode respectively.
@@ -731,7 +767,7 @@ Here, I use command line for the whole update process.
 ~ # su -s /bin/bash -c 'php occ status ' nginx
 ```
 
-Dunno why *occ upgrade* is not ran automatically even I typed 'y'. Maybe I should type 'Y'?
+Dunno why *occ upgrade* is not ran automatically even I typed 'y'. Maybe should I type 'Y'?
 
 ## miantenance mode
 
