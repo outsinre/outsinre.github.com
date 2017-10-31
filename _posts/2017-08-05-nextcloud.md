@@ -502,8 +502,6 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
 >Be careful on [No FILE_FORMAT](https://github.com/nextcloud/documentation/issues/513). This is just a trial.
 
-Read [How to easily convert utf8 tables to utf8mb4 in MySQL 5.5](https://dba.stackexchange.com/a/21684) first.
-
 **backup** database before going on!
 
 1. maintenance mode
