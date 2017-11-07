@@ -268,21 +268,25 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     5. Get UUID from *vboxmanage list usbhost* instead of *blkid*.
 
     We can also make this attachment permanent by creating a *usbfilter*.
-15 Host-only networking
+15. Host-only networking
 
-   ```bash
-   ~ $ VBoxManage hostonlyif create (remove vboxnet0)
-   ~ $ ip link
-   ~ $ VBoxManage list hostonlyifs
-   ~ $ VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
-   ~ $ VBoxManage modifyvm Android51 --nic2 hostonly --hostonlyadapter2 vboxnet0
-   ~ $ VBoxManage dhcpserver add/modify --ifname vboxnet0 (--netname HostInterfaceNetworking-vboxnet0) --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.150 --enable
-   ~ $ VBoxManage list dhcpservers
-   # boot VM
-   ~ # netcfg eth1 dhcp
-   ```
+    Take Android-x86 for example:
 
-   >You may check if *vboxnet0* state is up or down.
+    ```bash
+    ~ $ VBoxManage hostonlyif create/remove vboxnet0
+    ~ $ ip link
+    ~ $ VBoxManage list hostonlyifs
+    ~ $ VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1 ('--dhcp' is not supported currently)
+    ~ $ VBoxManage modifyvm Android51 --nic2 hostonly --hostonlyadapter2 vboxnet0
+    ~ $ VBoxManage dhcpserver add/modify --ifname vboxnet0 (--netname HostInterfaceNetworking-vboxnet0) --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.110 --enable
+    ~ $ VBoxManage list dhcpservers
+    ~ $ ip address
+    # boot Android51
+    ~ # netcfg eth1 dhcp
+    ```
+
+    1. WES7x86 fails to set *default gateway* as *192.168.56.1*. Fix it manually!
+    2. If the new interface (Local Area Connection 2) is *Public network*, host cannot connect to (i.e. *ping*) WES7x86. Switch to *Home network*.
 
 16. Delete VM
 
