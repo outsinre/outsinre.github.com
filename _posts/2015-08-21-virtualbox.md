@@ -286,8 +286,9 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     ```
 
     1. WES7x86 fails to set *default gateway* as *192.168.56.1*. Fix it manually!
-    2. If the new interface (Local Area Connection 2) is *Public network*, host cannot connect to (i.e. *ping*) WES7x86. Switch to *Home network*.
-
+    2. Check *iptables* and/or firewall. (`iptables -I INPUT/OUTPUT 4 -s 192.168.56.0/24 -j ACCEPT`)
+    3. If the new interface (Local Area Connection 2) is *Public network*, host cannot connect to (i.e. *ping*) WES7x86. Switch to *Home network*.
+    4. Apart from NAT/bridged networking, we can use *iptables redirect* to let *vboxnet0* traffic go outside.
 16. Delete VM
 
     ```bash
