@@ -289,7 +289,12 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     2. Check *iptables* and/or firewall. (`iptables -I INPUT/OUTPUT 4 -s 192.168.56.0/24 -j ACCEPT`)
     3. If the new interface (Local Area Connection 2) is *Public network*, host cannot connect to (i.e. *ping*) WES7x86. Switch to *Home network*.
     4. Apart from NAT/bridged networking, we can use *iptables redirect* to let *vboxnet0* traffic go outside.
-    5. Especially, guest VM can share host's proxy as long as it's listening on *local network* (i.e. *0.0.0.0*).
+    5. Especially, guest VM can share host's proxy as long as it's listening on *local network* (i.e. *0.0.0.0*). A better idea is to *iptables redirect vboxnet0* traffic to *127.0.0.1* like this:
+
+       ```
+       iptables -t nat -A PREROUTING -d 192.168.56.100 -i vboxnet0 -p tcp -m tcp --dport 1080:1081 -j DNAT --to-destination 127.0.0.1
+       ```
+
 16. Delete VM
 
     ```bash
