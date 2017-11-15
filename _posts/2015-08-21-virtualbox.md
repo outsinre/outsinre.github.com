@@ -285,15 +285,32 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     ~ # netcfg eth1 dhcp
     ```
 
-    1. WES7x86 fails to set *default gateway* as *192.168.56.1*. Fix it manually!
-    2. Check *iptables* and/or firewall. (`iptables -I INPUT/OUTPUT 4 -s 192.168.56.0/24 -j ACCEPT`)
-    3. If the new interface (Local Area Connection 2) is *Public network*, host cannot connect to (i.e. *ping*) WES7x86. Switch to *Home network*.
+    1. WES7x86 fails to set *default gateway* as *192.168.56.1*. Fix it manually! If the new adapter (Local Area Connection 2) is *Public network*, host cannot connect to (i.e. *ping*) WES7x86. Switch to *Home network*.
+    2. Check *iptables* and/or firewall.
+
+       ```bash
+       ~ # iptables -I INPUT/OUTPUT 4 -s 192.168.56.0/24 -j ACCEPT
+       ```
+
     4. Apart from NAT/bridged networking, we can use *iptables redirect* to let *vboxnet0* traffic go outside.
-    5. Especially, guest VM can share host's proxy as long as it's listening on *local network* (i.e. *0.0.0.0*). A better idea is to *iptables redirect vboxnet0* traffic to *127.0.0.1* like this:
+    5. Especially, guest VM can share host's proxy as long as it's listening on *local network* (i.e. *0.0.0.0*). You may want to prohibit LAN devices connection to proxy.
+
+       ```bash
+       ~ # iptables -I INPUT 4 -d 192.168.0.0/24 -i wlan0 -p tcp -m tcp --dport 1080 -j DROP
+       ```
+
+       Alternatively, *iptables redirect vboxnet0* traffic to *127.0.0.1* like:
 
        ```
-       iptables -t nat -A PREROUTING -d 192.168.56.100 -i vboxnet0 -p tcp -m tcp --dport 1080:1081 -j DNAT --to-destination 127.0.0.1
+       ~ # iptables -t nat -A PREROUTING -d 192.168.56.100 -i vboxnet0 -p tcp -m tcp --dport 1080:1081 -j DNAT --to-destination 127.0.0.1
+       ~ # sysctl -w net.ipv4.conf.vboxnet0.route_localnet=0 (runtime)
+       # or 
+       ~ # sysctl -p /etc/sysctl.d/15-route_localnet.conf
+       net.ipv4.conf.vboxnet0.route_localnet = 1 (better)
+       net.ipv4.conf.all.route_localnet = 1 (dangerous)
        ```
+
+       By default, kernel [refuses to route](https://security.stackexchange.com/a/137603) source or destination loopback addresses (i.e. 127.0.0.1). *vboxnet0* interface would not be created before VirtualBox launches. So *15-route_localnet.conf* does not apply accross boot.
 
 16. Delete VM
 
