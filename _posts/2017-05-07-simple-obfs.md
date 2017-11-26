@@ -145,3 +145,6 @@ stop() {
 # Notes
 
 1. Make sure Iptables allows relevant ports and IPs.
+2. On Android, first install *simple-obfuscation* app. Afterwards, Change profile port to that of *obfs-server*.
+
+   Obviously, you should set *Configure* part to relevant values.
