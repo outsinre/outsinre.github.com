@@ -145,6 +145,6 @@ stop() {
 # Notes
 
 1. Make sure Iptables allows relevant ports and IPs.
-2. On Android, first install *simple-obfuscation* app. Afterwards, Change profile port to that of *obfs-server*.
+2. On Android, first install *simple-obfuscation* app. Afterwards, Change profile port to that of *obfs-server*. Obviously, you should set *Configure* part to relevant values.
 
-   Obviously, you should set *Configure* part to relevant values.
+   You may got *[unknown](https://github.com/shadowsocks/shadowsocks-android/issues/1428) plugin obfs-local* error after the exact first run. Please turn on *autostart* permission.
