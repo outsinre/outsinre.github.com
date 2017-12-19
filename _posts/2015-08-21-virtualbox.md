@@ -108,7 +108,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 
       ` --usb on --usbehci on` enables USB 1.0 and 2.0. To enable 3.0, use `--usbxhci on`.
 
-      `--vrdeaddress` set to 127.0.0.1 loopback address. If unset, it defaults to 0.0.0.0 listening on all host network interfaces. Refer to [127.0.0.1 vs 0.0.0.0](/2015/09/14/0000-127001-localhost/).
+      `--vrdeaddress` set to 127.0.0.1 loopback address. If unset, it binds to all host network interfaces accepting both IPv4 and IPv6. Refer to [127.0.0.1 vs 0.0.0.0](/2015/09/14/0000-127001-localhost/).
 
       `--draganddrop` option is useful if you need it. However, it is vunerable to security issue.
    5. storagectl
@@ -134,9 +134,9 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 8. startvm
 
    ```bash
-   $ VBoxHeadless --startvm WinXP32
-   # or
    $ VBoxManage startvm "WinXP32" --type headless
+   # or
+   $ VBoxHeadless --startvm WinXP32
    ```
 
    *VBoxHeadless* is a tool the launch VM as a server mode instead of traditional GUI mode. If you guy a VPS, say from Linode, your VPS VM mostly runs as a similar mode (maybe through web protocol for your control in browser).
@@ -150,7 +150,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    $ xfreerdp +clipboard /w:1024 /h:576 /v:127.0.0.1:5001
    ```
 
-    1. The server IP is the IP address of *host*, NOT IP of *guest*. Since I connect to VM locally, so it *127.0.0.1*. *xfreerdp* can add many other parameters, like window size, audio, video etc.
+    1. The server IP is *vrdeaddress*, NOT IP of *guest*. Since I connect to VM locally, so it *127.0.0.1*. *xfreerdp* can add many other parameters, like window size, audio, video etc.
     2. 'Ctrl + Alt + Enter' to toggle full screen.
     3. You might found there are two mouse pointers, one for *host* while another for *guest*. Also the screen resolution is not correctly set. To solve issues like this, to install *VBoxGuestAdditions*. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions*, *VBoxWindowsAdditions.exe*. Before issues got solved, you can use keyboard shortcuts and TAB, ENTER etc keys.
     4. Remember to install the guest addtions and mount shared folder. During *VBoxGuestAddtions* installation, there is a option *Direct3D* which should NOT be enabled.
@@ -393,8 +393,34 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     >If you choose GPT at 3rd step, then install EFI and GRUB2 instead of GRUB.
 
     First boot takes several minutes to initialize system preparation.
+19. Arch Linux x86_64
 
-19. Troublshooting.
+    ```bash
+    ~ $ VBoxManage list ostypes (ArchLinux_64)
+    ~ $ VBoxManage createvm --name archlinux_64 --ostype ArchLinux_64 --register --basefolder /media/Misc/VirtualBox/Machines
+    ~ $ VBoxManage modifyvm archlinux_64 --memory 512 --acpi on --vrde on --vrdeproperty "TCP/Ports=5001,5010-5012" --vrdeproperty "TCP/Address=127.0.0.1" --clipboard bidirectional
+    ~ $ VBoxManage createmedium --filename /media/Misc/VirtualBox/Machines/archlinux_64/archlinux_64.vdi --size 4000
+    ~ $ VBoxManage modifymedium /media/Misc/VirtualBox/Machines/archlinux_64/archlinux_64.vdi --resize 5000
+    ~ $ VBoxManage storagectl archlinux_64 --name "SATA Controller" --add sata --controller IntelAHCI --portcount 3
+    ~ $ VBoxManage storageattach archlinux_64 --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium /media/Misc/VirtualBox/Machines/archlinux_64/archlinux_64.vdi
+    ~ $ VBoxManage storageattach archlinux_64 --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium ~/Downloads/archlinux-2017.11.01-x86_64.iso
+    ~ $ VBoxManage sharedfolder add archlinux_64 --name WLshare --hostpath /media/Misc/WLshare
+    # starvm
+    ~ $ VBoxManage startvm archlinux_64 --type headless
+    ```
+
+    1. Attention, The VDI file is [resized](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) after creation (done in *chroot*). Then follow the [installation guide](https://wiki.archlinux.org/index.php/Installation_guide).
+    2. VBoxGuestAdditions in Linux guest requires extra effors. Details refer to Arch Linux post.
+20. RDP/VRDP/VRDE
+
+    VirtualBox Remote Display Protocol (VRDP) is a backwards-compatible extension to Microsoft's Remote Desktop Protocol (RDP). VirtualBox Remote Desktop Extension (VRDE) is an Oracle VRDP implementation.
+
+    Apart from TCP/Ports and TCP/Address, we have:
+
+    `--vrdemulticon on` allows multiple simultaneous connections to the same VM, withou which we can resort to `--vrdereusecon on` that can cut off the current client for sake of a new one.
+
+    `--vrdeauthtype external` requires username and password of the host before connection.
+1. Troublshooting.
     1. Re-install VirtualBox. `emerge -av1 $(qlist -IC virtualbox)`.
     2. Check *VBoxSVC.log* and *VBox.log*.
     3. Avoid quotes on bash symbols `~` and `$`.
