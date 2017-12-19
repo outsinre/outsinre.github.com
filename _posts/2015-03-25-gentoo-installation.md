@@ -854,13 +854,13 @@ Boot with LiveDVD, then
 7. Use UUID to identify a partition instead of */dev/sdaxy*.
 8. Python
 
-   Since python-exec-2.3 / eselect-python-20160207, the preferred method of altering Python configuration is to use the *edit* mode that opens *python-exec.conf* in an editor
+   Since python-exec-2.3 / eselect-python-20160207, the preferred method of altering Python configuration is to use the *edit* mode that opens *python-exec.conf* in an editor. The previous *set* mode is deprecated.
 
    ```bash
-   # eselect python list/edit`.
+   ~ # eselect python list/edit`.
    ```
 
-   The previous *set* mode is deprecated.
+   For example, remove Python 3.4 after upgrading to 3.5.
 1. [Perl update](https://wiki.gentoo.org/wiki/Perl)
 
    The official way of upgrading Perl, e.g. from Perl 5.22 to Perl 5.24, is upgrading your entire *world* set, and upgrading Perl with it.
@@ -912,13 +912,22 @@ Boot with LiveDVD, then
    since *root* does not launch X. If really need, set in *~/.bash_profile* (detailed below).
 3. Display Manager: GDM, LightDM, SDDM etc.
 
+   Most display managers source */etc/xprofile*, *~/.xprofile* and */etc/X11/xinit/xinitrc.d/*.
+4. xinit
+
    We will use *startx* (wrapper of *xinit* binary) to read *~/.xinitrc* (the default is */etc/X11/xinit/xinitrc* or */etc/xdg/xfce4/xinitrc*). One of the main functions of *~/.xinitrc* is to dictate which client (i.e. Xfce4) for the X Window System is invoked with *startx* or *xinit* programs on a per-user basis.
 4. Window Manager: Awesome, OpenBox, Xfwm4 etc.
 5. Desktop: [Xfce](https://wiki.gentoo.org/wiki/Xfce) and [Xfce/Guide](https://wiki.gentoo.org/wiki/Xfce/HOWTO), KDE, Gnome etc.
    1. Refer to [XFCE_PLUGINS](https://gitweb.gentoo.org/repo/gentoo.git/tree/profiles/desc/xfce_plugins.desc).
    2. Similar to *xfce-extra/xfce4-notifyd*, *x11-themes/gnome-icon-theme* can be explicitly emerged along with *xfce-base/xfce4-meta*. Details refer to Missing icons in *Xfce4 configuration* below.
    3. Add *-qt4 -qt5* to *make.conf*.
-   
+6. It's essential to outline the diagram of X system:
+   1. login shell -> /etc/profile -> .bash_profile -> .bashrc -> startx/xinit
+   2. startx is a front wrapper to xinit program. startx/xinit launch X server (Xorg/X) and X client (Xfce4).
+   3. Command: startx/xinit <X client> <X client arguments> -- <X server> <X server arguments>
+   4. Without command line options, startx try to parse .xinitrc and .xserver respectively.
+   5. Put environment variables for GUI applications into *~/.xinitrc* while for terminal into *~/.bashrc* or *~/.bash_profile*.
+
 # X Configuration
 
 1. Per-user [Theming](/2016/11/23/theme/) locations:
@@ -1014,7 +1023,8 @@ Boot with LiveDVD, then
    fi
    ```
 
-   If *~/.xserverrc* exists, remove *vt7 -nolisten tcp*.
+   1. If *~/.xserverrc* exists, *vt7 -nolisten tcp* part can be removed.
+   2. If you would like to remain logged in when the X session ends, remove *exec*.
 4. Clear Xfce configuration
 
    ```bash
@@ -1137,7 +1147,7 @@ Boot with LiveDVD, then
    1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
 2. Recommendations
 
-   apg, guake, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/).
+   apg, guake, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/), remmina/freerdp.
 
    1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/). Those fonts are essential to display formulas. However, WPS-linux does not have built-in formula creation function due to copyright.
 
@@ -1202,7 +1212,7 @@ Boot with LiveDVD, then
    export XMODIFIERS=@im=fcitx
    ```
 
-   They should be *ahead* of *exec startxfce4* or *xfce4-session*. Commands after `exec` won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
+   They should be *ahead* of *exec startxfce4* or *xfce4-session*. Commands after *exec* won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
 6. FFmpeg
 
    ```
@@ -1369,7 +1379,7 @@ Boot with LiveDVD, then
    The reason is that */tmp* is mounted as *noexec*. To temporarily solve it,
 
    ```bash
-   $ TMPDIR=~/tmp pip(3) install NetEase-MusicBox
+   ~ $ TMPDIR=~/tmp pip(3) install NetEase-MusicBox
    ```
 
    Read more on [Won't install python 2.7.4 if /tmp is mounted noexec](https://github.com/pyenv/pyenv/issues/13) and [pip install pycrypto fails on centos 6.4](https://bugs.launchpad.net/pycrypto/+bug/1294670/comments/7).
