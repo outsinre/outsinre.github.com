@@ -302,7 +302,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
        Alternatively, *iptables redirect vboxnet0* traffic to *127.0.0.1* like:
 
        ```
-       ~ # iptables -t nat -A PREROUTING -d 192.168.56.100 -i vboxnet0 -p tcp -m tcp --dport 1080:1081 -j DNAT --to-destination 127.0.0.1
+       ~ # iptables -t nat -A PREROUTING [ -s 192.168.56.101 ] -d 192.168.56.100 -i vboxnet0 -p tcp -m tcp --dport 1080:1081 -j DNAT --to-destination 127.0.0.1
        ~ # sysctl -w net.ipv4.conf.vboxnet0.route_localnet=0 (runtime)
        # or 
        ~ # sysctl -p /etc/sysctl.d/15-route_localnet.conf
