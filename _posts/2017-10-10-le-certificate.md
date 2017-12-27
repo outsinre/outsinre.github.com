@@ -7,7 +7,7 @@ title: Let's Encrypt Certificate
 
 ```bash
 ~ # yum search certbot
-~ # yum install certbot python-certbot-nginx (optional `--nginx` plugin)
+~ # yum install certbot [python-certbot-nginx] (optional Nginx plugin)
 ~ # certbot -h [all]
 ~ # certbot certificates
 ```
@@ -24,7 +24,7 @@ title: Let's Encrypt Certificate
 
 # Tips
 
-1. Don't load Nginx virtual host before certificate is generated.
+1. A simple Nginx template:
 
    Use [Let's Encrypt template](/2017/04/11/nginx).
 2. Use *fullchain.pem* instead of *cert.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
@@ -51,15 +51,15 @@ Add a new domain (blog) to existing certificate (www).
 # Renewal
 
 ```bash
-~ # cerbot renew --renew-hook "systemctl reload nginx" --dry-run
+~ # cerbot renew --deploy-hook "systemctl reload nginx.service" --dry-run
 ```
 
-1. `--renew-hook` tells *nginx* to reload *if* renewal is successful. Another way is to put the hook into *renew* configuration file:
+1. `--deploy-hook` tells *nginx* to reload *if* renewal is successful. Another way is to put the hook into *renew* configuration file:
 
    ```
    # /etc/letsencrypt/renewal/www.example.conf
    [renewalparams]
-   renew_hook = systemctl reload nginx
+   renew_hook = systemctl reload nginx.service
    ```
 
 2. Renewal certificates of [standalone](https://certbot.eff.org/docs/using.html#standalone) plugin requires port 80 and/or 443 to be available. You may need to stop web server during renewal.
@@ -74,9 +74,9 @@ Add a new domain (blog) to existing certificate (www).
 3. We can use *crontab* or *systemd* timer to automate certificate renewal.
 
    ```bash
-   ~ # crontab -u root -l
+   ~ # crontab -u root -e/-l
    # /var/spool/cron/root
-   30 0,12 * * * /usr/bin/certbot renew --renew-hook "systemctl reload nginx" --quiet
+   30 0,12 * * * /usr/bin/certbot renew --deploy-hook "/usr/bin/systemctl reload nginx.service" --quiet
    ```
 
    Twice a day.
