@@ -21,8 +21,8 @@ root@tux / # gpasswd -a username wireshark
 You should log out and log in back to take effect. *newgrp* log in to a new group in current shell:
 
 ```bash
-user@tux ~ # newgrp wireshark
-user@tux ~ # wireshark-gtk
+user@tux ~ $ newgrp wireshark
+user@tux ~ $ wireshark-gtk
 ```
 
 Then launch Wireshark from terminal directly.
@@ -72,11 +72,11 @@ Firstly, we set Android Wi-Fi gateway to Linux's IP *192.168.0.150*. Do this in 
 Then on Linux, we should configure NAT for Android traffic, forwarding Android traffic to the real Wi-Fi gateway *192.168.0.1*.
 
 ```bash
-user@tux ~ $ sysctl -w net.ipv4.ip_forward=1
-user@tux ~ $ iptables -A FORWARD -i wlan0 -j ACCEPT
-user@tux ~ $ iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE (poor)
+root@tux / # sysctl -w net.ipv4.ip_forward=1
+root@tux / # iptables -A FORWARD -i wlan0 -j ACCEPT
+root@tux / # iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE (poor NAT)
 # or
-user@tux ~ $ iptables -t nat -A POSTROUTING -o wlan0 -j SNAT --to-source 192.168.0.150 (better)
+root@tux / # iptables -t nat -A POSTROUTING -o wlan0 -j SNAT --to-source 192.168.0.150 (better NAT)
 ```
 
 1. NAT requires IP forwarding that, by default, is disabled in Linux boxes.
@@ -85,12 +85,12 @@ user@tux ~ $ iptables -t nat -A POSTROUTING -o wlan0 -j SNAT --to-source 192.168
    As the router here is Linux PC, we'd [better](https://unix.stackexchange.com/q/21967) use SNAT istead. Bascially, we use SNAT for static router IP, improving Iptables performance. However, MASQUERADE is a *must* when the router connects to the Internet with PPoE dial-up (different WAN IP each dial-up).
 3. This is a special case of the reference as there is only one Linux interface (*wlan0*) for both LAN and WAN communication. Please read more details via [LinuxTutorialIptablesNetworkGateway](http://www.yolinux.com/TUTORIALS/LinuxTutorialIptablesNetworkGateway.html).
 
-   We can *omit* the MASQUERADE or SNAT part because Wi-Fi router can reach Android device directly without Linux *wlan0* NAT support. Think about it!
+   We can *omit* the MASQUERADE or SNAT part because Wi-Fi router can reach Android device directly without Linux *wlan0* NAT support.
 
 To check the setup, make sure Android connect to network (ping in Termux). Further more, we can check Iptables counts:
 
 ```bash
-user@tux ~ $ iptables -L -nv [-t nat]
+root@tux / # iptables -L -nv [-t nat]
 ```
 
 Android outgoing traffic flow is as follows:
@@ -118,3 +118,5 @@ Set up a proxy (i.e. OpenVPN, Privoxy HTTP etc.) on PC and proxy device traffic 
 3. We can use Charles and Fiddler for HTTP(s) capture.
 
 Solutions based on VPN service can capture transmission layer packets. Most tools above only capture HTTP(s) layer traffic.
+
+Above all, the most convenient method is running *tshark* (Wireshark terminal counterpart) on Wi-Fi router (i.e. OpenWrt).
