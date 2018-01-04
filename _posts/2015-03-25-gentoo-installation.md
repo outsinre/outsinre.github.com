@@ -265,6 +265,7 @@ title: Gentoo Installation
    ```
    LANG="en_US.UTF-8"
    LC_COLLATE="C"
+   LC_CTYPE="zh_CN.UTF-8"
    ```
 
    If you don't have privileged access, *export* them in shell RC file like *.bashrc*.
@@ -1348,9 +1349,9 @@ Boot with LiveDVD, then
    # emerge -av thunar-archive-plugin
    ```
 
-   1. *file-roller* is a front-end GTK interface - Archive Manager, which needs background Archiver support - *zip/unzip*, *bzip2*, *tar*, *7zip* etc.
+   1. *file-roller* is a front-end GTK interface - Archive Manager, which needs background Archiver support - *zip/unzip*, *bzip2*, *tar*, *7zip*, *unrar* etc.
    2. *thunar-archive-plugin* is a Thunar plugin (right-click menu). If *thunar-archive-plugin* cannot find a suitable archive manager, check [thunar archive plugin cannot integrate with file-roller](https://forums.gentoo.org/viewtopic-t-1006838.html?sid=bce8eeef9eab8d916c59b01cef493bb4) and [doesn't work anymore with recent file-roller](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=746504).
-   3. By default, *unzip* cannot extract arhives containing no-ascii file names (i.e. archives created on Chinese Windows). Enable *netspec* USE.
+   3. By default, *unzip* cannot extract arhives containing no-ASCII file names (i.e. archives created on Chinese Windows). Enable *natspec* USE that brings in `-O` command line option. Check `-O` by `-h` as it's not present in man page. Attention, *natpsec* requires `LC_CTYPE` be *zh_CN*.
    4. (opt) *p7zip* has a higher data compression ratio.
 
       *p7zip* brings 3 archive binaries, namely *7z*, *7za* and *7zr*. Only *7zr* can extract non-ascii *zip* files. However *file-roller* will take *7z* and *7za* primarily. Rename */usr/bin/7z* and */usr/bin/7za* to something else.
