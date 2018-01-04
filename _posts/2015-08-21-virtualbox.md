@@ -409,7 +409,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     ~ $ VBoxManage startvm archlinux_64 --type headless
     ```
 
-    1. Attention, The VDI file is [resized](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) after creation (done in *chroot*). Then follow the [installation guide](https://wiki.archlinux.org/index.php/Installation_guide).
+    1. The VDI file is [resized](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) after creation. Then follow the [installation guide](https://wiki.archlinux.org/index.php/Installation_guide).
     2. VBoxGuestAdditions in Linux guest requires extra effors. Details refer to Arch Linux post.
 20. RDP/VRDP/VRDE
 
@@ -420,6 +420,47 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     `--vrdemulticon on` allows multiple simultaneous connections to the same VM, withou which we can resort to `--vrdereusecon on` that can cut off the current client for sake of a new one.
 
     `--vrdeauthtype external` requires username and password of the host before connection.
+21. Expand VDI size
+
+    Occasionally, the guest OS warns running out of disk space when you should [resize](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) the VM disk and parition thereof.
+
+    1. Firstly, make sure the guest does **not** have snapshots. If there exist any, delete all of them.
+    2. Resizing does not work if the guest VM resides on fix-sized VDI.
+    3. Currently, only expansion is supported. You cannot decrease any VDI or partitions.
+
+    Here, I will show an example of expanding *archlinux_64* VM above. On the host:
+
+    ```bash
+    user@tux ~ $ VBoxManage list hdds
+    user@tux ~ $ VBoxManage modifymedium /media/Misc/VirtualBox/Machines/archlinux_64/archlinux_64.vdi --resize 10000
+    user@tux ~ $ VBoxManage list hdds
+    ```
+
+    The VDI is increasing from 5GiB to 10GiB. Next, we should let the VM known the expansion. Basically, we attach to the VM a live booting media containing *parted* or *gparted* tool. GParted live CD and Arch Linux ISO are such examples. On the host:
+
+    ```bash
+    user@tux ~ $ VBoxManage showvminfo archlinux_64
+    user@tux ~ $ VBoxManage storageattach archlinux_64 --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium ~/Downloads/archlinux-2018.01.01-x86_64.iso
+    user@tux ~ $ VBoxManage showvminfo archlinux_64
+    ```
+
+    Please make sure boot the VM on the attached ISO instead of VDI. In the live system, suppose */dev/sda* represents VDI:
+
+    ```bash
+    [root@archiso / #] fdisk/blkid/lsblk/findmnt
+    [root@archiso / #] parted -a optimal /dev/sda
+    (parted) help
+    (parted) print free
+    The backup GPT table is not at the end of the disk, as it should be. This might mean that another operating system believes the disk is smaller. Fix, by moving the backup to the end (and removing the old backup)? Fix/Ignore/Cancel?
+    (parted) Fix
+    (parted) print free
+    (parted) resizepart 1 100%
+    ```
+
+    *parted* detects the VDI expanded and reminds *Fix*. The key is *resizepart* (or *resize* depending on *parted* version) epxanding (100%) the *root* partition to include newly added space. That's all!
+
+    1. Some posts write *resizepart* can be done on guest OS directly as long as swap partition/file is turned off.
+    2. For Windows guest, use enclosed *disk management* to finish the job.
 1. Troublshooting.
     1. Re-install VirtualBox. `emerge -av1 $(qlist -IC virtualbox)`.
     2. Check *VBoxSVC.log* and *VBox.log*.
