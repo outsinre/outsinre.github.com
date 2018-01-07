@@ -366,7 +366,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
     - User Interface, untick 'Help', 'Microsoft Speech API', and 'Accessibility'.
     - Resolve Dependencies. Choose 'Unbranded Startup Screens', 'Windows Boot Environment', 'Standard Windows USB Stack' and 'Windows Explorer Shell' (a MSUT). Some previously unticked feature might be ticked again as a dependency of some other features.
 
-    >Since the IOS image is till attached to SATA Controller, booting will be directed to installation process again. Either update VM boot order or F12 at early phase.
+    >Since the ISO image is till attached to SATA Controller, booting will be directed to installation process again. Either update VM boot order or F12 at early phase.
 18. 32-bit Android-x86
 
     ```bash
@@ -505,8 +505,6 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 
        Especially, each port of SATA disk drive only supports one device, namely (0, 0), (1, 0), (2, 0) etc.
 
-    9. Windows XP Professional VOL SP3 x86: W733W-GWPGB-37X4T-BRD7P-JVT2D.
-    10. Windows Emebedded 7 Standard x86: XGY72-BRBBT-FF8MH-2GG8H-W7KCW, MPMVY-PP762-WWVBC-83RXJ-2H7RH, GJVTR-C4WQ6-BKRH3-DRFFH-J83DM
 20. References
     1. [gentoo wiki](https://wiki.gentoo.org/wiki/VirtualBox)
     2. [install_virtualbox_in_gentoo](http://baige5117.github.io/blog/install_virtualbox_in_gentoo.html)

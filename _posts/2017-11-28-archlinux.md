@@ -138,7 +138,7 @@ Here we set system locale to *en_US.UTF-8* (better for log trace). For per-user 
 
 ## *root* password
 
-``bash
+```bash
 [root@archiso / #] passwd
 ```
 
