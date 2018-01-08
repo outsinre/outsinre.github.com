@@ -55,7 +55,7 @@ Type=simple
 PermissionsStartOnly=false
 User=nobody
 Group=nobody
-LimitNOFILE=32768
+LimitNOFILE=4096
 ExecStart=/usr/local/bin/obfs-server -c /etc/shadowsocks-libev/obfs-server.json
 
 [Install]

@@ -49,10 +49,12 @@ Switch to firewalld.
 # Status
 
 ```bash
-~ # systemctl status firewalld (or firewall-cmd --state)
-~ # firewall-cmd --get-zones/--list-all-zones/get-services
-~ # firewall-cmd [--zone=public/drop/work] --list-all/list-ports/list-services
-~ # firewall-cmd --get-default-zone/get-active-zones
+~ # systemctl status firewalld
+~ # firewall-cmd --state
+~ # firewall-cmd ----get-services
+~ # firewall-cmd --get-zones/--list-all-zones
+~ # firewall-cmd --get-default-zone/--get-active-zones
+~ # firewall-cmd --zone=public --list-all/list-ports/list-services
 ~ # firewall-cmd --reload
 ~ # iptables -S [-t nat]
 ```
@@ -60,19 +62,17 @@ Switch to firewalld.
 1. Default zone is *public* to which unmatched traffic would be directed.
 
    For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted. 
-2. You *activate* a zone by binding a network interface or source IP address range(s) to it. Any firewall rules in the zone then apply to that network interface or IP address range(s).
-
-   We can have 0 active zone.
+2. We *activate* a zone (`--get-active-zones`) by binding a network interface or source IP address range(s) to it. Any firewall rules in the zone then apply to that network interface or IP address range(s).
 3. We can also examine *firewalld* settings by *iptables* command.
 
 # service and port
 
-1. service is pre-defined well-known ports like http, https etc.
+1. Services are pre-defined well-known ports like http, https etc.
 
    Check */usr/lib/firewalld/services* XML definitions. You shouldn't edit those files.
 2. To edit a servce (i.e. change ssh port):
-   1. Copy */usr/lib/firewalld/services/ssh.xml* to */etc/firewalld/services/*; change port there.
-   2. Adding port directly to default zone.
+
+   Copy */usr/lib/firewalld/services/ssh.xml* to */etc/firewalld/services/*; change port there.
 
    ```xml
    <?xml version="1.0" encoding="utf-8"?>
@@ -83,17 +83,19 @@ Switch to firewalld.
    </service>
    ```
 
+   Alternatively, adding port directly to default zone.
+
 # Adding ports
 
 ```bash
 ~ # firewall-cmd --zone=public --add-port=12345/tcp
-~ # firewall-cmd --permanent --zone=public --add-port=12345/tcp
 ~ # firewall-cmd --reload (opt)
+~ # firewall-cmd --permanent --zone=public --add-port=12345/tcp
 ```
 
 1. Take effect immediately at rumtine without *reload*.
-2. Take effect accross *reload*.
-3. As we have the runtime command at first, no `--reload` is required.
+2. As we have the runtime command at first, no `--reload` is required.
+3. Take effect accross *reload*.
 4. `--zone` can be ommited unless you want to change other zones.
 
 # Adding services
@@ -120,7 +122,6 @@ Modify it after creation:
 ~ # firewall-cmd --permanent --service=myservice --set-short=description
 ~ # firewall-cmd --permanent --service=myservice --add-port=portid[-portid]/protocol
 ~ # firewall-cmd --permanent --service=myservice --remove-port=portid[-portid]/protocol
-~ # firewall-cmd --reload
 ~ # firewall-cmd --info-service=myservice
 ```
 

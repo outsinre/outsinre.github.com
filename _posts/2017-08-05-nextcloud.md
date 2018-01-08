@@ -754,18 +754,16 @@ There is no space between `-p` and Password.
 Here, I use command line for the whole update process.
 
 ```
-~ # cd /usr/share/nginx/html/nextcloud/updater
-~ # su -s /bin/bash -c 'php updater.phar' nginx
+~ # cd /usr/share/nginx/html/nextcloud/
+~ # su -s /bin/bash -c 'php ./updater/updater.phar' nginx
 # if errors like "The following extra files have been found: .user.ini.bak", remove those files. Re-run:
-~ # su -s /bin/bash -c 'php updater.phar' nginx
-# Should the "occ upgrade" command be executed? [Y/n] y
-# Keep maintenance mode active? [y/N] y
-~ # cd ..
-~ # su -s /bin/bash -c 'php occ upgrade ' nginx
+~ # su -s /bin/bash -c 'php ./updater/updater.phar' nginx
+# Should the "occ upgrade" command be executed? [Y/n] Y
+# Keep maintenance mode active? [y/N] N
+~ # su -s /bin/bash -c 'php occ upgrade ' nginx (optionally)
 ~ # su -s /bin/bash -c 'php occ status ' nginx
+~ # su -s /bin/bash -c 'php ./updater/updater.phar' nginx
 ```
-
-Dunno why *occ upgrade* is not ran automatically even I typed 'y'. Maybe should I type 'Y'?
 
 ## miantenance mode
 
