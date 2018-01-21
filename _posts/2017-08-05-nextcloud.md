@@ -591,6 +591,8 @@ Finally, refresh Nextcloud by *occ*:
 
 # DAV
 
+## CardDAV
+
 1. App Contacts 1.5.3 by default does not create default address-book upon installation. Before creating or importing any contacts, an address-book must be created at first.
 2. [Importing address book from file works only partially because import breaks process limit in shared hosting environment](https://github.com/nextcloud/contacts/issues/235).
 
@@ -612,14 +614,13 @@ Finally, refresh Nextcloud by *occ*:
       ```
 
       Set back to original value once imported.
-3. When adding Davdroid account, select:
+3. [contact birthdays with no year given are shown with (*1604) in calendar](https://github.com/nextcloud/server/issues/3084).
 
-   >Contact group method: groups are per-contact categories 
+   The contacts app is using VCARD 3.0 at the moment.
+## CalDVA
 
-4. [Davdroid does not sync at all](https://forums.bitfire.at/topic/1508/zte-nubia-requires-autostart). For synchronization, must turn on [*autostart*](https://davdroid.bitfire.at/faq/entry/miui-no-synchronization/) for Davdroid in system setting.
-5. If Davdroid address book or calendar does not show up stock Contacts/Calendar apps, try *True Contacts* and *Etar* instead.
-6. Calendar app may remind incompatible *ics* format, then import without specifying an existing calendar and use *New Calendar* instead.
-7. Add or subscribe to [中国农历](https://github.com/infinet/lunar-calendar).
+1. Calendar app may remind incompatible *ics* format, then import without specifying an existing calendar and use *New Calendar* instead.
+2. Add or subscribe to [中国农历](https://github.com/infinet/lunar-calendar).
 
    Currently (as of Nextcloud 12), subscribed *iCal* web link [would not](https://github.com/nextcloud/server/issues/1497) be synced to mobile (i.e. Davdroid).
 
@@ -628,6 +629,27 @@ Finally, refresh Nextcloud by *occ*:
    3. Wait for Nextcloud 13.
 
    >Obviously, the 2nd method is favorable.
+
+## DAVDroid / Etar
+
+1. When adding Davdroid account, select,
+
+   >Contact group method: groups are per-contact categories 
+
+   as Nextcloud Contact app does *not* support VCARD 4.0.
+2. [Davdroid does not sync at all](https://forums.bitfire.at/topic/1508/zte-nubia-requires-autostart). For synchronization, must turn on [*autostart*](https://davdroid.bitfire.at/faq/entry/miui-no-synchronization/) for Davdroid in system setting.
+3. If Davdroid address book or calendar does not show up stock Contacts/Calendar apps, try *True Contacts* and *Etar* instead.
+
+   Etar has, by default, a special calendar called 'Contact Birthday nobody@gmail.com' which show *local* contacts' birthday. **Please* disable it's synchronization under 'CALENDARS TO SYNC', otherwise it incurs duplicate birthday events.
+
+## Maintenance
+
+   ```bash
+   ~ $ su -s /bin/bash -c "php ./occ dav:sync-birthday-calendar" nginx
+   ~ $ su -s /bin/bash -c "php ./occ dav:sync-system-addressbook" nginx
+   ```
+
+   For example, you accidently delete the default 'Contact birthdays' subscription, the first command will get it back.
 
 # Notes
 
