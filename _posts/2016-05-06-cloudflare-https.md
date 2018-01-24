@@ -3,7 +3,9 @@ layout: post
 title: Enforce HTTPS to your site by Cloudflare
 ---
 
->By default, GitHub takes HTTPS protocol to user/project pages i.e. *username.github.io*. However, for a custiomized domain, HTTPS is unsupported. This post tells us to enforce HTTPS to GitHub page through free Cloudflare services. Mainly, we just need to tune a few settings on Clouflare and your domain registrar.
+By default, GitHub takes HTTPS protocol to user/project pages i.e. *username.github.io*. However, for a custiomized domain, HTTPS is unsupported. This post tells us to enforce HTTPS to GitHub page through free Cloudflare services. Mainly, we just need to tune a few settings on Clouflare and your domain registrar.
+
+To be honest, Cloudflare's free CDN caching may slow down instead of accelerating your sites.
 
 # Cloudflare
 
@@ -19,6 +21,8 @@ The detailed free services are listed below. To achieve HTTPS, only the first th
 6. [CNAME flattening](https://blog.cloudflare.com/introducing-cname-flattening-rfc-compliant-cnames-at-a-domains-root/) - so you can use a DNS CNAME at the domain apex;
 7. ["Always online"](https://www.cloudflare.com/always-online/) protection - Your cached website will stay up even if the host goes down;
 8. [Firewall](https://www.cloudflare.com/features-security/) - intelligent protection against DDOS attacks.
+9. [websocket](https://support.cloudflare.com/hc/en-us/articles/200169466-Can-I-use-Cloudflare-with-WebSockets-)
+10. Require Modern TLS on Crypto tab.
 
 We should register a Cloudflare account and then *add site*. Follow the *add site* procedure, we will finish the HTTPS enforcement. Before we go into details, we should clarify a few points:
 
@@ -42,7 +46,15 @@ We will basically do two things:
    To make use of Cloudflare service, all other platforms' DNS servers must be deleted. Only Cloudflare ones are permitted.
 4. Up to now, Cloudflare takes over DNS servers and DNS records management.
 
->By default, Cloudflare caches web contents (i.e. files) of (there is a cloud symbol at the end of DNS record) website. You may want to disable caching for some domains like *irc.example.com*.
+## Cache
+
+By default, Cloudflare accelerate and protect (i.e. cache files) sites (an orange cloud symbol at the end of DNS record).
+
+You may want to disable that functionality for specific sub-domains like *irc.example.com*. For example, local ISP blocks Cloudflare CDN servers. On the other hand you lose the free services mentioned above.
+
+Alternatively, it hides web site's original location (i.e. IP). Refer to post V2ray for details. You can check by `dig` your domain and find IP changed to that of Cloudflare's CDN servers.
+
+**ATTENTION**: Cloudflare decrypts all traffic from browser and negotiate new TLS with destination server. So we usually only cache static web pages or public multimedia. For confidential communication like password login, please **avoid** CDN.
 
 # SSL settings
 
@@ -52,7 +64,7 @@ Unfortunately GitHub doesn't yet support SSL for custom domains which would ordi
 2. We can now add a Page Rule to enforce HTTPS, as you add other Page Rules make sure this is the primary Page Rule:
 
    ```
-   http://*example.tk/*
+   http://*example.com/*
 
    Always Use HTTPS
    ```
@@ -61,11 +73,11 @@ Unfortunately GitHub doesn't yet support SSL for custom domains which would ordi
 3. We can also create a Page Rule to ensure that non-www is redirected to www securely when using HTTPS:
 
    ```
-   https://example.tk/*
+   https://example.com/*
 
    Forwarding URL (Status Code: 301 - Permanent Redirect)
 
-   https://www.example.tk/$1
+   https://www.example.com/$1
    ```
 
    This rule should sit [before the previous one](https://support.cloudflare.com/hc/en-us/articles/218411427#overview) since it's more *specific*.
@@ -100,6 +112,7 @@ Unfortunately GitHub doesn't yet support SSL for custom domains which would ordi
 6. Disable SSL
 
    **Attention**: if you decide to disable SSL for whatever causes, please disable HSTS **before** HTTPS.
+
 # Cache all the things
 
 CloudFlare has a “Cache Everything” option in Page Rules. For static sites, it allows your HTML to be cached and served directly from CloudFlare's CDN. This will significantly accelerate your site access time.
@@ -107,7 +120,7 @@ CloudFlare has a “Cache Everything” option in Page Rules. For static sites, 
 Add a last rule as:
 
 ```
-https://*example.tk/*
+https://*example.com/*
 
 Cache Level: Cache Everything
 ```
