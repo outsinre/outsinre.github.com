@@ -37,6 +37,8 @@ We will basically do two things:
 
 # DNS switch
 
+>[Subdomains cannot be added on their own](https://support.cloudflare.com/hc/en-us/articles/220981767-Can-I-add-a-subdomain-on-CloudFlare-).
+
 1. After filling in your site url following *add site* procedure, Cloudflare will analyze and import the site's DNS records (from your previous platforms).
 
    We can add, delete a new DNS records. Even, we can toggle Cloudflare per a record.
@@ -46,7 +48,9 @@ We will basically do two things:
    To make use of Cloudflare service, all other platforms' DNS servers must be deleted. Only Cloudflare ones are permitted.
 4. Up to now, Cloudflare takes over DNS servers and DNS records management.
 
-## Cache
+## Cache and [Security](https://security.stackexchange.com/a/151572)
+
+>Cloudflare as a man in the middle (MITM)
 
 By default, Cloudflare accelerate and protect (i.e. cache files) sites (an orange cloud symbol at the end of DNS record).
 
@@ -54,7 +58,7 @@ You may want to disable that functionality for specific sub-domains like *irc.ex
 
 Alternatively, it hides web site's original location (i.e. IP). Refer to post V2ray for details. You can check by `dig` your domain and find IP changed to that of Cloudflare's CDN servers.
 
-**ATTENTION**: Cloudflare decrypts all traffic from browser and negotiate new TLS with destination server. So we usually only cache static web pages or public multimedia. For confidential communication like password login, please **avoid** CDN.
+**ATTENTION**: Cloudflare decrypts all traffic from browser and negotiate new TLS with destination server. It is common that a CDN platform just uses HTTP. Hence, we cache static web pages or public multimedia. For confidential communication like password login, please **avoid** CDN.
 
 # SSL settings
 

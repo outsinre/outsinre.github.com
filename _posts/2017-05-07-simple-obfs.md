@@ -24,13 +24,13 @@ I will show how to build binary in Gentoo. Before that, make sure dependency pac
 ~ $ ./autogen.sh
 ~ $ ./configure [--prefix=/home/username/opt] && make
 ~ $ make install prefix=~/opt
-# or
+# -or-
 ~ # cp src/{obfs-local,obfs-server} /opt/bin
 ```
 
 1. By default, binaries, doc, man are installed into */usr/local/{bin,doc,man}*. `configure --prefix=/foo/bar` changes to */foo/bar*.
-
-   Attention, do not put tailing slash to `--prefix=` argument.
+   1. Do not put tailing slash to `--prefix=` argument.
+   2. *prefix* must be *absolute* path.
 2. To be simple, *obfs-local* and *obfs-server* binaries are enough. Just copy to `PATH`.
 
 Finally, to clean letfovers:
@@ -77,7 +77,7 @@ WantedBy=multi-user.target
 ```
 
 1. Listen on port 1235 for *obfs-client* connection;
-2. Forward traffic to *shadowsocks* on port 1237;
+2. Forward traffic to *shadowsocks* on port 1235;
 3. Obfuscation method is *http* or *tls*.
 4. Fail over to public domain or personal web server.
 
