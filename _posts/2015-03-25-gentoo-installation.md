@@ -889,10 +889,11 @@ Boot with LiveDVD, then
 
    The last comman triggers over 60 packages rebuild.
 3. SysRq
-   1. `Alt - SysRq - arguments` simutaneously; ThinkPad Fn is not required.
-   2. Or press the key one by one: `Alt`, `[Fn] - SysRq`, and `arguments`.
-   3. Irrespective of pressing methods, the *arguments* part should be pressed one by one.
-   2. The detailed *arguments* can be found at [kernel sysrq](https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html).
+   1. `Alt - SysRq - argument` simutaneously; ThinkPad Fn is not required.
+   2. Or press the key one by one: `Alt`, `[Fn] - SysRq`, and *argument*.
+   3. The detailed *arguments* can be found at [kernel sysrq](https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html).
+
+       I generally unraw(r), sync(s), umount(u), and/or reboot(b) when my system locks.
 
 # [X Window System](https://en.wikipedia.org/wiki/X_Window_System)
 
