@@ -318,71 +318,6 @@ if shopt -q login_shell; then
 fi
 ```
 
-# [VirtualBox Guest Additions](https://www.virtualbox.org/manual/ch04.html#idm2096)
-
-VirtualBox Guest Additions consists of device drivers and system applications that optimize the guest operating system for better performance and usability.
-
-1. Some Linux distributions (i.e. Gentoo, Arch Linux) already come with all or part of the VirtualBox Guest Additions. On such Linux guests just install the corresponding package, for example:
-
-   ```bash
-   [root@host ~]# emerge -avt app-emulation/virtualbox-guest-additions (Gentoo)
-   [root@host ~]# pacman -S virtualbox-guest-utils/virtualbox-guest-utils-nox (archlinux)
-   ```
-
-   This method is always preferred!
-2. Alternatively, like Windows guest, we can mount the VBoxGuestAdditions.iso file and invoke the relevant installation script manually.
-
-   Firstly, we should obtain the ISO from host (i.e. *vboxmanage storageattach*), from guest package repository (if available) or more simply from VirtualBox official website.
-
-   ```bash
-   [root@host ~]# lsblk -f
-   [root@host ~]# mkdir -p /mnt/vbox
-   [root@host ~]# mount -o loop /dev/sr1 /mnt/vbox
-   [root@host ~]# ls /mnt/vbox
-   [root@host ~]# sh ./VBoxLinuxAdditions.run
-   ```
-
-   This is an example of gettin VBoxLinuxAdditions.iso from host. To get ISO file from Arch Linux package repository:
-
-   ```bash
-   [root@host ~]# pacman -S virtualbox-guest-iso
-   [root@host ~]# ls /usr/lib/virtualbox/additions/VBoxGuestAdditions.iso
-   ```
-
-3. Lastly but not least, guest additions on guest OS and VirtualBox application on host OS should have matching version, otherwise some guest addtions functionalities (i.e. shared clipboard) *may* stop working. Update of guest additions or VirtualBox application on one OS assumes the counterpart on the other OS.
-4. Environment:
-   1. Gentoo host: kernel-4.12.5, VirtualBox 5.1.26.
-   2. Arch guest: kernel-4.13.12,  VirtualBox 5.2.2.
-
-   Gentoo is relatively conservative on package rolling update compared to Arch Linux. There is a remarkable gap between VirtualBox packages and kernel versions. Latest Linux kernel version always expect newer Virutalbox packages. So installing VBoxGuestAdditions-5.1.26.iso from Gentoo host *may* break things.
-5. In this post, I choose the one from Arch Linux repository:
-
-   ```bash
-   [root@host ~]# pacman -S virtualbox-guest-utils (X environment)
-   # or
-   [root@host ~]# pacman -S virtualbox-guest-utils-nox (no X)
-   ```
-
-6. Enable *vboxservice*
-
-   ```bash
-   [root@host ~]# systemctl enable vboxservice
-   ```
-
-   This service loads *vboxguest*, *vboxsf*, and *vboxvideo* kernel modules. It's also responsible for synchronizing system time with host.
-7. VBoxClient
-
-   VBoxClient (or the wrapper *VBoxClient-all*) is the core VirtualBox guest additions service. It manages clipboard, seamless window display, etc. Package *virtualbox-guest-utils* installs */etc/xdg/autostart/vboxclient.desktop* that launches VBoxClient-all on logon.
-
-   VBoxClient-all script launches VBoxClient as:
-
-   ```bash
-   [user@host ~]$ VBoxClient --clipboard --draganddrop --seamless --display --checkhostversion
-   ```
-
-   Check Autostart section above on how to launch VBoxclient alongside with awesome.
-8. Notice: you should guest system before VirtualBox guest additions take effect.
-
 # Time
 
 >VirtualBox guest OS relies on VirtualBox guest additions to synchronizes time with host. Hence leave this part after VirtualBox guest additions.
@@ -506,26 +441,6 @@ XTerm.vt100.translations: #override \n\
 
 Notice: each key binding line must be separated by escape sequence *\n\*.
 
-# VirtualBox sharedfolder
-
-1. Make sure *vboxservice* is enabled and started.
-2. Add user account to *vboxsf* group: *usermod -aG vboxsf username*.
-
-Add shared folder:
-
-```bash
-user@host ~ $ VBoxManage sharedfolder add archlinux --name share_name --hostpath /path/to/host/folder [--automount]
-```
-
-Arch Linux guest can mount the shared folder manually (mount -t vboxsf), automatically (vboxmanage --automount), or by *fstab*. Here is an example of *fstab* method:
-
-```
-# /etc/fstab
-share_name	/mount/point	vboxsf	uid=user,gid=group,rw,dmode=700,fmode=600,noauto,x-systemd.automount 
-```
-
-The last two arguments *noauto,x-systemd.automount* avoid service racing on booting (i.e. guest additions are not loaded yet while systemd mounts partitions in *fstab*).
-
 # Resolution
 
 ## Virtual terminal
@@ -544,10 +459,10 @@ The newly created value will be listed by *vbeinfo*. To make the desired resolut
 GRUB_CMDLINE_LINUX_DEFAULT="quiet video=1300x730"
 ```
 
-We can also set Grub menu resolution by:
+We can also set Grub's resolution by:
 
 ```
-GRUB_GFXMODE="1366x768x24" (for Grub itself)
+GRUB_GFXMODE="1366x768x24" (for Grub menu itself)
 ```
 
 Do not forget to update the Grub menu:
