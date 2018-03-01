@@ -523,6 +523,30 @@ Fcitx has built-in Pinyin that is really fast. Open *fcitx-configtool* and add P
 
 Finally, Ctrl-Space.
 
+# System upgrading
+
+```bash
+[root@host ~ #] pacman -Syu
+```
+
+## Error
+
+1. Key could not be looked up remotely
+
+   ```
+   downloading required keys...
+   error: key "A6234074498E9CEE" could not be looked up remotely
+   error: required key missing from keyring
+   error: failed to commit transaction (unexpected error)
+   Errors occurred, no packages were upgraded.
+   ```
+
+   Follow [cannot import keys](https://wiki.archlinux.org/index.php/Pacman-key#Cannot_import_keys). For example, update *archlinux-kering* package before system upgrading.
+
+# Refs
+
+1. [System maintenance](https://wiki.archlinux.org/index.php/System_maintenance#Upgrading_the_system).
+
 # to-dos
 
 1. gentoo bypass lock screen; xdg_vtnr
