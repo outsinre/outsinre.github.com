@@ -12,6 +12,14 @@ title: Nextcloud
 3. M: MariaDB;
 4. P: Php-FPM.
 
+## Notes
+
+Administration work can be done:
+
+1. Web UI;
+2. [*occ*](https://docs.nextcloud.com/server/13/admin_manual/configuration_server/occ_command.html);
+3. Edit configuration file manually.
+
 # MariaDB
 
 ```bash
@@ -406,7 +414,7 @@ During configuration, some variables deserve special attention: Php *memory_limi
    Updates to Php *\*.ini* configuration file require reloading *php-fpm* service.
 4. Php memory limit
 
-   `memory_limit` in default */etc/php.ini* is 128M. However per-site value of Nextcloud in */opt/nextcloud/.user.ini* is 512M that is the whole available amount. To prevent Php from exhausting too much memory, set to 128M instead.
+   `memory_limit` in default */etc/php.ini* is 128M. However per-site value of Nextcloud in *.user.ini* is 512M that is the whole available amount. To prevent Php from exhausting too much memory, set to 128M instead.
 
    ```
    # /usr/share/nginx/html/nextcloud/.user.ini
@@ -496,13 +504,10 @@ During configuration, some variables deserve special attention: Php *memory_limi
 
    1. Outlook only accept valid `mail_from_address` owned by `mail_smtpname`. Fake `mail_from_address` or `mail_domain` cannot authenticate to the Outlook SMTP server.
    2. If a malware or SPAM scanner is running on the SMTP server it might be necessary that you increase the `mail_smtptimeout` value.
-9. Many administration work can be done through tool [*occ* command](https://docs.nextcloud.com/server/12/admin_manual/configuration_server/occ_command.html) - ownCloud Console.
 
 ## [4-byte UTF-8 support](https://docs.nextcloud.com/server/12/admin_manual/configuration_database/mysql_4byte_support.html)
 
->Be careful on [No FILE_FORMAT](https://github.com/nextcloud/documentation/issues/513). This is just a trial.
-
-**backup** database before going on!
+>Read [No FILE_FORMAT](https://github.com/nextcloud/documentation/issues/513) and **backup** database before going on!
 
 1. maintenance mode
 
@@ -756,7 +761,7 @@ mysqldump --single-transaction -h localhost -u nc_user -pPassword nc_db > nextcl
 # restore
 drop database nc_db
 create database nc_db
-# or
+# -or-
 create database nc_db default character set utf8mb4 collate utf8mb4_unicode_ci";
 ~ # mysql -h localhost -u nc_user -pPassword nc_db < nextcloud-sqlbkp.bak
 ```
@@ -782,10 +787,12 @@ Here, I use command line for the whole update process.
 ~ # su -s /bin/bash -c 'php ./updater/updater.phar' nginx
 # Should the "occ upgrade" command be executed? [Y/n] Y
 # Keep maintenance mode active? [y/N] N
-~ # su -s /bin/bash -c 'php occ upgrade ' nginx (optionally)
 ~ # su -s /bin/bash -c 'php occ status ' nginx
+~ # su -s /bin/bash -c 'php occ upgrade ' nginx (optionally)
 ~ # su -s /bin/bash -c 'php ./updater/updater.phar' nginx
 ```
+
+Please execute *occ upgrade* when prompted by *occ status*!
 
 ## miantenance mode
 
