@@ -631,7 +631,7 @@ Finally, refresh Nextcloud by *occ*:
 
    1. Use [ICSdroid](https://davdroid.bitfire.at/faq/entry/subscribe-ics-file/) to subscribe the original link or to Nextcloud's subscription link.
    2. As [中国农历](https://github.com/infinet/lunar-calendar) writes, use the tool to generate lunar for incoming years, which won't consume too much disk space. Afterwards, import that as a new calendar instead of a subscription.
-   3. Wait for Nextcloud 13.
+   3. Wait for Nextcloud 14.
 
    >Obviously, the 2nd method is favorable.
 
