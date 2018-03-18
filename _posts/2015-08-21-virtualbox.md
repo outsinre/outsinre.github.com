@@ -92,9 +92,11 @@ user@tux ~ $ VBoxManage createvm --name WinXP32 --ostype WindowsXP --register --
 user@tux ~ $ VboxManage list vms
 user@tux ~ $ VBoxManage registervm ~/Documents/VirtualBox/Machines/WinXP32/WinXP32.vbox (opt); vboxmanage list vms
 user@tux ~ $ VBoxManage modifyvm WinXP32 --memory 384 --acpi on --nic1 nat --nictype1 Am79C973 --audio alsa --audiocontroller ac97 --usb on --usbehci on --vrde on --vrdeaddress 127.0.0.1 --vrdeport 5001,5010-5012 --clipboard bidirectional
+user@tux ~ $ VBoxManage createmedium --filename ~/Documents/VirtualBox/Machines/WinXP32/WinXP32.vdi --size 5000 (omitted)
 user@tux ~ $ VBoxManage storagectl WinXP32 --name "IDE Controller" --add ide --controller PIIX4
 user@tux ~ $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium ~/Documents/VirtualBox/Machines/WinXP32/WinXP32.vdi
-user@tux ~ $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso (or --device 1 --medium additions)
+user@tux ~ $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 0 --device 1 --type hdd --medium /path/to/ISO (omitted)
+user@tux ~ $ VBoxManage storageattach WinXP32 --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium /usr/share/virtualbox/VBoxGuestAdditions.iso (or --device 1 --medium additions)
 user@tux ~ $ VBoxManage sharedfolder add WinXP32 --name WLshare --hostpath /media/Misc/VMs/WLshare
 ```
 
@@ -115,6 +117,7 @@ Here, I re-use an existing *.vdi* instead of guest installation ISO, thus avoidi
    2. Pass *full* path of *.vbox* file to *registervm* on a separate shell command.
 4. modifyvm
    + `--nictype1 Am79C973` sets virtual Ethernet hardware to AMD PCNet FAST III (Am79C973). VirtualBox 5 now use Intel PRO/1000 T Server (82543GC) as default, which requires extra drivers installed.
+   + `--audio alsa` could be *pulse* instead.
    + `--vrde on` is to enable VRDP support thus I can remotely connect to the VM by RDP client.
    + ` --usb on --usbehci on` enables USB 1.0 and 2.0. To enable 3.0, use `--usbxhci on`.
    + `--vrdeaddress` set to loopback address. If unset, it binds to all host network interfaces accepting both IPv4 and IPv6. Refer to [127.0.0.1 vs 0.0.0.0](/2015/09/14/0000-127001-localhost/).
