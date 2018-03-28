@@ -36,4 +36,4 @@ Here is a simple flow illustration:
 
    Proxy, on the other hand, needs enabled on application basis.
 3. Encryption and decryption incur much more overhead than SOCKS proxy, let alone HTTP proxy.
-4. UDP VPN is faster than TCP VPN but unreliable.
+4. UDP VPN (i.e. WireGuard) is faster than TCP VPN (OpenVPN) but less reliable.

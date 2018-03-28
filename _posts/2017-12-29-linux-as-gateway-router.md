@@ -20,8 +20,8 @@ The interface with WAN networking can serve as a gateway router for other device
    For Linux device, this can be done with *ip route* or *route* command line.
 
    ```bash
-   root@tux / # ip route add 192.168.10.0/24 via 192.168.10.101 dev eth0
-   root@tux / # route add 192.168.10.0 netmask 255.255.255.0 gw 192.168.10.101 dev eth0
+   root@tux / # ip route add default 192.168.10.0/24 via 192.168.10.101 dev eth1
+   root@tux / # route add 192.168.10.0 netmask 255.255.255.0 gw 192.168.10.101 dev eth1
    ```
 
    *192.168.10.0/24* is the inernal network IP block while *192.168.10.101* is IP of *eth1* from gateway Linux.
@@ -29,8 +29,7 @@ The interface with WAN networking can serve as a gateway router for other device
 
    ```bash
    root@tux / # sysctl -w net.ipv4.ip_forward=1
-   # or
-   root@tux / # echo 1 > /proc/sys/net/ipv4/ip_forward
+   root@tux / # cat /proc/sys/net/ipv4/ip_forward
    root@tux / # iptables -A FORWARD -i eth1 -j ACCEPT
    ```
 
@@ -44,7 +43,7 @@ The interface with WAN networking can serve as a gateway router for other device
    ```
 
    *XXX.XXX.XXX.XXX* is IP of *eth0* from gateway Linux.
-4. Read more on Wireshark post.
+4. Read more on [Wireshark post](/2017/12/12/wireshark/).
 
 # Reference
 

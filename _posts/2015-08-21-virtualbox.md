@@ -315,28 +315,40 @@ user@tux ~ # netcfg eth1 dhcp
 2. Check *iptables* and/or firewall.
 
    ```bash
-   user@tux ~ # iptables -I INPUT/OUTPUT 4 -s 192.168.56.0/24 -j ACCEPT
+   user@tux ~ # iptables -I INPUT 4 -i vboxnet0 -s 192.168.56.0/24 -j ACCEPT
+   user@tux ~ # iptables -I OUTPUT 4 -o vboxnet0 -s 192.168.56.0/24 -j ACCEPT
    ```
 
 4. Apart from NAT/bridged networking, we can use *iptables redirect* to let *vboxnet0* traffic go outside.
 5. Especially, guest VM can share host's proxy as long as it's listening on *local network* (i.e. *0.0.0.0*). You may want to prohibit LAN devices connection to proxy.
 
    ```bash
-   user@tux ~ # iptables -I INPUT 4 -d 192.168.0.0/24 -i wlan0 -p tcp -m tcp --dport 1080 -j DROP
+   user@tux ~ # iptables -I INPUT 4 -i vboxnet0 -d 192.168.56.0/24 -p tcp -m tcp --dport 1080 -j DROP
+   user@tux ~ # iptables -I INPUT 4 -i vboxnet0 -d 192.168.56.0/24 -p udp -m udp --dport 1080 -j DROP (opt)
    ```
+
+6. Share host proxy
 
    Alternatively, *iptables redirect vboxnet0* traffic to *127.0.0.1* like:
 
    ```
-   user@tux ~ # iptables -t nat -A PREROUTING [ -s 192.168.56.101 ] -d 192.168.56.100 -i vboxnet0 -p tcp -m tcp --dport 1080:1081 -j DNAT --to-destination 127.0.0.1
+   user@tux ~ # iptables -t nat -A PREROUTING [ -s 192.168.56.101 ] -d 192.168.56.100 -i vboxnet0 -p tcp -m tcp --dports 1080,9050 -j DNAT --to-destination 127.0.0.1
    user@tux ~ # sysctl -w net.ipv4.conf.vboxnet0.route_localnet=0 (runtime)
    # or 
    user@tux ~ # sysctl -p /etc/sysctl.d/15-route_localnet.conf
+   #
    net.ipv4.conf.vboxnet0.route_localnet = 1 (better)
    net.ipv4.conf.all.route_localnet = 1 (dangerous)
    ```
 
-   By default, kernel [refuses to route](https://security.stackexchange.com/a/137603) source or destination loopback addresses (i.e. 127.0.0.1). *vboxnet0* interface would not be created before VirtualBox launches. So *15-route_localnet.conf* does not apply accross boot.
+   By default, kernel [refuses to route](https://security.stackexchange.com/a/137603) from source or to destination loopback addresses (i.e. 127.0.0.1). *vboxnet0* interface would not be created before VirtualBox launches. So *15-route_localnet.conf* does not apply accross boot.
+
+   A more general method is enabling *net.ipv4.ip_forward*:
+
+   ```bash
+   user@tux ~ # sysctl -w net.ipv4.ip_forward=1
+   user@tux ~ # iptables -A FORWARD -i vboxnet0 -o vboxnet0 -j ACCEPT
+   ```
 
 # Delete VM
 

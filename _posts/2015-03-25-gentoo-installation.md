@@ -436,6 +436,7 @@ title: Gentoo Installation
    6. SquashFS. `CONFIG_SQUASHFS` as M; `CONFIG_SQUASHFS_XATTR` and `CONFIG_SQUASHFS_XZ` as Y. (*sys-fs/squashfs-tools*).
    7. IO scheduler - BFQ: `IOSCHED_BFQ`, `BLK_CGROUP` and `BFQ_GROUP_IOSCHED` as Y.
    8. Magic SysRq key `CONFIG_MAGIC_SYSRQ` as Y. `CONFIG_MAGIC_SYSRQ_DEFAULT_ENABLE` configure default value of */proc/sys/kernel/sysrq*.
+   9. [WireGuard](https://wiki.gentoo.org/wiki/User:Maffblaster/Drafts/WireGuard): `NET_FOU` (`NET_UDP_TUNNEL`) and `PADATA`.
    1. (opt) Thinkpad-related. *ThinkPad ACPI Laptop Extras* = `THINKPAD_ACPI` set to M.
    2. [e-sources / cjktty patch specific options].`FONTS` and `FONT_8x16` set to Y. And *console 16x16 CJK font ( cover BMP )* = `FONT_16x16_CJK` which is *cjktty* patch. These options are for Chinese characters display in TTY (Ctrl + Alt + Fn).
    3. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
@@ -553,6 +554,7 @@ title: Gentoo Installation
    # emerge -avt net-wireless/wpa_supplicant
    ```
 
+   1. Personal DNS servers can be put into */etc/resolv.conf.head* and/or */etc/resolv.conf.tail*.
    2. In case of the network interface card should be configured with a static IP address, entries can also be manually added to */etc/dhcpcd.conf*.
    3. If need GUI tool, use NetworkManager instead of *wicd* since the later one don't support *nl80211* driver. Also Networkmanager depends on *wpa_supplicant* and *dhcpcd* or *dhcpclient*.
    4. Reference: [Network management using DHCPCD](https://wiki.gentoo.org/wiki/Network_management_using_DHCPCD); [wpa_supplicant](https://wiki.gentoo.org/wiki/Wpa_supplicant); [Handbook:AMD64/Networking/Wireless](https://wiki.gentoo.org/wiki/Handbook:AMD64/Networking/Wireless); [configuration example](http://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf); [wpa_supplicant.conf for sMobileNet in HKUST](http://blog.ust.hk/yang/2012/09/21/wpa_supplicant-conf-for-smobilenet-in-hkust/); [wpa_supplicant.conf](http://www.freebsd.org/cgi/man.cgi?wpa_supplicant.conf).
