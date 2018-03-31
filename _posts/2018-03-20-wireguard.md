@@ -3,6 +3,7 @@ layout: post
 title: WireGuard
 ---
 
+* ToC
 {:toc}
 
 [WireGuard](https://www.wireguard.com/) claims to utilizes state-of-the-art cryptography (Noise protocol framework, Curve25519, ChaCha20, Poly1305, BLAKE2, SipHash24, HKDF etc.) while provide a simple construction.
@@ -326,33 +327,33 @@ Now let's go through an example to see how a DNS packet is routed through rules 
 
 In prevous section, we can route all traffic through WireGuard. The all-in-one routing is somewhat stupid. For example, we only want some traffic (i.e. that blocked by ISP) through WireGuard while the remaining through the *main* table.
 
-## IP list
+## IP set
 
-Firstly, we divide IPs into two lists. traffic of one goes to WireGuard while the other not. IPs are from [APNIC Delegated List](http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest).
+Firstly, we divide IPs into two sets. traffic of one goes to WireGuard while the other not. IPs are from [APNIC Delegated List](http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest).
 
-CN list:
+CN set:
 
 ```bash
 user@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > cnip.txt
 ```
 
-WireGuard list:
+non-CN set:
 
 ```bash
 user@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/\|ipv4\|/ && ! /\|CN\|/ && ! /\|\*\|/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > wgip.txt
 ```
 
-We can set a *cron* job to update IP list in the background.
+We can set a *cron* job to update IP set in the background.
 
 ## Static Route
 
-One obvious method is adding all IPs of WireGuard list to server peer's *allowed-ips* while removing the catch-all *0.0.0.0/0*. *wg-quick* will create the relevant route entries for them. It looks like:
+One obvious method is adding all IPs of WireGuard set to server peer's *allowed-ips* while removing the catch-all *0.0.0.0/0*. *wg-quick* will create the relevant route entries for them. It looks like:
 
 ```
 1.0.128.0/17 dev wg0 proto kernel scope link src 10.0.0.1
 ```
 
-Similarly we can also create route entries in *main* table for IPs of CN list:
+Similarly we can also create route entries in *main* table for IPs of CN set:
 
 ```
 1.0.32.0/19 via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304
@@ -373,9 +374,9 @@ root@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-la
 
 Read more on [chnroutes](https://github.com/fivesheep/chnroutes) and [chinaroute路由表更新命令](https://gist.github.com/lixingcong/286144b3a521add58d8dcf045700963f)
 
-## Geoip
+## Geoip method
 
-Instead of IP list, we can make use of *geopip* extension of *iptables*. This is much more simpler.
+Instead of IP set, we can make use of *geopip* extension of *iptables*. This is much more simpler.
 
 ```
 root@tux ~ # iptables -t mangle -A OUTPUT -o wlan0 -m geoip --dst-cc CN -j MARK --set-mark 51820
@@ -391,11 +392,13 @@ https://daenney.github.io/2017/01/07/geoip-filtering-iptables.html
 
 # Smart DNS
 
-With Smart routing above, we route traffic based on IP list. However, that depends on correct DNS resolving when visit a hostname. Hence, we usually want a custom DNS server (i.e. *8.8.8.8*) other than the one provided by ISP which (DNS poisoning).
+With Smart routing above, we route traffic based on IP set. However, that depends on correct DNS resolving when visit a domain. Hence, we usually want a custom DNS server (i.e. *8.8.8.8*) other than the one provided by ISP which (DNS poisoning).
 
 This in turn, would degrade performance when visiting pages within the ISP as custom DNS usually returns IP of geographically far. Therefore, we should enable set up smart DNS service which resolves domains within ISP as usual (geographically nearby) but others censorshipped correctly. If you could find such a public DNS server, just make sure traffic to it goes to WireGuard.
 
-Alternatively, we could set up local DNS server like [ChinaDNS](https://github.com/shadowsocks/ChinaDNS) and *dnsmasq*.
+The goal is to set a DNS which resolve CN domains into CN IP set while non-CN domains into non-CN IP set.
+
+Alternatively, we could set up local DNS server like [ChinaDNS](https://github.com/shadowsocks/ChinaDNS). An better setup is illustrated in [iproute2, iptables, dnsmasq](/2018/03/26/policy-routing/)
 
 # wg-quick
 
@@ -485,7 +488,7 @@ root@tux ~ # systemctl start wg-quick@wg0
 
 ## cron job
 
-Set a cron job to update IP list daily.
+Set a cron job to update IP set daily.
 
 ```bash
 root@tux ~ # crontab -u root -e
@@ -501,6 +504,36 @@ Alternatively, we can set a script file (executable) into */etc/cron.daily/*.
 #/etc/cron.daily/cnip
 
 wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > /etc/wireguard/cnip.txt
+```
+
+# Notes
+
+*wg-quick up* process:
+
+```
+[#] ip link add wg-quick type wireguard
+[#] wg setconf wg-quick /dev/fd/63
+[#] ip address add 192.168.57.1/24 dev wg-quick
+[#] ip link set mtu 1420 dev wg-quick
+[#] ip link set wg-quick up
+[#] resolvconf -a wg-quick -m 0 -x
+[#] wg set wg-quick fwmark 51820
+[#] ip -4 route add 0.0.0.0/0 dev wg-quick table 51820
+[#] ip -4 rule add not fwmark 51820 table 51820
+[#] ip -4 rule add table main suppress_prefixlength 0
+```
+
+*wg-quick down* process:
+
+```
+[#] wg showconf wg-quick
+[#] ip -4 rule delete table main suppress_prefixlength 0
+RTNETLINK answers: Address family not supported by protocol
+Dump terminated
+RTNETLINK answers: Address family not supported by protocol
+Dump terminated
+[#] ip link delete dev wg-quick
+[#] resolvconf -d wg-quick
 ```
 
 # Reference
