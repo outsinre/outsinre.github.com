@@ -3,15 +3,18 @@ layout: post
 title: Docker newbie
 ---
 
+* ToC
+{:toc}
+
 # [ABCs](https://yeasy.gitbooks.io/docker_practice/content/introduction/what.html)
 
 1. Application layer isolation.
 
    It is not virtual machine. Docker just provides application dependencies while VM virtualizes a whole bunch of hardware and OS.
-2. Dockers comprises image, container and registry.
+2. Dockers comprises *image*, *container* and *registry*.
    1. Image is *static* dependencies like a minimal root filesystem, a daemon etc. There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (think of as Gentoo stage tarball).
-   2. Container is *running* instance with namespace - the isolated application process.
-   3. Registry is online *store* where users public, share images. We call an image as *repository*.
+   2. Container is *running* instance with namespace - the isolated application process. We can think of image and container as class and object in Object-oriented programming. 
+   3. Registry is online *store* where users public, share *repostitory* which comprises images of different versions. We use *registry* and *repository* interchangebly.
 3. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
    2. Server: local/remote *docker-engine*.
@@ -20,7 +23,7 @@ title: Docker newbie
    Storage Driver prefers *overlay2* over *aufs*. Either enable *overlay2* in kernel or build external module.
 
    Pay attention to [CentOS/RHEL 的用户需要注意的事项](https://yeasy.gitbooks.io/docker_practice/content/image/rm.html#centosrhel-%E7%9A%84%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9) if *devicemapper* driver *loop-lvm* mode is used.
-5. Technically, Dockerfile defines new layers.
+5. Technically, Dockerfile defines image construction.
 
 # info
 
@@ -46,7 +49,9 @@ user@tux ~ $ docker image rm ubuntu:16.04
 user@tux ~ $ docker image prune
 ```
 
-1. *run* creates a container. `--rm` tells to delete it upon exit.
+1. *run* creates a container. `--rm` deletes it upon exit without which we can delete manually (discussed next).
+
+   By default, container object remains even it stops.
 
 # container
 
@@ -63,7 +68,7 @@ user@tux ~ $ docker container prune
 2. Visit the Nginx container page at *http://ip:8080*.
 3. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by default.
 
-# Into container
+# Get into container
 
 *exec* or *attch* a command in a running container. Alternatively, add `-it` to *run* getting interactive shell.
 
@@ -135,7 +140,7 @@ Successfully tagged nginx:v1
 
    >Context directory is NOT the *pwd* where we execute *docker build* though usually we switch to it before building.
 
-After the building, we can launch the *nginx:v1* as previously.
+After the building, we can run *nginx:v1* image to test.
 
 # Network
 
@@ -147,3 +152,5 @@ user@tux ~ $ docker run -dit --name ubt1604 -v /src/hostdir:/opt/condir:rw --net
 user@tux ~ $ docker network ls
 user@tux ~ $ docker network inspect mynet
 ```
+
+1. Docker automates network configuration upon container startup. We can customize that on purpose.
