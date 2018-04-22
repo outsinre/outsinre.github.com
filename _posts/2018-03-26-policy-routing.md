@@ -1,6 +1,6 @@
 ---
 layout: post
-title: iproute2, iptables, dnsmasq
+title: iproute2, iptables, ipset, dnsmasq
 ---
 
 * ToC
@@ -72,7 +72,7 @@ We will update it along with this post. As the previous post, add this to *local
 
 IP sets are a framework inside the Linux kernel, which can be administered by the *ipset* utility. Depending on the type, an IP set may store IP addresses, networks, (TCP/UDP) port numbers, MAC addresses, interface names or combinations of them in a way, which ensures lightning speed when matching an entry against a set. We set up an IP set based on domains censorshipped by ISP.
 
-To make use of IP set, *iptables* SET match extension (`NETFILTER_XT_SET`) and MARK target (`NETFILTER_XT_MARK`) are required. Meanwhile, IP set support is required as well, which can be done exclusively by kernel options `IP_SET` and submodules thereof like `IP_SET_HASH_IP` && `IP_SET_HASH_NET` or enable `USE=modules`. Then install *net-firewall/ipset* package.
+To make use of IP set, Netfilter (iptables) SET match extension (`NETFILTER_XT_SET`) and MARK target (`NETFILTER_XT_MARK`) are required. Meanwhile, enable IP set support as well, which can be done exclusively by kernel options `IP_SET` and submodules (`IP_SET_HASH_IP`, `IP_SET_HASH_NET` and `IP_SET_LIST_SET`) or enable `USE=modules`. Then install *net-firewall/ipset* package.
 
 ## ipset
 
@@ -120,18 +120,19 @@ Now we assign MARK target to *gfwlist* set with iptables:
 
 ```bash
 root@tux ~ # iptables -t mangle -N GFWLIST
-root@tux ~ # iptables -t mangle -C FORWARD -j GFWLIST || iptables -t mangle -A FORWARD -j GFWLIST
+root@tux ~ # iptables -t mangle -C FORWARD -j GFWLIST || iptables -t mangle -A FORWARD -j GFWLIST (opt)
+root@tux ~ # sysctl -w net.ipv4.ip_forward=1 (opt)
 root@tux ~ # iptables -t mangle -C OUTPUT -j GFWLIST || iptables -t mangle -A OUTPUT -j GFWLIST
 root@TUX ~ # iptables -t mangle -A GFWLIST -m set --match-set gfwlist dst -j MARK --set-mark 51820
 ```
 
-A new chain GFWLIST is created for *gfwlist* set for better isolation. `-C` checks whether a rule exists or not (ignore the command line errors). Replace FORWARD with PREROUTING (covers the former) if it's OpenWrt. We add FORWARD here just in case of VirtualBox.
+A new chain GFWLIST is created for *gfwlist* set for better isolation. `-C` checks whether a rule exists or not (ignore the command line errors). Replace FORWARD with PREROUTING (covers the former) if it's OpenWrt. We add FORWARD here just in case of traffic coming from a 3rd interface.
 
-### **[IMPORTANT](https://bigeagle.me/2016/02/ipset-policy-routing/)**
+### **[IMPORTANT](https://serverfault.com/q/248841)**
 
-To be consise, we should enable MASQUERADE or SNAT as post [linux as gateway router](/2017/12/29/linux-as-gateway-router/). Though that is a different story, they both routes traffic maong different interfaces, thus requiring NAT support.
+To be consise, we should enable IP forwarding and/or MASQUERADE/SNAT as post [linux as gateway router](/2017/12/29/linux-as-gateway-router/). Though that is a different story, they both routes traffic among different networks and/or different interfaces thereof.
 
-I leave this part the end of the post: MASQUERADE/SNAT.
+I leave this part the end of the post: IP forwarding and MASQUERADE.
 
 # ip rule
 
@@ -157,17 +158,16 @@ Up to now, *01-wg0.start* looks like:
 #!/bin/sh
 
 # Bring up WireGuad link
-
 ip link add wg0 type wireguad
 ip link set mtu 1420 dev wg0
 ip addr add 10.0.0.2/24 dev wg0
-
 wg setconf wg0 /etc/wireguard/wg0_wg.conf
-
 ip link set up dev wg0
 
-# ip rule
+# ip route
+ip route add 192.168.58.0/24 dev wg0
 
+# ip rule
 ip rule add fwmark 51820 table gfwlist
 ip route add default dev wg0 table gfwlist
 ```
@@ -239,6 +239,18 @@ dnssec
 resolv-file=/etc/resolv.dnsmasq.conf
 ```
 
+If we want *dnsmasq* support newly created interface on the fly, we can use `bind-dynamic`:
+
+```
+# lo only
+#bind-interfaces
+#listen-address=127.0.0.1
+
+# lo and eth2
+bind-dynamic
+interface=eth2
+```
+
 ### Update IP set
 
 We use *dnsmasq* to fill up *gfwlist* set with [gfwlist2dnsmasq](https://github.com/cokebar/gfwlist2dnsmasq).
@@ -269,24 +281,6 @@ ipset=/0rz.tw/gfwlist
 
 *dnsmasq* resolves *030buy.com* and *0rz.tw* through *8.8.8.8:53*.
 
-### [dnsmasq and openresolv](http://studioidefix.com/2014/07/21/openresolv/)
-
-In this section, we help *dnsmasq* and *openresolv* play together.
-
-Append to *resolvconf*:
-
-```
-# /etc/resolvconf.conf
-
-name_servers=127.0.0.1
-# extended configuration
-dnsmasq_conf=/etc/dnsmasq.d/dnsmasq-openresolv.ext
-# same as `resolv-file' of dnsmasq.conf
-dnsmasq_resolv=/etc/resolv.dnsmasq.conf
-```
-
-For instance, we can set our custom server and *ipset* pair there.
-
 # init
 
 *01-wg0.start*:
@@ -296,11 +290,13 @@ For instance, we can set our custom server and *ipset* pair there.
 #!/bin/sh
 
 # Bring up WireGuad link
-
 ip link add wg0 mtu 1420 type wireguard
 ip link set dev wg0 up
 ip addr add 10.0.0.2/24 dev wg0
 wg setconf wg0 /etc/wireguard/wg0.conf
+
+# ip route
+ip route add 192.168.58.0/24 dev wg0
 
 # ip rule
 ip rule add fwmark 51820 table gfwlist
@@ -312,16 +308,17 @@ ip route add default dev wg0 table gfwlist
 ```bash
 #!/bin/sh
 
-# Delete gfwlist table
-
+# del gfwlist table
 ip rule del table gfwlist
 
-# Remove WireGuad
+# ip route
+ip route del 192.168.58.0/24 dev wg0
 
+# Remove WireGuad
 ip link del dev wg0 type wireguard
 ```
 
-# MASQUERADE/SNAT
+# IP forwarding and MASQUERADE
 
 >This follows the iptables section above.
 
@@ -346,28 +343,31 @@ The issue results from OUT and SRC parts of line 1.
 
 Fromt his figure, on the right side, a packet (DNS) from upper layer is routed (**routing decision**) by *main* table before entering *iptables*. At this stage, source IP is determined to be that of *wlan0*.
 
-Then *mangle output* marks the packet as 51820 and pass it to *ip rule* for 2nd routing (**reroute check**). However, *ip rule* won't touch source IP, which explains the first log line. Line 2 means packet is correctly passed to VPN server by WireGuad (kernel module).
+Then *mangle output* marks the packet as 51820 and pass it to *ip rule* for 2nd routing (**reroute check**). However, *ip rule* won't touch OUT and SRC, which explains the first log line. Line 2 means packet is correctly passed to VPN server by WireGuad (kernel module).
 
 Suppose the VPN server gets the DNS query and send feedback packet with DST *192.168.0.100* and DPT 12345 which is then passed to *wg0* based on DPT where WireGuad listens for traffic. Upon receiving the packet, *wg0* abandons it immediately as DST does not match *10.0.0.1*.
 
-Therefore, we should add MASQUERADE support in *nat* table after **reroute check**:
+Therefore, we should add MASQUERADE/SNAT NAT support in *nat* table after **reroute check**:
 
 ```bash
-root@tux ~ # iptables -t nat -A POSTROUTING -m mark --mark 51820 -j SNAT --to-source 10.0.0.1
+root@tux ~ # iptables -t nat -A POSTROUTING -o wg0 -m mark --mark 51820 -j SNAT --to-source 10.0.0.1
 # -or-
-root@tux ~ # iptables -t nat -A POSTROUTING -m mark --mark 51820 -j MASQUERADE
+root@tux ~ # iptables -t nat -A POSTROUTING -o wg0 -m mark --mark 51820 -j MASQUERADE
 ```
 
-# to-dos
+If it's OpenWrt (LAN interface and WAN interface), then we should enable IP forwarding:
 
-tg ip range
+```bash
+root@tux ~ # sysctl -w net.ipv4.ip_forward=1
+root@tux ~ # iptables -A FORWARD -i wg0 -o eth0 -m mark --mark 51820 -j ACCEPT
+```
+
+In this post, we don't require IP forwarding as locally generated packets does not traverse FORWARD chain.
 
 # Refs
 
-http://harveyhu2012.webcrow.jp/wordpress/?p=184
-https://www.cnblogs.com/weifeng1463/p/6796140.html
-https://blog.sorz.org/p/openwrt-outwall/
-https://zohead.com/archives/openwrt-openvpn-ipset/
-https://github.com/qious/freedom
-https://github.com/cokebar/gfwlist2dnsmasq
-https://bigeagle.me/2016/02/ipset-policy-routing/
+1. [路由器自动分流科学上网原理和实现方式研究](http://harveyhu2012.webcrow.jp/wordpress/?p=184)
+2. [Openwrt上使用dnsmasq和ipset实现域名分流](https://www.cnblogs.com/weifeng1463/p/6796140.html)
+3. [OpenWrt VPN 按域名路由](https://blog.sorz.org/p/openwrt-outwall/)
+4. [OpenWRT实现OpenVPN按ipset自动分流](https://zohead.com/archives/openwrt-openvpn-ipset/)
+5. [使用 dnsmasq 和 ipset 的策略路由](https://bigeagle.me/2016/02/ipset-policy-routing/)

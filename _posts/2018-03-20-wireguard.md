@@ -12,6 +12,8 @@ It adds a virtual network interface and IP thereof. The interface is associated 
 
 Originally, WireGuard is integrated into Linux kernel (module or built-in tree). Nowadays, it's under heady development to be cross-platform and widely deployable.
 
+>The 6th reference (NAT-to-NAT VPN with WireGuard) is worth of reading.
+
 # Installation
 
 To install as an external module:
@@ -114,6 +116,9 @@ root@tux ~ # wg [showconf wg0]
    The catch-all *0.0.0.0/0* may be specified for matching all IPv4 addresses, and *::/0* may be specified for matching all IPv6 addresses, allowing and route *all* traffic on the client through the VPN tunnel. This is useful if want to set a VPN proxy.
 
    This can be narrowed down if you only want some traffic (i.e. remote LAN network *10.0.0.0/24*) to go over VPN.
+
+   >Peer B's internal IP must be covered by *allowed-ips*.
+
 5. Multiple peers can be set up.
 
 ## Persistent Configuration
@@ -220,14 +225,18 @@ Based on LAN access, we can route all local traffic through WireGuard tunnel for
 
 ## Remote arguments
 
-Mostly, we should add two *iptables* rules to allow FORWARDING on *wg0* interface and set up NAT. That is to say, we set remote peer as [gateway](/2017/12/29/linux-as-gateway-router/) to the Internet.
+Mostly, we should add two *iptables* rules to allow FORWARDING from *wg0* to *eth0* interface and set up NAT. That is to say, we set remote peer as [gateway](/2017/12/29/linux-as-gateway-router/) to the Internet.
 
 ```bash
-root@tux ~ # iptables -A FORWARD -i wg0 -o wg0 -j ACCEPT
-root@tux ~ # iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o eth0 -j MASQUERADE
+root@tux ~ # iptables -A FORWARD -i wg0 -o eth0 -j ACCEPT
+root@tux ~ # iptables -t nat -A POSTROUTING -i wg0 -o eth0 -s 10.0.0.0/24 -j MASQUERADE
+# -or-
+root@tux ~ # iptables -t nat -A POSTROUTING -i wg0 -o eth0 -s 10.0.0.0/24 -j SNAT --to-source <ip-of-eth0>
 ```
 
-Please make sure *net.ipv4.ip_forward* is turned as stated above.
+We assume *eth0* is the remote interface that has Internet access.
+
+>Please make sure *net.ipv4.ip_forward* is turned as stated above.
 
 ## Local arguments
 
@@ -416,7 +425,7 @@ Please make sure */etc/wireguard/INTERFACE.conf* file exist.
 
 Especially, *wg-quick* update system route table automatically.
 
-Here is an example:
+Here is an client example:
 
 ```
 [Interface]
@@ -433,6 +442,21 @@ Endpoint = 23.45.67.89:39814
 ```
 
 You can see that Address, DNS and SaveConfig items are added. The DNS defined by *wg-quick* will replace that of system default by *resolvconf* of *net-dns/openresolv*.
+
+Here is an server example:
+
+```
+[Interface]
+Address = 10.0.0.1/24
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = 39814
+PrivateKey = [SERVER PRIVATE KEY]
+
+[Peer]
+PublicKey = [CLIENT PUBLIC KEY]
+AllowedIPs = 10.0.0.1/32  # This denotes the clients IP.
+```
 
 # Booting
 
@@ -543,3 +567,5 @@ Dump terminated
 3. [Virtual private networks with WireGuard](https://lwn.net/Articles/748582/)
 4. [Quick Start](https://www.wireguard.com/quickstart/)
 5. [wireguard-vpn-typical-setup](https://www.ckn.io/blog/2017/11/14/wireguard-vpn-typical-setup/)
+6. [NAT-to-NAT VPN with WireGuard](https://staaldraad.github.io/2017/04/17/nat-to-nat-with-wireguard/)
+7. [WireGuard VPN Walkthrough](https://nbsoftsolutions.com/blog/wireguard-vpn-walkthrough)

@@ -27,15 +27,23 @@ The interface with WAN networking can serve as a gateway router for other device
    *192.168.10.0/24* is the inernal network IP block while *192.168.10.101* is IP of *eth1* from gateway Linux.
 2. Turn on IP forwarding on gateway Linux.
 
+   Read [IP Forwarding = when and why is this required?](https://serverfault.com/q/248841) and [What is kernel ip forwarding?](https://unix.stackexchange.com/q/14056). It is basically for inter-network (except for VLAN router) packet transfer and not for inter-interface transfers. By this I mean that if two interfaces are on the same network then we dont need to enable IP forwarding on the server. Also, if one is virtual interface, then we don't need IP forwarding either.
+
+   It simply determines behaviour when receiving a packet that is NOT destined for the receiving host. Without forwarding, the packet is dropped. With forwarding, a routing decision determines which interface it should be forwarded to.
+
+   Locally generated packets does not traverse FORWARD chain.
+
    ```bash
    root@tux / # sysctl -w net.ipv4.ip_forward=1
    root@tux / # cat /proc/sys/net/ipv4/ip_forward
-   root@tux / # iptables -A FORWARD -i eth1 -j ACCEPT
+   root@tux / # iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
    ```
 
    The FORWARD rule allows forwarding internal networking traffic to *eth0*.
-3. Turn on NAT on gateway Linux
+3. Turn on [MASQUERADE NAT](http://www.tldp.org/HOWTO/IP-Masquerade-HOWTO/index.html) on gateway Linux
 
+   Generally, MASQUERADE is required when many LAN private IP's traffic sits behind and goes through a (WAN public) single IP, namely a many-to-one mapping.
+   
    ```bash
    root@tux / # iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE (poor NAT)
    # or

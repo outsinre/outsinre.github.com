@@ -437,7 +437,7 @@ title: Gentoo Installation
    7. IO scheduler - BFQ: `IOSCHED_BFQ`, `BLK_CGROUP` and `BFQ_GROUP_IOSCHED` as Y.
    8. Magic SysRq key `CONFIG_MAGIC_SYSRQ` as Y. `CONFIG_MAGIC_SYSRQ_DEFAULT_ENABLE` configure default value of */proc/sys/kernel/sysrq*.
    9. [WireGuard](https://wiki.gentoo.org/wiki/User:Maffblaster/Drafts/WireGuard): `NET_FOU` (`NET_UDP_TUNNEL`) and `PADATA`.
-   1. IP set: `IP_SET`, `IP_SET_HASH_IP`, `IP_SET_HASH_NET`; `NETFILTER_XT_SET`, `NETFILTER_XT_MARK`.
+   1. IP set: `IP_SET`, `IP_SET_HASH_IP`, `IP_SET_HASH_NET`, `IP_SET_LIST_SET`; `NETFILTER_XT_SET`, `NETFILTER_XT_MARK`.
    1. (opt) Thinkpad-related. *ThinkPad ACPI Laptop Extras* = `THINKPAD_ACPI` set to M.
    2. [e-sources / cjktty patch specific options].`FONTS` and `FONT_8x16` set to Y. And *console 16x16 CJK font ( cover BMP )* = `FONT_16x16_CJK` which is *cjktty* patch. These options are for Chinese characters display in TTY (Ctrl + Alt + Fn).
    3. Reference links: [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html); [Linux Kernel in a Nutshell](http://www.kroah.com/lkn/); [kernel-seeds](http://kernel-seeds.org/); [device driver check page](http://kmuto.jp/debian/hcl); [How do you get hardware info and select drivers to be kept in a kernel compiled from source](http://unix.stackexchange.com/a/97813); and [Working with Kernel Seeds](http://kernel-seeds.org/working.html).
@@ -1188,6 +1188,12 @@ Boot with LiveDVD, then
    ```
 
    >From what we've done, you know *enabling pulseaudio* is quite easy as no kernel options required like ALSA.
+
+   Audio mixer... results in a message saying "pavucontrol binary not found":
+
+   ```bash
+   root@tux / # emerge -avt media-sound/pavucontrol
+   ```
 
 4. Firefox
 
