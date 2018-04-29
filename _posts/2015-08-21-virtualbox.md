@@ -311,7 +311,9 @@ user@tux ~ $ ip address
 user@tux ~ # netcfg eth1 dhcp
 ```
 
-1. WES7x86 fails to set *default gateway* as *192.168.56.1*. Fix it manually! If the new adapter (Local Area Connection 2) is *Public network*, host cannot connect to (i.e. *ping*) WES7x86. Switch to *Home network*.
+1. By default, the new WES7x86 adapter (Local Area Connection 2) is 'Unidentified network' as 'Public network' type. Host cannot connect to (i.e. *ping*) WES7x86.
+
+   Either 'turn on network discovery' or use security policy 'secpol.msc' to set 'Unidentified network' as 'Private'.
 2. Check *iptables* and/or firewall.
 
    ```bash
@@ -570,20 +572,7 @@ The backup GPT table is not at the end of the disk, as it should be. This might 
    To load the new rule, execute `udevadm trigger`.
 4. Avoid 64-bit guest OS. 64-bit OS occupies one third more resources (disk, memory) than the 32-bit version. What was worse, it seems *VBoxGuestAddtions-amd64.exe* makes no difference on the guest (double mouse, weird resolution etc.).
 6. WES7x86 no sound. Change `--audiocontroller` to [Intel *hda* instead of default *ac97*](https://www.virtualbox.org/manual/ch03.html#ftn.idm1540).
-7. Suppose you have unticked an feature (i.e. IE 8), and want to add it back after installation, do the following:
-   1. Find the feature package *cabinet* file from ISO, like *DS/Packages/FeaturePack/x86~winemb-ie-explorer~~~~6.1.7600.16385~1.0/WinEmb-IE-Explorer.cab*.
-   2. Use *Pkgmr* or [DISM](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism-operating-system-package-servicing-command-line-options) command line to install the cabinet file. *dism* is far more powerful than what you think. For example, you can use it to check a cabinet file information.
-
-   ```
-   # Do it in an elevated command prompt.
-   DISM /?
-   Pkgmgr /?
-   DISM /Online /Add-Package /PackagePath:"C:\Users\Brink\Desktop\WinEmb-IE-Explorer.cab"
-   Pkgmgr /ip /m:C:\Users\Brink\Desktop\WinEmb-IE-Explorer.cab
-   # restart system as requested
-   ```
-
-8. Windows XP `--port 2 --device 0` refuses to attach extra ISO:
+7. Windows XP `--port 2 --device 0` refuses to attach extra ISO:
 
    >VBoxManage: error: No drive attached to device slot 0 on port 2 of controller 'IDE Controller'
 
