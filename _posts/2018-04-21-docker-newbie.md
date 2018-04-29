@@ -12,12 +12,12 @@ title: Docker newbie
 
    It is not virtual machine. Docker just provides application dependencies while VM virtualizes a whole bunch of hardware and OS.
 2. Dockers comprises *image*, *container* and *registry*.
-   1. Image is *static* dependencies like a minimal root filesystem, a daemon etc. There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (think of as Gentoo stage tarball).
+   1. Image is *static* dependencies like a minimal root filesystem, a daemon etc. There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (like Gentoo stage tarball).
    2. Container is *running* instance with namespace - the isolated application process. We can think of image and container as class and object in Object-oriented programming. 
    3. Registry is online *store* where users public, share *repostitory* which comprises images of different versions. We use *registry* and *repository* interchangebly.
 3. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
-   2. Server: local/remote *docker-engine*.
+   2. Server: local/remote *docker-engine* (i.e. *systemctl start docker*).
 4. [Layer storage](https://docs.docker.com/storage/storagedriver/) uses Union FS (recall that Live CD on USB stick requires Union FS). Only the topmost (container storage layer) is writable and volatile.
 
    Storage Driver prefers *overlay2* over *aufs*. Either enable *overlay2* in kernel or build external module.
@@ -29,7 +29,8 @@ title: Docker newbie
 
 ```bash
 user@tux ~ $ docker info
-user@tux ~ $ docker image ls
+user@tux ~ $ docker image/container ls [-a]
+user@tux ~ $ docker inspect [ image ID | container ID | network ID ]
 user@tux ~ $ docker search ubuntu
 ```
 
@@ -70,7 +71,7 @@ user@tux ~ $ docker container prune
 
 # Get into container
 
-*exec* or *attch* a command in a running container. Alternatively, add `-it` to *run* getting interactive shell.
+*exec* or *attch* a command in a running container. Avoid *attch* as much as possible because it stops container after exit. Alternatively, add `-it` to *run* getting interactive shell.
 
 ```bash
 user@tux ~ $ docker exec -it webserver bash
@@ -120,7 +121,7 @@ Usually, in the end of image, *CMD* or *ENTRYPOINT* instruction sets commands an
 Now we build the image:
 
 ```bash
-user@tux ~ $ docker build -t nginx:v1 .
+user@tux ~ $ docker build -t nginx:v3 .
 #
 Sending build context to Docker daemon  2.048kB
 Step 1/2 : FROM nginx
@@ -130,7 +131,7 @@ Step 2/2 : RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
 Removing intermediate container d5baea5c6341
  ---> 18cc3a3480f0
 Successfully built 18cc3a3480f0
-Successfully tagged nginx:v1
+Successfully tagged nginx:v3
 ```
 
 1. During the building process, an intermediate container is launched for RUN instruction.
@@ -138,9 +139,13 @@ Successfully tagged nginx:v1
 
    Docker sends all files within context directory to remote Docker engine (daemon).
 
-   >Context directory is NOT the *pwd* where we execute *docker build* though usually we switch to it before building.
+   >Context directory is NOT the *pwd* where we execute *docker build* command though usually we switch to it before building.
 
-After the building, we can run *nginx:v1* image to test.
+After the building, we can run *nginx:v3* image:
+
+```bash
+user@tux ~ $ docker run --name web3 -d -p 8081:80 --rm nginx:v3
+```
 
 # Network
 
