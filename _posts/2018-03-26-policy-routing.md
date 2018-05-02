@@ -221,9 +221,13 @@ nohook resolv.conf
 Then we create */etc/dnsmasq.d/dns.conf*:
 
 ```
+
 # lo only
 bind-interfaces
 listen-address=127.0.0.1
+# lo and eth2
+#bind-dynamic
+#interface=eth2
 
 # DNS port
 port=53
@@ -232,14 +236,20 @@ port=53
 enable-dbus
 
 # dnssec
-conf-file=/usr/share/dnsmasq/trust-anchors.conf
 dnssec
+conf-file=/usr/share/dnsmasq/trust-anchors.conf
+#dnssec-check-unsigned
 
 # Upstream nameservers
-resolv-file=/etc/resolv.dnsmasq.conf
+resolv-file=/etc/dnsmasq.d/resolv.dnsmasq
+
+# hosts addon
+addn-hosts=/etc/dnsmasq.d/hosts.dnsmasq
 ```
 
-If we want *dnsmasq* support newly created interface on the fly, we can use `bind-dynamic`:
+*Note*: *dnssec-check-unsigned* would drop DNS replies if upstream DNS servers does not support DNSSEC. Up to now, I cannot find any China DNS servers with DNSSEC support. Hence, *dnssec-check-unsigned* cannot resolve domains out of GFWlist.
+
+If we want *dnsmasq* support newly created interface on the fly, we can use *bind-dynamic*:
 
 ```
 # lo only
