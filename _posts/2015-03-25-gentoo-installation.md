@@ -1286,7 +1286,7 @@ Boot with LiveDVD, then
    1. Use *athena Xaw3d -gtk -gtk3 -motif*  USEs to replace GTK toolkit if multiple monitors are used. Refer to *daemon mode* bug [reddit](https://www.reddit.com/r/emacs/comments/2ans0z/have_you_encountered_that_gtk_bug_in_daemon_mode/?ref=share&ref_source=link) and [wiki](https://wiki.gentoo.org/wiki/GNU_Emacs).
    2. *xft* for Fontconfig. *libxml2* support *shr* enables *eww* HTML viewer. *gnutls/ssl* supports Gnus IMAP connection.
    3. Chinese input with Fcitx. Change the Fcitx input method trigger to `WIN+I` instead of `CTRL+SPACE`.
-   4. (opt) If X frame does not input Chinese, emerge two fonts: *font-adobe-100dpi* and *font-adobe-75dpi*. You can read post-emerge message:
+   4. If X frame does not input Chinese, emerge two fonts: *font-adobe-100dpi* and *font-adobe-75dpi*. You can read post-emerge message:
 
       ```
       if use X; then
