@@ -8,32 +8,38 @@ title: TeXLive Gentoo
 
 # Installation
 
-1. If you are upgrading TeXLive, follow [Tex Live Migration Guide](https://wiki.gentoo.org/wiki/Project:TeX/Tex_Live_Migration_Guide) and [Upgrading TeXLive](https://wiki.gentoo.org/wiki/Upgrading_TeXLive) first.
-2. TeXLive 2015 ebuild bug. Read [cjk-latex-4.8.3-r1 econf failed](https://bugs.gentoo.org/show_bug.cgi?id=596938).   My current solution is bumping to *cjk-latex-4.8.4* (i.e. create a local ebuild with *>=cjk-latex-4.8.4*). *already fixed in upstream*
-
 ```bash
 # echo "app-text/texlive xetex cjk  l10n_zh" > /etc/portage/package.use/texlive
-# emerge -av app-text/texlive
+# emerge -avt app-text/texlive
+# emerge -avt font-adobe-100dpi font-adobe-75dpi
 ```
+
+TeXLive 2015 ebuild bug. Read [cjk-latex-4.8.3-r1 econf failed](https://bugs.gentoo.org/show_bug.cgi?id=596938).   My current solution is bumping to *cjk-latex-4.8.4* (i.e. create a local ebuild with *>=cjk-latex-4.8.4*). *already fixed in upstream*
 
 1. *xetex* makes use of system Fontconfig fonts directly besides those shipped with TeXLive.
 
-   By default, XeTeX pulls xeCJK macro package.
+   By default, XeTeX pulls xeCJK macro package which extends CJK for XeTeX.
 2. *cjk* draws in CJK which supports Chinese TeX documents though it requires extra efforts.
 3. *l10n_zh* draws in CTeX macro package which is based on CJK/xeCJK, thus compiling Chinese docs easier.
-4. xeCJK extends CJK for XeTeX.
 5. USE flags like *extra* and *science* draws in a bundle of packages many of which are not necessary.
+6. Many TeXLive packages depends on 100dpi and 75dpi bitmap fonts.
 
-Upgrading 2015 to 2016:
+## 2015 to 2016
 
 ```bash
 # emerge -avtC --deselect=n $(qlist -IC texlive)
 # emerge -av1 app-text/texlive
 ```
 
+1. If you are upgrading TeXLive, follow [Tex Live Migration Guide](https://wiki.gentoo.org/wiki/Project:TeX/Tex_Live_Migration_Guide) and [Upgrading TeXLive](https://wiki.gentoo.org/wiki/Upgrading_TeXLive) first.
+
+## TeXLive packages
+
 1. *app-text/texlive* handles basic configuration while *app-text/texlive-core* consists of real sources. Some important basic TeXLive macro pckages are split from *app-text/texlive-core* and should be built separately, like *dev-libs/ptexenc*, *app-text/ps2pkm*, *dev-libs/kpathsea*, etc. This allows for more unitary upgrades or security fixes. Separate TeXLive packages will go to TEXMFSITE (*/usr/share/texmf-site*) which is Gentoo-specific directory.
-2. (obsolete) Package *dev-tex/texmfind* returns what *portage package* you need for specific *TeXLive package*. Try *app-portage/pfl* instead!
-3. Manually install TeXLive package to TEXMFLOCAL or TEXMFHOME without *portage* management (not recommended).
+2. (obsolete) Package *dev-tex/texmfind* returns what *portage package* you need for specific *TeXLive package*.
+
+   Try *app-portage/pfl* instead!
+3. (not recommended) Manually install TeXLive package to TEXMFLOCAL or TEXMFHOME without *portage* management.
 
 For example, if need *biblatex* (an advance version of *bibtex*) support:
 
@@ -57,7 +63,7 @@ Though CTeX makes use of Fontconfig fonts directly, we need to make sure the fon
 $ fc-list :lang=zh-cn | sort
 ```
 
-Edit * /usr/share/texmf-dist/tex/latex/ctex/fontset/ctex-xecjk-winfonts.def*:
+Edit */usr/share/texmf-dist/tex/latex/ctex/fontset/ctex-xecjk-winfonts.def*:
 
 {% highlight TeX linenos %}
 
@@ -106,7 +112,7 @@ There are many free fonts shipped with *TeXLive*. For XeTeX, use those fonts by 
 2. Current stable TeXLive-2014 still requires *ctex-xecjk-winfonts.def*. Update font names there as above.
 3. Due to a [bug](http://bbs.ctex.org/forum.php?mod=viewthread&tid=78821) of *xdvipdfmx*, "Noto Sans S Chinese" (思源黑体) is garbled. Update to TeXLive-2015 or apply the patch.
 
-# Ref:
+# Ref
 
 1. Before anything else, read [2 Overview of TEX Live](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-80002)
 2. TeXLive layout */etc/texmf/web2c/texmf.cnf* or /*/usr/share/texmf-dist/web2c/texmf.cnf*.
