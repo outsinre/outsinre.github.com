@@ -6,56 +6,69 @@ title: TeXLive Gentoo
 * toc
 {:toc}
 
+# ABCs
+
+1. Before anything else, read [2 Overview of TEX Live](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-80002)
+2. Read [LaTeX](/2015/02/05/LaTeX/) on TeX *engine* and *format*.
+
 # Installation
 
 ```bash
-# echo "app-text/texlive xetex cjk  l10n_zh" > /etc/portage/package.use/texlive
-# emerge -avt app-text/texlive
-# emerge -avt font-adobe-100dpi font-adobe-75dpi
+root@tux / # echo "app-text/texlive xetex cjk l10n_zh science publishers" > /etc/portage/package.use/texlive
+root@tux / # emerge -avt app-text/texlive
+root@tux / # emerge -avt font-adobe-100dpi font-adobe-75dpi
 ```
 
-TeXLive 2015 ebuild bug. Read [cjk-latex-4.8.3-r1 econf failed](https://bugs.gentoo.org/show_bug.cgi?id=596938).   My current solution is bumping to *cjk-latex-4.8.4* (i.e. create a local ebuild with *>=cjk-latex-4.8.4*). *already fixed in upstream*
+1. *xetex* is compatible with Fontconfig.
 
-1. *xetex* makes use of system Fontconfig fonts directly besides those shipped with TeXLive.
+   XeTeX includes xeCJK macro package which invokes XeTeX engin to compile Chinese TeX files.
+2. (opt) *cjk* draws in CJK (*dev-texlive/texlive-langcjk* and *dev-tex/cjk-latex*)
 
-   By default, XeTeX pulls xeCJK macro package which extends CJK for XeTeX.
-2. *cjk* draws in CJK which supports Chinese TeX documents though it requires extra efforts.
-3. *l10n_zh* draws in CTeX macro package which is based on CJK/xeCJK, thus compiling Chinese docs easier.
-5. USE flags like *extra* and *science* draws in a bundle of packages many of which are not necessary.
-6. Many TeXLive packages depends on 100dpi and 75dpi bitmap fonts.
+   The old CJK macro script requires more user involvement.
+3. *l10n_zh* (*dev-texlive/texlive-langchinese*)
+
+   CTeX extends and depends on CJK, thus making Chinese TeX compiling much easier.
+4. USE flags like *extra* depend on a world of packages many of which are unnecessary. If you are sure, just install what we need on the fly.
+
+   Specially, *publishers* and *science* USE is useful when you write conference papers like IEEE, ACM etc.
+5. Many TeXLive packages depends on 100dpi and 75dpi bitmap fonts.
+6. TeXLive layout */etc/texmf/web2c/texmf.cnf*, */usr/share/texmf-dist/web2c/texmf.cnf* and */etc/texmf/texmf.d/05searchpaths.cnf*.
 
 ## 2015 to 2016
 
 ```bash
-# emerge -avtC --deselect=n $(qlist -IC texlive)
-# emerge -av1 app-text/texlive
+root@tux / # emerge -avtC --deselect=n $(qlist -IC texlive)
+root@tux / # emerge -av1 app-text/texlive
 ```
 
-1. If you are upgrading TeXLive, follow [Tex Live Migration Guide](https://wiki.gentoo.org/wiki/Project:TeX/Tex_Live_Migration_Guide) and [Upgrading TeXLive](https://wiki.gentoo.org/wiki/Upgrading_TeXLive) first.
+If you are upgrading TeXLive, follow [Tex Live Migration Guide](https://wiki.gentoo.org/wiki/Project:TeX/Tex_Live_Migration_Guide) and [Upgrading TeXLive](https://wiki.gentoo.org/wiki/Upgrading_TeXLive) first.
 
 ## TeXLive packages
 
-1. *app-text/texlive* handles basic configuration while *app-text/texlive-core* consists of real sources. Some important basic TeXLive macro pckages are split from *app-text/texlive-core* and should be built separately, like *dev-libs/ptexenc*, *app-text/ps2pkm*, *dev-libs/kpathsea*, etc. This allows for more unitary upgrades or security fixes. Separate TeXLive packages will go to TEXMFSITE (*/usr/share/texmf-site*) which is Gentoo-specific directory.
-2. (obsolete) Package *dev-tex/texmfind* returns what *portage package* you need for specific *TeXLive package*.
+*app-text/texlive* defines installtion configuration while *app-text/texlive-core*, *dev-texlive/texlive-basic*, *dev-libs/kpathsea* and *web2c* thereof consists of real sources. Separate TeXLive packages (i.e. *dev-tex/biblatex*, *dev-tex/cjk-latex* etc.) will go to TEXMFSITE (*/usr/share/texmf-site*) which is Gentoo-specific directory. This allows for more unitary upgrades or security fixes.
 
-   Try *app-portage/pfl* instead!
-3. (not recommended) Manually install TeXLive package to TEXMFLOCAL or TEXMFHOME without *portage* management.
+Use *app-portage/pfl* to search online repository locating specific package files.
 
-For example, if need *biblatex* (an advance version of *bibtex*) support:
+We can also *manually* put TeXLive packages into TEXMFHOME or TEXMFLOCAL without *portage* management. By convention, we put personal macro files or packages into TEXMFHOME.
 
-```bash
-# emerge -avt dev-tex/biblatex
-```
-
-*dev-tex/biblatex* is marked as *testing* in portage. It is *not* inlcuded in *TeXLive*. Since verion over 2.0, *biblatex* package use *biber* as te *default* backend. You could change it to *bibtex* in *TeX* source. Or if you insist on default  *biber* backend:
+For example, for *biblatex* (superior to *natbib*) support:
 
 ```bash
-# emerge -av dev-tex/biber
+root@tux / # emerge -av1 dev-tex/biblatex-3.7-r1
+root@tux / # emerge -avt dev-tex/biber-2.7
 ```
 
-For more on *bibliography* thing, read [bibtex-vs-biber-and-biblatex-vs-natbib](http://tex.stackexchange.com/a/25702).
+Versions *<dev-tex/biblatex-3.7-r1* would block *dev-texlive/texlive-plaingeneric-2017*. Make sure sub versions (*\*.5*, *\*.7*, *\*.10* etc.) of *biblatex* and *biber* should match.
 
-# Font name resolution (TeXLive 2014)
+Since verion over 2.0, *biblatex* package use *biber* (superior to *bibtex*) as te default backend:
+
+```bash
+root@tux / # emerge -avt dev-tex/biber
+```
+
+We could change it to TeXLive default *bibtex* in TeX source file. Read [bibtex-vs-biber-and-biblatex-vs-natbib](http://tex.stackexchange.com/a/25702) on bibliography.
+
+# Fontconfig
 
 Though CTeX makes use of Fontconfig fonts directly, we need to make sure the fonts name are correctly resolved between Fontconfig and TeX. Check what you have:
 
@@ -95,11 +108,11 @@ Edit */usr/share/texmf-dist/tex/latex/ctex/fontset/ctex-xecjk-winfonts.def*:
 
 Remove extra *square braces*. For setCJKmonofont, just use a normal 宋体 since all Chinese characters are monospace (single and same width).
 
-XeTeX can resolve Fontconfig fonts by *font file name* apart from *font (family) name*. We should add an extra *OSFONTDIR* varaible. Details refer to [TeXLive Ubuntu](/2015/02/03/TeXLive-2014-Ubuntu-Installation/).
+XeTeX can resolve Fontconfig fonts by *font file name* apart from *font (family) name*. We should set OSFONTDIR varaible then. Details refer to [TeXLive Ubuntu](/2015/02/03/TeXLive-2014-Ubuntu-Installation/).
 
 ## Enable TeXLive fonts
 
-There are many free fonts shipped with *TeXLive*. For XeTeX, use those fonts by *font name*, they should be enabled in Fontconfig by default. XeTeX can find those fonts by *font file name* like *FandolKai-Regular.otf*.
+There are many free fonts shipped with TeXLive. For XeTeX, they must be enabled in Fontconfig first:
 
 ```bash
 # eselect fontconfig list
@@ -111,9 +124,3 @@ There are many free fonts shipped with *TeXLive*. For XeTeX, use those fonts by 
 1. CTeX by default requires XeTeX (*xelatex* binary) egnine.
 2. Current stable TeXLive-2014 still requires *ctex-xecjk-winfonts.def*. Update font names there as above.
 3. Due to a [bug](http://bbs.ctex.org/forum.php?mod=viewthread&tid=78821) of *xdvipdfmx*, "Noto Sans S Chinese" (思源黑体) is garbled. Update to TeXLive-2015 or apply the patch.
-
-# Ref
-
-1. Before anything else, read [2 Overview of TEX Live](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-80002)
-2. TeXLive layout */etc/texmf/web2c/texmf.cnf* or /*/usr/share/texmf-dist/web2c/texmf.cnf*.
-3. Writing [LaTeX](/2015/02/05/LaTeX/).
