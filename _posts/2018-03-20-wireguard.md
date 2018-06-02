@@ -3,7 +3,7 @@ layout: post
 title: WireGuard
 ---
 
-* ToC
+1. toc
 {:toc}
 
 [WireGuard](https://www.wireguard.com/) claims to utilizes state-of-the-art cryptography (Noise protocol framework, Curve25519, ChaCha20, Poly1305, BLAKE2, SipHash24, HKDF etc.) while provide a simple construction.

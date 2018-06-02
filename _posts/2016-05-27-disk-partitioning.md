@@ -3,7 +3,7 @@ layout: post
 title: Partitioning and Booting
 ---
 
-*toc
+1. toc
 {:toc}
 
 # Firmware and Interface

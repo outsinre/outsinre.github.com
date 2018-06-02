@@ -3,7 +3,7 @@ layout: post
 title: Enforce HTTPS to your site by Cloudflare
 ---
 
-* ToC
+1. toc
 {:toc}
 
 By default, GitHub takes HTTPS protocol to user/project pages i.e. *username.github.io*. However, for a custiomized domain, HTTPS is unsupported. This post tells us to enforce HTTPS to GitHub page through free Cloudflare services. Mainly, we just need to tune a few settings on Clouflare and your domain registrar.

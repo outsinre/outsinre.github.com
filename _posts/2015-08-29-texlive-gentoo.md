@@ -3,7 +3,7 @@ layout: post
 title: TeXLive Gentoo
 ---
 
-* toc
+1. toc
 {:toc}
 
 # ABCs

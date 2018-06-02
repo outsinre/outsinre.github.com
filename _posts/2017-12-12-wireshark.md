@@ -3,7 +3,7 @@ layout: post
 title: Wireshark
 ---
 
-* ToC
+1. toc
 {:toc}
 
 # Installation

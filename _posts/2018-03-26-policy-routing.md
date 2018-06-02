@@ -3,7 +3,7 @@ layout: post
 title: iproute2, iptables, ipset, dnsmasq
 ---
 
-* ToC
+1. toc
 {:toc}
 
 # Policy Routing

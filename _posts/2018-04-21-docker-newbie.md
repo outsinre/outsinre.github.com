@@ -3,7 +3,7 @@ layout: post
 title: Docker newbie
 ---
 
-* ToC
+1. toc
 {:toc}
 
 # [ABCs](https://yeasy.gitbooks.io/docker_practice/content/introduction/what.html)
