@@ -324,7 +324,7 @@ title: Gentoo Installation
    If possible, apply kernel patches like *cjktty.patch*.
 2. Tips
    1. You'd best have a *.config* backup to start with.
-   2. If possible, try *sys-apps/pciutils, sys-apps/usbutils, and sys-apps/hwinfo* in LiveDVD. Don't emerge those packages in *chroot*, it's not necessary.
+   2. If possible, try *sys-apps/pciutils, sys-apps/usbutils, and sys-apps/{lshw,dmidecode}* in LiveDVD. Don't emerge those packages in *chroot*, it's not necessary.
    3. During kernel config, search the kernel options on page [Linux-3.10-x86_64 内核配置选项简介](http://www.jinbuguo.com/kernel/longterm-3_10-options.html) and refer to LiveDVD's configuration.
    4. Try `lspci -n` and paste it's output to [device driver check page](http://kmuto.jp/debian/hcl); that site gives kernel options that must be enabled.
    5. We can refer to the LiveDVD's kernel config directly.
@@ -697,54 +697,63 @@ title: Gentoo Installation
 
 # Bootloader - [Grub2](https://wiki.gentoo.org/wiki/GRUB2)
 
-1. Installation
+## Installation
 
-   ```bash
-   # echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
-   # emerge -avt grub:2 os-prober
-   # mount /dev/sda10 /boot; mount /dev/sda2 /boot/efi
-   # grub-install --target=x86_64-efi
-   ```
+```bash
+# echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
+# emerge -avt grub:2 os-prober
+# mount /dev/sda10 /boot; mount /dev/sda2 /boot/efi
+# grub-install --target=x86_64-efi [--bootloader-id=Gentoo_Grub] [--efi-directory=esp] [--removable] [/dev/sda]
+```
 
-   1. This must be the 1s step. Otherwise it would show *error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist*.
-   2. Default to slot 2. If there are other operating system, *os-prober* is suggested.
-   3. Make sure *boot* and EFI partition are mounted. Because Gentoo, Ubuntu, Windows share the EFI partition, we mount the shared EFI partion here.
-   4. To install Grub and EFI system to media.
+1. This must be the 1st step. Otherwise it would show *error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist*.
+2. Default to slot 2. If there are other operating system (i.e. dual boot), *os-prober* is suggested.
+3. Make sure *boot* and EFI partition are mounted. Because Gentoo, Ubuntu, Windows share the EFI partition, we mount the shared EFI partion here.
 
-2. [deprecated] Manually Grub menu
+## A bit of explanation
 
-   As long as the */boot* and */boot/efi* partitions are mounted, *grub-mkconfig* automatically detects other operating systems and writes to */etc/grub.d/30_os_prober* through *sys-boot/os-prober*.
+By default, EFI partition is mounted at */boot/efi*. Actually, we can mount it anywhere as long as `--efi-directory` is correctly set.
 
-   Chainloading Windows system manully in */etc/grub.d/40_custom*. The traditional `chainloader +1` does not boot Windows based on UEFI.
+Install the GRUB UEFI application *grubx64.efi* to *esp/EFI/Gentoo_Grub/* and install Grub modules to */boot/grub/x86_64-efi/*.
 
-   ```
-   menuentry "Microsoft Windows 8.1 x86_64" {
-       insmod part_gpt
-       insmod fat
-       insmod search_fs_uuid
-       insmod chain
-       search --fs-uuid --no-floppy --set=root $hints_string $fs_uuid
-       chainloader /efi/Microsoft/Boot/bootmgfw.efi
-   }
-   ```
+Chceck [`--removable`](https://wiki.archlinux.org/index.php/GRUB/EFI_examples#X270_Thinkpad) argument, without which the booting entry would not show up in UEFI NVRAM list within BIOS setting. You will find *esp/EFI/BOOT/BOOTX64.EFI* is just a copy of *esp/EFI/Gentoo_Grub/grub64.efi*.
 
-   The next is to replace `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
+You'd better set `INSTALL_DEVICE` when there exists multiple disks and/or multiple EFI partitions in case of ambiguity.
 
-   ```
-   # grub2-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
-   # grub2-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
-   ```
+## [deprecated] Manually Grub menu
 
-   1. Print `$hints_string`.
-   2. Print `fs_uuid`.
-   3. Now replace the relevant values.
-   4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB\#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
+As long as the */boot* and */boot/efi* partitions are mounted, *grub-mkconfig* automatically detects other operating systems and writes to */etc/grub.d/30_os_prober* through *sys-boot/os-prober*.
 
-3. Generate grub menu
+Chainloading Windows system manully in */etc/grub.d/40_custom*. The traditional `chainloader +1` does not boot Windows based on UEFI.
 
-   ```bash
-   # grub2-mkconfig -o /boot/grub/grub.cfg
-   ```
+```
+menuentry "Microsoft Windows 8.1 x86_64" {
+    insmod part_gpt
+    insmod fat
+    insmod search_fs_uuid
+    insmod chain
+    search --fs-uuid --no-floppy --set=root $hints_string $fs_uuid
+    chainloader /efi/Microsoft/Boot/bootmgfw.efi
+}
+```
+
+The next is to replace `$hints_string` and `$fs_uuid`. This is where `os-prober` comes into playing a role.
+
+```
+# grub-probe --target=hints\_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
+# grub-probe --target=fs\_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
+```
+
+1. Print `$hints_string`.
+2. Print `fs_uuid`.
+3. Now replace the relevant values.
+4. Refer to [Windows installed in UEFI-GPT Mode menu entry](https://wiki.archlinux.org/index.php/GRUB\#Windows_installed_in_UEFI-GPT_Mode_menu_entry) and [Can GRUB2 share the EFI system partition with Windows?](http://unix.stackexchange.com/q/49165).
+
+## Generate grub menu
+
+```bash
+# grub-mkconfig -o /boot/grub/grub.cfg
+```
 
 # Get out of Chroot - Reboot
 
