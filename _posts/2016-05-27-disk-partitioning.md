@@ -1,85 +1,82 @@
 ---
 layout: post
-title: Disk
+title: Partitioning and Booting
 ---
 
-# Factors
+*toc
+{:toc}
 
-1. Firmware boot mode
+# Firmware and Interface
 
-   BIOS; UEFI (EFI).
-2. Partitioning style
-3. Filesystem
+1. Firmware refers to underlying hardware as 'UEFI Firmware' or 'BIOS Firmware'. Nowadays, almost all PCs bring in UEFI Firmware.
+2. At the very beginning of booting, we press ESC/F2/F12 and get into 'Firmware interface' as System BIOS, ROM BIOS or PC BIOS which is also named to BIOS Setting.
 
-# Disk tool
-
-1. parted
-2. fdisk
-3. diskpart
-
-> create partition table and partitions
-
-# Partition table
+# Partitioning table
 
 1. GPT
-2. MBR/MSDOS
+2. MBR (MSDOS)
 3. MAC
 4. BSD
 
-# Format filesystem on partitions
+# Booting scheme
+
+1. Legacy (BIOS) booting
+2. UEFI booting.
+3. UEFI Firmware supports either UEFI booting or Legacy booting, which is called Compatibility Support Module (CSM).
+
+# Partitioning tool
+
+To create partition table and partitions
+
+1. parted
+2. fdisk
+3. diskpart on Windows
+
+Both *fdisk* and *parted* are partitioning utilities. *fdisk* is well known, stable, and recommended for the MBR partition layout while *parted* was one of the first Linux block device management utilities to support GPT partitions.
+
+# Filesystem
+
+'Format' refers to *create* filesystem on a disk parition.
 
 1. NTFS
-2. FAT(16)
-3. FAT32
-4. EXT2/3/4
+2. FAT 12/16/vfat/32
+4. EXT 2/3/4
 5. BTRFS
 
-# Bootable USB stick tool
+EFI System Partition (ESP) (including bootable USB stick) must be FAT (FAT32 is recommended) filesystem.
+
+# Bootable USB stick
 
 1. *dd* (rude but robust)
+
+   This make USB stick unacessible to OS file manager due to *boot* and/or *esp* flag.
 2. Rufus (reliable and versatile tool)
-3. UNetbootin
-4. Universal USB Installer
-5. *diskpart* (Windows)
-6. Ubuntu disk creater
+3. *diskpart* (Windows)
+4. Ubuntu Disk Creater
+5. Manual copy.
 
-# UEFI
+   For UEFI booting, just copy (i.e. *rsync*) ISO contents to FAT32 USB partition.
 
-Read [Dual boot with Windows](https://wiki.archlinux.org/index.php/Windows_and_Arch_dual_boot). Windows 8/8.1 AMD64 supports booting in AMD64 UEFI mode from GPT disk only, OR in BIOS mode from MBR/msdos disk only. They do not support IA32 UEFI boot, AMD64 UEFI boot from MBR/msdos disk, or BIOS boot from GPT disk.
+# Operating System Limitations
 
-1. GPT and UEFI; MBR/MSDOS and legacy BIOS.
-2. Disable *legacy* BIOS boot. Only allow UEFI for both Windows and Linux in BIOS setup.
-3. Main hard drive should adopt GPT scheme instead of MBR/MSDOS.
-4. Windows partition uses NTFS while Linux mainly uses EXT4.
-5. EFI partition must be FAT32/VFAT.
-6. UEFI requires 64-bit OS. 32-bit version is unacceptable.
-7. Bootable USB stick may adopts GPT.
+1. Usually, MBR and BIOS (MBR + BIOS), and GPT and UEFI (GPT + UEFI) go hand in hand without any compatibility issue. However, that matching is a must for Windows and Mac while Linux is more flexible.
+3. For [Dual boot with Windows](https://wiki.archlinux.org/index.php/Windows_and_Arch_dual_boot), turn off Windows 'Fast Reboot' and 'Secure boot' in BIOS setting.
 
-   If you receive such error during installing Windows:
+   What's more, then stick to the matching rule unless they are installed separately on two disks.
+2. UEFI requires the firmware and operating system loader (or kernel) to be size-matched; for example, a 64-bit UEFI firmware implementation can load only a 64-bit operating system (OS) boot loader or kernel. 
 
-   >We couldn't create a new partition or locate an existing one.  For more information, see the Setup log files.
+# Summary
 
-   then [create MBR/MSDOS disk table instead](https://wiki.archlinux.org/index.php/Windows_and_Arch_dual_boot#Couldn.27t_create_a_new_partition_or_locate_an_existing_one).
-8. USB stick partition must be FAT32.
+The final booting scheme depends on:
 
-   If you really have good reason to use NTFS, then resort to Rufus (built-in [UEFI bootable NTFS](https://github.com/pbatard/uefi-ntfs) support).
+1. Firmware: UEFI/BIOS Firmware;
+2. BIOS setting: uefi/Legacy/CSM booting;
+3. Partitioning: GPT/MBR;
+4. Operating System (and boot loader thereof).
 
-## Notes
+# Manually creating Windows UEFI bootable USB stick
 
-1. Don't use *dd* command for Windows 7 x64 UEFI bootable usb stick. By default, Windows 7 ISO does not prepare the *bootx64.exe* and relevant directories correctly.
-
-   Use robust tool like Rufus. For whatever reason you want to create usb stick manually, get a *bootx64.exe* copy from an existing Windows 7 OS. Alternatively, extract (i.e. by *7zip*) *\1\Windows\Boot\EFI\bootmgfw.efi* from ISO *\sources\install.wim* and rename it to *bootx64.exe*.
-
-   From within the USB stick, copy *\efi\microsoft\boot* directory to a upper level, namely *\efi\boot* where we put *bootx64.exe*.
-
-   Actually, Rufus just creates *\efi\boot* directly instead of copying.
-2. Windows does not care about file/directory name letter case.
-
-## Manual USB stick
-
->Rule: just copy the ISO contents into a FAT32 USB stick
-
-This tutorial shows how to manually create a Windows 8.1 bootable USB stick under Linux. **gpt does NOT ask for confirmation on each command like fdisk**.
+This tutorial shows how to manually create a Windows 8.1 bootable USB stick under Linux. **gpt does NOT ask for confirmation on each command like fdisk**. On Windows, we use *diskpart*.
 
 1. Create partition table - GPT
 
@@ -90,7 +87,7 @@ This tutorial shows how to manually create a Windows 8.1 bootable USB stick unde
    (parted) print free
    ```
 
-   *mktable/mklabel* **erases** the whole disk data!
+   *mktable/mklabel* **ERASE**s the whole disk data!
 2. Create a *primary* partition
 
    ```
@@ -101,28 +98,29 @@ This tutorial shows how to manually create a Windows 8.1 bootable USB stick unde
    (parted) print free
    ```
 
-   1. The *fat32* argument is optional at this step. It may be specified to set an appropriate partition ID.
+   1. The *fat32* argument is optional at this step. It may be specified to set an appropriate partition ID. *parted* does not format filesystem.
    2. *0%* is better for *start* of the very first partition alignment. Similarly, *100%* is better for *end* of the very last partition alignment.
-   3. *5GiB* is enough for Windows 8.1 ISO. The remaining space can be used to store data (i.e. create *ext4* partition).
+   3. 5 GiB is enough for Windows 8.1 ISO. The remaining space can be used to store data (i.e. create *ext4* partition).
    4. *align-check* checks partition alignment. *optimal/opt* guarantees optimal disk performance. Try to use *unit s* (sector) when *mkpart* for better disk performance.
-3. Set/toggle *boot* flag
+3. (opt) Set the partition be *bootable*
 
    ```
    (parted) set 1 boot on
    or
-   (parted) toogle 1 boot
+   (parted) toogle 1 esp
    (parted) print free
    (parted) quit
    ```
 
-   1. Set the partition be *bootable*.
-4. Format the partition to FAT32 filesystem
+   1. Just set of *boot* and *esp* as they imply each other.
+   2. As mentioned earlier, *boot* and *esp* flag prevents this partition unacessible to OS file manager.
+4. Format FAT32 filesystem
 
    ```bash
-   # mkfs.vfat -F 32 /dev/sdb1
+   # mkfs.vfat -F32 /dev/sdb1
    ```
 
-   1. Though we sepcify `fat32` argument when creating partition above, we MUST *explicitly* format the partition.
+   1. Though we sepcify *fat32* argument in *parted*, we must *explicitly* format the partition.
 5. Mount ISO file
 
    ```bash
@@ -136,25 +134,33 @@ This tutorial shows how to manually create a Windows 8.1 bootable USB stick unde
    # mount /dev/sdb1 /mnt/usbstick
    ```
    
-6. Copy ISO files to USB stick
+7. Copy ISO files to USB stick
 
    ```bash
-   # cp -rv /mnt/iso/* /mnt/usbstick
+   # cp -rv /mnt/iso/* /mnt/usbstick/
+   # -or-
+   # rsync -rv /mnt/iso/ /mnt/usbstick/
    ```
 
-7. Flush file system buffers
+8. Flush file system buffers
 
    ```bash
    # sync
    ```
 
-8. Umount ISO and USB stick
+9. Umount ISO and USB stick
 
    ```bash
    # umount /mnt/iso
    # umount /mnt/usbstick
    ```
 
-9. Refs
+1. Refs
    1. [fedora create windows 8.1 USB stick](https://superuser.com/questions/729087/fedora-create-windows-8-1-bootable-usb)
    2. [howtogeek cd/dvd ISO mount](http://www.howtogeek.com/168137/mount-an-iso-image-in-linux/?PageSpeed=noscript)
+
+## Windows 7 Notes
+
+By default, Windows 7 ISO does not prepare the *bootx64.exe* and relevant directories correctly. Use robust tool like Rufus.
+
+For whatever reason you want to create usb stick by copying or *dd*, please get *bootx64.exe* from an existing Windows 7 OS. Alternatively, extract (i.e. by *7zip*) *\1\Windows\Boot\EFI\bootmgfw.efi* from ISO *\sources\install.wim* and rename it to *bootx64.exe*. From within the USB stick, copy *\efi\microsoft\boot* directory to a upper level, namely *\efi\boot* into which we put *bootx64.exe*. Actually, Rufus just creates *\efi\boot* directly instead of copying.
