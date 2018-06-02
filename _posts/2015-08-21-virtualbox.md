@@ -3,6 +3,9 @@ layout: post
 title: VirtualBox
 ---
 
+*toc
+{:toc}
+
 This post indroduces installing VirtualBox in Gentoo host, and then create a Windows XP 32-bit virtual machine.
 
 # Installation
