@@ -10,7 +10,7 @@ title: LVM over LUKS over LVM
 5. LVM -> LUKS -> LVM.
 6. No swap partition. If possible, create a swapfile instead referring to [swapfile](http://www.fangxiang.tk/2015/03/25/gentoo-installation/).
 7. BOOT and EFI partitions share and reside on a USB partition, say *sdc1*. This is different from traditional scheme.
-   1. The shared USB partition should be formated as vfat (FAT32) to satisfiy EFI filesystem requirement.
+   1. The shared USB partition should be formated as FAT32 to satisfiy EFI filesystem requirement.
    2. It should be mounted on /boot if necessary.
    3. Make a directory 'EFI' at root of the shared parition.
    4. The shared USB partition is not encrypted.
@@ -34,7 +34,7 @@ title: LVM over LUKS over LVM
    ```
    
    EFI partition should be set *boot* flag.
-2. Create VFAT filesystem:
+2. Create FAT32 filesystem:
 
    ```bash
    # mkfs.vfat -F32 /dev/sdc1
@@ -42,7 +42,7 @@ title: LVM over LUKS over LVM
    # busybox mkfs.vfat /dev/sdc1
    ```
    
-3. USB shared partition is not encrypted. If you put the shared partition within the LVM-LUKS-LVM architecture, then you need add LUKS support to *grub2*.
+3. USB shared partition is not encrypted. If you put the shared partition within the LVM-LUKS-LVM architecture, then you need add LUKS support to Grub2.
 
 # key-file
 
@@ -252,7 +252,7 @@ If you return to LiveDVD and try to chroot again, please execute the above six c
 Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo over lvm luks](2015-08-15-gentoo-over-lvm-luks.md).
 
 1. Try to restore some config backup files like 'make.conf', 'fstab', 'wpa_supplicant.conf', '.bashrc' 'repos.conf/{gentoo.conf, layman.conf, local.conf} etc.
-2. Of the most important, the fundamental difference is 'grub2' and 'genkernel initramfs'.
+2. Of the most important, the fundamental difference is 'Grub2' and 'genkernel initramfs'.
 
    Follow steps below.
 
@@ -268,39 +268,51 @@ Refer to [Gentoo Installation](2015-03-25-gentoo-installation.md) and [gentoo ov
 
 Don't worry about *--gpg* problem occured in LiveDVD above. genkernell will compile GnuPG 1 instead of 2.
 
-## grub2
+## Grub2
 
 ```bash
-# grub2-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=grub2 --removable --modules=part\_gpt
+# grub-install --target=x86_64-efi --efi-directory=/boot --boot-directory=/boot --bootloader-id=Grub2 --removable --modules=part\_gpt
 ```
 
-- '--bootloader-id=grub2' and '/dev/sdc' (USB stick) might be optional.
-- '--efi-directory' specifies the mountpoint of the ESP (i.e. the USB sdc1 is mounted at /boot). It replaces '--root-directory' which is deprecated.
--  No need to append '/dev/sdc' since '--efi-directory=' is enough. The 'INSTALL_DEVICE' parameter of 'grub2-install' is mainly for BIOS boot.
+- `--bootloader-id=Grub2` and */dev/sdc* (USB stick) might be optional.
+- `--efi-directory` specifies the mountpoint of the ESP (i.e. the USB *sdc1* is mounted at */boot*). It replaces `--root-directory` which is deprecated.
+-  No need to append */dev/sdc* since `--efi-directory=` is enough. The `INSTALL_DEVICE` parameter of *grub-install* is mainly for BIOS boot.
 
 Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://forums.gentoo.org/viewtopic-p-7011836.html) and [grub2 zh-CN](https://wiki.gentoo.org/wiki/GRUB2/zh-CN).
-2. Kernel and init arguments '/etc/default/grub'
 
-   
-   >GRUB_CMDLINE_LINUX="crypt_root=UUID='of /dev/mapper/vg-crypt' dolvm root=UUID='of /dev/mapper/cryptvg-root' rootfstype=ext4 root_keydev=PARTUUID='of boot and EFI shared partition' root_key=/relative/path/to/luks-gnupg-key-file"
-   
-   1. crypt_root: the UUID of the partition which is encrypted by DM-crypt LUKS. In our case, this is LVM volume /dev/mapper/vg-crypt or /dev/vg/crypt.
-   2. dolvm: activate LVM volumes on bootup. This needs support from LVM support in initramfs.
-   3. root: the real / mount point for Gentoo. In our case, it is /dev/mapper/cryptvg-root or /dev/cryptvg/root.
-   4. rootfstype: Gentoo root filesystem.
-   5. root_keydev: the device where DM-crypt LUKS key-file is stored. In our case, it is boot and EFI partition on USB stick. Always prefer PARTUUID over UUID on a GPT disk.
-   6. root_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
-   7. You can use device file name or use UUID instead for those arguments. It's free choince.
-   8. The 2nd reference adds a parameter 'target=cryptroot' whose usage is unclear. Don't try this if not sure.
-   9. Refer to man page of *genkernel* for those parameters. They can be set to device name or the device UUID/PARTUUID.
-2. rc-service lvmetad start
+## Kernel and init arguments
 
-   After getting into new Gentoo system, *grub2-mkconfig* might complain about *lvmetad* issue which does NO harm. If you really want to get rid of the warning, just run *rc-service lvmetad start* before *grub2-mkconfig* and remember to stop afterwards.
-3. grub2-mkconfig -o /boot/grub/grub.cfg
+```
+# */etc/default/grub*:
 
-   In chroot, grub2-mkconfig might fail to probe (by calling os-prober) Windows on HDD. When getting into Gentoo, execute it again to make up.
+GRUB_CMDLINE_LINUX="crypt_root=UUID='of /dev/mapper/vg-crypt' dolvm root=UUID='of /dev/mapper/cryptvg-root' rootfstype=ext4 root_keydev=PARTUUID='of boot and EFI shared partition' root_key=/relative/path/to/luks-gnupg-key-file"
+```
 
-4. In our scheme, boot and EFI shared partition is not encrypted. If it is encrypted by LUKS too, we need more configurations. Read [grub2 advanced storage](https://wiki.gentoo.org/wiki/GRUB2/AdvancedStorage).
+1. crypt_root: the UUID of the partition which is encrypted by DM-crypt LUKS. In our case, this is LVM volume /dev/mapper/vg-crypt or /dev/vg/crypt.
+2. dolvm: activate LVM volumes on bootup. This needs support from LVM support in initramfs.
+3. root: the real / mount point for Gentoo. In our case, it is /dev/mapper/cryptvg-root or /dev/cryptvg/root.
+4. rootfstype: Gentoo root filesystem.
+5. root_keydev: the device where DM-crypt LUKS key-file is stored. In our case, it is boot and EFI partition on USB stick. Always prefer PARTUUID over UUID on a GPT disk.
+6. root_key: the path to DM-crypt LUKS key-file. The value should be relative path to root_keydev mount point.
+7. You can use device file name or use UUID instead for those arguments. It's free choince.
+8. The 2nd reference adds a parameter 'target=cryptroot' whose usage is unclear. Don't try this if not sure.
+9. Refer to man page of *genkernel* for those parameters. They can be set to device name or the device UUID/PARTUUID.
+
+## lvmetad service
+
+After getting into new Gentoo system, *grub-mkconfig* might complain about *lvmetad* issue which does NO harm. If you really want to get rid of the warning, just run *rc-service lvmetad start* before *grub-mkconfig* and remember to stop afterwards.
+
+## Generating Grub2 menu
+
+```bash
+# grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+In chroot, grub-mkconfig might fail to probe (by calling os-prober) Windows on HDD. When getting into Gentoo, execute it again to make up.
+
+## Notes
+
+In our scheme, boot and EFI shared partition is not encrypted. If it is encrypted by LUKS too, we need more configurations. Read [Grub2 advanced storage](https://wiki.gentoo.org/wiki/GRUB2/AdvancedStorage).
 
 # Get out of chroot
 
@@ -343,8 +355,8 @@ Refer to [EFI boot with GRUB2 on amd64, dual boot with Windows7 x64](https://for
 From the installation process, we find for sdc1, we only:
 
 1. Copy the LUKS key there;
-2. grub2-install command;
-3. grub2-mkconfig;
+2. grub-install command;
+3. grub-mkconfig;
 4. Mount sdc1 as /boot in /etc/fstab
 
 If data ruined in sdc1 or anything else undesirable happend, just repeat step 1-4 as long as LUKS key-file or fall-back passphrase exist.
