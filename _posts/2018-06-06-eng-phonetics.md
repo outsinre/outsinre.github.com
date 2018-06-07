@@ -24,7 +24,7 @@ title: ENG phonetics
 3. Film and TV series are not a proper guide. Use standard prounciation materials.
 4. Improve intonation.
 
-# [IPA](assets/IPA_chart_2018.pdf)
+# [IPA](/assets/IPA_chart_2018.pdf)
 
 The International Phonetic Alphabet (IPA) is an alphabetic system of phonetic notation based primarily on the Latin alphabet.
 
@@ -43,7 +43,7 @@ IPA symbols are composed of one or more elements of two basic types, letters and
 
 结合这四个步骤，我们可以对发音进行不同的分类。
 
-# [Vowel vs. Consonant](assets/phonetics_intro.pdf)
+# [Vowel vs. Consonant](/assets/phonetics_intro.pdf)
 
 语音一般分为辅音 (consonant) 和元音 (vowel) 两大类，元音和辅音的根本区别在于气流是否受阻。注意是“受阻”不是“完全没有”。发辅音时，声道紧闭或声道变窄使气流无法排出，或排出时会产生能够辨别出的摩擦。发元音时气流可以相对不受阻碍地从口腔或鼻腔中排出而不会产生类似的现象。
 
@@ -65,7 +65,7 @@ We can also divide phonation into voiceless (清音：声带不颤动) and voice
 
 元音和辅音都是指的单个发音，称为“音段（segment）”，当音段组合成音节（syllable）。通常把音节分成两个部分：韵基（rime）和节首（onset）, 韵基中的元音是节核（nucleus）, 后面的辅音称作节尾（coda）。
 
-![eng syllable](assets/eng_syllable.png)
+![eng syllable](/assets/eng_syllable.png)
 
 所有音节必须有节核,但不是所有的音节都有节首和节尾。没有节尾的音节叫做“开音节（open syllable）”, 有节尾的音节叫做“闭音节（closed syllable）”。
 
