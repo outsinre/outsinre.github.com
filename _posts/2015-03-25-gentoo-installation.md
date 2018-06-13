@@ -1161,7 +1161,7 @@ Boot with LiveDVD, then
    1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
 2. Recommendations
 
-   apg, guake, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/), remmina/freerdp.
+   apg, <s>guake</s>, st term, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/), remmina/freerdp.
 
    1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/). Those fonts are essential to display formulas. However, WPS-linux does not have built-in formula creation function due to copyright.
 
@@ -1198,7 +1198,7 @@ Boot with LiveDVD, then
 
    >From what we've done, you know *enabling pulseaudio* is quite easy as no kernel options required like ALSA.
 
-   Audio mixer... results in a message saying "pavucontrol binary not found":
+    *xfce4-pulseaudio-plugin* reports "pavucontrol binary not found":
 
    ```bash
    root@tux / # emerge -avt media-sound/pavucontrol
