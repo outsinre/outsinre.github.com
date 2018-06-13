@@ -3,6 +3,9 @@ layout: post
 title: Arch Linux
 ---
 
+1. toc
+{:toc}
+
 >Arch Linux has dropped support for *i686* platforms. Only *x86_64* now!
 
 # [Installation guide](https://wiki.archlinux.org/index.php/Installation_guide)
@@ -232,9 +235,9 @@ The configuration API varies often across awesome updates. So, repeat these conf
 [user@host ~]$ cp /etc/xdg/awesome/rc.lua ~/.config/awesome/
 ```
 
-### Autostart
+## Autostart
 
-Desktop (XFCE, KDE etc.) havs autostart *.desktop* files in */etc/xdg/autostart/* or *~/.config/autostart/*. awesome requires manual settings:
+Desktop (XFCE, KDE etc.) has many autostart *.desktop* files in */etc/xdg/autostart/* or *~/.config/autostart/* to launch default applications on startup (i.e. input method, power manager etc.). awesome requires manual settings:
 
 Here is an example of VBoxClient-all autostart with awesome. Create *~/.config/awesome/autostart.sh*:
 
@@ -249,6 +252,7 @@ function run {
 }
 
 run VBoxClient-all
+run fcitx-autostart
 ```
 
 Make it executable:
@@ -263,12 +267,19 @@ Check *autostart.sh*:
 [user@host ~]$ ~/.config/awesome/autostart.sh
 ```
 
-You can add any other programs to autostart by appending *run executable --arguments* to the end of *autostart.sh*.
+You can add any other programs to autostart by appending `run executable [--arguments]` to the end of *autostart.sh*.
 
-Finally, add the following line to *~/.config/awesome/rc.lua*:
+Finally, add to the end of *~/.config/awesome/rc.lua*:
 
 ```lua
-awful.spawn.with_shell("~/.config/awesome/autostart.sh")
+-- awful.spawn.with_shell("~/.config/awesome/autostart.sh")
+awful.spawn.with_shell(awful.util.getdir("config") .. "/autostart.sh")
+```
+
+To make sure modification syntax is correct:
+
+```bash
+user@tux ~ # awesome -k
 ```
 
 ## xinit
@@ -277,13 +288,23 @@ awful.spawn.with_shell("~/.config/awesome/autostart.sh")
 
 The default */etc/X11/xinit/xserver* does not include `vt$XDG_VTNR` which let adversaries bypass screen lock by switching terminals (Ctrl+Alt+Fx). So create *~/.xserver* as:
 
-```
+```shell
 #!/bin/sh
 
 exec /usr/bin/Xorg -nolisten tcp "$@" vt${XDG_VTNR}
 ```
 
-You can check `XDG_VNTR` variable afterwards.
+You can check `XDG_VNTR` variable afterwards. Attention that this variable is only available on Systemd startup. To be compatible with OpenRC, we use:
+
+```shell
+#!/bin/sh
+
+if [ -z "${XDG_VTNR}" ]; then
+  exec /usr/bin/X -nolisten tcp "$@" vt7
+else
+  exec /usr/bin/X -nolisten tcp "$@" vt${XDG_VTNR}
+fi
+```
 
 ### xinitrc
 
@@ -300,21 +321,33 @@ Go to the end and replace the defaults with:
 ```
 # ~/.xinitrc
 
+#exec $command
 exec awesome
 ```
 
 1. Commands after *exec* won't be executed in *.xinitrc*. If any other commands are required, put them before *exec* line.
 2. If you decide to write a custom *~/.xinitrc* file, then make sure existing *~/.Xresources* are loaded like the default does.
 
+For compatibility, we'd better add XSESSION to *~/.bash_profile* as it is checked by */etc/X11/chooser.sh*:
+
+```bash
+#export XSESSION="Xfce4"
+export XSESSION="awesome"
+```
+
 Finally, on terminal type: *startx*.
 
-### Automatic startx
+### Automatic startx on login
 
 Add the following code to *~/.bash_profile*:
 
 ```bash
 if shopt -q login_shell; then
-        [[ -t 0 && "${XDG_VTNR}" -eq 1 && "$USER" == "username" && ! "$DISPLAY" ]] && exec startx 2>&1 | tee "$HOME"/.startx.log
+  if [ -z "${XDG_VTNR}" ]; then
+    [[ -t 0 && "$(tty)" == /dev/tty1 && "$USER" == "username" && ! "$DISPLAY" ]] && exec startx 2>&1 | tee "$HOME"/.startx.log
+  else
+    [[ -t 0 && "${XDG_VTNR}" -eq 1 && "$USER" == "username" && ! "$DISPLAY" ]] && exec startx 2>&1 | tee "$HOME"/.startx.log
+  fi
 fi
 ```
 
