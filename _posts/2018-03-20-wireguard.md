@@ -6,7 +6,9 @@ title: WireGuard
 1. toc
 {:toc}
 
-[WireGuard](https://www.wireguard.com/) claims to utilizes state-of-the-art cryptography (Noise protocol framework, Curve25519, ChaCha20, Poly1305, BLAKE2, SipHash24, HKDF etc.) while provide a simple construction.
+# Preamble
+
+[WireGuard](https://www.wireguard.com/) claim to utilizes state-of-the-art cryptography (Noise protocol framework, Curve25519, ChaCha20, Poly1305, BLAKE2, SipHash24, HKDF etc.) while provide a simple construction.
 
 It adds a virtual network interface and IP thereof. The interface is associated with a public/private key pair of which the public part serves as that interface's identity within WireGuard network. WireGuard encapsulates IP packets (application data payload) over UDP and forwards packets based on Cryptokey Routing (UDP VPN).
 
@@ -29,7 +31,7 @@ Optionally, we can build WireGuard as an [internal kernel module or as built-in]
 
 Before everything else, we should grasp the conceptual overview.
 
-Peer | A | B
+Peer | Client A | Server B
 ---|---|---
 External IP | 192.168.0.123 | 23.45.67.89
 UDP port | 48574 | 39814
@@ -37,11 +39,11 @@ Internal IP | 10.0.0.1/24 | 10.0.0.2/24
 
 External IP (i.e. *eth0*) is given by ISP or Wi-Fi router, without which you cannot reach the Internet. On the other hand, internal IP manually assigned to WireGuard interface is only privately valid within WireGuard network. UDP port associated with external IP is where WireGuard service listens for traffic.
 
-WireGuard does not assume server side or client side. They differ in which initiates traffic sending. For consistent terminology, I regard peer (B) with public IP as server side while peer (A) censorshipped by firewall as client side.
+WireGuard does not assume server side or client side. They differ in which side initiates UDP connections. For terminology consistency, I regard peer B with public IP as the server side while peer A censorshipped by ISP as the client side. In this case, the client sites behind a Wi-Fi router.
 
-Clearly, Peer A, on the initiative, opens connections to peer B establishing a point-to-point tunnel. With a few arguments adjustment, peer A reaches the whole *10.0.0.0/24* LAN blocks (even machines without WireGuard) via B - the *gateway*. A step further, peer A can route all the Internet traffic through B.
+Clearly, Peer A, on the initiative, opens connections to peer B establishing a point-to-point tunnel. With a few arguments adjustment, peer A reaches the whole *10.0.0.0/24* LAN blocks (mostly machines without WireGuard) via B - the *gateway*. A step further, peer A can route all its traffic through B.
 
-Firstly, we start off by point-to-point link. Without explicit notice, the following steps should be executed on both sides.
+Firstly, we start off by establishing a point-to-point link. Without explicit notice, the following steps should be executed on both sides.
 
 # Interface
 
@@ -53,9 +55,9 @@ root@tux ~ # ip link add dev wg0 type wireguard
 root@tux ~ # ip link
 ```
 
-Internal IP assignment:
+## Internal IP
 
-Unless you have a really good reason, please assign internal IPs within the same subnet for client and server sides. Otherwise, you want extra route on both sides.
+Unless you have a really good reason, please assign internal IPs within the same subnet for client and server sides. Otherwise, you want extra routes on both sides.
 
 ```bash
 root@tux ~ # ip addr add 10.0.0.1/24 dev wg0
@@ -92,35 +94,31 @@ Arguments can be loaded from file.
 root@tux ~ # wg setconf wg0 /etc/wireguard/wg0.conf
 # -or-
 root@tux ~ # wg set wg0 listen-port 48574 private-key /etc/wireguard/private-key
-root@tux ~ # wg set wg0 peer <peer B public-key> [persistent-keepalive 25] [endpoint 23.45.67.89:39814] allowed-ips 10.0.0.2/32,10.0.100.2/24
+root@tux ~ # wg set wg0 peer <public-key of peer> [persistent-keepalive 25] [endpoint 23.45.67.89:39814] allowed-ips 10.0.0.2/32,10.0.100.2/24
 root@tux ~ # wg [showconf wg0]
 ```
 
-1. *peer B public key* should be *base64* format like *V7g3kxzLATJ6edBybau1IrE3FOgLHajxxFfMZ+QOUyE=*.
-2. To traverse NAT or firewall, we need *persistent-keepalive*.
+1. Public key should be *base64* format like *V7g3kxzLATJ6edBybau1IrE3FOgLHajxxFfMZ+QOUyE=*.
+2. To traverse NAT or firewall, we need *persistent-keepalive* on client sides.
 
-   It's the peer behind NAT or firewall that associates *persistent-keepalive* value with its peer setting.
+   It's the peer behind NAT or firewall that requires *persistent-keepalive* argument.
 
-   For instance, A sites behind NAT (i.e. Wi-Fi router), *persistent-keepalive* sends a packet to its peers periodically to keep NAT mapping open, without which, peers cannot reach A.
-3. *endpoint* is peer B's external yet public IP and UDP port.
+   For instance, peer A sites behind NAT (i.e. Wi-Fi router), *persistent-keepalive* sends packets to peers periodically to keep NAT mapping open, without which, peers cannot reach A.
+3. *endpoint* is the peer's external yet public IP and UDP port.
 
-   It's recommended to leave this argument out on server side because the server updates the endpoint of its peers by examining from where correctly authenticated packets originates. Only client side that makes the initial connection requires *endpoint*.
+   Only client side that makes the initial connection requires *endpoint*. It's recommended to leave this argument out when setting the server side because it updates the endpoint value by examining from where correctly authenticated packets originates. Meanwhile, clients behind NAT and dial-up do not have fixed public IPs.
+4. *allowed-ips* is a list of comma-separated IP ranges to which WireGuard traffic can be sent and from which WireGuard traffic can be recevied.
 
-   As peer A sits behind Wi-Fi router, *endpoint* representing it should be the WAN IP instead of *192.168.0.123*.
-4. *allowed-ips* is a list of comma-separated IP ranges to which WireGuard traffic can be sent and from where WireGuard traffic can be recevied.
+   For a simple point-to-point connection, it should be a peer's internal IP. To reach the whole LAN network, we set it to *10.0.0.0/24*).
 
-   For simple point-to-point connection, it should be peer B's internal IP.
+   The catch-all *0.0.0.0/0* and *::/0* match all addresses, routing all traffic through WireGuard. This is useful if we want to set up transparent proxy on client sides.
 
-   The catch-all *0.0.0.0/0* may be specified for matching all IPv4 addresses, and *::/0* may be specified for matching all IPv6 addresses, allowing and route *all* traffic on the client through the VPN tunnel. This is useful if want to set a VPN proxy.
-
-   This can be narrowed down if you only want some traffic (i.e. remote LAN network *10.0.0.0/24*) to go over VPN.
-
-   Whatever schema you choose, peer B's internal IP must be covered by *allowed-ips*.
-5. Multiple peers can be set up.
+   Whatever schemas we choose, the peer's internal IP must be covered.
+5. We can set multiple peers.
 
 # Persistent Configuration
 
-Previously *wg* commands are valid within current login session. To be permanent across reboots, arguments could be loaded from file which, by convention, locates under */etc/wireguard/*.
+Setup above is versatile across reboots. To be permanent, arguments can be loaded from file on boot. By default, configuration file locates under */etc/wireguard/*.
 
 To save and load configuration:
 
@@ -129,7 +127,7 @@ root@tux ~ # wg showconf wg0 > /etc/wireguard/wg0.conf
 root@tux ~ # wg setconf wg0 /etc/wireguard/wg0.conf
 ```
 
-Here is the example of point-to-point VPN link:
+Here is an example of point-to-point VPN link:
 
 ```
 [Interface]
@@ -152,7 +150,7 @@ root@tux ~ # ip link; ip addr
 root@tux ~ # ss -npelu
 ```
 
-You can find UDP sockets created.
+A WireGuard UDP socket is created.
 
 ## Route
 
@@ -160,43 +158,55 @@ When internal IP is assigned, a system route is added automatically for that IP 
 
 > 10.0.0.0/24 dev wg0 proto kernel scope link src 10.0.0.1
 
-If *allowed-ips* (i.e. peer B's internal IP *192.168.58.1/32*) belongs to different subnets (and vice versa). They cannot connect to each other unless extra routes for *allowed-ips* on both sides are created.
+If peer's internal IP (be covered by *allowed-ips*) belongs to a different subnet (i.e. B's is *192.168.58.1/32*), they cannot connect to each other unless a special routes is created on both sides.
 
 ```bash
-# client side
+# client A
 root@tux ~ # ip route add 192.168.58.0/24 dev wg0 proto kernel scope link
-# server side
+# server B
 root@tux ~ # ip route add 10.0.0.0/24 dev wg0 proto kernel scope link
 ```
 
-If you would like a strict route, the IP range could be narrowed down to IP address like:
+For strict control, the range could be narrowed down to the internal IP address like:
 
 ```bash
+# client A
 root@tux ~ # ip route add 192.168.58.1/32 dev wg0 proto kernel scope link
 ```
 
 ## Iptables
 
-Please make sure relevant UDP ports and IPs are accepted by firewall. By far, a point-to-point link is established. We can check by *ping* each other's internal IP.
+Please make sure relevant UDP ports and IPs are accepted by firewall.
 
 ```bash
 root@tux ~ # iptables -A OUTPUT -d 23.45.67.89/32 -p udp -m udp --dport 39814 -m conntrack --ctstate NEW -j ACCEPT
 root@tux ~ # iptables -A INPUT -s 23.45.67.89/32 -p udp -m udp --sport 39814 -m conntrack --ctstate NEW -j ACCEPT
 ```
 
+By far, a point-to-point link is established. Peers can *ping* each other's internal IP.
+
 # [LAN access](https://www.ericlight.com/wireguard-part-two-vpn-routing.html)
 
-Up to now, we have successfully established a point-to-point connection between two peers. Roughly speaking, if client A wants to reach the whole remote LAN block (*10.0.0.0/24*), we should tune a few arguments.
+Up to now, we have successfully established a point-to-point connection between two peers. For client A's visit to remote LAN block (i.e. *10.0.0.0/24*), we should tune a few arguments.
 
 ## Remote arguments
 
-On the remote peer, turn on IPv4 packet forwarding:
+On the remote peer, turn on IPv4 packet forwarding. WireGuard on server forwards traffic from client to other LAN IPs.
+
+Permanent across reboots:
 
 ```bash
-root@tux ~ # sysctl -w net.ipv4.ip_forward=1
-# consistent across reboot
-root@tux ~ # echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/20-ip_forward.conf
-root@tux ~ # sysctl -p /etc/sysctl.d/20-ip_forward.conf
+root@tux / # echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/20-ip_forward.conf
+```
+
+For current session:
+
+```bash
+root@tux / # sysctl -w net.ipv4.ip_forward=1
+# -or-
+root@tux / # sysctl -p /etc/sysctl.d/20-ip_forward.conf
+# Check
+root@tux / # cat /proc/sys/net/ipv4/ip_forward
 ```
 
 Afterwards, we enable Proxy ARP on *wg0*:
@@ -210,7 +220,7 @@ root@tux ~ # echo 'net.ipv4.conf.wg0.proxy_arp=1' > /etc/sysctl.d/25-proxy_arp.c
 root@tux ~ # sysctl -p /etc/sysctl.d/25-proxy_arp.conf
 ```
 
-Client A cannot send ARP requests directly to ohter remote LAN devices (i.e. *10.0.0.3*). Hence, server B with Proxy ARP support can hanle client A's ARP requests.
+Client A cannot send ARP requests directly to ohter remote LAN devices (i.e. *10.0.0.3*). Hence, server B with Proxy ARP support can forward client A's ARP requests.
 
 ## Local arguments
 
@@ -220,17 +230,21 @@ Then we can connect to the remote LAN through WireGuard.
 
 # [VPN proxy](https://www.wireguard.com/netns/)
 
-Based on LAN access, we can route all local traffic through WireGuard tunnel for whatever reasons. Similarly, we want to tune a few arguments.
+Based on LAN access, we can route all client's traffic through WireGuard tunnel: to set up a proxy.
 
 ## Remote arguments
 
-Mostly, we should add two *iptables* rules to allow FORWARDING from *wg0* to *eth0* interface and set up NAT. That is to say, we set remote peer as [gateway](/2017/12/29/linux-as-gateway-router/) to the Internet.
+Mostly, we should set server B as a [gateway](/2017/12/29/linux-as-gateway-router/) to the Internet.
 
-Please make sure *net.ipv4.ip_forward* is turned as stated in "LAN Access" part.
+1. Allow FORWARD from *wg0* to *eth0* interface.
+2. Set up NAT.
+
+Although *net.ipv4.ip_forward* is enabled in "LAN Access" section, it can only forward traffic from and to the same interface (i.e. *wg0* on server B). To route client traffic to the Internet, Iptables FORWARD chain is required such that traffic traverses the gateway, namely forwarding traffic from one interface (i.e. incoming from *wg0*) to another (i.e. *eth0*).
 
 ```bash
+# Forward traffic to 'eth0'.
 root@tux ~ # iptables -A FORWARD -i wg0 -o eth0 -j ACCEPT
-#
+# Set up NAT
 root@tux ~ # iptables -t nat -A POSTROUTING -i wg0 -o eth0 -s 10.0.0.0/24 -j MASQUERADE
 # -or-
 root@tux ~ # iptables -t nat -A POSTROUTING -i wg0 -o eth0 -s 10.0.0.0/24 -j SNAT --to-source <ip-of-eth0>
@@ -240,7 +254,7 @@ We assume *eth0* is the remote interface that has Internet access.
 
 ## Local arguments
 
-To route all local traffic through the tunnel, we mainly resort to system routes. Specifically, we should route traffic through *wg0* except that of server's external IP. The key is to bypass *default* in the first place and route traffic to *wg0* first.
+To route all local traffic through the tunnel, we mainly resort to system routes. Specifically, we should route traffic through *wg0* except that of *endpoint* (server B's public IP). The key is to bypass *default* route and route traffic to *wg0* first.
 
 Of all the methods mentioned below, *wg-quick* is robust to peer roaming (endpoint change) as it does not require explicit endpoint routing to be added.
 
