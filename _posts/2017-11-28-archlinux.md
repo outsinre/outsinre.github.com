@@ -282,6 +282,8 @@ To make sure modification syntax is correct:
 user@tux ~ # awesome -k
 ```
 
+Please be noted that, awesome restart does not restart scripts in *autostart.sh*.
+
 ## xinit
 
 ### xserver

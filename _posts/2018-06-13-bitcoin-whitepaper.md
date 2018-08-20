@@ -42,13 +42,18 @@ block reward = block subsidy + transactions fees
 5. other peers verify and accept the block.
 6. other peers create a new block by replacing the 'Prev Hash' field and announce it.
 
-Conceptually, there is only one valid (of course longest) blockchain over the network. But techniquely, there exist mutiple blockchains simutaneouly due to node joining/leaving, network latency etc.
+Conceptually, there is only one valid (of course longest) blockchain over the network. But techniquely, there exist mutiple blockchains simutaneouly due to node joining/leaving, network latency, forks etc.
 
 # double-spending
 
 1. Timestamp is acutally not critical element since attacker node can forge local time. Instead, the longest blockchain is accepted while other candidates are discarded.
 2. Currently, user confirm a transaction if it buried over 6 (included) blocks. 6 blockes are enough to avoid catching up by powerful attacker. If an attacker double-spends coins by signing second transaction immediately (say one to Alice and another to Bob), only one of them (say that to Bob) is accepted when it is buried in a longer blockchain.
 3. It is not really the Proof of Work which prevents double spends but rather the blockchain itself which prevents double spends. The Proof of Work is just one aspect of the blockchain.
+4. Freshly-mined coins cannot be spent for 100 blocks. It is advisable to wait some additional time for a better chance that the transaction will be propagated by all nodes. Some older bitcoin clients won't show generated coinsas confirmed until they are 120 blocks deep.
+
+   Blockchain forks might cause oprphan blocks. Suppose a block owner spends the subsidy and rewards (newly coins), and get 6 confirmations. However, 6 is too small to guarantee that the new block would finally merged into mainnet. Maybe this block will be orphaned and newly coins disappear as well.
+
+   The key is that transaction with coinbase coins input has no source! We cannot track back! For transaction with old coins input, we can track back to other transaction output. Even though the block container become orphan, it will be confirmed by other block afterwards.
 
 https://bitcoin.stackexchange.com/q/61385
 

@@ -1,37 +1,96 @@
 ---
 layout: post
-title: Intel HD3000 Tearing/Corruption/Glitch
+title: Intel Graphics
 ---
 
-> It's long-lasting panic to handle Intel HD3000 graphics corruption, tearing, judder, glitch etc. Desktop GUI get stuck without any responding. MPV playback spreads dots all over. Worsely, switches between virtual terminal and X freeze the desktop applications.
+It's long-lasting panic to handle Intel HD3000 graphics corruption, tearing, judder, glitch etc. Desktop GUI get stuck without any responding. MPV playback spreads dots all over. Worsely, switches between virtual terminal and X freeze the desktop applications.
 
-1. */etc/X11/xorg.conf.d/20-intel.conf*:
+# Intel DDX
 
-   ```
-   Section "Device"
-           Identifier        "Intel Graphics"
-           Driver        "intel"
-   #       Option        "AccelMethod"        "uxa"
-           Option        "AccelMethod"        "sna"
-           Option        "TearFree"        "true"
-   #       Option        "DRI"        "2"
-           Option        "DRI"        "3"
-   EndSection
-   ```
+It is almost deprecated but has better performance. We should manually install the official relevant Intel driver:
 
-   Turn on *TearFree* for *sna*.
-2. Bump to lastest (even 9999).
+```bash
+root@tux ~ # emerge -avt x11-drivers/xf86-video-intel
+```
 
-   *xf86-video-intel*, *mesa*, *libdrm*, *libva*, and *libva-intel-driver* (even *xorg-server* and *xorg-drivers*) etc.
-3. Upgrade kernel to lastest.
-4. Extra Xorg arguments
+Then configure Xorg to adopt it:
 
-   ```bash
-   # startx -- vt7
-   ```
-   
-   Arguments after the two dashes are passed to Xorg server. Default OpenRC Xinit configuration is located under */etc/X11/xinit*. However it fails to set the correct virtual terminal (i.e. vt7) to start X, resulting in X freezes upon switches between X and virtual terminal.
+```
+# /etc/X11/xorg.conf.d/20-intel.conf
 
-   Alternatively, *vt7* can be passed to X server directly in *~/.xserverrc*:
+Section "Device"
+        Identifier        "Intel Graphics"
+        Driver        "intel"
+#       Option        "AccelMethod"        "uxa"
+        Option        "AccelMethod"        "sna"
+#       Option        "TearFree"        "true"
+        Option        "DRI"        "2"
+#       Option        "DRI"        "3"
+EndSection
+```
 
-   >exec /usr/bin/X -nolisten tcp "$@" vt7
+This driver is just maintained but no new features or bug fixes available.
+
+# Modesetting DDX
+
+This is now the default driver on newer Intel graphics chipsets for Gentoo. It is more generic and actively developed. As of *x11-base/xorg-drivers-1.19*, this has become the default for Gentoo.
+
+Firstly, enable global *glamor* USE:
+
+```
+# /etc/portage/make.conf
+
+USE="glamor"
+VIDEO_CARDS="intel i965"
+```
+
+Then, Xorg configuration:
+
+```
+# /etc/X11/xorg.conf.d/20-modesetting.conf
+
+Section "Device"
+    Identifier  "Intel Graphics"
+    Driver      "modesetting"
+    Option      "AccelMethod"    "glamor"
+    Option      "DRI"            "3"
+EndSection
+```
+
+Note, if both *20-intel.conf* and *20-modesetting.conf* are defined in */etc/X11/xorg.conf.d/*, the X server will attempt to load the files in alpha-numeric order. 
+
+# Xorg arguments
+
+```shell
+startx -- vt7
+```
+
+Arguments after the two dashes are passed to Xorg server. Default OpenRC Xinit configuration is located under */etc/X11/xinit*. However it fails to set the correct virtual terminal (i.e. vt7) to start X, resulting in X freezes upon switches between X and virtual terminal.
+
+Alternatively, *vt7* can be passed to X server directly in *~/.xserverrc*:
+
+```shell
+exec /usr/bin/X -nolisten tcp "$@" vt7
+```
+
+# ThinkPad Buttons
+
+https://wiki.gentoo.org/wiki/ACPI/ThinkPad-special-buttons
+
+# Screen brightness
+
+```
+# /etc/default/grub
+
+acpi_osi="!Windows 2012"
+# -or-
+acpi_osi="Linux"
+
+acpi_backlight="video"
+# -or-
+acpi_backlight="vendor"
+# -or-
+acpi_backlight="native"
+```
+
+At the time of writing this post, correct combination is `acpi_osi="!Windows 2012" acpi_backlight="video"`.

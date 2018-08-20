@@ -11,17 +11,15 @@ title: iproute2, iptables, ipset, dnsmasq
 1. We can set a MARK on packet and/or CONNMARK on connection with iptables.
 2. We can also set up iproute2 *rule* based on MARK.
 
-Policy routing could be accomplished based on IPs or domains. In the [WireGuad](/2018/03/20/wireguard/), we collect IP set periodically and add relevant routes which is not smart enough as we most IPs of non-CN set are not blocked by ISP. All traffic, by default, is routed to WireGuard except those within CN IP set - WireGuad blacklist.
+Policy routing could be accomplished based on IPs or domains. In the [WireGuad](/2018/03/20/wireguard/), we collect IP set periodically and add relevant routes which is not smart enough as we most IPs of non-CN set are not blocked by ISP. All traffic, by default, is routed to WireGuard except those within CN IP set - WireGuad blacklist. Another WireGuad blacklist routing scheme over *dnsmasq* is [dnsmasq-china-list](https://github.com/felixonmars/dnsmasq-china-list). I will leave it on your own.
 
-An improved method is generating a much smaller IP set based on blocked domains. We then route packets to those IPs through proxy or VPN while the remaining through default gateway. Then *dnsmasq* and *ipset* come to help. All traffic, by default, is routed as normal while those blocked by ISP to WireGuad - whitelist.
-
-Another WireGuad blacklist routing scheme over *dnsmasq* is [dnsmasq-china-list](https://github.com/felixonmars/dnsmasq-china-list). I will leave it on your own.
+An improved method is generating a much smaller IP set of blocked domains. We then route packets to those IPs through proxy or VPN while the remaining through default gateway. Then *dnsmasq* and *ipset* come to help. All traffic, by default, is routed as normal while those blocked by ISP to WireGuad - whitelist.
 
 # Terminology
 
-1. Route refers to entries that direct packets flow. Route table is a collection of routes.
-2. Rule decides which route table to look up.
-3. Iproute2, iptables, dnsmasq, and even ipset together do smart routing, namely policy routing.
+1. A route refers to entries that direct packets flow. Route table is a collection of routes.
+2. A rule decides which route table to look up.
+3. Iproute2, iptables, dnsmasq, and ipset together do smart routing, namely policy routing.
 
 # iproute2
 
@@ -66,11 +64,11 @@ ip addr add 10.0.0.2/24 dev wg0
 wg setconf wg0 /etc/wireguard/wg0.conf
 ```
 
-We will update it along with this post. As the previous post, add this to *local.d* startup service as *01-wg0.start* after all.
+I will update the script as this post progresses. As the previous post, add this to *local.d* startup service as *01-wg0.start*.
 
 # ipset/iptables
 
-IP sets are a framework inside the Linux kernel, which can be administered by the *ipset* utility. Depending on the type, an IP set may store IP addresses, networks, (TCP/UDP) port numbers, MAC addresses, interface names or combinations of them in a way, which ensures lightning speed when matching an entry against a set. We set up an IP set based on domains censorshipped by ISP.
+"IP set" is a framework inside the Linux kernel, which can be administered by userspace utility *ipset*. Depending on the type, an IP set may store IP addresses, networks, (TCP/UDP) port numbers, MAC addresses, interface names or combinations of them in a way, which ensures lightning speed when matching an entry against a set. We set up an IP set based on blocked domains on the fly.
 
 To make use of IP set, Netfilter (iptables) SET match extension (`NETFILTER_XT_SET`) and MARK target (`NETFILTER_XT_MARK`) are required. Meanwhile, enable IP set support as well, which can be done exclusively by kernel options `IP_SET` and submodules (`IP_SET_HASH_IP`, `IP_SET_HASH_NET` and `IP_SET_LIST_SET`) or enable `USE=modules`. Then install *net-firewall/ipset* package.
 
@@ -100,7 +98,7 @@ root@tux ~ # ipset -! del gfwlist 8.8.4.4; ipset list
 
 By default, *ipset* will throw an error errors when creating or adding sets or elements that do exist or when deleting elements that don't exist. `-!, -exist` will ignore the error.
 
-We Want all IPs associated with blocked domains be added to *gfwlist* set, which is impossible without the help of *dnsmasq* as the association vary frequently. That is to say, *gfwlist* set should be updated frequently as well. Especially, we want to add public DNS server IP (i.e. *8.8.8.8*) to *gfwlist*.
+We Want all IPs associated with blocked domains be added to *gfwlist* set, which is impossible without the help of *dnsmasq* as IPs vary frequently. That is to say, *gfwlist* set should be updated frequently as well. Especially, we want to add public DNS server IP (i.e. *8.8.8.8*) to *gfwlist* at first.
 
 Save current state
 
@@ -112,7 +110,7 @@ root@tux ~ # ipset save > /var/lib/ipset/rules-save
 root@tux ~ # rc-service ipset start
 ```
 
-By default, *ipset* service will load privous set while save current set on stop.
+By default, *ipset* service will load privous set on startup while save current set on stop.
 
 ## iptables
 
@@ -126,17 +124,19 @@ root@tux ~ # iptables -t mangle -C OUTPUT -j GFWLIST || iptables -t mangle -A OU
 root@TUX ~ # iptables -t mangle -A GFWLIST -m set --match-set gfwlist dst -j MARK --set-mark 51820
 ```
 
-A new chain GFWLIST is created for *gfwlist* set for better isolation. `-C` checks whether a rule exists or not (ignore the command line errors). Replace FORWARD with PREROUTING (covers the former) if it's OpenWrt. We add FORWARD here just in case of traffic coming from a 3rd interface.
+A new chain GFWLIST is created for *gfwlist* set for better isolation. `-C` checks whether a rule exists or not (ignore the command line errors). Replace FORWARD with PREROUTING (covers the former) if it's OpenWrt.
 
-### **[IMPORTANT](https://serverfault.com/q/248841)**
+Locally generated traffic does not require IP forward feature. We add FORWARD here just in case of traffic coming from outside.
 
-To be consise, we should enable IP forwarding and/or MASQUERADE/SNAT as post [linux as gateway router](/2017/12/29/linux-as-gateway-router/). Though that is a different story, they both routes traffic among different networks and/or different interfaces thereof.
+### [**IMPORTANT**](https://serverfault.com/q/248841)
+
+To be consise, we should enable IP forwarding and/or MASQUERADE/SNAT as post [linux as gateway router](/2017/12/29/linux-as-gateway-router/) writes. Though that is a different story, they both routes traffic among different networks and/or different interfaces thereof.
 
 I leave this part the end of the post: IP forwarding and MASQUERADE.
 
 # ip rule
 
-Now that, *gfwlist* set is marked in *iptables*, we will create new routing table for the mark. Before that we can define string name for the table:
+Now that, *gfwlist* set is marked in *iptables*, we will create a routing table for the mark. Before that we can define string name for the table.
 
 ```bash
 root@tux ~ # echo "51820	gfwlist" >> /etc/iproute2/rt_tables
@@ -166,13 +166,15 @@ ip link set up dev wg0
 
 # ip route
 ip route add 192.168.58.0/24 dev wg0
+# -or-
+#ip rule add 192.168.58.0/24 table gfwlist
 
 # ip rule
 ip rule add fwmark 51820 table gfwlist
 ip route add default dev wg0 table gfwlist
 ```
 
-This almost the final version.
+This almost the final version. As *192.168.58.0/24* is an LAN block, we'd better leave it in the main table.
 
 # dnsmasq
 
@@ -184,7 +186,7 @@ root@tux ~ # emerge -avt net-dns/dnsmasq
 root@tux ~ # rc-update add dnsmasq default
 ```
 
-Presented with blocked domains, *dnsmasq* resolves them into IPs which in turn are added into *gfwlist* IP set. *dnsmasq* now has *ipset* support and resolved IPs can be added to *gfwlist* automatically as long as we configure it properly.
+Presented with blocked domains, *dnsmasq* resolves them into IPs which in turn are added into the *gfwlist* set. *dnsmasq* now has *ipset* support and resolved IPs can be added to *gfwlist* automatically as long as we configure it properly.
 
 ## Configuration
 
@@ -247,7 +249,7 @@ resolv-file=/etc/dnsmasq.d/resolv.dnsmasq
 addn-hosts=/etc/dnsmasq.d/hosts.dnsmasq
 ```
 
-*Note*: *dnssec-check-unsigned* would drop DNS replies if upstream DNS servers does not support DNSSEC. Up to now, I cannot find any China DNS servers with DNSSEC support. Hence, *dnssec-check-unsigned* cannot resolve domains out of GFWlist.
+*dnssec-check-unsigned* would drop DNS replies if upstream DNS servers does not support DNSSEC. Up to now, I cannot find any China DNS servers with DNSSEC support. Hence, *dnssec-check-unsigned* cannot resolve domains out of GFWlist.
 
 If we want *dnsmasq* support newly created interface on the fly, we can use *bind-dynamic*:
 
@@ -307,6 +309,8 @@ wg setconf wg0 /etc/wireguard/wg0.conf
 
 # ip route
 ip route add 192.168.58.0/24 dev wg0
+# -or-
+#ip rule add 192.168.58.0/24 table gfwlist
 
 # ip rule
 ip rule add fwmark 51820 table gfwlist
@@ -323,6 +327,8 @@ ip rule del table gfwlist
 
 # ip route
 ip route del 192.168.58.0/24 dev wg0
+# -or-
+#ip rule del 192.168.58.0/24 table gfwlist
 
 # Remove WireGuad
 ip link del dev wg0 type wireguard
@@ -365,7 +371,7 @@ root@tux ~ # iptables -t nat -A POSTROUTING -o wg0 -m mark --mark 51820 -j SNAT 
 root@tux ~ # iptables -t nat -A POSTROUTING -o wg0 -m mark --mark 51820 -j MASQUERADE
 ```
 
-If it's OpenWrt (LAN interface and WAN interface), then we should enable IP forwarding:
+If it's OpenWrt (LAN interface and WAN interface), we should also enable IP forwarding:
 
 ```bash
 root@tux ~ # sysctl -w net.ipv4.ip_forward=1

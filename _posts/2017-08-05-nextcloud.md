@@ -622,6 +622,7 @@ Finally, refresh Nextcloud by *occ*:
 3. [contact birthdays with no year given are shown with (*1604) in calendar](https://github.com/nextcloud/server/issues/3084).
 
    The contacts app is using VCARD 3.0 at the moment.
+
 ## CalDVA
 
 1. Calendar app may remind incompatible *ics* format, then import without specifying an existing calendar and use *New Calendar* instead.
@@ -642,6 +643,11 @@ Finally, refresh Nextcloud by *occ*:
    >Contact group method: groups are per-contact categories 
 
    as Nextcloud Contact app does *not* support VCARD 4.0.
+
+   This is **NOT** true when DAVDroid upgrades to *1.11.4.1-ose* and choose,
+
+   >Groups are separate VCards
+
 2. [Davdroid does not sync at all](https://forums.bitfire.at/topic/1508/zte-nubia-requires-autostart). For synchronization, must turn on [*autostart*](https://davdroid.bitfire.at/faq/entry/miui-no-synchronization/) for Davdroid in system setting.
 3. If Davdroid address book or calendar does not show up stock Contacts/Calendar apps, try *True Contacts* and *Etar* instead.
 
@@ -777,6 +783,7 @@ There is no space between `-p` and Password.
 3. Both tools could be executed through the web interface and/or command line.
 
    Web-based *updater* would ask you if *Keep maintenance mode active*. Command line *upgrade* and web-based *upgrade* require *active* (enabled) and *inactive* (disabled) maintenance mode respectively.
+4. We may execute *upgrade* twice: one for Nextcloud itself and the other for apps.
 
 Here, I use command line for the whole update process.
 
@@ -787,12 +794,12 @@ Here, I use command line for the whole update process.
 ~ # su -s /bin/bash -c 'php ./updater/updater.phar' nginx
 # Should the "occ upgrade" command be executed? [Y/n] Y
 # Keep maintenance mode active? [y/N] N
-~ # su -s /bin/bash -c 'php occ status ' nginx
-~ # su -s /bin/bash -c 'php occ upgrade ' nginx (optionally)
+~ # su -s /bin/bash -c 'php occ status' nginx
+~ # su -s /bin/bash -c 'php occ upgrade' nginx (optionally)
 ~ # su -s /bin/bash -c 'php ./updater/updater.phar' nginx
 ```
 
-Please execute *occ upgrade* when prompted by *occ status*!
+Please execute *occ upgrade* when prompted by *occ status*, which is usually required when new app versions are available.
 
 ## miantenance mode
 
