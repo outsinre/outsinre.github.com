@@ -94,7 +94,7 @@ Linux kernel must enable IP set and then *net-firewall/ipset* is required. IP se
 
 An IP set based on blocked domains will be updated on the fly. To make use of the IP set, please enable Netfilter (Iptables) SET match extension (`NETFILTER_XT_SET`) and MARK target (`NETFILTER_XT_MARK`).
 
-# Ipset
+# Create Ipset
 
 Installation:
 
@@ -422,6 +422,10 @@ ip route del 192.168.58.0/24 dev wg0
 # Remove WireGuard
 ip link del dev wg0 type wireguard
 ```
+
+The VPN Proxy section in prior post, all traffic is routed through *wg0*. So it presents multiple methods (i.e. *suppress_prefixlength 0* from *wg-quick*) such that traffic to the server's public IP is routed through the *main* table instead.
+
+The scripts above do not require any of those methods as 'gfwlist' does not include that IP. More specifically, as long as Ipset is used, we can put the IP into a set (i.e. CN set) routed by *main* table. At the same time, make sure it is not covered by Ipsets routed through *wg0*.
 
 # Refs
 
