@@ -10,9 +10,9 @@ title: WireGuard
 
 [WireGuard](https://www.wireguard.com/) claim to utilizes state-of-the-art cryptography (Noise protocol framework, Curve25519, ChaCha20, Poly1305, BLAKE2, SipHash24, HKDF etc.) while provide a simple construction.
 
-It adds a virtual network interface and IP thereof. The interface is associated with a public/private key pair of which the public part serves as that interface's identity within WireGuard network. WireGuard encapsulates IP packets (application data payload) over UDP and forwards packets based on Cryptokey Routing (UDP VPN).
+It requires a virtual network interface and an IP assigned. The interface is associated with a public/private key pair of which the public part serves as the identity within WireGuard network. WireGuard encapsulates IP packets (application data payload) over UDP and forwards packets based on Cryptokey Routing- a UDP VPN.
 
-Originally, WireGuard is integrated into Linux kernel (module or built-in tree). Nowadays, it's under heady development to be cross-platform and widely deployable. The 6th reference (NAT-to-NAT VPN with WireGuard) is worth of reading.
+Originally, WireGuard is integrated into Linux kernel (module or built-in tree). Nowadays, it's under heady development to be cross-platform and widely deployable. The 6th reference (NAT-to-NAT VPN with WireGuard) is worth reading.
 
 # Installation
 
@@ -25,9 +25,9 @@ root@tux ~ # modinfo wireguard
 
 Optionally, we can build WireGuard as an [internal kernel module or as built-in](https://www.wireguard.com/install/) with `module-src` USE.
 
-*wireguard* (by *wg-quick*) depends on *openresolv* when we define custom DNS for WireGuard tunnel.
+*openresolv* is needed if *wireguard* (by *wg-quick*) defines custom DNS.
 
-# Conceptual Overview
+# Schema
 
 Before everything else, we should grasp the conceptual overview.
 
@@ -37,17 +37,17 @@ External IP | 192.168.0.123 | 23.45.67.89
 UDP port | 48574 | 39814
 Internal IP | 10.0.0.1/24 | 10.0.0.2/24
 
-External IP (i.e. *eth0*) is given by ISP or Wi-Fi router, without which you cannot reach the Internet. On the other hand, internal IP manually assigned to WireGuard interface is only privately valid within WireGuard network. UDP port associated with external IP is where WireGuard service listens for traffic.
+External IP (i.e. *eth0*) is given by ISP or Wi-Fi router, without which you cannot reach the Internet. On the other hand, internal IP manually assigned to WireGuard interface is privately valid only within WireGuard network. UDP port associated with external IP is where WireGuard service listens for traffic.
 
-WireGuard does not assume server side or client side. They differ in which side initiates UDP connections. For terminology consistency, I regard peer B with public IP as the server side while peer A censorshipped by ISP as the client side. In this case, the client sites behind a Wi-Fi router.
+WireGuard does not assume server side or client side. The peer initiates connections is regarded as the client. For terminology consistency, peer B with public IP is the server while peer A censorshipped by ISP is the client. In this post, peer A sites behind a Wi-Fi router (NAT).
 
-Clearly, Peer A, on the initiative, opens connections to peer B establishing a point-to-point tunnel. With a few arguments adjustment, peer A reaches the whole *10.0.0.0/24* LAN blocks (mostly machines without WireGuard) via B - the *gateway*. A step further, peer A can route all its traffic through B.
+Clearly, Peer A, on the initiative, opens connections to peer B establishing a point-to-point tunnel. With a few arguments adjustment, peer A reaches the whole remote block *10.0.0.0/24* such as devices without WireGuard but IP falling into that range. A step further, peer A can route all its traffic through B to the Internet.
 
-Firstly, we start off by establishing a point-to-point link. Without explicit notice, the following steps should be executed on both sides.
+Firstly, we start off by establishing a point-to-point link. Without explicit notice, the configuration steps should be executed on both sides.
 
-# Interface
+# Create WireGuard Interface
 
-Create Wireguard interface with *ip* that would automatically load *wireguard* module:
+Create Wireguard interface with Iproute2, which automatically loads *wireguard* module:
 
 ```bash
 root@tux ~ # modprobe -v wireguard (opt)
@@ -55,7 +55,7 @@ root@tux ~ # ip link add dev wg0 type wireguard
 root@tux ~ # ip link
 ```
 
-## Internal IP
+## Assign WireGuard IP
 
 Unless you have a really good reason, please assign internal IPs within the same subnet for client and server sides. Otherwise, you want extra routes on both sides.
 
@@ -64,7 +64,7 @@ root@tux ~ # ip addr add 10.0.0.1/24 dev wg0
 root@tux ~ # ip addr
 ```
 
-# Key pair
+# WireGuard Key pair
 
 Permission:
 
@@ -86,7 +86,7 @@ Optionally, this can be done all at once:
 root@tux ~ $ wg genkey | tee private-key | wg pubkey > public-key
 ```
 
-# WireGuard setup
+# Configure WireGuard Interface
 
 Arguments can be loaded from file.
 
@@ -99,22 +99,20 @@ root@tux ~ # wg [showconf wg0]
 ```
 
 1. Public key should be *base64* format like *V7g3kxzLATJ6edBybau1IrE3FOgLHajxxFfMZ+QOUyE=*.
-2. To traverse NAT or firewall, we need *persistent-keepalive* on client sides.
+2. To traverse NAT or firewall, *persistent-keepalive* is a must for peers behind NAT or firewall.
 
-   It's the peer behind NAT or firewall that requires *persistent-keepalive* argument.
+   For instance, client A sites behind NAT (i.e. Wi-Fi router), *persistent-keepalive* sends packets to other peers periodically to keep NAT mapping open.
+3. *endpoint* is the remote peer's external yet public IP and UDP port.
 
-   For instance, peer A sites behind NAT (i.e. Wi-Fi router), *persistent-keepalive* sends packets to peers periodically to keep NAT mapping open, without which, peers cannot reach A.
-3. *endpoint* is the peer's external yet public IP and UDP port.
-
-   Only client side that makes the initial connection requires *endpoint*. It's recommended to leave this argument out when setting the server side because it updates the endpoint value by examining from where correctly authenticated packets originates. Meanwhile, clients behind NAT and dial-up do not have fixed public IPs.
+   Only client sides that makes the initial connection require *endpoint*. It's recommended to leave this argument out when setting server sides because they update *endpoint* values by examining from where correctly authenticated packets originates. Meanwhile, clients behind NAT or dial-up do not even have fixed public IPs.
 4. *allowed-ips* is a list of comma-separated IP ranges to which WireGuard traffic can be sent and from which WireGuard traffic can be recevied.
 
-   For a simple point-to-point connection, it should be a peer's internal IP. To reach the whole LAN network, we set it to *10.0.0.0/24*).
+   For a simple point-to-point connection, it should be a peer's internal IP. To reach the whole LAN network, we set it to *10.0.0.0/24*.
 
-   The catch-all *0.0.0.0/0* and *::/0* match all addresses, routing all traffic through WireGuard. This is useful if we want to set up transparent proxy on client sides.
+   The catch-all *0.0.0.0/0* and *::/0* match all IPv4/6 addresses, routing all local traffic through WireGuard. This is useful if we want to set up transparent proxy on client sides.
 
-   Whatever schemas we choose, the peer's internal IP must be covered.
-5. We can set multiple peers.
+   Whatever network ranges we choose, the peer's internal IP must be covered.
+5. Multiple peers can be added.
 
 # Persistent Configuration
 
@@ -140,9 +138,7 @@ AllowedIPs = 10.0.0.2/32
 Endpoint = 23.45.67.89:39814
 ```
 
-# iproute2 iptables
-
-## Link up
+# WireGuard Link Up
 
 ```bash
 root@tux ~ # ip link set up dev wg0
@@ -152,13 +148,13 @@ root@tux ~ # ss -npelu
 
 A WireGuard UDP socket is created.
 
-## Route
+# Check WireGuard Route
 
 When internal IP is assigned, a system route is added automatically for that IP range like:
 
 > 10.0.0.0/24 dev wg0 proto kernel scope link src 10.0.0.1
 
-If peer's internal IP (be covered by *allowed-ips*) belongs to a different subnet (i.e. B's is *192.168.58.1/32*), they cannot connect to each other unless a special routes is created on both sides.
+If a remote peer's internal IP (be covered by *allowed-ips*) belongs to a different subnet (i.e. B's is *192.168.58.1/32*), they cannot connect to each other unless a special route is created on both sides.
 
 ```bash
 # client A
@@ -174,91 +170,92 @@ For strict control, the range could be narrowed down to the internal IP address 
 root@tux ~ # ip route add 192.168.58.1/32 dev wg0 proto kernel scope link
 ```
 
-## Iptables
+# Allow endpoint in Iptables
 
-Please make sure relevant UDP ports and IPs are accepted by firewall.
+Please make sure the *endpoint* is accepted by firewall.
 
 ```bash
 root@tux ~ # iptables -A OUTPUT -d 23.45.67.89/32 -p udp -m udp --dport 39814 -m conntrack --ctstate NEW -j ACCEPT
 root@tux ~ # iptables -A INPUT -s 23.45.67.89/32 -p udp -m udp --sport 39814 -m conntrack --ctstate NEW -j ACCEPT
 ```
 
-By far, a point-to-point link is established. Peers can *ping* each other's internal IP.
+## Final ping
 
-# [LAN access](https://www.ericlight.com/wireguard-part-two-vpn-routing.html)
+By far, a point-to-point link is established. Peer A and B can communicate with each other.
 
-Up to now, we have successfully established a point-to-point connection between two peers. For client A's visit to remote LAN block (i.e. *10.0.0.0/24*), we should tune a few arguments.
+# Set Server B as a [Gateway](/2017/12/29/linux-as-gateway-router/)
 
-## Remote arguments
+For client A's visit to remote LAN or even the Internet, server B should be set as a gateway involving the following steps:
 
-On the remote peer, turn on IPv4 packet forwarding. WireGuard on server forwards traffic from client to other LAN IPs.
+1. IP forwarding and *optional* Proxy ARP.
+2. Iptables FORWARD.
+3. Iptables NAT.
 
-Permanent across reboots:
-
-```bash
-root@tux / # echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/20-ip_forward.conf
-```
-
-For current session:
+## IP Forwarding
 
 ```bash
 root@tux / # sysctl -w net.ipv4.ip_forward=1
-# -or-
-root@tux / # sysctl -p /etc/sysctl.d/20-ip_forward.conf
-# Check
-root@tux / # cat /proc/sys/net/ipv4/ip_forward
 ```
 
-Afterwards, we enable Proxy ARP on *wg0*:
+Usually, IP forwarding is not needed for communication within LAN. However, if peer A want to reach *10.0.0.123* without WireGuard setup, it must depend on peer B's forwarding functionality. This is because A does not have direct Ethernet connection with *10.0.0.123*.
+
+Needless to say, to reach the Internet through server B, this is a must.
+
+## [Proxy ARP](https://www.ericlight.com/wireguard-part-two-vpn-routing.html) on Server Side
+
+Optionally, enable Proxy ARP on *wg0*. However, it seems this step could be omitted.
 
 ```bash
-root@tux ~ # sysctl -w net.ipv4.conf.all.proxy_arp=1
-# -or-
-root@tux ~ # sysctl -w net.ipv4.conf.wg0.proxy_arp=1
-# consistent across reboot
+# Permanent across reboots
 root@tux ~ # echo 'net.ipv4.conf.wg0.proxy_arp=1' > /etc/sysctl.d/25-proxy_arp.conf
-root@tux ~ # sysctl -p /etc/sysctl.d/25-proxy_arp.conf
 ```
 
-Client A cannot send ARP requests directly to ohter remote LAN devices (i.e. *10.0.0.3*). Hence, server B with Proxy ARP support can forward client A's ARP requests.
-
-## Local arguments
-
-All we need to midify is *allowed-ips* to cover the whole LAN "10.0.0.0/24* instead of *10.0.0.2/32*.
-
-Then we can connect to the remote LAN through WireGuard.
-
-# [VPN proxy](https://www.wireguard.com/netns/)
-
-Based on LAN access, we can route all client's traffic through WireGuard tunnel: to set up a proxy.
-
-## Remote arguments
-
-Mostly, we should set server B as a [gateway](/2017/12/29/linux-as-gateway-router/) to the Internet.
-
-1. Allow FORWARD from *wg0* to *eth0* interface.
-2. Set up NAT.
-
-Although *net.ipv4.ip_forward* is enabled in "LAN Access" section, it can only forward traffic from and to the same interface (i.e. *wg0* on server B). To route client traffic to the Internet, Iptables FORWARD chain is required such that traffic traverses the gateway, namely forwarding traffic from one interface (i.e. incoming from *wg0*) to another (i.e. *eth0*).
+For the current session:
 
 ```bash
-# Forward traffic to 'eth0'.
-root@tux ~ # iptables -A FORWARD -i wg0 -o eth0 -j ACCEPT
-# Set up NAT
-root@tux ~ # iptables -t nat -A POSTROUTING -i wg0 -o eth0 -s 10.0.0.0/24 -j MASQUERADE
+root@tux ~ # sysctl -p /etc/sysctl.d/25-proxy_arp.conf
 # -or-
-root@tux ~ # iptables -t nat -A POSTROUTING -i wg0 -o eth0 -s 10.0.0.0/24 -j SNAT --to-source <ip-of-eth0>
+root@tux ~ # sysctl -w net.ipv4.conf.all.proxy_arp=1
 ```
 
-We assume *eth0* is the remote interface that has Internet access.
+## Allow IP Forwarding through Iptables 
 
-## Local arguments
+```bash
+root@tux ~ # iptables -A FORWARD -i wg0 -o eth0 -j ACCEPT
+```
 
-To route all local traffic through the tunnel, we mainly resort to system routes. Specifically, we should route traffic through *wg0* except that of *endpoint* (server B's public IP). The key is to bypass *default* route and route traffic to *wg0* first.
+1. We assume *eth0* is the remote interface that has Internet access.
+2. You may also choose to ACCEPT `-i eth0 -o wg0`. For example, server B initiates connection to client A.
+
+## Set up Iptables NAT
+
+```bash
+root@tux ~ # iptables -t nat -A POSTROUTING -i wg0 -o eth0 -s 10.0.0.0/24 -j SNAT --to-source <IP-of-eth0>
+```
+
+1. Similarly, you may also enable `-i eth0 -o wg0`.
+
+# [LAN Access](https://www.ericlight.com/wireguard-part-two-vpn-routing.html)
+
+In order to reach the whole remote block "10.0.0.0/24* including devices without WireGuard, client A should set *allowed-ips* to cover the LAN range.
+
+# [VPN Proxy](https://www.wireguard.com/netns/)
+
+All client A's traffic goes through the WireGuard tunnel: to set up VPN routing as a proxy.
+
+Please be noted that all configurations in this section are done on client A.
+
+## *allowed-ips* Catch All
+
+Similar to LAN Access section above, client A should firstly set its *allowed-ips* to cover the catch-all block: *0.0.0.0/0* and/or *::/0*.
+
+## Update Client A Routes
+
+To route all local traffic through the tunnel, local routes should be updated. Specifically, all traffic except that of *endpoint* (server B's public IP) goes to *wg0*. The key is to route traffic to *wg0* before the *default* route entry. Therefore, the only route via *eth0* is for server's public IP.
 
 Of all the methods mentioned below, *wg-quick* is robust to peer roaming (endpoint change) as it does not require explicit endpoint routing to be added.
 
-### Replacing the default route
+### Replace the default Route
 
 ```bash
 user@root ~ # ip route del default
@@ -266,11 +263,12 @@ user@root ~ # ip route add default dev wg0
 user@root ~ # ip route add 23.45.67.89/32 via 192.168.0.1 dev wlan0
 ```
 
-### Override the default route
+### Override the default Route
 
-Override the default with two more specific rules that *add up in sum* to the default, but match before the default. We split the default into *0.0.0.0/1* and *128.0.0.0/1*.
+Override the default with two more specific rules that add up to the default but match before the default. We split the default into *0.0.0.0/1* and *128.0.0.0/1*.
 
 ```bash
+user@root ~ # ip route del default (optional)
 user@root ~ # ip route add 0.0.0.0/1 dev wg0
 user@root ~ # ip route add 128.0.0.0/1 dev wg0
 user@root ~ # ip route add 23.45.67.89/32 via 192.168.0.1 dev wlan0
@@ -278,28 +276,48 @@ user@root ~ # ip route add 23.45.67.89/32 via 192.168.0.1 dev wlan0
 
 ### Rule-based routing
 
-Without explicit *priority* value, new rules are **prepended** to old ones.
+The two methods above operates on route entries of the *main* routing table. Here, new routing rules and tables are created.
 
-A new route table is created for *wg0*.
+Notice: a routing rule is set for a specific routing table, namely to determine which routing table is consulted when routing. Without explicit *priority* value, new rules are *prepended* to old ones.
 
 ```bash
+# Traffic to server's public IP is routed on the main table.
 user@root ~ # ip rule add to 23.45.67.89/32 lookup main pref 30
-user@root ~ # ip rule add to all lookup 80 pref 40
-user@root ~ # ip route add default dev wg0 table 80
+
+# Create a new routing table for WireGuard to route all other traffic.
+user@root ~ # ip rule add to all lookup 51820 pref 40
+
+# Create the default route for the new table.
+user@root ~ # ip route add default dev wg0 table 51820
+# -or-
+user@root ~ # ip route add 0.0.0.0/0 dev wg0 table 51820
 ```
 
-#### wg-quick method
+1. Routing table 51820 is created for *wg0*. A routing table can be referenced by its number or string name.
+2. *pref* means priority of a routing table.
+3. The keyword *default* can be replaced with *0.0.0.0/0* that resembles the catch-all block of *allowed-ips*.
 
-A variant version implied by *wg-quick*:
+### *wg-quick* method
+
+All the three methods above requires explicit route for server's public IP. However, such configuration is subject to peer roaming where public IP varies without prior notice. *wg-quick* utilizes an improved but obscure rule-based method: *fwmark* and *suppress_prefixlength*.
 
 ```
+# Mark all traffic of *wg0*.
 user@root ~ # wg set wg0 fwmark 51820
-user@root ~ # ip -4 route add 0.0.0.0/0 dev wg0 table 51820
+
+# Create a new routing table for WireGuard to route not marked traffic.
 user@root ~ # ip -4 rule add not fwmark 51820 table 51820
+
+# Create the default route for the new table.
+user@root ~ # ip -4 route add 0.0.0.0/0 dev wg0 table 51820
+
+# Suppress routing tables that the prefix length of the longest match
+# is <= 0 in the main table.
+# Namely skip the default entry (prefix length is 0).
 user@root ~ # ip -4 rule add table main suppress_prefixlength 0
 ```
 
-The *ip rule* looks likes:
+The resulting routing rules look like:
 
 ```
 0:	from all lookup local 
@@ -309,33 +327,41 @@ The *ip rule* looks likes:
 32767:	from all lookup default
 ```
 
-`suppress_prefixlength 0` bypass the *default* entry (i.e. *default via 192.168.0.1 dev*) in *main* (254) table because *default* prefix is 0 (*0.0.0.0/0*). Say we have a rule *from all lookup table 42 suppress_prefixlength 16*. When network stack hits the rule and looks up route table 42 against packet destination IP as it would do to rule *from all lookup table 42*. When the longest match found, it checks the route entry's prefix length. If the prefix is longer than 16 bits, it proceeds as usual. Otherwise (shorter than or equal to 16 bits), network stack go to check the next rule.
+#### suppress_prefixlength
 
-That is to say, prefix length less than or equal to 16 is ignored (*suppressed*). Specially, 0 threshold just excludes the *default* entry of a table. `suppress_prefixlength` want to set a minimal prefix threshold!
+Recall that an IP can be divided into the *network part* and the *host part*. Prefix length means the length of the network part. For example, the prefix length of *192.168.0.100/24* is 24 while that of *12.34.56.78/32* is 32.
 
-Let's say, table 42 contains two entries:
+Say we have a rule *from all lookup table 42 suppress_prefixlength 16*. When network stack hits the rule, it looks up routes in table 42 against destination IP as it would do to rule *from all lookup table 42*. When the longest match is found in table 42, it checks the route entry's prefix length. If the prefix is longer than 16 bits, it proceeds as usual. Otherwise (shorter than or equal to 16 bits), network stack go to check the next routing rule. That is to say, prefix length (of longest match) less than or equal to 16 is ignored (*suppressed*).
+
+Here is a more detailed explanation. Suppose table 42 contains two entries:
 
 ```
+# prefix 8
 10.0.0.0/8 dev eth0
+# prefix 24
 10.1.1.0/24 dev eth1
 ```
 
-And the destination IP is *10.1.1.1*. Obviously, the 2nd entry matches (24 > 16 > 8) and routes the packet to *eth1*. If *10.2.1.1*, then the 1st entry has the longest prefix and, however, is less than 16. Table 42 does not route the packet.
+And the destination IP is *10.1.1.1*. Obviously, the 2nd entry matches (24 > 16 > 8) and routes the packet to *eth1*. If *10.2.1.1*, then the 1st entry has the longest match but prefix is less than or equal to 16 bits. Hence table 42 does not route the packet.
 
-Now let's go through an example to see how a DNS packet is routed through rules by *wg-quick*:
+`suppress_prefixlength` wants to set a minimal network prefix threshold for routes! The longer a prefix is, the more favored the route entry is: to avoid routes that are too general. Specially, threshold 0 just excludes the *default* entry (i.e. *default via 192.168.0.1 dev eth0*) as the prefix length is 0 (*0.0.0.0/0*). Therefore *suppress_prefixlength 0* above suppresses or skips the *default* entry in the *main* (254) table.
 
-1. Suppose DNS query on *www.bing.com* is sent to server is *8.8.8.8*.
-2. Network stack checks rule 32764, namely the *main* table.
+## Procedures Illustrated
 
-   The *default* entry matches *8.8.8.8* but with prefix 0. So it's ignored.
+Now let's go through an example to see how a packet is routed through rules of *wg-quick*:
 
-   Assume there does not exist other explicit entries for *8.8.8.8* in *main* table.
+1. *dig @8.8.8.8 www.bing.com* sends DNS query to *8.8.8.8*.
+2. Network stack hits rule 32764 and checks *main* table.
+
+   The *default* entry matches *8.8.8.8/32* but its prefix length is 0. So it's ignored.
+
+   Suppose there are not any other routes.
 3. Network stack checks the next rule 32765.
 
-   The DNS packet is not marked as 51820 and successfully routed to 51820 table.
+   The DNS packet is not marked as 51820 and successfully routed to 51820 table, going to *wg0*.
 4. WireGuard received the DNS query packet.
 
-   It encrypts the packet and forms a new UDP packet with destination IP as *endpoint* (server public IP). This newly generated packet has *fwmark 51820*.
+   It encrypts the packet and forms a new UDP packet with destination IP as *endpoint* (server's public IP). This newly generated packet has *fwmark 51820*.
 5. Network checks rule 32764 to route the new UDP packet.
 
    Similary the *default* entry is ignored.
@@ -344,39 +370,47 @@ Now let's go through an example to see how a DNS packet is routed through rules 
    Due to *fwmark 51820*, table *51820* is ignored either.
 5. Network stack checks rule 32766.
 
-   It's the *main* table again. This time there is no `suppress_prefixlength 0` limit. The WireGuard UDP packet is routed to *default* entry of *main* table, going out!
+   It's the *main* table again. This time there is no *suppress_prefixlength 0* limit. The WireGuard UDP packet is routed to *default* entry of *main* table, going out!
 
-# Smart routing
+# Policy Routing Based on Bare IPs
 
-In prevous section, we can route all traffic through WireGuard. The all-in-one routing method is somewhat inefficient. For example, we only want some traffic (i.e. that blocked by ISP) through WireGuard while the remaining through the *main* table.
+In VPN Proxy section, traffic with *fwmark* is routed through the *main* table while that without the mark is routed through *wg0* table. Therefore, all traffic by default goes through WireGuard. Such all-in-one routing method is somewhat inefficient.
+
+For example, we can route some traffic (i.e. to *www.baidu.com*) through the main table while some (i.e. to *www.block.com*) through *wg0* table. To achieve smart routing, we can mark former part while leaving the rest alone.
+
+To set *fwmark* for a packet, we can resort to Iptables and IP set with the help of *dnsmasq* like [this post](/2018/03/26/policy-routing/). Obviously, there is no need to modify the routing rules and tables above.
+
+The two methods followed are somewhat less elegant but deserves attention. They are mainly based on bare IPs.
 
 ## IP set
 
-Firstly, we divide IPs into two sets. traffic of one goes to WireGuard while the other not. IPs are from [APNIC Delegated List](http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest).
+Firstly, we divide IPs into two sets. Traffic of one goes to WireGuard while the other not. IPs are from [APNIC Delegated List](http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest).
 
 CN set:
 
 ```bash
-user@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > cnip.txt
+user@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > CNip.txt
 ```
 
 non-CN set:
 
 ```bash
-user@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/\|ipv4\|/ && ! /\|CN\|/ && ! /\|\*\|/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > wgip.txt
+user@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/\|ipv4\|/ && ! /\|CN\|/ && ! /\|\*\|/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > nonCNip.txt
 ```
 
-We can set a *cron* job to update IP set in the background.
+We can set a *cron* job to update IP set.
 
-## Static Route
+### Static Route Method
 
-One obvious method is adding all IPs of WireGuard set to server peer's *allowed-ips* while removing the catch-all *0.0.0.0/0*. *wg-quick* will create the relevant route entries for them. It looks like:
+One obvious method is adding all IPs of non-CN set to server peer's *allowed-ips* while removing the catch-all *0.0.0.0/0*. *wg-quick* will create the relevant routes in *main* table like:
 
 ```
 1.0.128.0/17 dev wg0 proto kernel scope link src 10.0.0.1
 ```
 
-Similarly we can also create route entries in *main* table for IPs of CN set:
+However, that would fluff the *allowed-ips* list and increase maintainance burden.
+
+Similarly we can also create routes in *main* table for IPs of CN set like:
 
 ```
 1.0.32.0/19 via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304
@@ -385,19 +419,19 @@ Similarly we can also create route entries in *main* table for IPs of CN set:
 I will choose the 2nd method as:
 
 ```bash
-root@tux ~ # xargs -a /etc/wireguard/cnip.txt -I'{}' ip route add '{}' via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304
+root@tux ~ # xargs -a /etc/wireguard/CNip.txt -I'{}' ip route add '{}' via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304
 # -or-
 root@tux ~ # wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' | xargs -I'{}' ip route add '{}' via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304
 ```
 
-1. Don't worry about route entries if you manually bring down WireGuad.
+1. Don't worry about route entries if you manually bring down WireGuard.
 2. We have *src* in the route entries, which would fail if *wlan0* or *wg0* do not have a IP the time we add routes (i.e. Wi-Fi router down).
 
    To simplify things, just remove *src* part. If you'd like, remove *metric* and *proto* as well.
 
 Read more on [chnroutes](https://github.com/fivesheep/chnroutes) and [chinaroute路由表更新命令](https://gist.github.com/lixingcong/286144b3a521add58d8dcf045700963f)
 
-## Geoip method
+### Geoip method
 
 Instead of IP set, we can make use of *geopip* extension of *iptables*. This is much more simpler.
 
@@ -405,23 +439,19 @@ Instead of IP set, we can make use of *geopip* extension of *iptables*. This is 
 root@tux ~ # iptables -t mangle -A OUTPUT -o wlan0 -m geoip --dst-cc CN -j MARK --set-mark 51820
 ```
 
-Recall the *ip rule* above, we packets with *51820* mark will routed by *main* table as usual.
+Recall the *ip rule* above, packets with *51820* mark will be routed by *main* table as usual.
 
-That's all!
+1. [Gentoo Geoip](http://worldend.logdown.com/posts/304263-gentoo-install-iptables-geoip)
+2. [woods/geoip.sh](https://gist.github.com/woods/25ef91a95da85bf10974)
+3. [GeoIP based filtering with iptables](https://daenney.github.io/2017/01/07/geoip-filtering-iptables.html)
 
-http://worldend.logdown.com/posts/304263-gentoo-install-iptables-geoip
-https://gist.github.com/woods/25ef91a95da85bf10974
-https://daenney.github.io/2017/01/07/geoip-filtering-iptables.html
+## Improve Local DNS Servers
 
-# Smart DNS
+Policy routing based on IPs highly depends on correct DNS resolving when visiting a domain. Accordingly, a custom clean DNS server (i.e. *8.8.8.8*) other than the one provided by ISP (prone to DNS poisoning) is required. This, in turn, would degrade performance when visiting domestic domains as custom DNS servers such as *8.8.8.8* usually return IPs geographically far.
 
-With Smart routing above, we route traffic based on IP set. However, that depends on correct DNS resolving when visit a domain. Hence, we usually want a custom DNS server (i.e. *8.8.8.8*) other than the one provided by ISP which (DNS poisoning).
+Consequentially, smart DNS service that resolves domestic domains as usual (geographically nearby) but censorshipped domains correctly. There exist such smart DNS servers around. Just make sure traffic to it goes to WireGuard! In other words, organize IPs of smart DNS servers into the non-CN set. The goal is to set system DNS servers such that they resolve domestic domains into IPs of CN set while foreign domains into IPs of non-CN set.
 
-This in turn, would degrade performance when visiting pages within the ISP as custom DNS usually returns IP of geographically far. Therefore, we should enable set up smart DNS service which resolves domains within ISP as usual (geographically nearby) but others censorshipped correctly. If you could find such a public DNS server, just make sure traffic to it goes to WireGuard.
-
-The goal is to set a DNS which resolve CN domains into CN IP set while non-CN domains into non-CN IP set.
-
-Alternatively, we could set up local DNS server like [ChinaDNS](https://github.com/shadowsocks/ChinaDNS). An better setup is illustrated in [iproute2, iptables, dnsmasq](/2018/03/26/policy-routing/)
+Alternatively, a smart DNS server can be set locally such like [ChinaDNS](https://github.com/shadowsocks/ChinaDNS). An far better method is illustrated in [iproute2, iptables, dnsmasq](/2018/03/26/policy-routing/)
 
 # wg-quick
 
@@ -435,7 +465,7 @@ root@tux ~ # wg-quick up wg0
 
 Please make sure */etc/wireguard/INTERFACE.conf* file exist.
 
-**ATTENTION**: The configuration file of *wg-quick* introduces a few extra items (i.e. internal IP, DNS) to format understood by *wg* in order to configure additional attribute of WireGuard interface. It handles the values that it understands, and then it passes the remaining ones directly to *wg setconf*. Especially, *wg-quick* update system route table automatically.
+*Attention*: the configuration file of *wg-quick* introduces a few extra arguments (i.e. internal IP, DNS) to format understood by *wg* in order to configure additional attributes. *wg-quick* handles the values that it understands, and then passes the rest directly to *wg setconf*. Especially, *wg-quick* update system route table automatically.
 
 Here is an client example:
 
@@ -453,13 +483,13 @@ AllowedIPs = 10.0.0.2/32
 Endpoint = 23.45.67.89:39814
 ```
 
-You can see that "Address", "DNS" and "SaveConfig" items are added. The DNS defined by *wg-quick* will replace that of system default by *resolvconf* of *net-dns/openresolv*.
+You can see that "Address", "DNS" and "SaveConfig" items are added. The DNS defined by *wg-quick* will replace local ones with help of *resolvconf*.
 
 Here is an server example:
 
 ```
 [Interface]
-Address = 10.0.0.1/24
+Address = 10.0.0.2/24
 PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 ListenPort = 39814
@@ -467,7 +497,7 @@ PrivateKey = [SERVER PRIVATE KEY]
 
 [Peer]
 PublicKey = [CLIENT PUBLIC KEY]
-AllowedIPs = 10.0.0.1/32  # This denotes the clients IP.
+AllowedIPs = 10.0.0.1/32  # Client's internal IP.
 ```
 
 # Booting
@@ -484,8 +514,8 @@ Up: */etc/local.d/01-wireguard.start*:
 echo "Starting WireGuard ..."
 /usr/bin/wg-quick up wg0
 
-echo "Adding cnip routes in background ..."
-xargs -a /etc/wireguard/cnip.txt -I'{}' ip route add '{}' via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304 >/dev/null 2>&1 &
+echo "Adding CNip routes in background ..."
+xargs -a /etc/wireguard/CNip.txt -I'{}' ip route add '{}' via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304 >/dev/null 2>&1 &
 ```
 
 The route part can be moved to */etc/dhcpcd.exit-hook* as well. But on my system, *dhcpcd* reports:
@@ -502,8 +532,8 @@ Down: */etc/local.d/01-wireguard.stop*:
 echo "Stopping WireGuard ..."
 /usr/bin/wg-quick down wg0
 
-echo "Removing cnip routes in background ..."
-xargs -a /etc/wireguard/cnip.txt -I'{}' ip route del '{}' via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304 >/dev/null 2>&1 &
+echo "Removing CNip routes in background ..."
+xargs -a /etc/wireguard/CNip.txt -I'{}' ip route del '{}' via 192.168.0.1 dev wlan0 proto dhcp src 192.168.0.123 metric 304 >/dev/null 2>&1 &
 ```
 
 By default, the *local* service will silence all output. Setting `rc_verbose=yes` will cause it to show which scripts were run and their output, if any.
@@ -529,7 +559,7 @@ Set a cron job to update IP set daily.
 ```bash
 root@tux ~ # crontab -u root -e
 #
-9  14  * * *     root    wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > /etc/wireguard/cnip.txt
+9  14  * * *     root    wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > /etc/wireguard/CNip.txt
 ```
 
 Alternatively, we can set a script file (executable) into */etc/cron.daily/*.
@@ -537,9 +567,9 @@ Alternatively, we can set a script file (executable) into */etc/cron.daily/*.
 ```bash
 #!/bin/sh
 
-#/etc/cron.daily/cnip
+#/etc/cron.daily/CNip
 
-wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > /etc/wireguard/cnip.txt
+wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > /etc/wireguard/CNip.txt
 ```
 
 # Notes

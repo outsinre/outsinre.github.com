@@ -33,7 +33,7 @@ If the box receives a packet with destination address not configured locally, it
 
 Read more at [IP Forwarding = when and why is this required?](https://serverfault.com/q/248841). It is basically for inter-network (except for VLAN router) packet transmission and not for that of inter-interface. If two interfaces are on the same network then IP forwarding is not involved (rare case though). Additionally, if one is virtual interface, IP forwarding is not needed either.
 
-For example, traffic between two devices on the same LAN does not require forwarding/routing at layer 3. Instead, it is handled at layer 2 by switches, access points of Wi-Fi router, or direct Ethernet wire.
+For example, traffic between two devices on the same network does not require forwarding/routing at layer 3. Instead, it is handled at layer 2 by switches, access points of Wi-Fi router, or direct Ethernet wire.
 
 The box should enable `net.ipv4.ip_forward`.
 
@@ -43,7 +43,7 @@ Once forwarded, the foreign packet will be examined by FORWARD chain of Iptables
 
 The box should allow forwarded packets to go outside by `-j ACCEPT`.
 
-## IPtables NAT
+## Iptables NAT
 
 Before a foreign packet is forwarded outside, the box should also modify the source IP to that of the outgoing interface (i.e. *eth0*), namely to set up NAT by Iptables.
 
