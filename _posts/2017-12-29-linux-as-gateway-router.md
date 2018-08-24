@@ -101,6 +101,8 @@ It is not unusual that home devices' (i.e. smartphone) default gateway is set to
 3. Enable Iptables NAT
 
    Turn on [MASQUERADE NAT](http://www.tldp.org/HOWTO/IP-Masquerade-HOWTO/index.html) on the box. Generally, MASQUERADE is required when many LAN private IPs' traffic sits behind and goes through a public single IP (i.e. Wi-Fi router), namely a many-to-one relationship.
+
+   Needless to say, Iptables NAT should be accomplished by `-t nat` table.
    
    ```bash
    root@tux / # iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE (poor NAT)

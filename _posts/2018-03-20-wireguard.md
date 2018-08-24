@@ -251,7 +251,7 @@ Similar to LAN Access section above, client A should firstly set its *allowed-ip
 
 ## Update Client A Routes
 
-To route all local traffic through the tunnel, local routes should be updated. Specifically, all traffic except that of *endpoint* (server B's public IP) goes to *wg0*. The key is to route traffic to *wg0* before the *default* route entry. Therefore, the only route via *eth0* is for server's public IP.
+To route all local traffic through the tunnel, local routes should be updated. Specifically, all traffic except that of *endpoint* (server B's public IP) goes to *wg0*. The key is to route traffic to *wg0* before the *default* route entry, such that only traffic to the server is routed through the *main* table.
 
 Of all the methods mentioned below, *wg-quick* is robust to peer roaming (endpoint change) as it does not require explicit endpoint routing to be added.
 
@@ -326,6 +326,10 @@ The resulting routing rules look like:
 32766:	from all lookup main 
 32767:	from all lookup default
 ```
+
+1. 32764: specific routes in the *main* table except the *default* is respected.
+2. 32765: all the rest goes to table 51820.
+3. 32766: traffic to the server goes to the *main* table including the *default*.
 
 #### suppress_prefixlength
 

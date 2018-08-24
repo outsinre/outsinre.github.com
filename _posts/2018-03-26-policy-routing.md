@@ -28,8 +28,8 @@ In a nutshell, blacklist, whitelist and their sub-list can combine to realize po
 
 1. Dnsmasq serves as a smart DNS service, maintaining domain sets: blocked domain set, non-blocked domain set, and sub-sets.
 2. A relevant kernel Ipset is created in respond to each domain set.
-3. Dnsmasq updates blocked Ipsets on the fly.
-4. Iptables set a MARK on Ipsets.
+3. Dnsmasq updates Ipsets on the fly.
+4. Iptables set MARK on Ipsets.
 5. Iproute2 rules and tables route packets based on Iptables MARK.
 
 # Iproute2 Tutorial
@@ -153,11 +153,12 @@ root@tux ~ # iptables -t mangle -C [ FORWARD | PREROUTING ]  -j GFWLIST || iptab
 root@tux ~ # sysctl -w net.ipv4.ip_forward=1 (opt)
 ```
 
-1. A new chain GFWLIST is created for 'gfwlist' IP set for better isolation.
-2. `-C` checks whether a rule exists or not.
-3. When a packet hits FORWARD chain, it has been routed already. Instead, PREROUTING is hit before routing.
+1. *mangle* table is used for specialized packet alteration.
+2. A new chain GFWLIST is created for 'gfwlist' IP set for better isolation.
+3. `-C` checks whether a rule exists or not.
+4. When a packet hits FORWARD chain, it has been routed already. Instead, PREROUTING is hit before routing.
 
-# Iproute2 Rule and Table
+# Iproute2 Rule and Table On the MARK
 
 Now that 'gfwlist' IP set is marked by Iptables, we will create a routing rule and table for the mark. Before that we can define a string identifier for the table.
 
@@ -186,7 +187,7 @@ root@tux ~ # ip route add 8.8.8.8 dev wg0 table main
 #!/bin/sh
 
 # Bring up WireGuard link
-ip link add wg0 type wireguad
+ip link add wg0 type wireguard
 ip link set mtu 1420 dev wg0
 ip addr add 10.0.0.2/24 dev wg0
 wg setconf wg0 /etc/wireguard/wg0_wg.conf
@@ -205,7 +206,7 @@ ip route add default dev wg0 table gfwlist
 1. In this case, the internal IP of client and server fall into different network block, namely *10.0.0.0/24* and *192.168.58.0/24*. As mentioned in the prior post, explicit route should be added on both sides.
 2. This is almost the final version. As *192.168.58.0/24* is an LAN block, we'd better leave it in the main table.
 
-# Set Up Dnsmasq
+# Set Up Dnsmasq to Update Ipset
 
 The key success of policy routing depends on the accuracy of 'gfwlist' IP set. So far, it is almost empty besides a few clean DNS elements. This is where Dnsmasq comes to help!
 
@@ -333,6 +334,14 @@ So far, Dnsmasq is done! However, we can't even *dig* blocked domains.
 
 To be clear, we should enable MASQUERADE or SNAT as post [linux as gateway router](/2017/12/29/linux-as-gateway-router/) writes. Please be noted policy routing on the client side do not require IP forwarding or Iptables FORWARD.
 
+Please refer to the Netfilter flow chart:
+
+![Packet flow in Netfilter and General Networking](http://inai.de/images/nf-packet-flow.svg)
+
+1. Locally generated packets are routed twice before going out. The first routing is exercized before entering the Iptables flow as *routing decision*. The second routing happens within the flow as "reroute check".
+2. Routing will not modify any field of packet!
+3. We can examine Iptables logs at different steps of the flow chart.
+
 Let us have a look at Iptables log on `-t nat OUTPUT` chain:
 
 ```bash
@@ -348,14 +357,11 @@ Here is an log sample:
 [20083.739408] IN= OUT=wlan0 SRC=192.168.0.100 DST=23.45.67.89 LEN=124 TOS=0x00 PREC=0x00 TTL=64 ID=14878 PROTO=UDP SPT=12345 DPT=54321 LEN=104 
 ```
 
-Please refer to the Netfilter flow chart:
+1. The first line. The packet DST is *8.8.8.8* with MARK as 0xca6c, which means this is the original DNS query packet. The *routing decision* successfully matched the *default* route in *main* table. Afterwards, the packet was set MARK by `-t mangle OUTPUT` chain. Then *reroute check* routed the packet against *gfwlist* rule and table according to the the MARK. This packet went to *wg0* and we get the log at `-t nat OUTPUT`.
+2. The second line. The original DNS packet was encapsulated into a new WireGuard UDP with DST *23.45.67.89* (server's public IP). The new packet was then sent to server.
+3. IN is empty as local generated packets do have associated any input interface.
 
-![Packet flow in Netfilter and General Networking](http://inai.de/images/nf-packet-flow.svg)
-
-1. The first line. The packet DST is *8.8.8.8* with MARK as 0xca6c, which means this is the original DNS query packet. The *routing decision* successfully matched the *default* route in *main* table. Afterwards, the packet was set MARK by `-t mangle OUTPUT` chain. Then *reroute check* routed the packet against *gfwlist* rule and table according the the MARK. Finally, a new packet is generated.
-2. The second line. The new packet DST is *23.45.67.89* (server's public IP), which suggests the the first packet was routed through WireGuard by *reroute check*. The new packet was then sent to server.
-
-However, the OUT and SRC of the first packet must be changed to *wg0* and *10.0.0.1* (internal IP of client A) after *reroute check* and before goint out, which is done with support from Iptables NAT. That is to say, the first packet should be transferred from:
+As mentioned earlier, routing does not change a packet. However, the OUT and SRC of the first packet should be changed to *wg0* and *10.0.0.1* (internal IP of client A) after *reroute check* and before encapsulation by WireGuard. This can be achieved by Iptables NAT. That is to say, the first packet should be transferred from:
 
 ```
 # Before 'reroute check'.
@@ -365,13 +371,11 @@ OUT=wlan0 SRC=192.168.0.100 DST=8.8.8.8
 to
 
 ```
-# After 'reroute check'.
+# After 'reroute check' and before encapsulation.
 OUT=wg0 SRC=10.0.0.1 DST=8.8.8.8 MARK=0xca6c
 ```
 
 Without Iptables NAT support, reply packets from the server would be abandoned. Suppose the VPN server receives the second line and replies with DST *192.168.0.100* and DPT 12345. The reply packet is then passed to *wg0* in accord with DPT where WireGuard listens for traffic. Upon receiving the packet, *wg0* abandons it immediately as DST does not match *10.0.0.1* - malformed packet.
-
-We can also examine Iptable log on other Iptables tables and chains in accordance with the figure above. For example, before `-t mangle OUTPUT` the first packet is not marked.
 
 Iptables NAT usually is executed in `-t nat POSTROUTING` chain with MASQUERADE or SNAT target.
 
@@ -380,6 +384,8 @@ root@tux ~ # iptables -t nat -A POSTROUTING -o wg0 -m mark --mark 51820 -j SNAT 
 # -or-
 root@tux ~ # iptables -t nat -A POSTROUTING -o wg0 -m mark --mark 51820 -j MASQUERADE
 ```
+
+We can also examine Iptable logs in other tables and chains in accordance with the figure above. For example, before `-t mangle OUTPUT` the first packet is not marked. After `-t nat POSTROUTING`, the first packet is modified accordingly.
 
 Up to now, policy routing with WireGuard whitelist ('gfwlist' Ipset) is done! We can add extra Ipsets and relevant Iproute2 routing rules and tables. Of course, new Ipsets should also be marked by Iptables.
 
