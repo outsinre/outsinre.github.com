@@ -251,7 +251,7 @@ Similar to LAN Access section above, client A should firstly set its *allowed-ip
 
 ## Update Client A Routes
 
-To route all local traffic through the tunnel, local routes should be updated. Specifically, all traffic except that of *endpoint* (server B's public IP) goes to *wg0*. The key is to route traffic to *wg0* before the *default* route entry, such that only traffic to the server is routed through the *main* table.
+To route all local traffic through the tunnel, the *default* route in *main* table should be bypassed as it catches all traffic. Specifically, all traffic except that of *endpoint* (server B's public IP) goes to *wg0*. The key is to route traffic to *wg0* before the *default* route entry, such that only traffic to the server is routed through the *main* table.
 
 Of all the methods mentioned below, *wg-quick* is robust to peer roaming (endpoint change) as it does not require explicit endpoint routing to be added.
 
@@ -284,7 +284,7 @@ Notice: a routing rule is set for a specific routing table, namely to determine 
 # Traffic to server's public IP is routed on the main table.
 user@root ~ # ip rule add to 23.45.67.89/32 lookup main pref 30
 
-# Create a new routing table for WireGuard to route all other traffic.
+# All the rest is routed through WireGuard table.
 user@root ~ # ip rule add to all lookup 51820 pref 40
 
 # Create the default route for the new table.
@@ -305,7 +305,7 @@ All the three methods above requires explicit route for server's public IP. Howe
 # Mark all traffic of *wg0*.
 user@root ~ # wg set wg0 fwmark 51820
 
-# Create a new routing table for WireGuard to route not marked traffic.
+# Not marked traffic is routed through WireGuard table.
 user@root ~ # ip -4 rule add not fwmark 51820 table 51820
 
 # Create the default route for the new table.

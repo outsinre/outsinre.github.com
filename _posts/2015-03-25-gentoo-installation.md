@@ -487,7 +487,7 @@ title: Gentoo Installation
    7. Append current kernel to Grub menu.
    8. Although we are on the old kernel, *@module-rebuild* knows how to re-install external kernel modules for the new kernel as long as */usr/src/linux* symlink pointing the new kernel source tree (see *eselect kernel list*).
 
-      If we are re-compiling the kernel, this is not a requirement.
+      Optionally, this step could be omitted if we are re-compiling the kernel, or we have done *make modules_prepare*.
 7. Linux firmware
 
    Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces.
