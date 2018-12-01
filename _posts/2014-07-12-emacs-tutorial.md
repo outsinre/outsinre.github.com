@@ -1,7 +1,10 @@
 ---
 layout: post
-title: Emacs Configuration
+title: Emacs Tutorial
 ---
+
+1. toc
+{:toc}
 
 # README
 
@@ -12,20 +15,20 @@ title: Emacs Configuration
 
 # ABCs
 
-For Emacs installation, refer to [Emacs installation](http://jimgray.tk/2014/09/14/emacs-installation/).
+Read [Emacs installation](http://jimgray.tk/2014/09/14/emacs-installation/) first.
 
 1. Emacs consists of 90% Elisp codes and 10% core C codes. The tiny C part interact with the underlying operating system ABI, while of the Elisp part is the most important - *Elisp interpreter*.
 
-    Almost all of our development and configuration are transferred to the interpreter and finally to the C core.
-2. All files are buffers, but NOT all buffers are files. Some buffers just a throw-away area to temporarily store snippets from a log file, or manipulate text, or whatever your reason — you just create and name a new buffer.
+   Almost all of our development and configuration are transferred to the interpreter and finally to the C core.
+2. All files are buffers, but NOT all buffers are files. Some buffers just a throw-away area to temporarily store snippets from a log file, or manipulate text, or whatever your reason - you just create and name a new buffer.
 3. In Emacs, *the buffer is the data structure*. This is an extremely powerful concept because the very same commands you use to move around and edit in Emacs are almost always the same ones you use behind-the-scenes in Elisp.
 
-    Commands/key bindings/function calls on the front end UI are nearly the same ones in the background Elisp. Hence, when you write Elisp codes to specialize/customize Emacs, you use nearly the same set of commands/functions as you edit a file/buffer.
-4. It’s important to remember that each buffer can have just one major mode. Minor modes, by contrast, are typically optional add-ons that you enable for some (or all) of yourbuffers.
+   Commands/key bindings/function calls on the front end UI are nearly the same ones in the background Elisp. Hence, when you write Elisp codes to specialize/customize Emacs, you use nearly the same set of commands/functions as you edit a file/buffer.
+4. It’s important to remember that each buffer can have just one major mode. Minor modes, by contrast, are typically optional add-ons that you enable for some (or all) of your buffers.
 
-    The major mode is always displayed in the modeline. Some minor modes are also displayed in the modeline, but usually only the ones that alter the buffer or how you interact with it in some way.
+   The major mode is always displayed in the modeline. Some minor modes are also displayed in the modeline, but usually only the ones that alter the buffer or how you interact with it in some way.
 
-## frame VS window
+# frame VS window
 
 Emacs 中两个概念容易混淆，即 frame 和 window。
 
@@ -41,56 +44,57 @@ Emacs is a sophisticated self-documenting editor. Every facet of Emacsis searcha
 
 1. The *info* Manual
 
-    ```lisp
-    M-x: info
-    or
-    C-h i
-    ```
-    Emacs’s own manuals (and indeed, all manuals in the  ecosystem) are written in TeXinfo. Emacs’s info manual contains more than just topics relating to Emacs. By default, the info browser will index all the other info manuals installed on your system. It even shows info manual of Nano editor which is absolutely not part of Emacs.
+   ```lisp
+   M-x: info
+   or
+   C-h i
+   ```
 
-    We usually use *info* command in terminal shell. That's it. The only difference is Emacs has its own TeXinfo viewer. If you want to focus on Emacs manual only without distraction, press `m: Emacs` after `C-h i`.
+   Emacs’s own manuals (and indeed, all manuals in the  ecosystem) are written in TeXinfo. Emacs’s info manual contains more than just topics relating to Emacs. By default, the info browser will index all the other info manuals installed on your system. It even shows info manual of Nano editor which is absolutely not part of Emacs.
 
-    This help utility is to get you into a thorough explanation of Emacs things, which is nearly the same as you type `info` on the command line including the navagation key bindings.
+   We usually use *info* command in terminal shell. That's it. The only difference is Emacs has its own TeXinfo viewer. If you want to focus on Emacs manual only without distraction, press `m: Emacs` after `C-h i`.
+
+   This help utility is to get you into a thorough explanation of Emacs things, which is nearly the same as you type `info` on the command line including the navagation key bindings.
 2. Apropos
 
-    Emacs has an extensive apropos system that works in much the same way as *apropos* does on the command line. The apropos system is especially useful if you’re not entirely sure what you’re looking for or you just know a few characters. There is a variety of niche commands that only search particular aspects of Emacs’s self-documenting internals. And all of apropos supports regular expressions.
+   Emacs has an extensive apropos system that works in much the same way as *apropos* does on the command line. The apropos system is especially useful if you’re not entirely sure what you’re looking for or you just know a few characters. There is a variety of niche commands that only search particular aspects of Emacs’s self-documenting internals. And all of apropos supports regular expressions.
 
-    The most common usage is:
+   The most common usage is:
 
-    ```lisp
-    C-h a
-    or
-    M-x: apropos-command
-    ```
-    shows all commands (and just the commands, *not* functions) that match a given pattern. For example, you are hunting for commands with "coding", just type `C-h a` followed by `*-coding-*`. There are a wide variaty of *apropos* commands to find useful information. Use `C-h a apropos` to check the list.
+   ```lisp
+   C-h a
+   or
+   M-x: apropos-command
+   ```
 
-    If you’re unsure of what you are looking for – maybe you only have part of a name, or you just remember a bit of the documentation – then apropos is a tool that can help you.
+   shows all commands (and just the commands, *not* functions) that match a given pattern. For example, you are hunting for commands with "coding", just type `C-h a` followed by `*-coding-*`. There are a wide variaty of *apropos* commands to find useful information. Use `C-h a apropos` to check the list.
+
+   If you’re unsure of what you are looking for – maybe you only have part of a name, or you just remember a bit of the documentation – then apropos is a tool that can help you.
 3. The Describe System
 
-    If you know what you’re looking for, then describe will explain what it is. Every facet of Emacs – be it code written in elisp or the core layer written is C – is accessible and indexed through the describe system. From keys, to commands, character sets, coding systems, fonts, faces, modes, syntax tables and more — it’s all there, neatly categorized.
+   If you know what you’re looking for, then describe will explain what it is. Every facet of Emacs – be it code written in elisp or the core layer written is C – is accessible and indexed through the describe system. From keys, to commands, character sets, coding systems, fonts, faces, modes, syntax tables and more — it’s all there, neatly categorized.
 4. To use the three Help Utilities, you always use the prefix key `C-h` (which is called *the help character*) followed by a *help option*.
 
-    1. `C-h f`: help on *fuction*.
-    2. `C-h v`: help on *variable*.
-    3. `C-h m`: help on loaded *modes*.
-    4. `C-h P`: help on *packages*.
-    5. `C-h k`: help on *key* bindings.
-    6. `C-h t`: builtin basic *tutorial*.
-    7. `C-h w`: check the key bindings of a function.
-    8. `C-h c`: check the function of a key binding.
-    9. `C-x 8 C-h`: display the list of key bindings starting with`C-x 8`.
-    10. `C-h C`: to see detailed coding system of current buffer. Though the *modeline* does give us some hints on *coding*, but it is somewhat unclear and obsecure sometimes. `C-h h` to see what language environment your Emacs support.
+   1. `C-h f`: help on *fuction*.
+   2. `C-h v`: help on *variable*.
+   3. `C-h m`: help on loaded *modes*.
+   4. `C-h P`: help on *packages*.
+   5. `C-h k`: help on *key* bindings.
+   6. `C-h t`: builtin basic *tutorial*.
+   7. `C-h w`: check the key bindings of a function.
+   8. `C-h c`: check the function of a key binding.
+   9. `C-x 8 C-h`: display the list of key bindings starting with`C-x 8`.
+   10. `C-h C`: to see detailed coding system of current buffer. Though the *modeline* does give us some hints on *coding*, but it is somewhat unclear and obsecure sometimes. `C-h h` to see what language environment your Emacs supports.
+
 5. `C-h C-h` to display the list of *help options*.
 
-    **Use the help system to teach you how to get help**.
-
-## Killing and Deleting
+# Killing and Deleting
 
 1. Kill VS. Delete
 
-    *Killing*: put the killed text in a ring for recovery; usually earase a text blcok.
+   *Killing*: put the killed text in a ring for recovery; usually earase a text blcok.
 
-    *Delete*: no ring involved; erase a character or several whitespaces at a time.
+   *Delete*: no ring involved; erase a character or several whitespaces at a time.
 2. `C-k`  (kill-line) kills all the text from point up to the end of the line.
 3. `C-Shift-<DEL>` kills tall text from point up to the beginning of the line.
 4. `M-x kill-whole-line` kills the whole line.
@@ -100,23 +104,23 @@ Emacs is a sophisticated self-documenting editor. Every facet of Emacsis searcha
 1. `C-d` (the <delect> key) deletes the next character. `<DEL>` ( the <Backspace> key) deletes the the previous character.
 1. `M-a` and `M-e` moves the beginning and end of *sentence*. But Emacs assumes you begin your sentences with *two whitespaces* after a period.
 
-    There is long history of debate over the *sentence spacing*. Two whitespaces are mostly used in old days when typewriter was heavily used. While, in modern computer society, *proportional/vector fonts* are good at isolating sentences by one space with a period, especially on the WEB.
+   There is long history of debate over the *sentence spacing*. Two whitespaces are mostly used in old days when typewriter was heavily used. While, in modern computer society, *proportional/vector fonts* are good at isolating sentences by one space with a period, especially on the WEB.
 
-## Useful keys
+# Useful keys
 
 1. `C-x h`: select all.
 2. `C-g`: during execution of Lisp code, this character causes a quit directly. You can use ‘C-g’ to cancel any action you have started.
 
-    For some actions, you may need to repeat this. (If even this doesn’t clear things up entirely, then try `C-]` or `M-x top-level`; that should do the trick.)
+   For some actions, you may need to repeat this. (If even this doesn’t clear things up entirely, then try `C-]` or `M-x top-level`; that should do the trick.)
 
-    `ESC-ESC-ESC`: three consective ESC key. This command can exit an interactive command such as `query-replace (M-%)`,can clear out a prefix argument or a region,can get out of the minibuffer or other recursive edit,cancel the use of the current buffer (for special-purpose buffers),or go back to just one window (by deleting all but the selected window).
+   `ESC-ESC-ESC`: three consective ESC key. This command can exit an interactive command such as `query-replace (M-%)`,can clear out a prefix argument or a region,can get out of the minibuffer or other recursive edit,cancel the use of the current buffer (for special-purpose buffers),or go back to just one window (by deleting all but the selected window).
 3. `M-:`: evaluate lisp statement.
 4. `C-x TAB`: Indent all lines starting in the region. If called interactively with no prefix argument, activate a transient mode in which the indentation can be adjusted interactively by typing <left>, <right>, <S-left>, or <S-right>.
 
-    You can prefix it with `C-u C-x TAB` or `C-u 6 C-x TAB`. Alternatively, after `C-x TAB`, use left/right key to move the selected region.
+   You can prefix it with `C-u C-x TAB` or `C-u 6 C-x TAB`. Alternatively, after `C-x TAB`, use left/right key to move the selected region.
 5. `M-m`: move point to the first non-whitespace character on this line.
 
-## Universay arguments
+# Universal arguments
 
 Negative arguments add directionality to commands; digits add repetition or change how a command works.
 
@@ -125,18 +129,16 @@ Negative arguments add directionality to commands; digits add repetition or chan
 3. `C-- 6 a`; `M-- 6 a`; `C-M-- 6 a`.
 4. `M-- M-d` and `C-- M-d` both delete the previous word.
 
-    But it the former is more convenient as there is no need to switch our finger from Ctrl to Alt.
+But it the former is more convenient as there is no need to switch our finger from Ctrl to Alt. Refer to *Universal Arguments* part of *Mastering Emacs* book.
 
-Refer to *Universal Arguments* part of *Mastering Emacs* book.
-
-## Frame and Window operation
+# Frame and Window operation
 
 1. `C-x 0`: delete *active* window; `C-x o`: switch window.
 2. If other window will be accessed frequently, `C-x o` is tedious. Emacs support sending commands directly into another window by prefix `C-x 4`.
 
-    Use `C-x 4 C-h` to display the list. For example, `C-x 4 C-f` will open a file in another window and switch to that window immediately. If we omit the `4`, then it will be command opening file in current window.
+   Use `C-x 4 C-h` to display the list. For example, `C-x 4 C-f` will open a file in another window and switch to that window immediately. If we omit the `4`, then it will be command opening file in current window.
 
-### Frame management
+## Frame management
 
 Most of the time, on X system with one monitor, we only open up ONE frame. But what if the monitor big enough and/or two monitors exist?
 
@@ -150,7 +152,7 @@ Yes, we can make use of more frames at a time. The prefix key used for frames is
 | C-x 5 1 | Delete other frames |
 | C-x 5 C-f | Finds a file in the other frame window |
 
-## Move by S-expression
+# Move by S-expression
 
 *s-expression* (*sexp*) can be called *balanced expression* especially in programming languages i.e. Python, C, Java etc, typically include:
 
@@ -172,7 +174,7 @@ The first two commands support *sexp* fully. The next four work on balanced expr
 
 *attention*: these key bindings might not work in Emacs due to *fcitx* occupying them.
 
-## Undo/Redo
+# Undo/Redo
 
 This section describe the builtin Undo/Redo, NOT the *undo-tree* (see configuration below) package.
 
@@ -223,102 +225,100 @@ This adding/re-adding happens ad infinitum. It takes a little getting used to, b
 1. [(emacs)Undo](http://www.cs.cmu.edu/cgi-bin/info2www?%28emacs%29Undo)
 2. [How do you 'redo' changes after 'undo' with Emacs?](http://stackoverflow.com/q/3527142)
 
-## Changing encoding
+# Changing encoding
 
 1. C-x C-m/RET r (M-x: revert-buffer-with-coding-system): if Emacs fails to display file contents.
-2. C-x C-m/RET f (M-x: set-buffer-file-coding-system): changing file's encoding when C-x C-s
-3. C-x C-m/TET c <encoding> C-x C-w (M-x: universal-coding-system-argument): changing file's encoding immediately by saving as a new file.
+2. C-x C-m/RET f (M-x: set-buffer-file-coding-system): set file's encoding when C-x C-s is invoked.
+3. C-x C-m/RET c <encoding> C-x C-w (M-x: universal-coding-system-argument): changing file's encoding immediately by saving as a new file.
 
 # Configuration
 
-> It has been a long time since this post and many updates were made to optimize performance. For latest configuration, refer to the GitHub repository instead. The configuration Elisp cdoes are self-explanatory full of comments and easy to start off.
+> It has been a long time since this post and many updates were made to optimize performance. For latest configuration, refer to the GitHub repository. The configuration Elisp is self-explanatory, full of comments and easy to start off with.
 
-1. Everything is synced on GitHub repository - *.emacs.d*
-1. Plugin/package/library are the same meaning for Emacs, all regarded as *.el* or *.elc* files. These words are used losely, and do NOT have TECHNICAL definitions in Elisp.
+1. Everything is synced on GitHub repository.
+1. Plugin/package/library are the same thing to Emacs, all regarded as *.el* or *.elc* files. These words are used losely, and do NOT have TECHNICAL definitions in Elisp.
 
-    Emacs 一般称“插件”为 "package" 或者 "library" 。本质上，它们都提供一堆定义好的函数，来实现一些操作，进而实现某个功能。这里多说几句。在 Emacs 中，连移动光标这种最底层的操作都有对应的函数。比如，你在 Emacs 中可以键入 `C-f` 来将光标向右移动一个字符，同时也可键入 `M-x forward-char` 来实现。任何复杂的功能，比如给文档生成一个目录，都可以被分解为一个个操作，或者说调用一个个函数，而这些函数顺序执行下来功能就得到了实现。
+   Emacs 一般称“插件”为 "package" 或者 "library" 。本质上，它们都提供一堆定义好的函数，来实现一些操作，进而实现某个功能。这里多说几句。在 Emacs 中，连移动光标这种最底层的操作都有对应的函数。比如，你在 Emacs 中可以键入 `C-f` 来将光标向右移动一个字符，同时也可键入 `M-x forward-char` 来实现。任何复杂的功能，比如给文档生成一个目录，都可以被分解为一个个操作，或者说调用一个个函数，而这些函数顺序执行下来功能就得到了实现。
 2. 当 Emacs 想要加载某个插件时，归根到底需要定位并运行一个（也许是一些）脚本文件，那个脚本里定义了实现插件功能所需的变量和函数。Emacs 将它们转变为可供自己使用的对象（Elisp object），放到运行环境中等待调用。而脚本自身还可以在内部进一步加载其他脚本。
-4. If edit *init* files manually, pay attention the *lisp* grammar. They can also be modified by *M-x: customize variable*. Remember to *C-x C-s* saving the updates.
-5. If Emacs is running at *daemon* server mode, updates to *init* files does **Not** take effect until *daemon* server is re-launched!
+4. When editing *init* files manually, pay attention the *lisp* grammar. They can also be modified by *M-x: customize variable* GUI.
+5. If Emacs is running as *daemon* server mode, updates to *init* files does **Not** take effect until *daemon* server is re-launched!
 
-    So when configuring Emacs, use *emacs* instead of C/S mode *emacsclient*.
-6. *Common Lisp* needs a slash ending of directory name while *Emacs Lisp* does not.
-
-*reference*:
+   So when configuring Emacs, use *emacs* instead of C/S mode *emacsclient*.
+6. *Common Lisp* requires a slash ending of directory name while *Emacs Lisp* does not.
 
 1. [purcell](https://github.com/purcell/emacs.d)
 2. [master emacs in one year](https://github.com/redguardtoo/mastering-emacs-in-one-year-guide)
 2. [Emacs配置文件——新手攻略](https://www.zybuluo.com/qqiseeu/note/17692)
 
-## Loading
+# Loading
 
-其实，连整个 Emacs 的启动都可以概括为一句话：加载一系列脚本。只不过这些脚本有的是内置的（built in），有的是你安装的插件包含的，有的是你自己写的。
+其实，连整个 Emacs 的启动都可以概括为一句话：加载一系列脚本。只不过这些脚本有的是内置的（built in），有的是你安装的插件包含的，有的是你自己写的。配置emacs归根结底是在配置各种各样的脚本。
 
-**配置emacs归根结底是在配置各种各样的脚本。**
-
-Emacs Lisp's Library System: What's `require`, `load`, `load-library`, `load-file`, `autoload`, `feature`?
+Emacs Lisp's Library System: What's *require*, *load*, *load-library*, *load-file*, *autoload*, *feature*?
 
 1. Interactive lisp function.
 
-    `C-h f interactive`: specify a way of parsing arguments for interactive use of a function. *interactive* can be invoked by `M-x:` and prompts user to input arguments on-the-fly. It declares that the function in which it appears is a *command*, and that it may therefore be called interactively (via `M-x` or by entering a key sequence bound to it). 
+   `C-h f interactive`: specify a way of parsing arguments for interactive use of a function. *interactive* can be invoked by `M-x:` and prompts user to input arguments on-the-fly. It declares that the function in which it appears is a *command*, and that it may therefore be called interactively (via `M-x` or by entering a key sequence bound to it). 
 
-    Most of time, they are bound to shortcut keys, which is optional.  Without *interactive*, a function can only be called *programmatically* (in Elisp *.el* sources), not from `M-x` nor via key-binding.
+   Most of time, they are bound to shortcut keys, which is optional.  Without *interactive*, a function can only be called *programmatically* (in Elisp *.el* sources), not from `M-x` nor via key-binding.
 
-    *interactive* functions are functions and therefore not constrained to mini-buffer. Instead, they can be called *programmatically* by supplying a default *interactive* argument (if really need) in Elisp sources.
+   *interactive* functions are functions and therefore not constrained to mini-buffer. Instead, they can be called *programmatically* by supplying a default *interactive* argument (if really need) in Elisp sources.
 
 2. *load-file* - interactive
 
-    Load one specific file by *full file path*. “.el” or “.elc” file name extentions are not auto added, but “.gz” is. Use this when you don't want emacs to guess the file name extention of “.el”, “.elc” or none.
+   Load one specific file by *full file path*. “.el” or “.elc” file name extentions are not auto added, but “.gz” is. Use this when you don't want emacs to guess the file name extention of “.el”, “.elc” or none.
 
-    So basically the file can be put anywhere as long as you remember the file path.
+   So basically the file can be put anywhere as long as you remember the file path.
 
-    ```lisp
-    M-x: load-file "~/elisp/foo-bar.el"
-    or
-    (load-file "~/elisp/foo-bar.el")
-    ```
-    *load-file* is not a smart way to pull in libraries as you have to remember and offer each library full path on call.
+   ```lisp
+   M-x: load-file "~/elisp/foo-bar.el"
+   or
+   (load-file "~/elisp/foo-bar.el")
+   ```
+
+   *load-file* is not a smart way to pull in libraries as you have to remember and offer each library full path on call.
 3. *load*
 
-    Usually it is better to install files in your *load-path*, though. Load a file by searching through directories of *load-path*. Argument should be just the file name without full path.
+   Usually it is better to install files in your *load-path*, though. Load a file by searching through directories of *load-path*. Argument should be just the file name without full path.
 
-    If file extension is omitted, it will auto add *.elc* for compiled version if exist, or add *.el*, or with *.gz*. Preference is given to the *compiled* (*.elc*) version.
+   If file extension is omitted, it will auto add *.elc* for compiled version if exist, or add *.el*, or with *.gz*. Preference is given to the *compiled* (*.elc*) version.
 4. *load-libarry* - interactive
 
-    It is the *interactive* version of *load*. Can be called by	`M-x` (or key bindings if exists) to read arguments.
+   It is the *interactive* version of *load*. Can be called by	`M-x` (or key bindings if exists) to read arguments.
 5. *require*
 
-    ```lisp
-    (require 'foo-bar "the-library-file" <soft-flag>)
-    ```
+   ```lisp
+   (require 'foo-bar "the-library-file" <soft-flag>)
+   ```
     A library declares that it provides a certain *foo-bar* feature as follows:
 
-    ```lisp
-    (provide 'foo-bar)
-    ```
-    Checks the variable *features*, if symbol *foo-bar* is not a member of that list, *foo-bar* is not loaded yet. If *foo-bar* is not loaded, load it from *the-library-file* (which defined the *foo-bar* feature).
-    If *the-library-file* is omitted, the printname of *foo-bar* is used as the file name, and *load* will try to load this name appended with the suffix *.elc* or *.el*, in that order. *the-library-file* (file name) is guessed from the feature name - *foo-bar* in this case.
+   ```lisp
+   (provide 'foo-bar)
+   ```
 
-    Load a package if it has not already been loaded. It won't load a library twice. It is similar to other lang's “require” or “import”.
+   Checks the variable *features*, if symbol *foo-bar* is not a member of that list, *foo-bar* is not loaded yet. If *foo-bar* is not loaded, load it from *the-library-file* (which defined the *foo-bar* feature).
+
+   If *the-library-file* is omitted, the printname of *foo-bar* is used as the file name, and *load* will try to load this name appended with the suffix *.elc* or *.el*, in that order. *the-library-file* (file name) is guessed from the feature name - *foo-bar* in this case.
+
+   Load a package if it has not already been loaded. It won't load a library twice. It is similar to other lang's “require” or “import”.
 6. *autoload*
 
-    Load a file only when a function is called - on-demand loading. Associate a function name with a file path. When the function is called, load the file, and execute the function. 
+   Load a file only when a function is called - on-demand loading. Associate a function name with a file path. When the function is called, load the file, and execute the function. 
 
-    The *autoload* facility lets you register the existence of a function or macro, but put off loading the file that defines it. The first call to the function automatically loads the proper library, in order to install the real definition and other associated code, then runs the real definition as if it had been loaded all along. Autoloading can also be triggered by looking up the documentation of the function or macro.
+   The *autoload* facility lets you register the existence of a function or macro, but put off loading the file that defines it. The first call to the function automatically loads the proper library, in order to install the real definition and other associated code, then runs the real definition as if it had been loaded all along. Autoloading can also be triggered by looking up the documentation of the function or macro.
 
-    这样做的一个好处是，避免在启动 Emacs 时因为执行过多代码而效率低下，比如启动慢，卡系统等。想象一下，如果你安装了大量的有关 Python 开发的插件，而某次打开 Emacs 只是希望写点日记，你肯定不希望这些插件在启动时就被加载，让你白白等上几秒，也不希望这些插件在你做文本编辑时抢占系统资源（内存，CPU 时间等）。所以，一个合理的配置应该是，当你打开某个 Python 脚本，或者手动进入 Python 的编辑模式时，才加载那些插件。
+   这样做的一个好处是，避免在启动 Emacs 时因为执行过多代码而效率低下，比如启动慢，卡系统等。想象一下，如果你安装了大量的有关 Python 开发的插件，而某次打开 Emacs 只是希望写点日记，你肯定不希望这些插件在启动时就被加载，让你白白等上几秒，也不希望这些插件在你做文本编辑时抢占系统资源（内存，CPU 时间等）。所以，一个合理的配置应该是，当你打开某个 Python 脚本，或者手动进入 Python 的编辑模式时，才加载那些插件。
 
-    Loading a file triggered by calling a function defined is in it.
+   Loading a file triggered by calling a function defined is in it.
 7. All the loading facilities at the end call the *load* function to do their job. Refer to [how programs do loading ](http://www.gnu.org/software/emacs/manual/html_node/elisp/How-Programs-Do-Loading.html).
 
-## Package/Library/Feature names are not Managed
+# Package/Library/Feature names are not Managed
 
 There is no absolute relation between any concept of package/library/feature/autoload facilities and the file name. If there exists relation, it's just a programming convention.
 
 By convention, if a elisp file name is *xyz-mode.el*, it OFTEN provides a lisp symbol *xyz-mode* as its feature name (if it does at all), and the command to invoke the mode is OFTEN named *xyz-mode*. Sometimes the *-mode* part is omitted in any of {file name, feature symbol name, command name}.
 
 This is only a lose convention. There are a lot exceptions. For example:
-
 
 - The file *lisp-mode.el* provides the symbol *lisp-mode* as feature, and is invoked by a command named *emacs-lisp-mode*.
 - The *cua-base.el* file provides symbols *cua-base* and *cua* as features, and is invoked by a command named *cua-mode*.
@@ -327,13 +327,13 @@ This is only a lose convention. There are a lot exceptions. For example:
 
 All the above means, you could have a file named *Joe-xyz-mode_v2.1.el*, which provides a feature named *abc*, while the command name to activate it may be *opq*, and it might be displayed in mode line as *OPQ helper*. And, this file can be considered as a *package* or *library*.
 
-## buffer-local variable
+# buffer-local variable
 
 1. If a variable is *buffer-local*, means the value is specific to that current buffer (where the cursor blinks). Different buffers might have different values. *default-directory* and *tab-width* are such variables.
 2. Use `setq` to change current value, which will overrides global default value. For example, on Linux, Emacs's global default *default-directory* is *~/* for all buffers. After evaluating `(setq default-directory "~/workspace/")`, the *default-directory* of current buffer is changed to *~/workspace/*, while other buffers' (without `setq`) *default-directory* remains to be global default *~/*.
 3. Usually in Emacs *init.el*, we can change the global default *default-directory* by `(setq-default default-directory "/path/")`. `(setq default-directory "/path/")` in *init.el* only change the very first buffer's *default-directory* on startup.
 
-## elpa
+# elpa
 
 1. Compared to install libraries manually, *elpa* automates the process.
 2. `M-x: list-packages`，会启动 Emacs 自带的插件管理器 elpa (Emacs lisp package archive)。例如找到 auctex，按下 `i` 标记为安装，再按 `x` 开始安装。除了 Emacs 官方的 elpa，还有添加 melpa，org 等 package archives。
@@ -347,7 +347,7 @@ All the above means, you could have a file named *Joe-xyz-mode_v2.1.el*, which p
     ```
     are appended after that. The first line is to disable load of installed packages after all init files. The 2nd line is to load those packages. That is to load installed packages earlier as usual.
 
-## Find init
+# Find init
 
 Normally Emacs uses the environment variable HOME to find .emacs; that’s what ‘~’ means in a file name. If .emacs is not found inside ~/ (nor .emacs.el), Emacs looks for ~/.emacs.d/init.el (which, like ~/.emacs.el, can be byte-compiled). 
 
@@ -358,26 +358,30 @@ More precisely, Emacs first determines which user’s init file to use. It gets 
 1. After startup, use `C-h v user-init-file` to see your init file location.
 2. If during configuration, you modified and want to verify init files:
 
-    ```lisp
-    M-x: load-file
-    M-x: load-library
-    ```
-    To load *HOME/.emacs.d/init.el*. If current buffer is your init file config, use:
+   ```lisp
+   M-x: load-file
+   M-x: load-library
+   ```
 
-    ```lisp
-    M-x: eval-buffer
-    ```
-    You can usually just re-evaluate the changed region. Mark the region of ~/.emacs that you've changed, and then use:
+   To load *HOME/.emacs.d/init.el*. If current buffer is your init file config, use:
 
-    ```lisp
-    M-x: eval-region
-    ```
-    Simple code can be evaluated in minibuffer as well:
+   ```lisp
+   M-x: eval-buffer
+   ```
 
-    ```lisp
-    M-: list-code-here
-    ```
-    More read on [How can I reload .emacs after changing it?](http://stackoverflow.com/q/2580650).
+   You can usually just re-evaluate the changed region. Mark the region of ~/.emacs that you've changed, and then use:
+
+   ```lisp
+   M-x: eval-region
+   ```
+
+   Simple code can be evaluated in minibuffer as well:
+
+   ```lisp
+   M-: list-code-here
+   ```
+
+   More read on [How can I reload .emacs after changing it?](http://stackoverflow.com/q/2580650).
     
 ## init directory
 
@@ -444,7 +448,7 @@ Run `$ tree -a -C -F -L 2 -I *~ .emacs.d/`:
     └── goto-chg/
 ```
 
-## Load init
+# Load init
 
 1. When Emacs starts, it first load *init.el* which in turn load package-specific *init-file-name.el* configs under *lisp/*.
 
@@ -459,7 +463,7 @@ Run `$ tree -a -C -F -L 2 -I *~ .emacs.d/`:
         If this package is manually installed, then the config file needs more lisp codes to adjust performance. However, if it installed by builtin package managers, most configs are done in *elpa/pkg-name-version/*. Just a few arguments is enough.
     2. Add `(require 'init-pkg-name)` in *init.el*.
 
-## init
+## init.el
 
 The very first feature loaded on startup.
 
@@ -503,14 +507,15 @@ The very first feature loaded on startup.
 
 1. *init* itself is also a feature. End with
 
-    ```lisp
-    (provide 'init)
-    ```
-    to provide feature. A feature must be *provide*d before *require*d.
+   ```lisp
+   (provide 'init)
+   ```
+
+   to provide feature. A feature must be *provide*d before *require*d.
 2. Check Emacs version and give warning/error if too old.
 3. *user-emacs-directory* refers to *~/.emacs.d/* where '~' is determined by user environment variable `HOME`.
 
-    `C-h v user-emacs-directory` shows the exact path.
+   `C-h v user-emacs-directory` shows the exact path.
 4. Reduce garbage collection on startup from [purcell](https://github.com/purcell/emacs.d).
 5. Pay attention to *require* orders, i.e. *init-site-lisp* comes before *init-elpa*.
 
@@ -641,18 +646,18 @@ Emacs Python Development Environment.
 
 1. *elpy* requires *pyvenv* - python virtualenv support which is a global minor mode.
 
-    So when programming, Emacs is aware of and can activate/deactivate virutalenv! By default, *pyvenv* mode is turned globally on Emacs startup.
+   So when programming, Emacs is aware of and can activate/deactivate virutalenv! By default, *pyvenv* mode is turned globally on Emacs startup.
 
-    Mainly through command `M-x: pyvenv-activate` and `M-x: pyvenv-deactivate`.
+   Mainly through command `M-x: pyvenv-activate` and `M-x: pyvenv-deactivate`.
 2. In order to support *elpy* better, we need to `pip install` several backends like *rope*, *jedi*, *flake8*, *importmagic*, *autopep8* in *virtualenv*.
 
-    Install these Python packages in *virtualenv* instead of in global environment. Do NOT mess true system up.
+   Install these Python packages in *virtualenv* instead of in global environment. Do NOT mess true system up.
 
-    Details refer to [python virtualenv](http://www.jimgray.tk/2015/03/05/python-virtualenv/).
+   Details refer to [python virtualenv](http://www.jimgray.tk/2015/03/05/python-virtualenv/).
 3. When programing with Python, first `M-x: pyvenv-activate` to enable virtualenv in Emacs.
 4. Use `M-x: elpy-config` to check elpy configs.
 
-*reference*:
+Reference:
 
 1. [elpy github](https://github.com/jorgenschaefer/elpy)
 2. [readdoc elpy](https://elpy.readthedocs.org/en/latest/index.html)
@@ -665,18 +670,19 @@ Emacs now has a builtin *ido.el* which just focuses on files and buffers. Howeve
 
 1. First enable builtin *ido*:
 
-    ```lisp
-    ;;; Enable ido in as many places as possible
+   ```lisp
+   ;;; Enable ido in as many places as possible
 
-    (ido-mode 1)
-    (ido-everywhere 1)
-    ```
+   (ido-mode 1)
+   (ido-everywhere 1)
+   ```
+
 2. Enable *ido-ubiquitous*:
 
-    ```lisp
-    ; (require 'ido-ubiquitous)
-    (ido-ubiquitous-mode 1)
-    ```
+   ```lisp
+   ; (require 'ido-ubiquitous)
+   (ido-ubiquitous-mode 1)
+   ```
 
 ## init-goto-chg
 
@@ -723,16 +729,17 @@ Emacs's builtin undo/redo (see above *Undo/Redo* section) is confusing and not i
 2. Download and extract evil source to *site-lisp/evil/*.
 3. Add
 
-    ```lisp
-    ;;; Load evil mode
+   ```lisp
+   ;;; Load evil mode
 
-    ;;; evil requires undo-tree and goto-chg which must be
-    ;;; loaded at first.
+   ;;; evil requires undo-tree and goto-chg which must be
+   ;;; loaded at first.
 
-    ;; evil was installed manually, so require it first before enabling it.
-    (require 'evil)
-    (evil-mode 1)
-    ```
+   ;; evil was installed manually, so require it first before enabling it.
+   (require 'evil)
+   (evil-mode 1)
+   ```
+
     By setting `(evil-mode 1)`, Emacs enters evil mode by default. `C-z` to switch between evil and normal Emacs.
 
 ## init-win-nt
@@ -754,6 +761,7 @@ Mainly special options for Windows system.
 
 (provide 'init-win-nt)
 ```
+
 There are many other Windows configs, but integrated into other features, like AucTeX PDF viewer in *init-auctex*.
 
 ## init-chinese-pyim
@@ -762,43 +770,46 @@ There are many other Windows configs, but integrated into other features, like A
 
 1. Install through *melpa* repository.
 
-    In *\*scratch\** buffer input:
+   In *\*scratch\** buffer input:
 
-    ```lisp
-    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-    ```
-    Temporarily enable *melpa* repository.
+   ```lisp
+   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+   ```
 
-    ```lisp
-    M-: eval-buffer
-    M-x: list-packages
-    ```
-    Find *chinese-pyim* and install it.
+   Temporarily enable *melpa* repository.
+
+   ```lisp
+   M-: eval-buffer
+   M-x: list-packages
+   ```
+
+   Find *chinese-pyim* and install it.
 2. Configure
 
-    ```
-    (setq pyim-dicts
-	  ; 主词库
-	  '((:name "bigdict"
-	     :file #("/home/zachary/.emacs.d/pyim/dicts/pyim-bigdict.pyim" 14 23
-		     (face flx-highlight-face)
-		     23 25
-		     (face flx-highlight-face))
-	     :coding utf-8-unix
-	     :dict-type pinyin-dict)
-	    ; guesss dict 两个联想词库
-	    (:name "guessdict-a"
-	     :file "/home/zachary/.emacs.d/pyim/dicts/pyim-guessdict-a.gpyim"
-	     :coding utf-8-unix
-	     :dict-type guess-dict)
-	    (:name "guessdict-b"
-	     :file "/home/zachary/.emacs.d/pyim/dicts/pyim-guessdict-b.gpyim"
-	     :coding utf-8-unix
-	     :dict-type guess-dict)))
-    ```
-    里面的 `14 23 (face flx-highlight-face)` 好像可以去掉，不知道是不是因为我的 Emacs 里其它插件自动调整的。
+   ```
+   (setq pyim-dicts
+	 ; 主词库
+	 '((:name "bigdict"
+	    :file #("/home/zachary/.emacs.d/pyim/dicts/pyim-bigdict.pyim" 14 23
+		    (face flx-highlight-face)
+		    23 25
+		    (face flx-highlight-face))
+	    :coding utf-8-unix
+	    :dict-type pinyin-dict)
+	   ; guesss dict 两个联想词库
+	   (:name "guessdict-a"
+	    :file "/home/zachary/.emacs.d/pyim/dicts/pyim-guessdict-a.gpyim"
+	    :coding utf-8-unix
+	    :dict-type guess-dict)
+	   (:name "guessdict-b"
+	    :file "/home/zachary/.emacs.d/pyim/dicts/pyim-guessdict-b.gpyim"
+	    :coding utf-8-unix
+	    :dict-type guess-dict)))
+   ```
 
-    It's important to configure a good phrase file (词库）. *chinese-pyim* phrase file *.pyim* is much the same as *.org* format except that it uses `-` instead of `'`. Both *org* and *pyim* are normal text file. More on *org* phrase file, refer to [fcitx](http://jimgray.tk/2016/01/01/fcitx-chinese-pyim/) post. By *org* phrase file, we can generate both phrase file for *fcitx .mb* and *chinese-pyim .pyim* format. But pay attention to their difference.
+   里面的 `14 23 (face flx-highlight-face)` 好像可以去掉，不知道是不是因为我的 Emacs 里其它插件自动调整的。
+
+   It's important to configure a good phrase file (词库）. *chinese-pyim* phrase file *.pyim* is much the same as *.org* format except that it uses `-` instead of `'`. Both *org* and *pyim* are normal text file. More on *org* phrase file, refer to [fcitx](http://jimgray.tk/2016/01/01/fcitx-chinese-pyim/) post. By *org* phrase file, we can generate both phrase file for *fcitx .mb* and *chinese-pyim .pyim* format. But pay attention to their difference.
 3. Refer to [github chinese-pyim](https://github.com/tumashu/chinese-pyim). 
 
 ## init-sdcv
@@ -809,7 +820,7 @@ A console version of *StarDict*.
 
 这个插件可以让你用 TAB 键自动补齐代码。
 
-### Emacs 24.3 Chinese characters on Windows
+# Emacs 24.3 Chinese characters on Windows
 
 系统为英文版 Windows RTM X64。在使用 Emacs 24.3 打开文件时候，发现中文字体部分显示为方块。通过对编码的设置依然不能解决问题。在网上查找解决方案的时候，发现有人提到通过设置字体能够解决这个问题。于是仔细看了下 Emacs 里的那些个方块，里面的内容其实是中文的编码，由于不能显示对应的文字，Emacs 于是原样将字符编码给打印出来。能够显示的中文也很丑，歪歪扭扭。进入控制面板里查看了下字体，发现中文该有的字体都有，只是不同的是，英文版下字体自然也是英文名称。于是根据谷歌的搜索，在 init 文件的最开始写入如下内容：
 
@@ -828,9 +839,9 @@ To change the default directory by either of the two:
 1. Either edit the Emacs shortcut, in the `start in` field, fill in your default working directory.
 2. Or add:
 
-    ```lisp
-    (setq default-directory "E:/workspace")
-    ```
+   ```lisp
+   (setq default-directory "E:/workspace")
+   ```
 
 # TD
 
