@@ -180,7 +180,7 @@ if the tag at point is a reference. The the tag at point is a
 
 Other useful functions are:
 
-
+--- | ---
 ggtags-find-definition | find definition tags
 --- | ---
 ggtags-find-reference | find reference tags
@@ -190,13 +190,19 @@ ggtags-find-other-symbol | find tags that have no definitions
 ggtags-find-tag-regexp | find definition tags by *regexp*
 --- | ---
 ggtags-query-replace | do a query & replace in all files found in a search
+--- | ---
+ggtags-find-file | find a file from all the files indexed by `gtags`
+--- | ---
+ggtags-visit-project-root | open the project root in `dired`
+--- | ---
 
-# Multiple matches
+## Multiple matches
 
 When a search find multiple matches, a new buffer named
 *ggtags-global* is created and *ggtags-navigation-mode* is enabled to
 faciliate entry selection by following commands:
 
+--- | ---
 M-n | move to the next match
 --- | ---
 M-p | move to the previous match
@@ -214,6 +220,75 @@ M-> | move to the last match
 C-M-s, M-s s | use `isearch` to find a match
 --- | ---
 M-, | abort and go back to the location where search was started
+--- | ---
+
+# Code Completion
+
+Install [company-mode](https://github.com/company-mode/company-mode)
+and add to *init.el*:
+
+```lisp
+(require 'company) ; optional
+(add-hook 'after-init-hook 'global-company-mode)
+```
+
+By default, *company-clang* backend to retrieve standard libraries
+(*/usr/include/*) but not our project files. We can make use of
+*company-complete* that encompasses *company-clang*.
+
+```lisp
+(setq company-backends (delete 'company-semantic company-backends)) ; optional
+(define-key c-mode-map  [(tab)] 'company-complete)
+(define-key c++-mode-map  [(tab)] 'company-complete)
+```
+
+By this snippet, we use 'company-complete' which calls 'company-clang'
+on demand while completes project entities. The very first reference
+suggests deleting *company-semantic* from *company-backends*. However,
+as far as I know, it is unneccessary.
+
+Then we resort to [GNU Emacs Manual - Per-Directory Local
+Variables](https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html),
+creating a special file *.dir-locals.el* under our project root. This
+file is usually used to define directory-local variables.
+
+Emacs will read it when it visits any file in that directory or any of
+its subdirectories, and apply the settings it specifies to the file' s
+buffer.
+
+We set *company-clang-arguments* in this file, specifying the project
+header files' location, namly the *include path*.
+
+```lisp
+((nil . ((company-clang-arguments . ("-I/home/<user>/project_root/include1/"
+                                     "-I/home/<user>/project_root/include2/")))))
+```
+
+That is enough! *company-clang* is able to retrieve completion
+candidates from our project sources.
+
+## Header file completion
+
+[company-c-headers](https://github.com/randomphrase/company-c-headers)
+helps complete `#include` statements by searching header filenames.
+
+After installation, add to *init.el*:
+
+```lisp
+(add-to-list 'company-backends 'company-c-headers)
+```
+
+By default, *company-c-headers* only covers C headers under
+*/usr/include/* and */usr/local/include/*. To support C++ headers, we
+should:
+
+```lisp
+(add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8/")
+```
+
+Simiarly, to complete projects header files, set
+*company-c-headers-path-user* in *.dir-locals.el*.
+
 
 
 # References
