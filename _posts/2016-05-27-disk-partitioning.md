@@ -112,7 +112,7 @@ This tutorial shows how to manually create a Windows 8.1 bootable USB stick unde
    (parted) quit
    ```
 
-   1. Just set of *boot* and *esp* as they imply each other.
+   1. Enable either *boot* or *esp* as they imply each other.
    2. As mentioned earlier, *boot* and *esp* flag prevents this partition unacessible to OS file manager.
 4. Format FAT32 filesystem
 
