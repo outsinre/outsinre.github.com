@@ -49,13 +49,13 @@ EFI System Partition (ESP) (including bootable USB stick) must be FAT (FAT32 is 
 
 1. *dd* (rude but robust)
 
-   This make USB stick unacessible to OS file manager due to *boot* and/or *esp* flag.
+   The ISO is installed to the whole USB stick as if it were a hard drive. This make USB stick unacessible to OS file manager due to *boot* and/or *esp* flag.
 2. Rufus (reliable and versatile tool)
 3. *diskpart* (Windows)
 4. Ubuntu Disk Creater
 5. Manual copy.
 
-   For UEFI booting, just copy (i.e. *rsync*) ISO contents to FAT32 USB partition.
+   For UEFI booting, just copy (i.e. *rsync*) ISO contents to a FAT32 USB partition without altering other partitions that can be used as data storage.
 
 # Operating System Limitations
 
