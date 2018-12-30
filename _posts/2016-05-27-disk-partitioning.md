@@ -104,16 +104,18 @@ This tutorial shows how to manually create a Windows 8.1 bootable USB stick unde
    4. *align-check* checks partition alignment. *optimal/opt* guarantees optimal disk performance. Try to use *unit s* (sector) when *mkpart* for better disk performance.
 3. (opt) Set the partition be *bootable*
 
+   *parted* presents GPT partition GUIDs as *flags* while other tools like *gdisk* uses short codes (i.e. *ef00*). However, those codes mean nothing at all in *parted*.
+
    ```
    (parted) set 1 boot on
    or
-   (parted) toogle 1 esp
+   (parted) toggle 1 esp
    (parted) print free
    (parted) quit
    ```
 
-   1. Enable either *boot* or *esp* as they imply each other.
-   2. As mentioned earlier, *boot* and *esp* flag prevents this partition unacessible to OS file manager.
+   1. Enable either *boot* or *esp* as they imply each other (alias) on GPT disks. We can also set *msftdata* for Windows stick.
+   2. As mentioned earlier, *boot* or *esp* flag makes this partition unacessible to Windows OS file manager.
 4. Format FAT32 filesystem
 
    ```bash
