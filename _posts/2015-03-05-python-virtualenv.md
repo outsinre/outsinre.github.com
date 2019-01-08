@@ -148,7 +148,10 @@ To create isolated Python development environment, each for a specific project.
 
    Use *full path* to *python* or the script within *virtualenv*, Python will add */full/path/to/virtualenv/lib/python2.7/site-packages/* to *sys.path* automatically. It is handy if we want to invoke the script from GUI. It also helps if we don't bother activating virtualenv each time.
 1. As the word implies, *virtualenvwrapper* is a wrapper to *virtualenv* and helps manage multiple virtual environments. Especially, it places all your virtual environments in one place.
-2. Details
+2. Emacs [pyvenv](https://github.com/jorgenschaefer/pyvenv) supports virtual environment. If you installed [elpy](https://github.com/jorgenschaefer/elpy), then it is probably brought in.
+
+   To activate a virtual environment with Emacs, just `M-x: pyvenv-activate` and type the relevant directory.
+3. Details
    1. [virtualenv](https://virtualenv.pypa.io/en/latest/)
    2. [virtual environment](http://docs.python-guide.org/en/latest/dev/virtualenvs/)
    3. [gentoo python pip and virtualenv](http://blog.samuelololol.org/2013/10/how-python-pip-and-virtualenv-go-along.html)
