@@ -3,9 +3,8 @@ layout: post
 title: Emacs installation
 ---
 
-# Windows 安装
-
-Refer to [从零开始——Emacs 安装配置使用教程 2015](http://www.jianshu.com/p/b4cf683c25f3).
+1. toc
+{:toc}
 
 # Linux 安装
 
@@ -54,7 +53,7 @@ Emacs 23 之前的那种方法有个缺点，即所开启的 server mode 只属�
 
     -n 表示不必等待 Emacs 结束，立即返回。譬如在命令行运行 emcasclient，默认当前 Terminal 被 Emacs 占用，无法干别的事情。加上 -n 后，Emacs 创建 frame 后立马释放 Termial，你可以继续使用 Terminal。一般 -n 和 -c 相结合使用。注意，-a 和 -n 没有意义。
 
-    注意，如果开启了 -n，那些需要等待 Emacs 结束的主调用程序就无法正常工作了。譬如，git commit 默认调用系统 EDITOR 或者它自己的 core.editor，如果设置成了下面的 ecx 或者 emc，那么用户无法输入 commit 信息，Emacs已经立马返回了，无法 commit.
+    注意，如果开启了 -n，那些需要等待 Emacs 结束的主调用程序就无法正常工作了。譬如，git commit 默认调用系统 EDITOR 或者它自己的 core.editor，如果设置成了下面的 ecx 或者 emc，那么用户无法输入 commit 信息，Emacs已经立马返回了，无法 commit. 所以要为这类程序单独设置一个不带 -n 的小脚本。
 
     另外，没有 -n 时，C-x # 会自动关闭 buffer，但是开了 -n 后，就不用 C-x # 了，而是直接 C-x k 或 C-x 5 0.
 3. -a
@@ -93,6 +92,7 @@ _$_ emacsclient -nc -a "" [file names]
     >$ type ecx ect
     
     >$ ect/ecx [file names]
+
 2. 还有一个更好的脚本 /usr/local/bin/emc，同时支持 ect 和 ecx
 
     ```bash
@@ -137,6 +137,7 @@ _$_ emacsclient -nc -a "" [file names]
     #     emacsclient -a "" -t "$@"
     # fi
     ```
+
 3. 为了省略脚本中 `-a` 参数,在 */etc/env.d/* 下创建文件 *99local*，用于存放 system-wide environment variable，内容如下：
 
         export ALTERNATE_EDITOR=""
@@ -181,3 +182,26 @@ _$_ emacsclient -nc -a "" [file names]
 其中有个 `%F` 参数，具体意义参考 [Desktop Entry Specification](http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html)。注意这个参数不能放在 Terminal 启动脚本里，它只属于 freedesktop 菜单。
 
 现在可以直接在系统菜单找到 emacsclient 菜单, 而且右键可以正常使用 *Open With "emacsclient"*。由于 Emacs 的启动速度问题解决了，mousepad 就基本推出历史舞台了.
+
+# Windows 安装
+
+Refer to [从零开始——Emacs 安装配置使用教程 2015](http://www.jianshu.com/p/b4cf683c25f3), [Windows Integration](https://www.emacswiki.org/emacs/EmacsMsWindowsIntegration) and [Emacs Windows](https://www.gnu.org/software/emacs/manual/html_node/emacs/Microsoft-Windows.html).
+
+Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
+
+1. 只需解圧即可，放到 *c:\programs files\emacs* 下。首先把 *c:\programs files\emacs\bin" 加进 PATH, 这样可在 CMD 或 PowerShell 下运行。凡涉及到启动，运行 *runemacs.exe* 而不是 *emacs.exe*.
+2. 设置 HOME 环境变量为 *%APPDATA%*, 即为 *c:\users\username\appdata\roaming*. 在 *HOME\.emacs.d\* 下建 *init.el* 配制文件。
+3. 设置快捷键。在桌面新建快捷键，设置为 *c:\programs files\emacs\emacsclientw.exe -c -n -a ""*.
+
+   同时，修改属性里的 Start In 为 *%USERPROFILE%\Documents*, 这样 `c-x c-f` 时默认目录是 Start In. 还有一个办法是，在 *init.el* 里加一句
+
+   ```lisp
+   (setq default-directory "C:/Users/Username/Documents")
+   ```
+
+   这个办法的缺点是，没法灵活设置不同的默认目录。
+4. [文件关联](https://blogs.technet.microsoft.com/windowsinternals/2017/10/25/windows-10-how-to-configure-file-associations-for-it-pros/)
+
+   千万不要用双雄参考文献里的 *ftype* 和 *assoc*, 不仅没有效果，还会搞乱注册表。
+
+   最简单的方法是用 Windows 10, Settings, Apps, Default apps.
