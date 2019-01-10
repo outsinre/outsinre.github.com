@@ -183,14 +183,16 @@ _$_ emacsclient -nc -a "" [file names]
 
 现在可以直接在系统菜单找到 emacsclient 菜单, 而且右键可以正常使用 *Open With "emacsclient"*。由于 Emacs 的启动速度问题解决了，mousepad 就基本推出历史舞台了.
 
-# Windows 安装
+# Windows 10 安装
 
 Refer to [从零开始——Emacs 安装配置使用教程 2015](http://www.jianshu.com/p/b4cf683c25f3), [Windows Integration](https://www.emacswiki.org/emacs/EmacsMsWindowsIntegration) and [Emacs Windows](https://www.gnu.org/software/emacs/manual/html_node/emacs/Microsoft-Windows.html).
 
 Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
 
 1. 只需解圧即可，放到 *c:\programs files\emacs* 下。首先把 *c:\programs files\emacs\bin" 加进 PATH, 这样可在 CMD 或 PowerShell 下运行。凡涉及到启动，运行 *runemacs.exe* 而不是 *emacs.exe*.
-2. 设置 HOME 环境变量为 *%APPDATA%*, 即为 *c:\users\username\appdata\roaming*. 在 *HOME\.emacs.d\* 下建 *init.el* 配制文件。
+2. 设置当前用户的 HOME 环境变量为 *%APPDATA%*, 即为 *c:\users\username\appdata\roaming*. 在 *HOME\.emacs.d\* 下建 *init.el* 配制文件。
+
+   注意这里是给当前用户设置，而不是给系统设置。
 3. 设置快捷键。在桌面新建快捷键，设置为 *c:\programs files\emacs\emacsclientw.exe -c -n -a ""*.
 
    同时，修改属性里的 Start In 为 *%USERPROFILE%\Documents*, 这样 `c-x c-f` 时默认目录是 Start In. 还有一个办法是，在 *init.el* 里加一句
@@ -205,3 +207,4 @@ Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
    千万不要用双雄参考文献里的 *ftype* 和 *assoc*, 不仅没有效果，还会搞乱注册表。
 
    最简单的方法是用 Windows 10, Settings, Apps, Default apps.
+5. [Caps to Ctrl](https://superuser.com/questions/949385/map-capslock-to-control-in-windows-10)
