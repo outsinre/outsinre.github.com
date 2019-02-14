@@ -118,7 +118,9 @@ title: Gentoo Installation
 
 2. The `MAKEOPTS` variable defines how many parallel compilations should occur when emerging packages.
 
-   The recommended value is the number of logical processors in the CPU plus 1. But this rule is outdated. I have 4GB memory and *swap/swapfile* enabled, *emerge* will make use of *swap* havily. *swap* naturally slow down application performance though support more parallel tasks. So turn down to 2 or 3 to reduce usage of *swap* file.
+   The recommended value is the number of logical processors in the CPU plus 1. But this rule is outdated. I have 4GB memory and *swap/swapfile* enabled, *emerge* will make use of *swap* havily.
+
+   *swap* naturally slows down performance but supports more parallel tasks. So turn down to 2 or even 1 to reduce usage of *swap* file.
 
    1. Add a line `MAKEOPTS="-j3"`.
    2. The boot screen shows several penguins, that is the number of logical hardware cores. If kernel `X86_SYSFB` and `FB_SIMPLE` were turned off, you could not see boot penguins.
