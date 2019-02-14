@@ -1450,10 +1450,9 @@ Boot with LiveDVD, then
    /mnt/1GB-swapfile none swap defaults 0 0
    ```
 
-   >Since OpenRC-0.22, please enable *rc_need="localmount"* in */etc/conf.d/swap*.
-
-   1. Use *dd* to create a file occupying continuing disk space instead of a *sparse file*. Refer to [swap partition vs file for performance?](https://serverfault.com/a/25708).
-   2. Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).
+   1. Since OpenRC-0.22, please enable *rc_need="localmount"* in */etc/conf.d/swap*.
+   2. Use *dd* to create a file occupying continuing disk space instead of a *sparse file*. Refer to [swap partition vs file for performance?](https://serverfault.com/a/25708).
+   3. Refer to [swap file creation](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation).
 
    It is recommended to turn down *vm.swappiness* by `sysctl`. By default, it is 60, and we can change it to 10 or so.
 
