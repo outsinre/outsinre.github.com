@@ -6,18 +6,74 @@ title: Arch Linux
 1. toc
 {:toc}
 
->Arch Linux has dropped support for *i686* platforms. Only *x86_64* now!
-
 # [Installation guide](https://wiki.archlinux.org/index.php/Installation_guide)
 
-Once booting into the live CD (*archlinux-2017.11.01-x86_64.iso*), check network connection and rectify system clock:
+1. Arch Linux has dropped support for *i686* platforms. Only *x86_64* now!
+2. After installation and before reboot, check out all commands by `history > cmd.log` for later reference.
+3. Download the latest ISO image from [download link](https://www.archlinux.org/download/).
+
+## USB Stick
+
+*dd* command will be used to create the bootable stick as it is more reliable and also the recommended method on the Wiki page. *dd* erases the whole USB stick and treats it as a hard drive.
+
+Without explict notice, we assume the USB drive to be */dev/sdb*. *dd* command is effective but dangerous as well. It take effects immediately without user confirmation. Therefore, please make sure you select the exact *of=* argument with the help from `fdisk -l/blkid/lsblk -f/findmnt`.
+
+```bash
+root@archiso / # dd bs=1M if=/path/to/archlinux.iso of=/dev/sdb status=progress oflag=sync
+```
+
+The optimal block size *bs* argument is determined by various factors (both hardware and software) on the system. Empirically, 1M or 4M is good enough.
+
+To restore the USB stick as normal data storage, we should remove the ISO 9660 filesystem signature before re-partitioning and re-formating the USB drive by *wipefs* command.
+
+```bash
+root@archiso / # wipefs --all /dev/sdb
+```
+
+## USB Booting
+
+Disable Secure Boot in UEFI BIOS setting to boot Linux distritions as most distributions do not buy digital certifits from Verisign.
+
+By default, Arch ISO uses Zsh shell. To log all commands, set in *~/.zshrc* the following to empty string:
+
+```
+HISTSIZE= 
+HISTFILESIZE=
+```
+
+## Time Network and Keyboard
+
+Once booting into the live Arch system, check network connection and rectify system clock:
 
 ```bash
 root@archiso ~ # ping www.archlinux.org
-root@archiso ~ # timedatectl set-ntp true; timedatectl status
+root@archiso ~ # timedatectl set-ntp true; timedatectl set-timezone Asia/Shanghai; timedatectl status
 ```
 
-## Scheme
+For wired/wireless network that require captive login or user agreement, here are a few tips:
+
+1. Use terminal text-based browsers like *elinks*, *lynx* etc.
+2. Use *curl* arguments to fill in username and password.
+3. Check if *dhcpcd* or *wpa_supplicant* service is launched.
+
+```bash
+root@archiso ~ # systemctl start dhcpcd
+root@archiso ~ # wpa_passphrase ssid psk > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+root@archiso ~ # systemctl start wpa_supplicant@wlan0
+root@archiso ~ # ip addr; ping www.example.com
+```
+
+Details refer to [Using command line to connect to a wireless network with an http login](https://superuser.com/q/132392) and [Connecting to a Wireless network with a captive portal](https://bbs.archlinux.org/viewtopic.php?id=187511).
+
+If you'd like, switch to *emacs* keymap:
+
+```bash
+root@archiso ~ # loadkeys emacs
+```
+
+Check */usr/share/keymaps/i386/qwerty/\*.\*.gz* for keymaps.
+
+## BIOS GPT scheme
 
 1. Grub, BIOS/GPT partitioning.
 2. Single *root* partition plus extra *swap file*.
@@ -27,15 +83,12 @@ root@archiso ~ # timedatectl set-ntp true; timedatectl status
 Firstly, to identify disk devices:
 
 ```bash
-root@archiso ~ # fdisk -l
-root@archiso ~ # lsblk -f
-root@archiso ~ # blkid
-root@archiso ~ # findmnt
+root@archiso ~ # fdisk -l/blkid/lsblk -f/findmnt
 ```
 
 For Grub, BIOS/GPT scheme, we must create the [BIOS boot partition](https://wiki.archlinux.org/index.php/BIOS_boot_partition) to hold Grub *core.img*. Around 1 MiB (2048 sectors) is enough. It can be in any position order (partition number) but has to be on the first 2 TiB of the disk. This partition should be flagged as *bios_grub* for *parted*, *ef02* for *gdisk*, or select *BIOS boot* and partition type *4* for *fdisk*.
 
-Grub, BISO/MBR scheme uses post-MBR gap (after the 512B MBR and before the first partition) to store *core.img*. Usually this gap is 31 KiB. For complex modules in *core.img*, this space is limited. That can be resolved by pushing forward starting sector of the first parititon. For instance, partitioning tool can align at MiB boundaries, thus leaving enough post-MBR gap.
+On the other hand, Grub, BIOS/MBR scheme uses post-MBR gap (after the 512B MBR and before the first partition) to store *core.img*. Usually this gap is 31 KiB. For complex modules in *core.img*, this space is limited. That can be resolved by pushing forward starting sector of the first parititon. For instance, partitioning tool can align at MiB boundaries, thus leaving enough post-MBR gap.
 
 >Attention, the later scheme eliminates the bother to create BIOS boot partition.
 
@@ -60,7 +113,7 @@ root@archiso ~ # parted -a optimal /dev/sda
    Choose *Ignore* as this partition will not be regularly accessed. Performance issues can be disregarded though this is out of GPT alignment specifications.
 3. The rest space is assigned to *root* starting at *2048s*.
 
-   On a device with 512B sectors, *parted* wants to align at multiple 1 MiB (i.e. 2048s, 4096s, 6144s). This tells the reason that previous BIOS boot partition ends at 2047s.
+   On a device with logical 512B sectors, *parted* wants to align at multiple 1 MiB (i.e. 2048s, 4096s, 6144s). This tells the reason that previous BIOS boot partition ends at 2047s.
 
 #### Swap
 
@@ -84,6 +137,208 @@ root@archiso ~ # mount /dev/sda2 /mnt
 
 As there is only the *root* parition, we would not create other mount points (i.e. *boot*) under */mnt*.
 
+## UEFI GPT scheme
+
+To set the PC booting in only UEFI mode in BIOS setting (disable legacy BIOS). To verify if the live Arch Linux is booted in UEFI mode, check by:
+
+```bash
+root@archiso / # ls /sys/firmware/efi/efivars
+```
+
+If directory *efivars* exists, then Yes. By default, Arch Linux uses [system-boot](https://wiki.archlinux.org/index.php/Systemd-boot).
+
+### Disk Preparation
+
+1. If you want LVM, system encrytion (LUKS), or RAID, do it now.
+2. ESP could be one of FAT12, FAT16, FAT32 and VFAT.
+
+We will erase partition or the whole drive before partitioning and formating.
+
+### [Erase Disk](https://wiki.archlinux.org/index.php/Dm-crypt/Drive_preparation#Secure_erasure_of_the_hard_disk_drive)
+
+>This section only covers normal mechanical disk drives. For SSDs, it is a different story.
+
+We want to securely erase the disk by overwritting the entire drive with random data. There are a host of [general methods](https://wiki.archlinux.org/index.php/Securely_wipe_disk) available. But I choose the *dm-crypt* specific method here. Optionally, you could either erase just a single partition (i.e. */dev/sdXY*) or the complete drive (i.e. */dev/sdX*).
+
+We first create a temporary *dm-crypt* container:
+
+```
+root@archiso ~ # cryptsetup open /dev/sda --type plain -d /dev/urandom to_be_wiped
+# -or-
+root@archiso ~ # cryptsetup open /dev/sda1 --type plain -d /dev/urandom to_be_wiped
+```
+
+*--key-file /dev/urandom* is used as the encryption key. The container device is named as */dev/mapper/to\_be\_wipded*. We can verify its existence by *lsblk*.
+
+Next, we fill the container with zeros without the need of */dev/urandom*:
+
+```bash
+root@archiso ~ # dd bs=1M if=/dev/zero of=/dev/mapper/to_be_wiped status=progress
+```
+
+For a large (i.e. a multi-terabyte disk) drive or partition, this may take hours or even a day.
+
+Finally, close the temporary container:
+
+```bash
+root@archiso ~ # cryptsetup close /dev/mapper/to_be_wipded
+root@archiso ~ # lsblk
+```
+
+### GPT Table
+
+Use *parted* to create GPT table:
+
+```bash
+root@archiso ~ # parted -a opt /dev/sda
+(parted) mktable/mklabel gpt
+```
+
+### [Partitioning](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Encrypted_boot_partition_(GRUB))
+
+For future compatability and scability, create extra BIOS boot partition (for Grub). Additionally, I want the */boot* partition also encrypted.
+
+```bash
+root@archiso ~ # parted -a opt /dev/sda
+(parted) unit s/MiB
+(parted) p free
+(parted) mkpart primary 34s/40s 2047s
+(parted) toggle 1 bios_grub
+(parted) mkpart primary fat32 2048s 551MiB
+(parted) toggle 2 esp/boot
+(parted) mkpart primary 551MiB 751MiB
+(parted) mkpart primary 751MiB 100%
+(parted) print free
+```
+
+1. As the Grub BIOS boot partition is not regularly accessed, there is no need to follow rigid alignment rules. It can just start at 34s.
+
+   GRUB embeds its *core.img* into this partition
+2. It is recommended to create the ESP with [550MiB](https://www.rodsbooks.com/efi-bootloaders/principles.html).
+3. Note that the end of part 2 and the start of part 3 are both 551MiB. If using *s* unit, their relation should be *+1*.
+
+### ESP Filesystem
+
+```bash
+root@archiso ~ # mkfs.vfat -F32 /dev/sda2
+root@archiso ~ # parted /dev/sda p free ; fdisk -l /dev/sda
+```
+
+1. BIOS boot partition shall not be formated or mounted. Just leave it alone.
+2. Both *sda3* and *sda4* will be encrypted by LUKS, so there is no need to create filesystem at this stage.
+
+### LUKS
+
+As Grub does not support LUKS2, use LUSK1 (`--type luks1`) on partitions that Grub need access (basically where */boot* resides).
+
+Firstly, we create a gpg-encrypted file (namely *arch-luks.gpg*) by symmetric passphrase, which will be used to to encrypt the LUKS container.
+
+```bash
+root@archiso ~ # export GPG_TTY=$(tty)
+root@archiso ~ # dd if=/dev/urandom bs=8388607 count=1 | gpg -v --symmetric --cipher-algo AES256 --armor --output ~/arch-luks.gpg
+```
+
+Before anything else, make a backup of the key (i.e. to a USB stick), as otherwise the Live environment would lose it upon reboot.
+
+Next, we create the LUKS encrypted container. *luksFormat* does not format the device, but sets up the LUKS device *header* and encrypts the *master-key* with the desired cryptographic options (`--key-file` here). To use the key file generated, we should firstly decrypt it.
+
+```bash
+root@archiso ~ # gpg --output ~/arch-luks --decrypt ~/arch-luks.gpg
+root@archiso ~ # cryptsetup -v --type luks1 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file ~/arch-luks --use-random luksFormat /dev/sda3
+root@archiso ~ # cryptsetup -v --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file ~/arch-luks --use-random luksFormat /dev/sda4
+```
+
+In this case, both the containers use the same key file but different LUKS type.
+
+For safety, add a fallback passphrase in addition to the key file. It always asks for an existing passphrase or key file before adding a new one.
+
+```bash
+root@archiso ~ # cryptsetup -v --key-file ~/arch-luks --iter-time 5000 luksAddKey /dev/sda3
+root@archiso ~ # cryptsetup -v --key-file ~/arch-luks --iter-time 5000 luksAddKey /dev/sda4
+```
+
+Apart from *luksAddKey*, we can also *luksRemoveKey*, *luksKillSlot* etc.
+
+Once created, it is time to open the containers. The first open command, uses the fallback passphrase while the second uses key file.
+
+```bash
+root@archiso ~ # cryptsetup open /dev/sda3 cryptboot
+root@archiso ~ # cryptsetup --key-file ~/arch-luks open /dev/sda4 cryptlvm
+root@archiso ~ # cryptsetup luksDump /dev/sda3
+root@archiso ~ # cryptsetup luksDump /dev/sda4
+root@archiso ~ # ls -al /dev/mapper/
+root@archiso ~ # lsblk
+```
+
+Now, we can use *luksDump* command to verify the LUKS header information. The decrypted containers are now available at */dev/mapper/*.
+
+Next, we should backup the LUKS header.
+
+```bash
+root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda3 --header-backup-file ~/sda3-luks-header.img /dev/sda3
+root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda4 --header-backup-file ~/sda4-luks-header.img /dev/sda4
+```
+
+Of course, we have a counterpart command *luksHeaderRestore* to restore header file. Details, refer to Arch wiki.
+
+### LVM
+
+LUKS containers are ready for LVM containers on which we then create Arch Linux filesystem.
+
+At this stage, we only care about */dev/mapper/cryptlvm* as there is no LVM requirement on */dev/mapper/cryptboot*.
+
+```bash
+root@archiso ~ # pvcreate /dev/mapper/cryptlvm ; pvdisplay -v -m
+root@archiso ~ # vgcreate volgrp /dev/mapper/cryptlvm ; vgdisplay -v
+root@archiso ~ # lvcreate --size 16G volgrp --name swap
+root@archiso ~ # lvcreate --size 60G volgrp --name root
+root@archiso ~ # lvcreate --size 250G volgrp --name home ; lvdisplay -v -m
+root@archiso ~ # ls -al /dev/{mapper,volgrp}
+```
+
+1. Create a physical volume on top of the LUKS container.
+2. Create a volume group and add the physical volume into it (can add more, if multiple physical volumes exist).
+3. Create logical volumes. Attention that, for futher compatibility, leave some *volgrp* space unallocated. Logical volume size can be ajusted on the fly.
+4. Created logical volmes' symbolic links reside in two distinct locations, namely */dev/mapper/* and */dev/volgrp/*.
+
+Create logical volume devices are located under */dev/volgrp/*.
+
+### Filesystem
+
+Format the logical volumes.
+
+```bash
+root@archiso ~ # mkswap /dev/volgrp/swap
+root@archiso ~ # mkfs.ext4 /dev/volgrp/root
+root@archiso ~ # mkfs.ext4 /dev/volgrp/home
+```
+
+Recall that, we have not create filesystem for the decrypted *cryptboot* yet. Just create filesystem on top LUKS container directly without LVM.
+
+```bash
+root@archiso ~ # mkfs.ext2 /dev/mapper/cryptboot
+root@archiso ~ # lsblk
+```
+
+### Mounting
+
+```bash
+root@archiso ~ # blkid
+root@archiso ~ # swapon /dev/volgrp/swap
+root@archiso ~ # mount /dev/volgrp/root /mnt
+root@archiso ~ # mkdir /mnt/home; mount /dev/volgrp/home /mnt/home
+#
+root@archiso ~ # mkdir /mnt/boot; mount /dev/mapper/cryptboot /mnt/boot
+#
+root@archiso ~ # mkdir /mnt/efi; mount /dev/sda2 /mnt/efi
+#
+root@archiso ~ # lsblk
+```
+
+1. Before mounting, we should use *blkid* to check relevant partition and filesystem are correctly prepared.
+2. LUKS boot partition can be mounted directly.
+3. ESP, boot, swap, root, and home are all mounted.
+
 ## Mirrors
 
 Edit */etc/pacman.d/mirrorlist* and place geographically closest mirrors on top. Optionally comment out all the other mirrors.
@@ -91,10 +346,11 @@ Edit */etc/pacman.d/mirrorlist* and place geographically closest mirrors on top.
 ## base packages
 
 ```bash
-root@archiso ~ # pacstrap /mnt base
+root@archiso ~ # pacstrap /mnt base [base-devel]
 ```
 
-This will install all packages from *base* group to *root* partition. Around 200 MiB packages will be downloaded and 700 MiB disk space consumed. Ignore the warning on *locale* failure that will be handled after *chroot*.
+1. This will install all packages from *base* group to *root* partition. Around 200 MiB packages will be downloaded and 700 MiB disk space consumed. Ignore the warning on *locale* failure that will be handled after *chroot*.
+2. Other optional groups (i.e. *base-devel*) can be appended. We can also install packages after *chroot*.
 
 ## fstab
 
@@ -103,7 +359,15 @@ root@archiso ~ # genfstab -U /mnt >> /mnt/etc/fstab
 root@archiso ~ # cat /mnt/etc/fstab
 ```
 
-`-U` and `-L` use UUID and label respectively. Obviously, there is only one record generated.
+`-U` and `-L` use UUID and label respectively.
+
+## Keyfile Copy
+
+Before chrooting, copy the key file to ESP partition. Within the *chroot* environment, we cannot access the keyfile in Live ISO.
+
+```bash
+root@archiso ~ # cp ~/arch-luks.gpg /mnt/efi/
+```
 
 ## Chroot
 
@@ -111,9 +375,27 @@ root@archiso ~ # cat /mnt/etc/fstab
 root@archiso ~ # arch-chroot /mnt
 ```
 
-Pretty simple step.
+Much simpler than Gentoo (manually). The shell prompt becomes `[root@archiso /#]` and the default shell is Bash.
 
-## Locale
+To log all commands, set the following in *~/.bashrc* empty string or negative integer:
+
+```
+# ~/.bashrc
+HISTSIZE= 
+HISTFILESIZE=
+# -or-
+HISTSIZE=-1
+HISTFILESIZE=-1
+```
+
+## Time
+
+```bash
+[root@archiso /#] ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+[root@archiso /#] hwclock -w/--systohc
+```
+
+## Localization
 
 Mainly, we will modify two files */etc/locale.gen* and */etc/locale.conf*.
 
@@ -122,22 +404,32 @@ Mainly, we will modify two files */etc/locale.gen* and */etc/locale.conf*.
 en_US.UTF-8 UTF-8
 zh_CN.UTF-8 UTF-8
 zh_CN.GB18030 GB18030
-zh_TW.UTF-8 UTF-8
+zh_TW BIG5
 #
 [root@archiso / #] locale-gen
-[root@archiso / #] echo LANG=en_US.UTF-8 > /etc/locale.conf
+[root@archiso / #] echo LANG=en_US.UTF-8 >> /etc/locale.conf
 ```
 
 Here we set system locale to *en_US.UTF-8* (better for log trace). For per-user locale, leave it after new user account creation.
+
+To set customized keymap, edit (create) */etc/vconsole.conf*:
+
+```bash
+[root@archiso / #] echo 'KEYMAP=emacs' >> /etc/vconsole.conf
+```
 
 ## Hostname
 
 ```bash
 # Create /etc/hostname
-[root@archiso / #] echo "myhostname" > /etc/hostname
+[root@archiso / #] echo "myhostname" >> /etc/hostname
 # add a line to /etc/hosts accordingly
+127.0.0.1	localhost
+::1		localhost
 127.0.1.1	myhostname.localdomain	myhostname
 ```
+
+The third line in the request uses *127.0.1.1* instead of *127.0.0.1*. It does not matter which one is used, actually. But [hostname resolution](https://www.debian.org/doc/manuals/debian-reference/ch05.en.html#_the_hostname_resolution) provide some information.
 
 ## *root* password
 
@@ -145,7 +437,92 @@ Here we set system locale to *en_US.UTF-8* (better for log trace). For per-user 
 [root@archiso / #] passwd
 ```
 
+## Initramfs by mkinitcpio
+
+```
+# /etc/mkinitcpio.conf
+HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck)
+```
+
+hook | info
+--- | ---
+udev | a must
+keyboard | a must; place it after *autodetect*
+keymap | needed as custom keymap (*emacs*) is set in *vconsole.conf*.
+encrypt | LUKS
+lvm2 | LVM
+
+1. This is a *busybox* based *initramfs* configuration. It is different from *systemd init* booting process, which is the next phase.
+2. Use *mkinitpico -H mod_name* to check hooks info. Only add necessary hooks to keep a minimal *initramfs* image.
+3. Remove *consolefont* hook as it is unnecessary.
+
+Now we will re-create the *initramfs* to include the new hooks, though *pacstrap* above already created it upon installation of *linux* package (pulled in by the *base* group)
+
+```bash
+[root@archiso / #] mkinitcpio -p linux
+```
+
+*mkinitcpio* will install generate two images, a *default* and a *fallback* that skips the autodetect hook thus including a full range of mostly-unneeded modules. Obviously, the fallback image is much bigger in size than the default one as it attempts to pull in as many modules as possible. Therefore, *fallback* image generation usually reports [missing firmware](https://wiki.archlinux.org/index.php/Mkinitcpio#Possibly_missing_firmware_for_module_XXXX). If the system does not have such hardware, it can be safely ignored. Otherwise, just install the relevant modules like 'wd719x-firmware'.
+
 ## Boot loader - Grub
+
+```bash
+[root@archiso / #] pacman -S grub efibootmgr intel-ucode
+```
+
+1. *efibootmgr* is used by the GRUB installation script to write boot entries to NVRAM.
+2. *intel-ucode* is used to apply CPU stability and security updates during boot.
+
+Since the boot partition is encrypted by LUKS, so we should enable encryption option for Grub.
+
+```
+# /etc/default/grub
+GRUB_ENABLE_CRYPTODISK=y
+```
+
+This option is used by *grub-install* to generate *core.img*. Then we set the kernel parameters so that *initramfs* can unlock (using *encrypt* hook) the encrypted swap, root, home partitions. For the form, check `mkinitcpio -H encrypt`.
+
+```
+# /etc/default/grub
+
+# or PARTUUID
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=of-sda4:cryptlvm cryptfile=UUID=of-sda2:auto:arch-luks.gpg resume=UUID=of-volgrp-swap root=UUID=of-volgrp-root"
+# or /dev/mapper/volgrp-root
+GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptfile=/dev/sda2:fat32:arch-luks.gpg resume=/dev/volgrp/swap root=/dev/volgrp/root"
+```
+
+1. It is error-prone to input UUID/PARTUUID without GUI, we can replace UUID with the device pathname.
+2. Please make sure the key file is located under ESP partition.
+
+   If you forget the copy the key file before choorting, just exit the chroot, copy key file, and re-enter.
+3. [Kernel parameter](https://wiki.archlinux.org/index.php/Kernel_parameters)
+
+   *resume* is used to *suspend to disk*. *root* is optional as long as *grub-mkconfig* is used to generate the boot menu.
+
+Once the configured, we can install the bootloader to ESP partition:
+
+```bash
+[root@archiso / #] grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB --recheck --modules="part_gpt"
+```
+
+Attention that, there is no */dev/sda* argument as that is for legacy BIOS booting.
+
+Then, generate boot menu:
+
+```bash
+[root@archiso / #] grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+If the *grub-mkconfig* hangs there, probably read [LVM need access to /run/lvm under new root](https://bugs.archlinux.org/task/61040) and use the [suggested hack](https://bbs.archlinux.org/viewtopic.php?pid=1820949#p1820949).
+
+```
+root@archiso ~ # mkdir /mnt/hostlvm
+root@archiso ~ # mount --bind /run/lvm /mnt/hostlvm
+root@archiso ~ # arch-chroot /mnt
+root@archiso ~ # ln -s /hostlvm /run/lvm
+```
+
+>The following is for BIOS/GPT.
 
 ```bash
 [root@archiso / #] pacman -S grub intel-ucode
@@ -153,13 +530,14 @@ Here we set system locale to *en_US.UTF-8* (better for log trace). For per-user 
 [root@archiso / #] grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-1. Although we install *x86_64* Arch Linux, the `--target` should be *i386-pc* due to BIOS booting scheme.
-2. For intel CPU, *intel-ucode* package is installed to update processor *microcode*.
+Although we install *x86_64* Arch Linux, the `--target` should be *i386-pc* due to BIOS booting scheme.
 
 ## Reboot
 
 ```bash
-[root@archiso / #] exit
+[root@archiso / #] cp .bash_history /path/to/usb-stick/bash.log (optionally as it remains after reboot but maybe overriden)
+[root@archiso / #] exit/Ctrl-D
+root@archiso ~ # cp .zsh_history /path/to/usb-stick/zsh.log
 root@archiso ~ # umount -R /mnt
 root@archiso ~ # reboot
 ```
@@ -178,7 +556,7 @@ We'd better unmount all partitions under */mnt* to determine busy partitions and
 2. 1 GiB Swap file
 
    ```bash
-   [root@host ~]# dd if=/dev/zero of=/swapfile bs=1M count=1024
+   [root@host ~]# dd bs=1M count=1024 if=/dev/zero of=/swapfile
    [root@host ~]# chmod 600 /swapfile
    [root@host ~]# mkswap /swapfile
    [root@host ~]# swapon /swapfile
@@ -439,11 +817,16 @@ XTerm.vt100.translations: #override \n\
     Ctrl Shift <Key>V: insert-selection(CLIPBOARD)
 ```
 
-To take these settings into effec immediately:
+To take these settings into effect immediately:
 
 ```bash
 [root@host ~ #] xrdb -merge ~/.Xresources
+# -or-
+[root@host ~ #] xrdb ~/.Xresources
 ```
+
+_xrdb* without `-merge` option, will _reload_ _.Xresources_, replacing current settings.
+
 
 ## Copy/Paste
 
@@ -586,3 +969,6 @@ Finally, Ctrl-Space.
 
 1. gentoo bypass lock screen; xdg_vtnr
 2. gentoo linput instead of synaptics?
+1. no entry in bios: https://wiki.archlinux.org/index.php/GRUB#UEFI
+2. no boot decryption ask
+3. no initramfs gpg
