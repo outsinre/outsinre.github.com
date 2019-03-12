@@ -26,7 +26,21 @@ title: Let's Encrypt Certificate
 
 1. A simple Nginx template:
 
-   Use [Let's Encrypt template](/2017/04/11/nginx).
+```
+# Template for '--webroot' plugin to obtain a certificate
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name cloud.example.com;
+    root /usr/share/nginx/html;
+
+    # Load configuration files for the default server block.
+    include /etc/nginx/default.d/*.conf;
+}
+```
+
 2. Use *fullchain.pem* instead of *cert.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
 
 # webroot/standalone plugin

@@ -11,20 +11,22 @@ title: Arch Linux
 1. Arch Linux has dropped support for *i686* platforms. Only *x86_64* now!
 2. After installation and before reboot, check out all commands by `history > cmd.log` for later reference.
 3. Download the latest ISO image from [download link](https://www.archlinux.org/download/).
+4. Install necessary packages. At least *wpa_supplicant* as the *base* group does not include that.
 
 ## USB Stick
 
 *dd* command will be used to create the bootable stick as it is more reliable and also the recommended method on the Wiki page. *dd* erases the whole USB stick and treats it as a hard drive.
 
-Without explict notice, we assume the USB drive to be */dev/sdb*. *dd* command is effective but dangerous as well. It take effects immediately without user confirmation. Therefore, please make sure you select the exact *of=* argument with the help from `fdisk -l/blkid/lsblk -f/findmnt`.
+Without explict notice, we assume the USB drive to be */dev/sdb*. *dd* command is effective but dangerous as well. It take effects immediately without confirmation prompt. Therefore, please make sure you select the exact `of=` argument.
 
 ```bash
+root@archiso / # fdisk -l; blkid; lsblk -f; findmnt
 root@archiso / # dd bs=1M if=/path/to/archlinux.iso of=/dev/sdb status=progress oflag=sync
 ```
 
-The optimal block size *bs* argument is determined by various factors (both hardware and software) on the system. Empirically, 1M or 4M is good enough.
+The optimal block size `bs` argument is determined by various factors (both hardware and software) on the system. Empirically, 1M or 4M is good enough.
 
-To restore the USB stick as normal data storage, we should remove the ISO 9660 filesystem signature before re-partitioning and re-formating the USB drive by *wipefs* command.
+To restore the USB stick as normal data storage, we should remove the ISO 9660 filesystem signature before re-partitioning and re-formating the USB drive by *wipefs* command. It only erase signatures of filesystem, raid  or partition-table while leave filesystem itself untouched.
 
 ```bash
 root@archiso / # wipefs --all /dev/sdb
@@ -41,7 +43,7 @@ HISTSIZE=
 HISTFILESIZE=
 ```
 
-## Time Network and Keyboard
+## Time Network
 
 Once booting into the live Arch system, check network connection and rectify system clock:
 
@@ -52,9 +54,9 @@ root@archiso ~ # timedatectl set-ntp true; timedatectl set-timezone Asia/Shangha
 
 For wired/wireless network that require captive login or user agreement, here are a few tips:
 
-1. Use terminal text-based browsers like *elinks*, *lynx* etc.
-2. Use *curl* arguments to fill in username and password.
-3. Check if *dhcpcd* or *wpa_supplicant* service is launched.
+1. Check if *dhcpcd* or *wpa_supplicant* service is launched.
+2. Use terminal text-based browsers like *elinks*, *lynx* etc.
+3. Use *curl* arguments to fill in username and password.
 
 ```bash
 root@archiso ~ # systemctl start dhcpcd
@@ -65,32 +67,24 @@ root@archiso ~ # ip addr; ping www.example.com
 
 Details refer to [Using command line to connect to a wireless network with an http login](https://superuser.com/q/132392) and [Connecting to a Wireless network with a captive portal](https://bbs.archlinux.org/viewtopic.php?id=187511).
 
-If you'd like, switch to *emacs* keymap:
-
-```bash
-root@archiso ~ # loadkeys emacs
-```
-
-Check */usr/share/keymaps/i386/qwerty/\*.\*.gz* for keymaps.
-
 ## BIOS GPT scheme
 
 1. Grub, BIOS/GPT partitioning.
 2. Single *root* partition plus extra *swap file*.
+
+This booting schema is only used in virtual machine.
 
 ### [Partitioning](https://wiki.archlinux.org/index.php/Partitioning)
 
 Firstly, to identify disk devices:
 
 ```bash
-root@archiso ~ # fdisk -l/blkid/lsblk -f/findmnt
+root@archiso ~ # fdisk -l
 ```
 
-For Grub, BIOS/GPT scheme, we must create the [BIOS boot partition](https://wiki.archlinux.org/index.php/BIOS_boot_partition) to hold Grub *core.img*. Around 1 MiB (2048 sectors) is enough. It can be in any position order (partition number) but has to be on the first 2 TiB of the disk. This partition should be flagged as *bios_grub* for *parted*, *ef02* for *gdisk*, or select *BIOS boot* and partition type *4* for *fdisk*.
+For Grub, BIOS/GPT scheme, we must create the [BIOS boot partition](https://wiki.archlinux.org/index.php/BIOS_boot_partition) to hold Grub *core.img*. Around 1 MiB (2048 sectors) is enough. Partition number can be in any position order but has to be on the first 2 TiB of the disk. This partition should be flagged as *bios_grub* for *parted*, *ef02* for *gdisk*, or select *BIOS boot* and partition type *4* for *fdisk*.
 
-On the other hand, Grub, BIOS/MBR scheme uses post-MBR gap (after the 512B MBR and before the first partition) to store *core.img*. Usually this gap is 31 KiB. For complex modules in *core.img*, this space is limited. That can be resolved by pushing forward starting sector of the first parititon. For instance, partitioning tool can align at MiB boundaries, thus leaving enough post-MBR gap.
-
->Attention, the later scheme eliminates the bother to create BIOS boot partition.
+On the other hand, Grub, BIOS/MBR scheme uses post-MBR gap (after the 512B MBR and before the first partition) to store *core.img*. Usually this gap is 31 KiB. For complex modules in *core.img*, this space is limited. That can be resolved by pushing forward starting sector of the first parititon. For instance, partitioning tool can align at MiB boundaries, thus leaving enough post-MBR gap. So, it eliminates the bother to create BIOS boot partition.
 
 ```
 root@archiso ~ # parted -a optimal /dev/sda
@@ -113,11 +107,9 @@ root@archiso ~ # parted -a optimal /dev/sda
    Choose *Ignore* as this partition will not be regularly accessed. Performance issues can be disregarded though this is out of GPT alignment specifications.
 3. The rest space is assigned to *root* starting at *2048s*.
 
-   On a device with logical 512B sectors, *parted* wants to align at multiple 1 MiB (i.e. 2048s, 4096s, 6144s). This tells the reason that previous BIOS boot partition ends at 2047s.
-
 #### Swap
 
-There is not any other separate partitions except that a *swap file* will be created. Swap partition bears NO advantages over swap file while could be shared among different systems. On the other hand, we can easily resize and plug/unplug a swap file on-the-fly.
+There is not any other separate partitions except that a *swap file* will be created. Swap partition bears NO advantages over swap file but could be shared among different systems. On the other hand, we can easily resize and plug/unplug a swap file on-the-fly.
 
 Leave the swap file part after booting into new system.
 
@@ -135,11 +127,13 @@ root@archiso ~ # mkfs.ext4 /dev/sda2
 root@archiso ~ # mount /dev/sda2 /mnt
 ```
 
-As there is only the *root* parition, we would not create other mount points (i.e. *boot*) under */mnt*.
+As there is only the *root* parition, we would not create any other mount points under */mnt*, neither */home* nor */boot*.
 
 ## UEFI GPT scheme
 
-To set the PC booting in only UEFI mode in BIOS setting (disable legacy BIOS). To verify if the live Arch Linux is booted in UEFI mode, check by:
+Almost all modern systems take UEFI booting schema. The old BIOS legacy mode discussed above is almost deprecated. To set the PC booting in only UEFI mode in BIOS setting (disable legacy BIOS).
+
+To verify if the live Arch Linux is booted in UEFI mode, check by:
 
 ```bash
 root@archiso / # ls /sys/firmware/efi/efivars
@@ -149,8 +143,8 @@ If directory *efivars* exists, then Yes. By default, Arch Linux uses [system-boo
 
 ### Disk Preparation
 
-1. If you want LVM, system encrytion (LUKS), or RAID, do it now.
-2. ESP could be one of FAT12, FAT16, FAT32 and VFAT.
+1. If LVM, system encrytion (LUKS), or RAID is desired, do it now.
+2. ESP could be any of FAT12, FAT16, FAT32 and VFAT.
 
 We will erase partition or the whole drive before partitioning and formating.
 
@@ -163,12 +157,13 @@ We want to securely erase the disk by overwritting the entire drive with random 
 We first create a temporary *dm-crypt* container:
 
 ```
-root@archiso ~ # cryptsetup open /dev/sda --type plain -d /dev/urandom to_be_wiped
-# -or-
+# erase a partition
 root@archiso ~ # cryptsetup open /dev/sda1 --type plain -d /dev/urandom to_be_wiped
+# erase a disk
+root@archiso ~ # cryptsetup open /dev/sda --type plain -d /dev/urandom to_be_wiped
 ```
 
-*--key-file /dev/urandom* is used as the encryption key. The container device is named as */dev/mapper/to\_be\_wipded*. We can verify its existence by *lsblk*.
+`--key-file /dev/urandom` is used as the encryption key. The container device is located at */dev/mapper/to\_be\_wipded*. We can verify its existence by *lsblk*.
 
 Next, we fill the container with zeros without the need of */dev/urandom*:
 
@@ -196,7 +191,7 @@ root@archiso ~ # parted -a opt /dev/sda
 
 ### [Partitioning](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Encrypted_boot_partition_(GRUB))
 
-For future compatability and scability, create extra BIOS boot partition (for Grub). Additionally, I want the */boot* partition also encrypted.
+For future compatability and scability, create extra BIOS boot partition (for Grub). Additionally, I want the */boot* partition also encrypted. This setup really makes the system complicated. Anyway, the practice and security improvement deserve it!
 
 ```bash
 root@archiso ~ # parted -a opt /dev/sda
@@ -215,7 +210,18 @@ root@archiso ~ # parted -a opt /dev/sda
 
    GRUB embeds its *core.img* into this partition
 2. It is recommended to create the ESP with [550MiB](https://www.rodsbooks.com/efi-bootloaders/principles.html).
-3. Note that the end of part 2 and the start of part 3 are both 551MiB. If using *s* unit, their relation should be *+1*.
+3. Note that the end of part 2 and the start of part 3 are both 551MiB.
+
+   If using *s* unit, their relation should be `+1`.
+
+Up to now, the partitions layout looks like:
+
+```
+/dev/sda1: BIOS boot
+/dev/sda2: ESP
+/dev/sda3: boot LUKS
+/dev/sda4: '/', '/home', and '/swap' LUKS
+```
 
 ### ESP Filesystem
 
@@ -229,18 +235,22 @@ root@archiso ~ # parted /dev/sda p free ; fdisk -l /dev/sda
 
 ### LUKS
 
-As Grub does not support LUKS2, use LUSK1 (`--type luks1`) on partitions that Grub need access (basically where */boot* resides).
+As Grub does not support LUKS2, use LUSK1 (`--type luks1`) on partitions (i.e. */dev/sda3* for */boot*) that Grub need access to.
 
-Firstly, we create a gpg-encrypted file (namely *arch-luks.gpg*) by symmetric passphrase, which will be used to to encrypt the LUKS container.
+Firstly, we create a passphrase-protected file by *gpg* (namely *arch-luks.gpg*) that will be used to to encrypt the LUKS container.
 
 ```bash
 root@archiso ~ # export GPG_TTY=$(tty)
 root@archiso ~ # dd if=/dev/urandom bs=8388607 count=1 | gpg -v --symmetric --cipher-algo AES256 --armor --output ~/arch-luks.gpg
 ```
 
+Why does `bs=8388607 count=1` is used? That's because the maximum key file size is 8192KiB. From the empirics of Gentoo installation, we should decrease the maximum value by 1.
+
 Before anything else, make a backup of the key (i.e. to a USB stick), as otherwise the Live environment would lose it upon reboot.
 
-Next, we create the LUKS encrypted container. *luksFormat* does not format the device, but sets up the LUKS device *header* and encrypts the *master-key* with the desired cryptographic options (`--key-file` here). To use the key file generated, we should firstly decrypt it.
+Next, we create the LUKS encrypted container. *luksFormat* does not format the device, but sets up the LUKS device *header*, and specially encrypts the *master key* in the header with the desired passphrase (`--key-file` here). Master key is randomly choosen upon container creation and, encrypted and embedded in the header part. It is the master key's job ([not that passphrase](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions)) to encrypt the data on partition.
+
+To use the *gpg* file generated, we should firstly decrypt it.
 
 ```bash
 root@archiso ~ # gpg --output ~/arch-luks --decrypt ~/arch-luks.gpg
@@ -255,17 +265,15 @@ For safety, add a fallback passphrase in addition to the key file. It always ask
 ```bash
 root@archiso ~ # cryptsetup -v --key-file ~/arch-luks --iter-time 5000 luksAddKey /dev/sda3
 root@archiso ~ # cryptsetup -v --key-file ~/arch-luks --iter-time 5000 luksAddKey /dev/sda4
+root@archiso ~ # cryptsetup luksDump /dev/sda3
+root@archiso ~ # cryptsetup luksDump /dev/sda4
 ```
 
-Apart from *luksAddKey*, we can also *luksRemoveKey*, *luksKillSlot* etc.
-
-Once created, it is time to open the containers. The first open command, uses the fallback passphrase while the second uses key file.
+Apart from *luksAddKey*, we can also *luksRemoveKey*, *luksKillSlot* etc. Once created, it is time to open the containers. The first open command, uses the fallback passphrase while the second uses key file.
 
 ```bash
 root@archiso ~ # cryptsetup open /dev/sda3 cryptboot
 root@archiso ~ # cryptsetup --key-file ~/arch-luks open /dev/sda4 cryptlvm
-root@archiso ~ # cryptsetup luksDump /dev/sda3
-root@archiso ~ # cryptsetup luksDump /dev/sda4
 root@archiso ~ # ls -al /dev/mapper/
 root@archiso ~ # lsblk
 ```
@@ -279,7 +287,7 @@ root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda3 --header-backup-file ~/sd
 root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda4 --header-backup-file ~/sda4-luks-header.img /dev/sda4
 ```
 
-Of course, we have a counterpart command *luksHeaderRestore* to restore header file. Details, refer to Arch wiki.
+Of course, we have a counterpart command *luksHeaderRestore* to restore header file. Once backuped, the the LUKS header may be deleted from the container. Details, refer to Arch wiki.
 
 ### LVM
 
@@ -296,12 +304,12 @@ root@archiso ~ # lvcreate --size 250G volgrp --name home ; lvdisplay -v -m
 root@archiso ~ # ls -al /dev/{mapper,volgrp}
 ```
 
-1. Create a physical volume on top of the LUKS container.
-2. Create a volume group and add the physical volume into it (can add more, if multiple physical volumes exist).
-3. Create logical volumes. Attention that, for futher compatibility, leave some *volgrp* space unallocated. Logical volume size can be ajusted on the fly.
-4. Created logical volmes' symbolic links reside in two distinct locations, namely */dev/mapper/* and */dev/volgrp/*.
+1. Create a physical volume */dev/mapper/cryptlvm* on top of the LUKS container.
+2. Create a volume group *volgrp* and add the physical volume into it (can add more, if multiple physical volumes exist).
+3. Create logical volumes within *volgrp*.
 
-Create logical volume devices are located under */dev/volgrp/*.
+   For futher compatibility, leave some *volgrp* space unallocated. Size of logical volumes can be ajusted on the fly.
+4. Created logical volmes' symbolic links reside in two equivalent locations, namely */dev/mapper/* and */dev/volgrp/*.
 
 ### Filesystem
 
@@ -343,6 +351,12 @@ root@archiso ~ # lsblk
 
 Edit */etc/pacman.d/mirrorlist* and place geographically closest mirrors on top. Optionally comment out all the other mirrors.
 
+Or get a state-of-the-art copy from [mirrorlist generator](https://www.archlinux.org/mirrorlist/):
+
+```bash
+curl -vo mirrorlist https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6
+```
+
 ## base packages
 
 ```bash
@@ -359,7 +373,14 @@ root@archiso ~ # genfstab -U /mnt >> /mnt/etc/fstab
 root@archiso ~ # cat /mnt/etc/fstab
 ```
 
-`-U` and `-L` use UUID and label respectively.
+1. `-U` and `-L` use UUID and label respectively.
+
+Attention that, the separate *cryptboot* container is also included in */etc/fstab*. To support automount of */boot* partition, we should resort to [/etc/crypttab](https://wiki.archlinux.org/index.php/Dm-crypt/System_configuration#crypttab):
+
+```
+# /etc/crypttab
+cryptboot	/dev/sda2	/efi/arch-luks.gpg	cipher=aes-xts-plain64:sha512,size=512
+```
 
 ## Keyfile Copy
 
@@ -375,7 +396,7 @@ root@archiso ~ # cp ~/arch-luks.gpg /mnt/efi/
 root@archiso ~ # arch-chroot /mnt
 ```
 
-Much simpler than Gentoo (manually). The shell prompt becomes `[root@archiso /#]` and the default shell is Bash.
+Much simpler than that of Gentoo (manually). The shell prompt becomes `[root@archiso /#]` and the default shell is Bash now.
 
 To log all commands, set the following in *~/.bashrc* empty string or negative integer:
 
@@ -406,17 +427,26 @@ zh_CN.UTF-8 UTF-8
 zh_CN.GB18030 GB18030
 zh_TW BIG5
 #
+[root@archiso / #] grep '^[^#]'/etc/locale.gen
 [root@archiso / #] locale-gen
 [root@archiso / #] echo LANG=en_US.UTF-8 >> /etc/locale.conf
 ```
 
-Here we set system locale to *en_US.UTF-8* (better for log trace). For per-user locale, leave it after new user account creation.
+Here we set system locale to *en_US.UTF-8* (better for log trace). For per-user locale, leave it to *~/.config/locale.conf*.
 
-To set customized keymap, edit (create) */etc/vconsole.conf*:
+To set customized keymap permanently, edit (create) */etc/vconsole.conf*:
 
 ```bash
 [root@archiso / #] echo 'KEYMAP=emacs' >> /etc/vconsole.conf
 ```
+
+Check _/usr/share/keymaps/i386/qwerty_ for predefined keymaps. Switch to a keymap temporarily:
+
+```bash
+root@archiso ~ # loadkeys emacs
+```
+
+Attention, this only affects keyboard layout in virtual console. X keyboard layout is discuessed below.
 
 ## Hostname
 
@@ -441,6 +471,7 @@ The third line in the request uses *127.0.1.1* instead of *127.0.0.1*. It does n
 
 ```
 # /etc/mkinitcpio.conf
+MODULES=(vfat)
 HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck)
 ```
 
@@ -453,8 +484,9 @@ encrypt | LUKS
 lvm2 | LVM
 
 1. This is a *busybox* based *initramfs* configuration. It is different from *systemd init* booting process, which is the next phase.
-2. Use *mkinitpico -H mod_name* to check hooks info. Only add necessary hooks to keep a minimal *initramfs* image.
+2. Use *mkinitpico -H hook_name* to check hooks info. Only add necessary hooks to keep a minimal *initramfs* image.
 3. Remove *consolefont* hook as it is unnecessary.
+4. Add **vfat** module, otherwise *initramfs* fails load the key file.
 
 Now we will re-create the *initramfs* to include the new hooks, though *pacstrap* above already created it upon installation of *linux* package (pulled in by the *base* group)
 
@@ -480,15 +512,15 @@ Since the boot partition is encrypted by LUKS, so we should enable encryption op
 GRUB_ENABLE_CRYPTODISK=y
 ```
 
-This option is used by *grub-install* to generate *core.img*. Then we set the kernel parameters so that *initramfs* can unlock (using *encrypt* hook) the encrypted swap, root, home partitions. For the form, check `mkinitcpio -H encrypt`.
+This option is used by *grub-install* to generate *core.img*. Then we set the kernel parameters so that *initramfs* can unlock (using *encrypt* hook) the encrypted swap, root, home partitions. For the arguments format, check `mkinitcpio -H encrypt` before editing */etc/default/grub*.
 
 ```
 # /etc/default/grub
 
 # or PARTUUID
-GRUB_CMDLINE_LINUX="cryptdevice=UUID=of-sda4:cryptlvm cryptfile=UUID=of-sda2:auto:arch-luks.gpg resume=UUID=of-volgrp-swap root=UUID=of-volgrp-root"
+GRUB_CMDLINE_LINUX="cryptdevice=UUID=of-sda4:cryptlvm cryptkey=UUID=of-sda2:auto:/arch-luks resume=UUID=of-volgrp-swap root=UUID=of-volgrp-root"
 # or /dev/mapper/volgrp-root
-GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptfile=/dev/sda2:fat32:arch-luks.gpg resume=/dev/volgrp/swap root=/dev/volgrp/root"
+GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptkey=/dev/sda2:fat32:/arch-luks.gpg resume=/dev/volgrp/swap root=/dev/volgrp/root"
 ```
 
 1. It is error-prone to input UUID/PARTUUID without GUI, we can replace UUID with the device pathname.
@@ -498,6 +530,7 @@ GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptfile=/dev/sda2:fat32:arc
 3. [Kernel parameter](https://wiki.archlinux.org/index.php/Kernel_parameters)
 
    *resume* is used to *suspend to disk*. *root* is optional as long as *grub-mkconfig* is used to generate the boot menu.
+4. *mkinitpico* by default, doe not support GnuPG-1.0 hook. Therefore, we cannot use a gpg-procted key file unless [mkinitcpio-gnupg](https://aur.archlinux.org/packages/mkinitcpio-gnupg/) is adopted.
 
 Once the configured, we can install the bootloader to ESP partition:
 
@@ -522,7 +555,7 @@ root@archiso ~ # arch-chroot /mnt
 root@archiso ~ # ln -s /hostlvm /run/lvm
 ```
 
->The following is for BIOS/GPT.
+The following is for BIOS/GPT schema:
 
 ```bash
 [root@archiso / #] pacman -S grub intel-ucode
@@ -532,7 +565,15 @@ root@archiso ~ # ln -s /hostlvm /run/lvm
 
 Although we install *x86_64* Arch Linux, the `--target` should be *i386-pc* due to BIOS booting scheme.
 
-## Reboot
+## Before reboot
+
+As the base group lacks *wpa_supplicant*, we cannot connect to wireless network after rebooting.
+
+```bash
+[root@archiso / #] pacman -S wpa_supplicant
+```
+
+## Do Reboot
 
 ```bash
 [root@archiso / #] cp .bash_history /path/to/usb-stick/bash.log (optionally as it remains after reboot but maybe overriden)
@@ -544,16 +585,48 @@ root@archiso ~ # reboot
 
 We'd better unmount all partitions under */mnt* to determine busy partitions and diagnose with *fuser*.
 
-# Post-installation tricks
+# [Post-installation](https://wiki.archlinux.org/index.php/General_recommendations)
 
-1. *dhcpcd* is not *enabled* by default.
+1. *dhcpcd* is not *wap_supplicant* by default.
 
    ```bash
-   [root@host ~]# systemctl enable dhcpcd
-   [root@host ~]# systemctl start dhcpcd
+   [root@host ~]# systemctl enable/start dhcpcd
+   [root@host ~]# wpa_passphrase ssid psk > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+   [root@host ~]# systemctl enable/start wpa_supplicant@wlan0
    ```
 
-2. 1 GiB Swap file
+2. New user account
+
+   ```bash
+   [root@host ~]# passwd -Sa
+   [root@host ~]# useradd -m username
+   [root@host ~]# passwd username
+   ```
+
+3. sudo
+
+   ```bash
+   [root@host ~]# pacman -S sudo
+   [root@host ~]# sudo -ll -U username
+   ```
+
+   1. To modify configuration file */etc/sudoers*, please use command *visudo*.
+   2. Personally, I'd like to put personal modifications under */etc/sudoers.d/*.
+   3. [sudoedit /path/to/file](https://superuser.com/q/785187) is preferred than `sudo vim /path/to/file`.
+
+   ```
+   # /etc/sudoers.d/username
+   
+   #Defaults:%wheel targetpw
+   username hostname=(ALL) ALL
+   ```
+
+   ```bash
+   [username@host ~]$ sudo -ll -U username
+   [username@host ~]$ sudo -u another-username command
+   ```
+
+5. Swap file (opt)
 
    ```bash
    [root@host ~]# dd bs=1M count=1024 if=/dev/zero of=/swapfile
@@ -570,39 +643,58 @@ We'd better unmount all partitions under */mnt* to determine busy partitions and
 
    1. We must use the exact swap file path instead of UUID or Label.
    2. To cease manual operation bother, try *systemd-swap* that automates swap management.
-3. New user account
 
-   ```bash
-   [root@host ~]# passwd -Sa (list system users)
-   [root@host ~]# useradd -m test
-   [root@host ~]# passwd test
-   ```
 
-4. Default EDITOR
 
-   ```bash
-   # ~/.bashrc
-   export EDITOR=emt
-   ```
-   
-# Xorg and awesome
 
-```bash
-[root@host ~]# pacman -S xorg-server (X server)
-[root@host ~]# pacman -S xorg-xinit (startx/xinit)
-[root@host ~]# pacman -S awesome (X client - WM)
-[root@host ~]# awesome
-# E: awesome: main:656: cannot open display (error 5)
+
+
+
+
+
+
+
+
+# GPU Driver
+
+Firstly, identify vedio cards:
+
+```
+[root@host ~]# lspci | grep -e VGA -e 3D
 ```
 
-1. We will use *startx* or *xinit* to launch X server and client awesome. awesome alone would fail as X server is not launched.
-2. Video drivers. If this Arch Linux is VirtualBox guest, then install VirtualBox guest additions. Ohterwise:
+The command returns:
+
+```
+Intel HD Graphics 520
+NVIDIA GeForce 920M
+```
+
+So the computer has an integrated Intel video card and a discrete NVIDIA video card respectivelly: it is called [NVIDIA Optimus](https://wiki.archlinux.org/index.php/NVIDIA_Optimus). We have several choices to deal with NVIDIA Optimus: turn of one of the video card, use [Bumbelee](https://wiki.archlinux.org/index.php/Bumblebee), use [Nvidia-xrun](https://wiki.archlinux.org/index.php/Nvidia-xrun) etc. I will set up the system to _switch_ the two cards intelligently:
+
+>Nvidia-xrun is a utility to allow Nvidia optimus enabled laptops run X server with discrete nvidia graphics on demand. This solution offers full GPU utilization, compatibility and better performance than Bumblebee.
+
+Install Intel driver:
 
 ```bash
-[root@host ~]# lspci | grep -e VGA -e 3D (check video card)
-[root@host ~]# pacman -Ss xf86-video (search for video drivers)
-[root@host ~]# pacman -S xf86-video-intel (take Intel for example)
+[root@host ~]# pacman -S xf86-video-intel
 ```
+
+
+
+2. Video drivers. If this Arch Linux is VirtualBox guest, then install VirtualBox guest additions.
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Configuration
 
@@ -611,124 +703,6 @@ The configuration API varies often across awesome updates. So, repeat these conf
 ```bash
 [user@host ~]$ mkdir -p ~/.config/awesome
 [user@host ~]$ cp /etc/xdg/awesome/rc.lua ~/.config/awesome/
-```
-
-## Autostart
-
-Desktop (XFCE, KDE etc.) has many autostart *.desktop* files in */etc/xdg/autostart/* or *~/.config/autostart/* to launch default applications on startup (i.e. input method, power manager etc.). awesome requires manual settings:
-
-Here is an example of VBoxClient-all autostart with awesome. Create *~/.config/awesome/autostart.sh*:
-
-```bash
-#!/usr/bin/env bash
-
-function run {
-  if ! pgrep $1 ;
-  then
-    $@&
-  fi
-}
-
-run VBoxClient-all
-run fcitx-autostart
-```
-
-Make it executable:
-
-```bash
-[user@host ~]$ chmod +x ~/.config/awesome/autostart.sh
-```
-
-Check *autostart.sh*:
-
-```bash
-[user@host ~]$ ~/.config/awesome/autostart.sh
-```
-
-You can add any other programs to autostart by appending `run executable [--arguments]` to the end of *autostart.sh*.
-
-Finally, add to the end of *~/.config/awesome/rc.lua*:
-
-```lua
--- awful.spawn.with_shell("~/.config/awesome/autostart.sh")
-awful.spawn.with_shell(awful.util.getdir("config") .. "/autostart.sh")
-```
-
-To make sure modification syntax is correct:
-
-```bash
-user@tux ~ # awesome -k
-```
-
-Please be noted that, awesome restart does not restart scripts in *autostart.sh*.
-
-## xinit
-
-### xserver
-
-The default */etc/X11/xinit/xserver* does not include `vt$XDG_VTNR` which let adversaries bypass screen lock by switching terminals (Ctrl+Alt+Fx). So create *~/.xserver* as:
-
-```shell
-#!/bin/sh
-
-exec /usr/bin/Xorg -nolisten tcp "$@" vt${XDG_VTNR}
-```
-
-You can check `XDG_VNTR` variable afterwards. Attention that this variable is only available on Systemd startup. To be compatible with OpenRC, we use:
-
-```shell
-#!/bin/sh
-
-if [ -z "${XDG_VTNR}" ]; then
-  exec /usr/bin/X -nolisten tcp "$@" vt7
-else
-  exec /usr/bin/X -nolisten tcp "$@" vt${XDG_VTNR}
-fi
-```
-
-### xinitrc
-
-If *~/.xinitrc* is present in a user's home directory, startx and xinit execute it. Otherwise startx will run the default */etc/X11/xinit/xinitrc*. On the onther hand, xinit has its own defaults (check *man 1 xinit*).
-
-xinitrc, by default, launches Twm, xorg-xclock and Xterm (assumen these packages are installed). We want awesome instead:
-
-```bash
-[user@host ~]$ cp /etc/X11/xinit/xinitrc ~/.xinitrc
-```
-
-Go to the end and replace the defaults with:
-
-```
-# ~/.xinitrc
-
-#exec $command
-exec awesome
-```
-
-1. Commands after *exec* won't be executed in *.xinitrc*. If any other commands are required, put them before *exec* line.
-2. If you decide to write a custom *~/.xinitrc* file, then make sure existing *~/.Xresources* are loaded like the default does.
-
-For compatibility, we'd better add XSESSION to *~/.bash_profile* as it is checked by */etc/X11/chooser.sh*:
-
-```bash
-#export XSESSION="Xfce4"
-export XSESSION="awesome"
-```
-
-Finally, on terminal type: *startx*.
-
-### Automatic startx on login
-
-Add the following code to *~/.bash_profile*:
-
-```bash
-if shopt -q login_shell; then
-  if [ -z "${XDG_VTNR}" ]; then
-    [[ -t 0 && "$(tty)" == /dev/tty1 && "$USER" == "username" && ! "$DISPLAY" ]] && exec startx 2>&1 | tee "$HOME"/.startx.log
-  else
-    [[ -t 0 && "${XDG_VTNR}" -eq 1 && "$USER" == "username" && ! "$DISPLAY" ]] && exec startx 2>&1 | tee "$HOME"/.startx.log
-  fi
-fi
 ```
 
 # Time

@@ -919,13 +919,13 @@ Boot with LiveDVD, then
    2. *vaapi* USE is enabled to utilize hardware acceleration.
    3. The *i965* and *i915* drivers split at system application (*media-libs/mesa*) level. The kernel always enable *i915* instead.
 
-   Avoid
+   Do NOT do:
 
    ```bash
    # echo XSESSION="Xfce4" > /etc/env.d/90xsession
    ```
 
-   since *root* does not launch X. If really need, set in *~/.bash_profile* (detailed below).
+   since *root* does not launch X. If really need, set in *~/.bash_profile* (detailed below). It is referenced by */etc/X11/chooser.sh* to determine *command* in */etc/X11/xinit/xinitrc*.
 3. Display Manager: GDM, LightDM, SDDM etc.
 
    Most display managers source */etc/xprofile*, *~/.xprofile* and */etc/X11/xinit/xinitrc.d/*.
@@ -1163,7 +1163,7 @@ Boot with LiveDVD, then
    1. Go to Applications > Settings > Keyboard, Application Shortcuts. Add the *xfce4-screenshooter -r* command to use the PrtSc key.
 2. Recommendations
 
-   apg, <s>guake</s>, st term, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/), remmina/freerdp.
+   apg, <s>guake</s>, <s>st term</s>, rxvt-unicode, wgetpaste, weechat, wps-office, evince, [TeXLive](/2015/08/29/texlive-gentoo/), remmina/freerdp.
 
    1. [wps math formula fonts](https://github.com/IamDH4/ttf-wps-fonts) and [fontconfig](/2015/04/13/fontconfig/). Those fonts are essential to display formulas. However, WPS-linux does not have built-in formula creation function due to copyright.
 
