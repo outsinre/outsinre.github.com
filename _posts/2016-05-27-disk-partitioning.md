@@ -1,10 +1,27 @@
 ---
 layout: post
-title: Partitioning and Booting
+title: Disk Partitioning and Filesystem
 ---
 
 1. toc
 {:toc}
+
+# Hard Disk Drive (HDD)
+
+In terms of transmission method:
+
+1. Parallel: IDE/ATA/PATA; SCSI.
+2. Serial: Serial ATA/SATA; Serial Attached SCSI/SAS.
+
+In terms of application:
+
+1. SCSI/SAS: workstation, RAID.
+2. ATA/SATA: PC.
+
+In terms of features:
+
+1. ATA/SATA: hotplug; cheap; warm-friendly.
+2. SCSI/SAS: stable; higher performance.
 
 # Firmware and Interface
 
@@ -36,17 +53,31 @@ Both *fdisk* and *parted* are partitioning utilities. *fdisk* is well known, sta
 
 # [Sector](https://www.ibm.com/developerworks/cn/linux/l-linux-on-4kb-sector-disks/index.html)
 
-Nowadays, it is necessary to differentiate the concepts of *physical sector* and *logical sector*, especially on sectors alignment when partitioning.
+Read [Storage I/O Alignment and Size](http://fibrevillage.com/storage/563-storage-i-o-alignment-and-size) first! It is imperative to differentiate the concepts of *physical sector* and *logical sector*, especially on partitions alignment.
 
-On the hardware level, we have sectors with 512B (0.5K) in the old days. In order to improve disk scability and abilities of error check, new disk drives with 4096B (4KiB) sectors are inovated. It is nonnegligible that there exist gaps between physical sectors, data within which could be utilized to detect disk error and recovery partial data.
+On the hardware level, we have sectors with 512B (0.5KiB) in the old days. In order to improve disk scability and abilities of error check, new disk drives with 4096B (4KiB) sectors are inovated. It is nonnegligible that there exist gaps between physical sectors, data within which could be utilized to detect disk error and recovery partial data.
 
-For backward compatibility, we have physical sector and logical sector, which is called *advanced format feature*. Many ancient operating systems does not support reading sectors with 4KiB. Consequently, operating systems still read and write logical sectors of 512B (0.5K) while low layer driver operates on physical sectors in 4096B (4KiB).
+For backward compatibility, we have physical sector and logical sector, which is called *advanced format feature*. Many ancient operating systems does not support reading sectors with 4KiB. Consequently, operating systems still read and write logical sectors of 512B (0.5KiB) while disk driver operates on physical sectors in 4096B (4KiB). Here is an example output of _parted_ command. It makes sense that partition size is presented with logical sectors, when *unit* is selected to _s_ector.
 
-Obviously, 1 physical sector corresponds to 8 logical sectors. We can check both values through Linux runtime *sysfs*:
+```
+Model: ATA HITACHI HTS72323 (scsi)
+Disk /dev/sda: 625142448s
+Sector size (logical/physical): 512B/4096B
+Partition Table: gpt
+Disk Flags: 
+```
+
+Obviously, 1 physical sector corresponds to 8 logical sectors. We can check both values through Linux runtime [sysfs](http://fibrevillage.com/storage/563-storage-i-o-alignment-and-size):
 
 ```
 /sys/block/sdX/queue/physical_block_size
 /sys/block/sdX/queue/logical_block_size
+
+/sys/block/sdX/alignment_offset
+/sys/block/sdX/sdXY/alignment_offset
+
+/sys/block/sdX/queue/optimal_io_size
+/sys/block/sdX/queue/minimum_io_size
 ```
 
 However, *sysfs* is not always reliable. To get authorative results, we resort to the disk official page by checking disk model first:
@@ -55,15 +86,15 @@ However, *sysfs* is not always reliable. To get authorative results, we resort t
 /sys/block/sdX/device/model
 ```
 
-For the purpose of disk performance, we should make sure partitions align at boundaries of physical sectors (at multiple 4KiB bytes).
+For the purpose of disk performance, we should make sure partitions __start__ at boundary of physical sectors (multiple 4KiB). Alignment does not care about the ending boundary at all. That is to say, space gap may exist between partitions.
 
-Take *parted* for example, unit *s* means logical sectors instead of physical sectors. That is to say, we create partitions at multiple 8s (8s = 8 logical sectors = 8 x 0.5K = 4KiB) like 40s, 48s, etc. Just keep in mind, on software layer (either OSes or partitioning tools), *s* is equivalent to logical sector. We sometimes call partition boundaries on software level as *logical sector address* (LBA).
+We are suggested to create partitions at multiple 8s (8s = 8 logical sectors = 8 x 0.5K = 4KiB = 1 physical sector) like 40s, 48s, etc. Keep in mind, on software layer (both OSes and partitioning tools), *s* is equivalent to logical sector. We sometimes call partition boundaries on software level as *logical sector address* (LBA).
 
 For instance. I want to create a [Grub GPT/BIOS boot partition](https://wiki.archlinux.org/index.php/Grub#GUID_Partition_Table_(GPT)_specific_instructions). Although alignment is not critical to this partition (not regularly accessed), I present it here to illustrate the rules above.
 
 Usually, a Grub BIOS boot partition takes around 1MiB = 1024KiB = 2048s (logical sector). On GPT disks, the very [first usable sector is 34s](https://askubuntu.com/q/199413) since the size of the EFI label is usually 34 sectors (0s - 33s).
 
-So we can choose the starting sector to be 40s and the ending point be 2047s (included). Please be noted, here we use 2047s as the ending sector such that the next partition can start at 2048s. Hence, a properly aligned partition ends at *multiple 8s minus 1*. Actually, the ending point could be anywhere, but the next partition always starts at multiple 8s, which might leave empty disk gap unused.
+So we can choose the starting sector to be 40s and the ending point be 2047s (included). Please be noted, here we use 2047s as the ending sector such that the next partition can start at 2048s. Hence, a properly aligned partition ends at *multiple 8s minus 1*.
 
 ```
 root@tux / # parted -a opt /dev/sda
@@ -76,15 +107,21 @@ Ignore/Cancel?
 (parted) align-check min 1
 ```
 
-Now that the the starting point and ending point is set appropriately, why does *parted* still reports warning? This is related the alignment type argument `-a opt`. The *optimal* argument aligns at multiple 1MiB (a more general corse level) while *minimal* tells to align precisely at multiple physical sectors (4KiB). With *minimal* alignment, please set *unit* to KiB, MiB, or even GiB (orders of 1024) which are different from K, M and G (orders of 1000).
+Now that the the starting point and ending point is set appropriately, why does *parted* still reports warning? This is related the alignment type argument `-a opt`. What have been discussed above is about *minimal* alignment. *minimal* tells to align _precisely_ at multiple physical sectors (4KiB). Please set *unit* to KiB, MiB, or GiB (power of 2, orders of 1024): require __exact__ unit.
 
-For old mechanical disk drive, size of physical sector equals to that of logical sector. It is unnecessary to consider disk alignment since logical and physical partitions are always coherent.
+>Use minimum alignment as given by the disk topology information. This and the opt value will use layout information provided by the disk to align the logical partition table  addresses to actual physical blocks on the disks. The min value is the minimum alignment needed to align the partition properly to physical blocks, which avoids performance degradation.
 
-By the way, LVM partitions comply with with the same alignment rules above.
+By default, _parted_ uses _optimal_ alignment at __inexact__ megabytes:
 
+>Use optimum alignment as given by the disk topology information. This aligns to a multiple of the physical block size in a way that guarantees optimal performance.
 
-1. [4 KB 扇区磁盘上的 Linux：实用性建议](https://www.ibm.com/developerworks/cn/linux/l-linux-on-4kb-sector-disks/index.html)
-2. [What's the point of hard drives reporting their physical sector size?](https://superuser.com/questions/982680/whats-the-point-of-hard-drives-reporting-their-physical-sector-size)
+The *optimal* uses inexact units like K, M or G (power of 10, oders of 1000). It aligns at a more general level, usually in MB and allows +/-500KB (500MB for GB unit) adjustment automatically. Specially, we can set _unit %_. Hence start a partition by _percentile_ is appreciated like _mkpart primary fat32 0% 551MB_.
+
+1. By the way, LVM partitions comply with with the same alignment rules above.
+2. Interestingly, HD manufactures use order of 1000 to present disk size as that would make the number larger.
+3. In math, 1MB is actually 1M B while 1GiB is 1Gi B.
+
+[4 KB 扇区磁盘上的 Linux：实用性建议](https://www.ibm.com/developerworks/cn/linux/l-linux-on-4kb-sector-disks/index.html); [What's the point of hard drives reporting their physical sector size?](https://superuser.com/questions/982680/whats-the-point-of-hard-drives-reporting-their-physical-sector-size)
 
 # Filesystem
 
