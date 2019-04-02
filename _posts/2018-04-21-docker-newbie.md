@@ -20,16 +20,16 @@ title: Docker newbie
    2. Server: local/remote *docker-engine* (i.e. *systemctl start docker*).
 4. [Layer storage](https://docs.docker.com/storage/storagedriver/) uses Union FS (recall that Live CD on USB stick requires Union FS). Only the topmost (container storage layer) is writable and volatile.
 
-   Storage Driver prefers *overlay2* over *aufs*. Either enable *overlay2* in kernel or build external module.
-
-   Pay attention to [CentOS/RHEL 的用户需要注意的事项](https://yeasy.gitbooks.io/docker_practice/content/image/rm.html#centosrhel-%E7%9A%84%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9) if *devicemapper* driver *loop-lvm* mode is used.
+   Of the Union FS, *overlay2* is recommended over *aufs*. Either enable *overlay2* in kernel or build external module. *devicemapper* is also used in CentOS/RHEL. Pay attention to [CentOS/RHEL 的用户需要注意的事项](https://yeasy.gitbooks.io/docker_practice/content/image/rm.html#centosrhel-%E7%9A%84%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9) if *devicemapper* driver *loop-lvm* mode is used.
 5. Technically, Dockerfile defines image construction.
 
 # info
 
 ```bash
+user@tux ~ $ fgrep -qa docker /proc/1/cgroup; echo $?
 user@tux ~ $ docker info
 user@tux ~ $ docker image/container ls [-a]
+user@tux ~ $ docker ps
 user@tux ~ $ docker inspect [ image ID | container ID | network ID ]
 user@tux ~ $ docker search ubuntu
 ```
