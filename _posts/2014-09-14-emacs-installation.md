@@ -195,7 +195,9 @@ Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
    注意这里是给当前用户设置，而不是给系统设置。
 3. 设置快捷键。在桌面新建快捷键，设置为 *c:\programs files\emacs\emacsclientw.exe -c -n -a ""*.
 
-   同时，修改属性里的 Start In 为 *%USERPROFILE%\Documents*, 这样 `c-x c-f` 时默认目录是 Start In. 还有一个办法是，在 *init.el* 里加一句
+   同时，修改属性里的 Start In 为 *%USERPROFILE%\Documents*, 这样 `c-x c-f` 时默认目录是 Start In. 同时，把快捷键放一份到 *C:\ProgramData\Microsoft\Windows\Start Menu* 下。
+
+   还有一个办法是，在 *init.el* 里加一句
 
    ```lisp
    (setq default-directory "C:/Users/Username/Documents")
