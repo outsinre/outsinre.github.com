@@ -14,7 +14,7 @@ title: Docker newbie
 2. Dockers comprises *image*, *container* and *registry*.
    1. Image is *static* dependencies like a minimal root filesystem, a daemon etc. There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (like Gentoo stage tarball).
    2. Container is *running* instance with namespace - the isolated application process. We can think of image and container as class and object in Object-oriented programming. 
-   3. Registry is online *store* where users public, share *repostitory* which comprises images of different versions. We use *registry* and *repository* interchangebly. The official registry is [Docker Hub](https://hub.docker.com).
+   3. Registry is *store* where users publicize, share and download *repostitory* which comprises different images of the same name. We will find different image versions are referenced to by *tag* or *digest*. The official registry is *docker.io* with a frontend website [Docker Hub](https://hub.docker.com).
 3. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
    2. Server: local/remote *docker-engine* (i.e. *systemctl start docker*).
