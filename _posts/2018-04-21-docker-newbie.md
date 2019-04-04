@@ -64,7 +64,7 @@ root@tux ~ # docker image ls ubuntu
    To get image digest, we should firstly pull down a image, and use *inspect* list digests included.
 4. Dunno why 'tags' and 'digest' cannot be *search*ed on command line directly.
 
-# Run a Container
+# Run an Image
 
 Syntax:
 
@@ -88,8 +88,9 @@ root@docker ~ # exit 13
 root@docker ~ # echo $?
 ```
 
-1. `-it` runs interactively and allocates a pseudo-TTY.
-2. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
+1. When we run an image, a container is created.
+2. `-it` runs interactively and allocates a pseudo-TTY.
+3. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
 
 # Data Share
 
@@ -110,7 +111,7 @@ Docker containers can read from or write to pathnames, either on host or on memo
 
    In the example above, the source directory */root/workspace* will be created on demand.
 
-# Nginx Container
+# Manage a Nginx Container
 
 ```bash
 root@tux ~ # docker run --name webserver \
@@ -132,13 +133,13 @@ root@tux ~ # docker container prune                # remove all stopped containe
    CMD ["nginx", "-g", "daemon off;"]
    ```
 
-3. The `--mount` type is a bind mount directory.
+3. The `--mount` type is a Bind Mount directory.
 4. Visit the Nginx container page at *http://host-ip:8080*.
 5. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by default.
 
 # Get into container
 
-*exec* or *attch* a command into a running container. Avoid *attch* as much as possible because it stops container after exit. Alternatively, add `-it` to *run* or *exec*, getting an interactive shell.
+*exec* or *attch* sends a command into a running container. However, avoid *attch* as much as possible because it stops container after exit. Most ofen, we add `-it` to *run* or *exec*, getting an interactive shell.
 
 ```bash
 root@tux ~ # docker exec -it webserver bash

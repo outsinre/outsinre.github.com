@@ -73,26 +73,38 @@ Obviously, 1 physical sector corresponds to 8 logical sectors. We can check both
 /sys/block/sdX/queue/physical_block_size
 /sys/block/sdX/queue/logical_block_size
 
-/sys/block/sdX/alignment_offset
-/sys/block/sdX/sdXY/alignment_offset
+/sys/block/sdX/alignment_offset          # 0
+/sys/block/sdX/sdXY/alignment_offset     # 0
 
-/sys/block/sdX/queue/optimal_io_size
+/sys/block/sdX/queue/optimal_io_size     # 1048576 = 1024 * 1024 = 1MiB
 /sys/block/sdX/queue/minimum_io_size
 ```
 
-However, *sysfs* is not always reliable. To get authorative results, we resort to the disk official page by checking disk model first:
+*fdisk* can also reports *optimal_io_size* and *minimum_io_size*. To get authorative results, we resort to the disk official page by checking disk model first:
 
 ```
 /sys/block/sdX/device/model
 ```
 
-For the purpose of disk performance, we should make sure partitions __start__ at boundary of physical sectors (multiple 4KiB). Alignment does not care about the ending boundary at all. That is to say, space gap may exist between partitions.
+For the purpose of disk performance, please align the logical partition table addresses to actual physical blocks on the disks. Make sure partitions __start__ at boundaries of:
 
-We are suggested to create partitions at multiple 8s (8s = 8 logical sectors = 8 x 0.5K = 4KiB = 1 physical sector) like 40s, 48s, etc. Keep in mind, on software layer (both OSes and partitioning tools), *s* is equivalent to logical sector. We sometimes call partition boundaries on software level as *logical sector address* (LBA).
+```
+(optimal_io_size + alignment_offset) / physical_block_size = 256 physical sectors
+# -or-
+(minimal_io_size + alignment_offset) / physical_block_size
+```
+
+Alignment does not care about the ending boundary at all. That is to say, space gap may exist between partitions.
+
+## Minimal Alignment
+ 
+Keep in mind, on software layer (both OSes and partitioning tools), *s*ector is equivalent to logical sector. We sometimes call partition boundaries on software level as *logical sector address* (LBA).
+
+We are suggested to create partitions at the exact boundary of physical blocks, namely oders of 4096 (8s) like 40s, 48s, etc.
 
 For instance. I want to create a [Grub GPT/BIOS boot partition](https://wiki.archlinux.org/index.php/Grub#GUID_Partition_Table_(GPT)_specific_instructions). Although alignment is not critical to this partition (not regularly accessed), I present it here to illustrate the rules above.
 
-Usually, a Grub BIOS boot partition takes around 1MiB = 1024KiB = 2048s (logical sector). On GPT disks, the very [first usable sector is 34s](https://askubuntu.com/q/199413) since the size of the EFI label is usually 34 sectors (0s - 33s).
+Usually, a Grub BIOS boot partition takes around 1MiB = 2048s. On GPT disks, the very [first usable sector is 34s](https://askubuntu.com/q/199413) since the size of the EFI label is usually 34 sectors (0s - 33s).
 
 So we can choose the starting sector to be 40s and the ending point be 2047s (included). Please be noted, here we use 2047s as the ending sector such that the next partition can start at 2048s. Hence, a properly aligned partition ends at *multiple 8s minus 1*.
 
@@ -107,19 +119,26 @@ Ignore/Cancel?
 (parted) align-check min 1
 ```
 
-Now that the the starting point and ending point is set appropriately, why does *parted* still reports warning? This is related the alignment type argument `-a opt`. What have been discussed above is about *minimal* alignment. *minimal* tells to align _precisely_ at multiple physical sectors (4KiB). Please set *unit* to KiB, MiB, or GiB (power of 2, orders of 1024): require __exact__ unit.
+Now that the the starting point and ending point is set appropriately, why does *parted* still reports warning? Because `-a opt` tells the partition to align optimally. *minimal* tells to align _precisely_ at multiple physical sectors. Please set *unit* to KiB, MiB, or GiB (power of 2, orders of 1024): require __exact__ unit.
 
 >Use minimum alignment as given by the disk topology information. This and the opt value will use layout information provided by the disk to align the logical partition table  addresses to actual physical blocks on the disks. The min value is the minimum alignment needed to align the partition properly to physical blocks, which avoids performance degradation.
+
+## Optimal Alignment
 
 By default, _parted_ uses _optimal_ alignment at __inexact__ megabytes:
 
 >Use optimum alignment as given by the disk topology information. This aligns to a multiple of the physical block size in a way that guarantees optimal performance.
 
-The *optimal* uses inexact units like K, M or G (power of 10, oders of 1000). It aligns at a more general level, usually in MB and allows +/-500KB (500MB for GB unit) adjustment automatically. Specially, we can set _unit %_. Hence start a partition by _percentile_ is appreciated like _mkpart primary fat32 0% 551MB_.
+The *optimal* uses inexact units like K, M or G (power of 10, oders of 1000). It aligns at a more general level, usually in MB and allows +/-500KB (500MB for GB unit) adjustment automatically, like *mkpart primary fat32 1MB 201MB*.  Specially, we can set _unit %_. Hence start a partition by _percentile_ is appreciated like _mkpart primary fat32 0% 551MB_.
 
-1. By the way, LVM partitions comply with with the same alignment rules above.
+The resulting boundary is determined by **optimal_io_size** (check the formula above). If the that value is zero, then conform to 1MiB. Therefore, in real practice, just use the exact units or percentiles, as alignment is guranteed.
+
+## Alignment Summary
+
+1. LVM partitions comply with with the same alignment rules above.
 2. Interestingly, HD manufactures use order of 1000 to present disk size as that would make the number larger.
-3. In math, 1MB is actually 1M B while 1GiB is 1Gi B.
+3. In math, 1MB is actually 1M Bytes while 1GiB is 1Gi Bytes.
+4. We use unit _s_ector to create small partitions while MiB/GiB for large partitions.
 
 [4 KB 扇区磁盘上的 Linux：实用性建议](https://www.ibm.com/developerworks/cn/linux/l-linux-on-4kb-sector-disks/index.html); [What's the point of hard drives reporting their physical sector size?](https://superuser.com/questions/982680/whats-the-point-of-hard-drives-reporting-their-physical-sector-size)
 

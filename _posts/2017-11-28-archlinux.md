@@ -92,14 +92,14 @@ root@archiso ~ # parted -a optimal /dev/sda
 (parted) mktable gpt
 (parted) unit s
 (parted) print free
-(parted) mkpart primary 0% 2047s
+(parted) mkpart primary 0% 2047s # mkpart primary 1MiB 2047s
 (parted) set 1 bios_grub on
 (parted) mkpart primary 2048s 100%
 (parted) print free
 (parted) quit
 ```
 
-1. Tell *parted* to optimally align parititon boundaries.
+1. Tell *parted* to optimally align at 1MiB boundaries.
 2. By default, GPT's free sector starts at 34s (equally *0%*). Make BIOS boot partition be the very first parition which starts at *34s* spanning to *2047s*. *parted* reminds:
 
    >Warning: The resulting partition is not properly aligned for best performance. Ignore/Cancel?
@@ -197,16 +197,16 @@ For future compatability and scability, create extra BIOS boot partition (for Gr
 root@archiso ~ # parted -a opt /dev/sda
 (parted) unit s/MiB
 (parted) p free
-(parted) mkpart primary 34s/40s 2047s
+(parted) mkpart primary 30s/40s 2047s
 (parted) toggle 1 bios_grub
-(parted) mkpart primary fat32 2048s 551MiB
+(parted) mkpart primary fat32 2048s/1MiB 551MiB
 (parted) toggle 2 esp/boot
 (parted) mkpart primary 551MiB 751MiB
 (parted) mkpart primary 751MiB 100%
 (parted) print free
 ```
 
-1. As the Grub BIOS boot partition is not regularly accessed, there is no need to follow rigid alignment rules. It can just start at 34s.
+1. As the Grub BIOS boot partition is not regularly accessed, there is no need to follow rigid alignment rules. It can just start at 34s (no alignment) or 40s (minimal alignment).
 
    GRUB embeds its *core.img* into this partition
 2. It is recommended to create the ESP with [550MiB](https://www.rodsbooks.com/efi-bootloaders/principles.html).
@@ -250,12 +250,11 @@ Before anything else, make a backup of the key (i.e. to a USB stick), as otherwi
 
 Next, we create the LUKS encrypted container. *luksFormat* does not format the device, but sets up the LUKS device *header*, and specially encrypts the *master key* in the header with the desired passphrase (`--key-file` here). Master key is randomly choosen upon container creation and, encrypted and embedded in the header part. It is the master key's job ([not that passphrase](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions)) to encrypt the data on partition.
 
-To use the *gpg* file generated, we should firstly decrypt it.
+Create Luks containers:
 
 ```bash
-root@archiso ~ # gpg --output ~/arch-luks --decrypt ~/arch-luks.gpg
-root@archiso ~ # cryptsetup -v --type luks1 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file ~/arch-luks --use-random luksFormat /dev/sda3
-root@archiso ~ # cryptsetup -v --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file ~/arch-luks --use-random luksFormat /dev/sda4
+root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --type luks1 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file - --use-random luksFormat /dev/sda3
+root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file -  ~/arch-luks --use-random luksFormat /dev/sda4
 ```
 
 In this case, both the containers use the same key file but different LUKS type.
@@ -263,8 +262,8 @@ In this case, both the containers use the same key file but different LUKS type.
 For safety, add a fallback passphrase in addition to the key file. It always asks for an existing passphrase or key file before adding a new one.
 
 ```bash
-root@archiso ~ # cryptsetup -v --key-file ~/arch-luks --iter-time 5000 luksAddKey /dev/sda3
-root@archiso ~ # cryptsetup -v --key-file ~/arch-luks --iter-time 5000 luksAddKey /dev/sda4
+root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --key-file - --iter-time 5000 luksAddKey /dev/sda3 --key-slot 0
+root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --key-file - --iter-time 5000 luksAddKey /dev/sda4 --key-slot 0
 root@archiso ~ # cryptsetup luksDump /dev/sda3
 root@archiso ~ # cryptsetup luksDump /dev/sda4
 ```
