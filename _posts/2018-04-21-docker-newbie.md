@@ -92,8 +92,8 @@ root@tux ~ # docker run --name centos-5.8 \
 -d \
 -it \
 --rm \
---mount type=bind,source=/home/jim/workspace/,destination=/root/workspace \
--w /root/workspace \
+--mount type=bind,source=/home/jim/workspace/,target=/home/jim/workspace/ \
+-w /home/jim/workspace/ \
 -u $(id -u):$(id -g) \
 7a126f3dba08 \
 bash
@@ -131,13 +131,42 @@ Docker containers can read from or write to pathnames, either on host or on memo
    Needless to say, *tmpfs* is a memory filesystem.
 4. The `--volume , -v` or `--mount` can be used. `--mount` is recommended though `--volume, -v` won't be deprecated.
 
+    The source pathname must exist beforehand! If `-v, --volume` is used, then the source pathname is created as a directory (NOT a file) on demand.
+
+## [SELinux](https://stackoverflow.com/q/24288616)
+
+When binding a file or mount a directory of host, SELinx policy in the container may restrict access to the shared pathname.
+
+1. Temporarily turn off SELinux policy: 
+
+   ```bash
+   root@tux ~ # su -c "setenforce 0"
+   root@tux ~ # docker restart container-ID
+   ```
+
+2. Adding a SELinux rule for the shared pathname:
+
+   ```
+   root@tux ~ # chcon -Rt svirt_sandbox_file_t /path/to/volume
+   ```
+
+3. Pass argument `:z` or `:Z` to `-v, --volume` option:
+
+   ```
+   -v /root/workspace:/root/workspace:z
+   ```
+
+   This method does not apply to `--mount`.
+
+Check *man docker-run* page.
+
 # Manage a Nginx Container
 
 ```bash
 root@tux ~ # docker run --name webserver \
 -d \
 --net host
---mount type=bind,source=/tmp/logs,destination=/var/log/nginx \
+--mount type=bind,source=/tmp/logs,target=/var/log/nginx \
 -p 8080:80 nginx
 
 root@tux ~ # docker container ls
@@ -155,7 +184,7 @@ root@tux ~ # docker container prune                # remove all stopped containe
    CMD ["nginx", "-g", "daemon off;"]
    ```
 
-3. The `--mount` type is a Bind Mount directory. The source pathname must exist beforehand!
+3. The `--mount` type is a Bind Mount directory.
 4. Visit the Nginx container page at *http://host-ip:8080*.
 5. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by default.
 
@@ -261,9 +290,9 @@ Successfully built 18cc3a3480f0
 Successfully tagged nginx:v3
 ```
 
-1. During the building process, an intermediate container is created for 'RUN' instruction, adding a new layer.
+1. During the building process, both an intermediate container (d5baea5c6341) and image (18cc3a3480f0) is created for 'RUN' instruction.
 
-   The new layer is then automatically committed.
+   The intermediate container defines a new layer which is then committed to create a new image. Afterwards, the intermediate container is removed, but the intermediate image is kept.
 2. The trailing dot means the current directory is the building *context* directory. It is also the Dockerfile's default location.
 
    Docker sends all files within context directory to remote Docker engine (daemon). Image can be built without a context directory like:
@@ -278,5 +307,14 @@ Successfully tagged nginx:v3
    ```bash
    root@tux ~ # docker run --name web3 -d -p 8081:80 --rm nginx:v3
    ```
+4. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
 
-Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
+Here is another Dockerfile instance:
+
+```
+FROM 7a126f3dba08
+RUN useradd -ms /bin/bash -u 1000 zhan.hu
+CMD ["/bin/bash"]
+```
+
+Recall that in section 'Run an Image', `-u username:groupname` requires that the username and groupname exist when creating the image. The RUN instruction add a new user account in *sh* form.
