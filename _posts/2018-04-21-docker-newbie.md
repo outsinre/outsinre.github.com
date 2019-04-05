@@ -29,6 +29,8 @@ title: Docker newbie
 
 # Daemon
 
+Install [docker-ce instead of docker-ee](https://docs.docker.com/install/linux/docker-ce/centos/)
+
 ```bash
 ~ # systemctl enable docker
 ~ # systemctl status docker
@@ -87,9 +89,10 @@ Example:
 
 ```bash
 root@tux ~ # docker run --name test-ubuntu \
--i --rm \
--t \
--v /root/workspace:/root/workspace:rw \
+-d \
+-it \
+--rm \
+--mount type=bind,source=/root/workspace,destination=/root/workspace,readonly \
 -w /root/workspace/ \
 -u $(id -u):$(id -g) \
 ubuntu:16.04 \
@@ -102,10 +105,12 @@ root@docker ~ # echo $?
 ```
 
 1. When we run an image, a container is created.
-2. `-i --rm` runs interactively and automatically remove the container when it exits.
-3. `-t` allocates a pseudo-TTY.
-4. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
-5. `-u --user` runs the image as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
+2. With `-d` option, containers run in in background mode and terminal is released immediately, otherwise in foreground mode.
+3. `-i` keeps STDIN open even if not attached and runs the container interactively. `--rm` automatically remove the container when it exits.
+4. `-t` allocates a pseudo-TTY connected to the container's STDIN.
+5. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
+6. `-u, --user` runs the image as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
+7. *bash* overrides CMD instruction by Dockerfile.
 
 # Data Share
 
@@ -122,9 +127,7 @@ Docker containers can read from or write to pathnames, either on host or on memo
 3. Tmpfs.
 
    Needless to say, *tmpfs* is a memory filesystem.
-4. The `--volume , -v` or `--mount` can be used. `--mount` is more powerful and recommended though `--volume, -v` won't be deprecated.
-
-   In the example above, the source directory */root/workspace* will be created on demand.
+4. The `--volume , -v` or `--mount` can be used. `--mount` is recommended though `--volume, -v` won't be deprecated.
 
 # Manage a Nginx Container
 
@@ -143,20 +146,18 @@ root@tux ~ # docker container rm webserve          # remove one or more containe
 root@tux ~ # docker container prune                # remove all stopped container
 ```
 
-1. `-d` runs container in detached mode and terminal is released immediately. `-p` maps host port 8080 to container port 80 that is already bound to host Nginx process.
+1. `-p` maps host port 8080 to container port 80 that is already bound to host Nginx process.
 2. Check the Dockerfile, there is a line telling how Nginx should be started:
 
    ```
    CMD ["nginx", "-g", "daemon off;"]
    ```
 
-3. The `--mount` type is a Bind Mount directory.
+3. The `--mount` type is a Bind Mount directory. The source pathname must exist beforehand!
 4. Visit the Nginx container page at *http://host-ip:8080*.
 5. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by default.
 
 # Get into container
-
-*exec* or *attch* sends a command into a running container. However, avoid *attch* as much as possible because it stops container after exit. Most ofen, we add `-it` to *run* or *exec*, getting an interactive shell.
 
 ```bash
 root@tux ~ # docker exec -it webserver bash
@@ -182,6 +183,7 @@ root@tux ~ # docker history nginx:v2
    ```
 
    The `--rm` tells to remove the container upon exit.
+5. [docker attach](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
 
 # [Networking Drivers](https://docs.docker.com/network/)
 
