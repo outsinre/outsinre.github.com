@@ -91,7 +91,7 @@ root@tux ~ # docker run --name test-ubuntu \
 -t \
 -v /root/workspace:/root/workspace:rw \
 -w /root/workspace/ \
--u $(id -u):$(id -g)
+-u $(id -u):$(id -g) \
 ubuntu:16.04 \
 bash
 
@@ -105,7 +105,7 @@ root@docker ~ # echo $?
 2. `-i --rm` runs interactively and automatically remove the container when it exits.
 3. `-t` allocates a pseudo-TTY.
 4. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
-5. `-u` runs the image as a non-root user. Attention that, the username is that within the container.
+5. `-u --user` runs the image as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
 
 # Data Share
 
@@ -239,7 +239,7 @@ RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
 
 Just two lines! FROM imports the base image on which we will create the new layer. If we do not want any base image, use the special null image *scratch*.
 
-Usually, in the end of image, [exec form or sh (/bin/sh) form](https://www.cnblogs.com/sparkdev/p/8461576.html) instruction sets commands and arguments. *docker container inspect* show the default commands and arguments. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`. We can pass custom commands and arguments when invoking *docker run*. Apart from the difference between *exec* form and *sh* form, there are command instructions like [RUN, ENTRYPOINT and CMD](http://goinbigdata.com/docker-run-vs-cmd-vs-entrypoint/). ENTRYPOINT configures a container that will run as an executable in that we can pass explicit arguments when running the container, making it looks like a normal command. The RUN instruction prefers the *sh* form while ENTRYPOINT and CMD prefer the *exec* form.
+Usually, in the end of image, [exec form or sh (/bin/sh) form](https://www.cnblogs.com/sparkdev/p/8461576.html) instruction sets commands and arguments. *docker container inspect* show the default commands and arguments. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`. We can pass custom commands and arguments when invoking *docker run*. Apart from the difference between *exec* form and *sh* form, there are command instructions like [RUN, ENTRYPOINT and CMD](http://goinbigdata.com/docker-run-vs-cmd-vs-entrypoint/). ENTRYPOINT configures a container that will run as an executable in that we can pass explicit arguments when running the container, making it looks like a normal command. The RUN instruction prefers the *sh* form while ENTRYPOINT and CMD prefer the *exec* form. If */bin/bash* is preferred to */bin/sh*, then choose the *exec* form like `["/bin/bash", "-c", "echo 'Hello, world.'"]`.
 
 Now we build the image:
 
