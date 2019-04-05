@@ -88,14 +88,14 @@ docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 Example:
 
 ```bash
-root@tux ~ # docker run --name test-ubuntu \
+root@tux ~ # docker run --name centos-5.8 \
 -d \
 -it \
 --rm \
---mount type=bind,source=/root/workspace,destination=/root/workspace,readonly \
--w /root/workspace/ \
+--mount type=bind,source=/home/jim/workspace/,destination=/root/workspace \
+-w /root/workspace \
 -u $(id -u):$(id -g) \
-ubuntu:16.04 \
+7a126f3dba08 \
 bash
 
 #
@@ -106,8 +106,10 @@ root@docker ~ # echo $?
 
 1. When we run an image, a container is created.
 2. With `-d` option, containers run in in background mode and terminal is released immediately, otherwise in foreground mode.
-3. `-i` keeps STDIN open even if not attached and runs the container interactively. `--rm` automatically remove the container when it exits.
-4. `-t` allocates a pseudo-TTY connected to the container's STDIN.
+3. `-i` keeps STDIN open even if not attached and runs the container interactively.
+
+   `-t` allocates a pseudo-TTY connected to the container's STDIN.
+4. `--rm` automatically remove the container when it exits.
 5. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
 6. `-u, --user` runs the image as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
 7. *bash* overrides CMD instruction by Dockerfile.
@@ -262,9 +264,15 @@ Successfully tagged nginx:v3
 1. During the building process, an intermediate container is created for 'RUN' instruction, adding a new layer.
 
    The new layer is then automatically committed.
-2. The trailing dot means building *context* directory. It is also Dockerfile's default location.
+2. The trailing dot means the current directory is the building *context* directory. It is also the Dockerfile's default location.
 
-   Docker sends all files within context directory to remote Docker engine (daemon). Context directory is NOT the PWD where we execute *docker build* command though usually we switch to it before building.
+   Docker sends all files within context directory to remote Docker engine (daemon). Image can be built without a context directory like:
+
+   ```bash
+   root@tux ~ # docker build -t nginx:v3 - < /path/to/Dockerfile
+   ```
+
+   The hypen character cannot be omitted!
 3. After the building, we can run *nginx:v3* image:
 
    ```bash
