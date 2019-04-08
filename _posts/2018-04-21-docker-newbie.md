@@ -94,6 +94,7 @@ root@tux ~ # docker run --name centos-5.8 \
 --rm \
 --mount type=bind,source=/home/jim/workspace/,target=/home/jim/workspace/ \
 -w /home/jim/workspace/ \
+--net host
 -u $(id -u):$(id -g) \
 7a126f3dba08 \
 bash
@@ -111,6 +112,7 @@ root@docker ~ # echo $?
    `-t` allocates a pseudo-TTY connected to the container's STDIN.
 4. `--rm` automatically remove the container when it exits.
 5. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
+6. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
 6. `-u, --user` runs the image as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
 7. *bash* overrides CMD instruction by Dockerfile.
 
