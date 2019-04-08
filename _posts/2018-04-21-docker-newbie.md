@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Docker newbie
+title: Docker Newbie
 ---
 
 1. toc
@@ -159,6 +159,9 @@ When binding a file or mount a directory of host, SELinx policy in the container
    ```
 
    This method does not apply to `--mount`.
+4. Pass `--privileged=true` to *docker run*.
+
+   However, this method is discouraged as privileged containers bring in security risks.
 
 Check *man docker-run* page.
 
@@ -218,6 +221,7 @@ root@tux ~ # docker history nginx:v2
    The `--rm` tells to remove the container upon exit.
 5. [docker attach](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
 
+   
 # [Networking Drivers](https://docs.docker.com/network/)
 
 The Docker's networking subsystem is *pluggable*, using drivers. Below is a simple explanation:
