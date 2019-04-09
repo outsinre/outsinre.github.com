@@ -161,7 +161,7 @@ When binding a file or mount a directory of host, SELinx policy in the container
    This method does not apply to `--mount`.
 4. Pass `--privileged=true` to *docker run*.
 
-   However, this method is discouraged as privileged containers bring in security risks.
+   However, this method is discouraged as privileged containers bring in security risks. If it is the last resort, first create a privileged container and then create a non-priviledged container inside.
 
 Check *man docker-run* page.
 
@@ -191,7 +191,7 @@ root@tux ~ # docker container prune                # remove all stopped containe
 
 3. The `--mount` type is a Bind Mount directory.
 4. Visit the Nginx container page at *http://host-ip:8080*.
-5. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by default.
+5. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by sending SIGKILL signal.
 
 # Get into container
 
@@ -221,7 +221,12 @@ root@tux ~ # docker history nginx:v2
    The `--rm` tells to remove the container upon exit.
 5. [docker attach](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
 
-   
+   This command attaches the host's terminal STDIN, STDOUT and STDERR files (or any combination of the three) to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal.
+
+   For example, a container can be shutdown by `C-c` shortcut, sending the SIGINT signal (identical to SIGTERM) to the container by default. Rather, `C-p C-q` detaches from the container and leave it running in the background again.
+
+   If the process is running as PID 1 (mostly */usr/bin/init*), it ignores any signal and will not terminate on SIGINT or SIGTERM unless it is coded to do so.
+
 # [Networking Drivers](https://docs.docker.com/network/)
 
 The Docker's networking subsystem is *pluggable*, using drivers. Below is a simple explanation:
