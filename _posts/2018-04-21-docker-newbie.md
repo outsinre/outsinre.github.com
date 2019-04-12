@@ -323,11 +323,16 @@ Successfully tagged nginx:v3
 
    ```
    FROM 7a126f3dba08
-   RUN useradd -ms /bin/bash -u 1000 username
-   # RUN echo 'username:1C2B3A' | chpasswd
+   RUN /bin/bash -c 'useradd -ms /bin/bash -u 1000 -g 1000 username; echo "username:1C2B3A" | chpasswd'
    CMD ["/bin/bash"]
    ```
 
-   Recall that in section 'Run an Image', `-u username:groupname` requires that the username and groupname exist when creating the image. The RUN instruction add a new user account in *sh* form.
+   1. Recall that in section 'Run an Image', `-u username:groupname` requires that the username and groupname exist when creating the image. Change the account password immedately after the container is created as the initial password is explicitly written in the Dockerfile.
+   2. By default, the 'RUN' instruction uses */bin/sh* form. It is replaced by */bin/bash* in this example.
 
-   Change the account password immedately after the container is created as the initial password is explicitly written in the Dockerfile.
+      Also, multiple relevant shell commands are merged into one single 'RUN' instruction. We can also the split the command by line continuation like:
+
+      ```
+      RUN /bin/bash -c 'useradd -ms /bin/bash -u 1000 -g 1000 username ; \
+      echo "username:1C2B3A" | chpasswd'
+      ```
