@@ -319,13 +319,15 @@ Successfully tagged nginx:v3
    root@tux ~ # docker run --name web3 -d -p 8081:80 --rm nginx:v3
    ```
 4. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
+5. Here is another Dockerfile instance:
 
-Here is another Dockerfile instance:
+   ```
+   FROM 7a126f3dba08
+   RUN useradd -ms /bin/bash -u 1000 username
+   # RUN echo 'username:1C2B3A' | chpasswd
+   CMD ["/bin/bash"]
+   ```
 
-```
-FROM 7a126f3dba08
-RUN useradd -ms /bin/bash -u 1000 zhan.hu
-CMD ["/bin/bash"]
-```
+   Recall that in section 'Run an Image', `-u username:groupname` requires that the username and groupname exist when creating the image. The RUN instruction add a new user account in *sh* form.
 
-Recall that in section 'Run an Image', `-u username:groupname` requires that the username and groupname exist when creating the image. The RUN instruction add a new user account in *sh* form.
+   Change the account password immedately after the container is created as the initial password is explicitly written in the Dockerfile.
