@@ -240,7 +240,9 @@ The Docker's networking subsystem is *pluggable*, using drivers. Below is a simp
    Please pay attention: this is different from the *bridge* mode of VMWare or VirtualBox (real Virtual Machine). VMWare and VirtualBox's bridge is deployed directly on the host's interface and appears to be a real physical device parallel to the host and can be connected to directly from within LAN.
 2. Host
 
-   Share the host's networking directly without isolation. However, LAN devices cannot differntiate between containers and the host.
+   Share the host's networking directly without isolation. However, LAN devices cannot differntiate between containers and the host as there is not individual IP addressed assigned to containers.
+
+   The host mode is preferred when the service exposes a port publicly like Nginx servers.
 3. Overlay
 
    Overlay connects multiple Docker daemons together, creating a distributed network among multiple Docker daemon hosts. This network sits on top of (overlays) the host-specific networks, allowing containers connected to it.
@@ -322,8 +324,8 @@ Successfully tagged nginx:v3
 5. Here is another Dockerfile instance:
 
    ```
-   FROM 7a126f3dba08
-   RUN /bin/bash -c 'useradd -ms /bin/bash -u 1000 -g 1000 username; echo "username:1C2B3A" | chpasswd'
+   FROM centos:latest
+   RUN /bin/bash -c 'groupadd -g 1000 username ; useradd -ms /bin/bash -u 1000 -g 1000 username; echo "username:1C2B3A" | chpasswd'
    CMD ["/bin/bash"]
    ```
 
