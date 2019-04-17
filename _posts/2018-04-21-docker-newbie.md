@@ -163,7 +163,7 @@ When binding a file or mount a directory of host, SELinx policy in the container
 
    However, this method is discouraged as privileged containers bring in security risks. If it is the last resort, first create a privileged container and then create a non-priviledged container inside.
 
-Check *man docker-run* page.
+   Privilege permissions can have fine-grained control by `--cap-add` or `--cap-drop`, which is recommended!
 
 # Manage a Nginx Container
 
@@ -233,7 +233,7 @@ The Docker's networking subsystem is *pluggable*, using drivers. Below is a simp
 
 1. Bridge
 
-   The *default* driver if none is given upon *run*, providing network isolation from the outside. It is to bridge traffic among multiple containers and the host. Check the image below, *docker0" is the bridge interface.
+   The *default* driver if none is given upon *run*, providing network isolation from the outside. It is to bridge traffic among multiple containers and the host. Check the image below, *docker0* is the bridge interface.
 
    ![docker netowrk](/assets/docker-net.png)
 
