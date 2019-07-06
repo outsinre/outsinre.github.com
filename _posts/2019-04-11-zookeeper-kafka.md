@@ -674,7 +674,6 @@ From the excerpt, we know ZooKeeper create an individual znode for each Kafka se
 
 ```bash
 logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 ls /
-```
 
 # [cluster, controller_epoch, controller, brokers, zookeeper, admin, isr_change_notification, consumers, log_dir_event_notification, latest_producer_id_block, config]
 
