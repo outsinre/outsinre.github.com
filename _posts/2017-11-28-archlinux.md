@@ -602,30 +602,7 @@ We'd better unmount all partitions under */mnt* to determine busy partitions and
    [root@host ~]# passwd username
    ```
 
-3. sudo
-
-   ```bash
-   [root@host ~]# pacman -S sudo
-   [root@host ~]# sudo -ll -U username
-   ```
-
-   1. To modify configuration file */etc/sudoers*, please use command *visudo*.
-   2. Personally, I'd like to put personal modifications under */etc/sudoers.d/*.
-   3. [sudoedit /path/to/file](https://superuser.com/q/785187) is preferred than `sudo vim /path/to/file`.
-
-   ```
-   # /etc/sudoers.d/username
-   
-   #Defaults:%wheel targetpw
-   username hostname=(ALL) ALL
-   ```
-
-   ```bash
-   [username@host ~]$ sudo -ll -U username
-   [username@host ~]$ sudo -u another-username command
-   ```
-
-5. Swap file (opt)
+4. Swap file (opt)
 
    ```bash
    [root@host ~]# dd bs=1M count=1024 if=/dev/zero of=/swapfile
