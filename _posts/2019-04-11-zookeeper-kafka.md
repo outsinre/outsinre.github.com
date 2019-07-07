@@ -12,7 +12,7 @@ title: ZooKeeper and Kafka
 
 ![zkservice](/assets/zkservice.jpg)
 
-ZooKeeper is a Distributed Coordination Service for Distributed Applications, relieving them from coordination but focusing on high-level synchronization, configuration maintenance, and groups and naming.
+ZooKeeper is a Distributed Coordination Service for Distributed Applications (i.e. Kafka), relieving them from coordination but focusing on high-level synchronization, configuration maintenance, and groups and naming.
 
 ZooKeeper defines a hierarchical namespace similar to the structure and a Linux filesystem like the figure below. Each node in the tree is named as a path starting with a forward slash '/' (the root node). In ZooKeeper parlance, a tree node is called *znode*.
 
@@ -22,9 +22,9 @@ As ZooKeeper is designed to coordinate data (like metadata, configuration, locat
 
 Like the applications it coordinates, ZooKeeper itself is also distributed and replicated across a cluster of hosts - ZooKeeper *ensemble*. The in-memory data and persistent data are replicated among the ZooKeeper servers.
 
-The servers that make up the ZooKeeper ensemble must all know about each other (by configuration file). At any give moment, a client (a coordinated application) connects (TCP connection) to a single ZooKeeper server, and switch to another one if the current TCP connection breaks. ZooKeeper do *heartbeat*s test (a tiny packet) periodically to check connection and availability of servers.
+The servers that make up the ZooKeeper ensemble must all know about each other (by configuration file). ZooKeeper performs *heartbeat*s test (a tiny packet) periodically to check connection and availability of servers.
 
-Read requests are servered served locally while requests to change the state of data (write requests) are all forwarded to a particular server called *leader*; the rest servers are called *follower*s (recall partitions leader and followers in Kafka above). Followers replicate write results from the leader to keep synchronized.
+At any give moment, a client (a coordinated application) connects (TCP connection) to a single ZooKeeper server, and switch to another one if the current TCP connection breaks. Read requests are served locally while requests to change the state of data (write requests) are all forwarded to a particular server called *leader*. The rest servers are called *follower*s (similar to partitions leader and followers of Kafka). Followers replicate write results from the leader to keep synchronized.
 
 >Write synchronization is the core of ZooKeeper.
 
@@ -34,11 +34,13 @@ The underlying implementation takes care of replacing the leader upon failure an
 
 According to Wikipedia, a *quorum* is the *minimum number* of members of a deliberative assembly necessary to conduct the business of that group. A quorum requirement is protection against totally unrepresentative action in the name of the body by an *unduly* small number of persons. A quorum is often more than half of the total number.
 
-ZooKeeper is functional only when a quorum of the servers (the leader included) are available. Recall that all writes requests are forwarded to the leader in ZooKeeper. Upon successive write, the result is synced to followers. If less than a quorum of the servers are synched on the write, ZooKeeper was nonfunctional!
+ZooKeeper is functional only when a quorum of the servers are available. Recall that all writes requests are forwarded to the leader in ZooKeeper. Upon successive write, the result is synced to followers. If less than a quorum of the servers are synched on the write, ZooKeeper was nonfunctional as 'write synchronization is the core'.
 
-Take 4 ZooKeeper servers for example, a quorum is 3 (> 4/2) which allows 1 server failure and writes should be synced among 3 servers. If there are only 3 servers, the quorum is 2 (> 3/2) which is able to allow 1 server failure as well. So the additional 4th server does not bring in any performance advancement. But what if the number is increased to 5? This requires 3 (> 5/2) servers to form a quorum, the same as a 4-server ZooKeeper. However, the system allows 2 server failure and is more fault-tolerant. So either 3 or 5, not 4 - choose an **odd** number, namely 1, 3, 5, etc. When there is only server, it is called *standalone mode*, otherwise, it is *replicated mode*.
+Take 4 ZooKeeper servers for example, a quorum is 3 (> 4/2) which allows 1 server failure and writes should be synced among 3 servers. If there are only 3 servers, the quorum is 2 (> 3/2) which is able to allow 1 server failure as well. So the additional 4th server does not bring in any improvement in terms of stability. However, it benefits load balancing. But what if the number is increased to 5? This requires 3 (> 5/2) servers to form a quorum, the same as a 4-server ZooKeeper. However, the system allows 2 server failure and is more fault-tolerant. Usually, either 3 or 5, not 4 - choose an **odd** number, namely 1, 3, 5, etc.
 
-Additionally, ZooKeeper elects the leader from at least of a quorum of the servers. Therefore, proper choice of the number of servers is essential for deployment.
+ZooKeeper elects the leader from at least of a quorum of the servers. Therefore, proper choice of the number of servers is essential for deployment.
+
+If there is only 1 server, it forms the *standalone mode*, otherwise, it is *replicated mode*.
 
 Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.corejavaguru.com/blog/bigdata/why-zookeeper-on-odd-number-nodes.php)
 
@@ -48,15 +50,15 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
 
 1. Kafka is a *distributed streaming* platform.
    1. Streaming: real-time messaging pipeline similar to Logstash and different from Elasticsearch that is a static storage.
-   2. Distributed: cluster with fault-tolerance (and/or load balancing).
+   2. Distributed: cluster with fault-tolerance and load balancing.
 
-   Kafka receives data from *producer*s while streaming it to *consumer*s (also called*subscriber*s). In this post, words *read* and *consume* are used interchangeably; *write* and *produce* are used interchangeably. However, read and write emphasize internal operations while produce and consume emphasize interactions with external applications.
+   Kafka receives data from *producer*s while streaming it to *consumer*s (also called *subscriber*s). In this post, words *read* and *consume* are used interchangeably; *write* and *produce* are used interchangeably. However, read and write emphasize internal actions while produce and consume emphasize interactions with external applications.
 2. Kafka and Logstash are both message pipeline.
 
    However, Kafka is more powerful. Basically, Kafka is a cluster while Logstash runs in standalone mode.
 
-   They can co-operate: each Logstash instance connects to a Kafka server (also called *broker*) in the cluster.
-3. Kafka uses the term *record* while Elastic Stack and Flume use *event* - the data.
+   They can co-operate: each Logstash instance connects to a Kafka server (also called *broker*) in the cluster. Logstash instances are not aware of each other.
+3. Kafka uses the term *record* while Elastic Stack and Flume use *event*, namely the data.
 
    Each record comprises timestamp and other key-value pairs.
 
@@ -68,30 +70,38 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
 
    ![Kafka Partition](/assets/kafka-partition.png)
 
-   Records are classified into *topic*s: categories of records. We can regard the topic as a label assigned to a group of relevant records. For each topic, records are stored in one or more *partition*s. Each partition is an *ordered* and *immutable* sequence of records with new records continuously appended to. A partition is similar to an array but disallows random write - producing records in the exact order, and allows random read - consuming records in a free style.
+   Records are classified into *topic*s: categories of records. We can regard the topic as a label assigned to a group of relevant records (i.e. Nginx logs). Records of a particular topic are stored in one or more *partition*s with an individual record replicated in one or more partitions.
 
-   Partitions of a topic act as a parallelism to speed up producing and consuming. Secondly, the capacity of a partition may be limited by the Kafka server hold it. So multiple partitions accomplish storage scalability.
+   A partition is an *ordered* and *immutable* sequence of records with new records continuously appended to, similar to an array disallowing random write.
 
-   Topics data in partitions forms a structured *commit log*. In the context of Kafka, name ["log" refers to topics data](https://stackoverflow.com/q/40369238), **not** the log of Kafka processes. In this post, we call them *commit log* and *broker log* separately.
+   >Write in order while read in a free style.
 
-   Typically, it is stored on dedicated high speed I/O devices like SSD.
+   Multiple partitions act as a parallelism to speed up producing and consuming. Additionally, the capacity of a partition may be limited by the Kafka server hold it. So multiple partitions accomplish storage scalability. Typically, partititons reside on dedicated high speed I/O devices like SSD.
+
+   Records in partitions form a structured *commit log*. In the context of Kafka, ["log" refers to topic data](https://stackoverflow.com/q/40369238), **NOT** the log of Kafka itself. The relevant configuration directive is `log.dir`. In this post, we call them *commit log* and *broker log* separately.
+
+   
 5. Offset
 
    ![Kafka Read and Write](/assets/kafka-read-write.png)
 
-   A record is uniquely identified by the index within a partition, which is called *offset* - the only metadata retained by each consumer. For sequential consumption, the offset is reduced one by one. Consumers are independent of each other. We can use command line *tail -F* to examine the topic records without interfering in what is and what can be consumed. Apparently, records sent by a particular producer to a particular topic partition are appended in the order they are sent.
+   A record is uniquely identified by the *index* within a partition, which is called *offset* - the only metadata retained by each consumer. For sequential consumption, the offset is reduced one by one. Consumers are independent of each other. We can use command line *tail -F* to examine the topic records without interfering in what is and what can be consumed.
 
-   Kafka only guarantee the index (order of records) in a per-partition base. The order among partitions is not the business. If the order of total records is desired, then configure only one partition for the topic, and only one consumer instance per consumer group: each topic, one partition, one consumer group, one consumer instance.
+   Records sent by a particular producer to a particular topic partition are appended in the order they are sent. However Kafka only guarantees such order on a per-partition base. The order of records among consumers, producers and/or partitions are not forseeable. If that is the desired outcome, then configure only one partition for a topic and only one consumer instance per *consumer group* (discussed below).
 5. Persistent Storage
 
-   Kafka can be configured to hold records for a retention period of time. During the retention period a record is available for consumption, after which it is discarded to free up space.
+   Kafka can be configured to hold records for a retention period of time. During that period, a record is available for consumption, after which it is discarded to free up space.
 
-   Consumption does mean to eat up records but just read. When to get rid of a record depends on the retention configuration. The performance is *constant* with respect to storage size so storing data for a long time is not a problem.
+   Consumption does not mean to eat up records but just read. Whether to get rid of a record depends on the retention configuration. The read/write performance is *constant* with respect to storage size so storing data for a long time is not a problem.
 6. Distribution
 
-   Each partition is replicated across a configurable number - the *replication factor* of Kafka servers for fault tolerance. Of those servers, one is the *leader* and the others are *follower*s. At any given moment, only the leader server handles the read and write operation while the rest servers replicate the leader operations. If a leader fails, one of the followers becomes the new leader. A distribution leader has to maintain a list of followers that are *in-sync replicas* (ISR). An ISR means the follower has fully caught up with the leader, namely synced in time.
+   Each partition is replicated across a configurable number of Kafka brokers - the *replication factor* for fault tolerance. Of the replicated brokers, one is the *leader* and the rest are *follower*s (recall the leader and follower of Zookeeper). At any given moment, the leader broker handles both readding and writing operation (different from that of Zookeeper) while the rest brokers only replicate the leader.
 
-   Each Kafka server holds a share of the partitions. It acts as a leader for some of its partitions and a follower for others. So load is well balanced within the cluster.
+   A leader has to maintain a list of followers that are *in-sync replicas* (ISR). An ISR means the follower has fully caught up with the leader, namely synced in time. If a leader fails, one of the ISR followers becomes the new leader. 
+
+   From the perspective of a Kafka broker, it holds a share of existing partitions and acts as a leader for some of its partitions and a follower for others.
+
+   Therefore, load is well balanced within the cluster.
 7. Producer
 
    A producer publish data to the records of its choice and decide the partition to which a record is assigned to. The assignment can be done in a round robin fashion to load balance. Instead, records can also be assigned to partitions based on the key value of the tuple.
