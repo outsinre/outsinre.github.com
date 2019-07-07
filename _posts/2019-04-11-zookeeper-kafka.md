@@ -553,10 +553,12 @@ zookeeper.connect=logger1:2181,logger2:2181,logger3:2181
 
 1. listeners
 
-   The directive is a list of comma-separated listeners. Each listener is actually a TCP socket on the broker and is associated with a string name, host/IP, and port.
+   >Listeners are what interfaces a Kafka broker bind to.
+
+   The directive is a list of comma-separated listeners. Each listener is actually a TCP socket on the broker and is associated with a name, hostname/IP, and port.
 
    ```
-   # listeners = listener_name://host_name:port
+   # listeners = listener_name://my.host.name:port
    
    # two sockets on LAN and public IPs
    listeners=PLAINTEXT://192.168.1.100:9092,SSL://12.34.56.78:9092
@@ -567,25 +569,31 @@ zookeeper.connect=logger1:2181,logger2:2181,logger3:2181
    listeners=EXTERNAL://:9093
    ```
 
-   Specify hostname as '0.0.0.0' to bind to all interfaces. Leave hostname empty to bind to the default interface. A hostname can be resolved to multiple IPs to do load balance. If not specified, it is set to '0.0.0.0'.
+   Specify hostname as '0.0.0.0' to bind to all interfaces. Leave hostname empty to bind to the default interface. A hostname can be resolved to multiple IPs to do load balance. If this directive is not set, it defaults to 'PLAINTEXT://0.0.0.0:9093'.
 
    A listener should be mapped to a security protocol by its name for connection authentication, and thus often named after a security protocol:
 
    ```
-   $ listenere name to security protocol
+   $ name to security protocol map
    listener.security.protocol.map=PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
    ```
 
    So we cannot define two listeners with the same name.
 2. advertised.listeners
 
-   A listener is firtly published to the ZooKeeper, then spreaded to all brokers, and finally to clients (consumers and producers). The limitation is that a listener can be advertised only once. Read and/or write connections are only allowed to advertised listeners.
+   >Advertised listeners are what interfaces a client (producer/consumer) connects to.
+
+   A listener is firtly published to the ZooKeeper cluster, then spreaded to all other Kafka brokers, and finally to clients. The limitation is that a listener can be advertised only once.
+
+   1. Communication within the cluster brokers and can be achieved through any defined listeners. Clients get the cluster metadata from any defined listeners as well.
+   2. However, read and/or write connections are only done through advertised listeners. Hence, usually we advertise listeners with public IP.
 
    ```
    listeners=PLAINTEXT://0.0.0.0:9092
 
-   # error:
+   # error: two listners with the same name
    listeners=PLAINTEXT://192.168.1.100:9092,PLAINTEXT://12.34.56.78:9092
+   
    # correct
    advertised.listeners=PLAINTEXT://12.34.56.78:9092
    ```
@@ -609,14 +617,16 @@ logger@container-logger1 ~ $ mkdir -p /var/opt/logger/k1-logs
 logger@container-logger1 ~ $ echo 'PATH=/opt/kafka/bin:${PATH}' >> ~/.bashrc ; source ~/.bashrc
 ```
 
-Kafka has a bunch of built-in scripts, of which 'kafka-server-start.sh' and 'kafka-run-class.sh' are responsible for starting the service. In the scripts, there is a special variable 'base_dir' setting the base directory (like 'ZOO_LOG_DIR' of ZooKeeper). Like ZooKeeper, Kafka also utilize 'Log4j' to trace broker logs affected by environment variables 'LOG_DIR', and 'KAFKA_LOG4J_OPTS', and Java property 'kafka.logs.dir'
+Kafka has a bunch of built-in scripts, of which 'kafka-server-start.sh' and 'kafka-run-class.sh' are responsible for starting the service. In the scripts, there is a special variable 'base_dir' setting the base directory (like 'ZOO_LOG_DIR' of ZooKeeper).
+
+Similar to ZooKeeper, Kafka also utilize 'Log4j' to trace broker logs affected by environment variables 'LOG_DIR', and 'KAFKA_LOG4J_OPTS', and Java property 'kafka.logs.dir'
 
 ```bash
-# kafka-server-start.sh
+# Script 'kafka-server-start.sh':
 # Log4j property file
 export KAFKA_LOG4J_OPTS="-Dlog4j.configuration=file:$base_dir/../config/log4j.properties"
 
-# kafka-run-class.sh
+# Script 'kafka-run-class.sh'
 LOG_DIR="$base_dir/logs"
 KAFKA_LOG4J_OPTS="-Dkafka.logs.dir=$LOG_DIR $KAFKA_LOG4J_OPTS"
 ```
@@ -711,7 +721,7 @@ To gracefully stop a broker:
 logger@container-logger1 ~ $ kafka-server-stop.sh
 ```
 
-The script does **not* accept any options and just sends 'SIGTERM' signal to the Kafka process. So don't try to pass `--help`.
+The script does *not* accept any options and just sends 'SIGTERM' signal to the Kafka process. So don't try to pass `--help` as it inevitably stops the service.
 
 ## Dynamic Update Mode
 
@@ -772,7 +782,7 @@ Post [introduction-to-apache-kafka-security](https://medium.com/@stephane.maarek
 
 Kafka provides a simple console producer and consumer script, quite handy for test.
 
-In earlier Kafka versions, built-in scripts require the option `--zookeeper` to specify one or more ZooKeeper servers to connect to as *offset* data is stored within ZooKeeper which is moved into Kafka itself (the built-in `__consumer_offset` topic). So `--zookeeper` option is [depcreated](https://stackoverflow.com/q/46173003) in favor of option `--bootstrap-server` using brokers.
+In earlier Kafka versions, built-in scripts require the option `--zookeeper` to specify one or more ZooKeeper servers to connect to as *offset* data is stored within ZooKeeper. The offset data is now moved into Kafka itself (the built-in `__consumer_offset` topic). So `--zookeeper` option is [depcreated](https://stackoverflow.com/q/46173003) in favor of option `--bootstrap-server` using brokers.
 
 Firstly, create a test topic:
 
@@ -821,4 +831,6 @@ logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 get /brokers/topics
 
 Use `^C` to stop the consumer and producer.
 
->A final note: whenever one or more servers are to supplied, only a subset of all the servers is required as they serve only as server seeds from which the full server list is retrieved. TO BE CONFIRMED!
+# Note
+
+Whenever one or more servers are supplied to `--zookeeper`, `--broker-list` etc., only a subset of the total servers is required as they serve only as seeds from which the full server list is retrieved.
