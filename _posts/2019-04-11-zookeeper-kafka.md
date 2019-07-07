@@ -406,6 +406,7 @@ Now, it is time to start the servers. A customized configuration file can be sup
 
 ```bash
 logger@container-logger1 ~ $ zkServer.sh start [/path/to/zoo.cfg]
+logger@container-logger1 ~ $ zkServer.sh stop
 
 logger@container-logger1 ~ $ zkServer.sh status
 ```
