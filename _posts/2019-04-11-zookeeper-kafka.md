@@ -58,9 +58,9 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
    However, Kafka is more powerful. Basically, Kafka is a cluster while Logstash runs in standalone mode.
 
    They can co-operate: each Logstash instance connects to a Kafka server (also called *broker*) in the cluster. Logstash instances are not aware of each other.
-3. Kafka uses the term *record* while Elastic Stack and Flume use *event*, namely the data.
+3. Kafka uses the term *record* or *message* while Elastic Stack and Flume use *event*, namely the data.
 
-   Each record comprises timestamp and other key-value pairs.
+   Each record comprises *timestamp*, *metadata* other key-value pairs.
 
    ```
    {"@timestamp":"2019-04-17T09:45:22.361Z","@metadata":{"beat":"filebeat","type":"_doc","version":"7.0.0","topic":"var-logs"},"message":"127.0.0.1 - - [17/Apr/2019:09:45:19 +0000] \"GET /index.html HTTP/1.1\" 200 3700 \"-\" \"curl/7.29.0\" \"-\"","log":{"offset":505,"file":{"path":"/var/log/nginx/access.log"}},"input":{"type":"log"},"ecs":{"version":"1.0.0"},"host":{"name":"76595710480d","architecture":"x86_64","os":{"platform":"centos","version":"7 (Core)","family":"redhat","name":"CentOS Linux","kernel":"3.10.0-693.el7.x86_64","codename":"Core"},"containerized":true,"hostname":"76595710480d"},"agent":{"ephemeral_id":"8909f3d3-8037-4288-bf12-7f22e821181b","hostname":"76595710480d","id":"0c54a8df-1b11-421a-b91b-98a18b4d1ff0","version":"7.0.0","type":"filebeat"},"cloud":{"instance":{"id":"i-00000472","name":"apple-dev.novalocal"},"machine":{"type":"8C16G100G"},"availability_zone":"nova","provider":"openstack"}}
@@ -70,7 +70,7 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
 
    ![Kafka Partition](/assets/kafka-partition.png)
 
-   Records are classified into *topic*s: categories of records. We can regard the topic as a label assigned to a group of relevant records (i.e. Nginx logs). Records of a particular topic are stored in one or more *partition*s with an individual record replicated in one or more partitions.
+   Records are classified into *topic*s: categories of records. We can regard the topic as a label assigned to a group of relevant records (i.e. Nginx logs). Records of a particular topic are stored in one or more (determined at topic creation) *partition*s with individual records replicated in one or more partitions (determined at topic creation).
 
    A partition is an *ordered* and *immutable* sequence of records with new records continuously appended to, similar to an array disallowing random write.
 
@@ -79,8 +79,6 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
    Multiple partitions act as a parallelism to speed up producing and consuming. Additionally, the capacity of a partition may be limited by the Kafka server hold it. So multiple partitions accomplish storage scalability. Typically, partititons reside on dedicated high speed I/O devices like SSD.
 
    Records in partitions form a structured *commit log*. In the context of Kafka, ["log" refers to topic data](https://stackoverflow.com/q/40369238), **NOT** the log of Kafka itself. The relevant configuration directive is `log.dir`. In this post, we call them *commit log* and *broker log* separately.
-
-   
 5. Offset
 
    ![Kafka Read and Write](/assets/kafka-read-write.png)
@@ -104,26 +102,26 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
    Therefore, load is well balanced within the cluster.
 7. Producer
 
-   A producer publish data to the records of its choice and decide the partition to which a record is assigned to. The assignment can be done in a round robin fashion to load balance. Instead, records can also be assigned to partitions based on the key value of the tuple.
+   A producer publish data to the records of its choice and decide the partition to which a record is assigned to. The assignment can be done in a round robin fashion to load balance or based on key values.
 8. Consumer
 
-   A topic can have zero or more consumers which are also assigned to labels, forming *consumer group*s (also called *subscriber group*). That is to say, all consumers subscribing to a topic are divided into groups. That make a sense as there may exist multiple entities interested in the same topic, with each entity corresponds to a subscriber group. *consumer instance*s within a group can be separate processes or on separate machines.
+   A topic can have zero or more consumers which are also assigned to labels, forming *consumer group*s (also called *subscriber group*). That is to say, all consumers subscribing to a topic are divided into groups. That makes a sense as there may exist multiple entities interested in the same topic, with each entity forms a subscriber group. *Consumer instance*s within a group can be separate processes or on separate machines.
 
-   Partitions of a topic are effectively load-balanced over the consumer instances of a subscribing group, in a granularity of partitions. Each instance *exclusively* consumes a share of the partitions at any given time. In the other way around, among multiple subscribing groups, each partition is *broadcasted*.
+   Partitions of a topic are effectively load-balanced over the consumer instances of a subscribing group, in a granularity of partitions. Each instance *exclusively* consumes zero or more of the partitions at any given time. If there are more instances than partitions, then some of them may be in idle state, consuming nothing. In the other way around, each partition is *broadcasted* in a granularity of subscribing groups.
 
-   The relation between partitions and consumer instances is a [surjection](https://en.wikipedia.org/wiki/Surjective_function). In the figure below, there are 4 partitions (P0 - P3) belonging to a particular topic (replication is left out for simplifition). From the figure, each partition is broadcasted to both group A and group B. Within either group, partitions are exclusively distributed (like the storage distribution above).
+   In the figure below, there are 4 partitions (P0 - P3) belonging to a particular topic (replication is left out for simplifition). From the figure, each partition is broadcasted to both group A and group B. Within either group, partitions are exclusively distributed.
 
    ![Subscribing Groups](/assets/kafka-consumer-groups.png)
 
    Subscribing groups achieve multi-subscriber support (with the help of persistent storage), namely scalability. Within each group, Kafaka achives parallelism and load balance. The points are:
 
-   1. Broadcast is only done between groups.
-   2. Exclusive distribution is done within each group.
+   1. Broadcast among groups.
+   2. Exclusive distribution among consumer instances of a group.
 
-   A subscribers' group can be esteemed as a *logical subscriber*. In terms of scalability, load balance, and fault tolerance:
+   A consumer group can be esteemed as a *logical subscriber*. In terms of scalability, load balance, and fault tolerance:
 
-   1. Consumer instances can dynamically join a group (get a share from others) and leave (i.e. die) a group (its partitions are distributed among others).
-   2. Subscribing groups can also leave and join the system.
+   1. Groups can also leave and join the system.
+   2. Instances can dynamically join (get a share from other instances) and/or leave (i.e. die) a group (its partitions are transferred to others).
 
 # [Deployment](https://progressive-code.com/post/17/Setup-a-Kafka-cluster-with-3-nodes-on-CentOS-7)
 
