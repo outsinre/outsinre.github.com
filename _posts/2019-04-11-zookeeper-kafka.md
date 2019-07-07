@@ -18,7 +18,7 @@ ZooKeeper defines a hierarchical namespace similar to the structure and a Linux 
 
 ![zknamespace](/assets/zknamespace.jpg)
 
-As ZooKeeper is designed to coordinate data (like metadata, configuration, location etc.), so the data stored in each znode is usually small in the byte to kilobyte range. ZooKeeper keeps the data in memory for high throughput and low latency, along with transaction logs and snapshots of the in-memory data in a persistent store (disk).
+As ZooKeeper is designed to coordinate data (like metadata, configuration, location etc.), so the data stored in each znode is usually small in the byte to kilobyte range. ZooKeeper keeps the data in memory for high throughput and low latency. Meanwhile, snapshots of the in-memory data and transaction logs are kept in a persistent storage (disk).
 
 Like the applications it coordinates, ZooKeeper itself is also distributed and replicated across a cluster of hosts - ZooKeeper *ensemble*. The in-memory data and persistent data are replicated among the ZooKeeper servers.
 
@@ -179,8 +179,8 @@ root@tux ~ # docker image ls
 
 ### Dockerfile
 
-1. In the Dockerfile, we pass a default password for 'logger', which should be changed after *docker attach' or *docker exec*.
-2. We enable EPEL and IUS.
+1. In the Dockerfile, we pass a default password for 'logger', which should be changed after *docker attach* or *docker exec*.
+2. Enable EPEL and IUS, and install a few tools ([iproute2 vs net-tools](http://xmodulo.com/linux-tcpip-networking-net-tools-iproute2.html)).
 
 ```
 FROM centos:latest
@@ -203,13 +203,13 @@ logger@tux ~ $ sudo docker image ls
 
 ### Create Container
 
-1. Create an alias in */etc/hosts* for the IP of the host, making connections to the host easier.
+1. Create an alias in */etc/hosts* for the host IP by `--add-host`, making connections to the host easier.
 2. Use the default 'bridge' networking mode; run as the default 'root'.
 
 ```bash
-logger @tux ~ # HOSTIP="$( awk -F $'/|[[:space:]]+' '{print $4}' < <(ip -4 -o address show scope global dev eth0) )"
+logger@tux ~ # HOSTIP="$( awk -F $'/|[[:space:]]+' '{print $4}' < <(ip -4 -o address show scope global dev eth0) )"
 
-logger@tux ~ $ sudo docker run --name logger1 -d -it --mount type=bind,source=/var/opt/logger,target=/var/opt/logger -w /var/opt/logger --net bridge --add-host docker-eth0:${HOSTIP} --user root:root centos-7.6:logger bash
+logger@tux ~ $ sudo docker run --name logger1 -d -it --mount type=bind,source=/var/opt/logger,target=/var/opt/logger -w /var/opt/logger --net bridge --add-host host-eth0:${HOSTIP} --user root:root centos-7.6:logger bash
 ```
 
 ### Container Setup
@@ -252,7 +252,7 @@ logger@container-logger1 ~ $ sudo yum install java-1.8.0-openjdk.x86_64
 logger@container-logger1 ~ $ java -version
 ```
 
-System property value can be configured dynamically on command line by `java -Dproperty=value`. *property* is a Java variable while *value* overrides that set in configuration files. If *value* is a string with blanks, then quote it.
+System property value can be configured dynamically on command line by `java -Dproperty=value`. *property* is a Java variable while *value* overrides the counterpart set in configuration files. If *value* is a string with blanks, then quote it.
 
 # [ZooKeeper Replicated Mode](http://zookeeper.apache.org/doc/current/zookeeperStarted.html)
 
@@ -271,22 +271,25 @@ logger@container-logger1 ~ $ cd zookeeper/conf/
 
 Next, we focus on the configuration. A sample configuration file is located at *zookeeper/conf/zoo_sample.cfg*. We are interested in the following [directives](https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html#sc_configuration):
 
-1. tickTime: basic unit in milliseconds; heartbeats interval - the *tick*. The minimum timeout value will be twice the 'tickTime' and the maximum timeout value is 10 times.
+1. tickTime: basic unit in milliseconds; heartbeats interval - the *tick*. The minimum timeout value will be *twice* the 'tickTime' and the maximum timeout value is 10 times.
 2. initLimit: timeout for servers in quorum to connect to the leader.
 3. syncLimit: timeout between sending a update request to and receiving acknowledgement from a leader.
 
    The two directives are not required in standalone mode.
-4. dataDir: persistent storage for both in-memory snapshots and trasaction logs.
+4. dataDir: persistent storage for both snapshots of in-memory data and trasaction logs.
+4. dataLogDir: a dedicated directive that defines a different location to store transactions logs.
 
-   A dedicated directive 'dataLogDir' defines a new location to store transactions logs. A separate physical storage device for transaction logs can significanly reduce updates latencies.
+   A separate physical storage device for transaction logs can significantly reduce latencies of updating.
 5. clientPort: the port to listen for client (Kafka brokers in this case) connections. By default, it is 2181.
 6. autopurge.snapRetainCount: when doing storage cleanup, only retain the most recent version. No less than 3!
 7. autopurge.purgeInterval: cleanup interval in hour unit.
-8. server.X=hostname:port1:port2: specify ZooKeeper server where X is an integer between 1 and 255, being the unique identifier within the ensemble. The first port number *port1* (2888) is for followers to connect to the leader; the next *port2* (default to 3888) is for leader selection.
+8. server.X=hostname:port1:port2:
+
+   Specify ZooKeeper servers where X is an integer between 1 and 255, being the *unique identifier* within the ensemble. The first port number *port1* (default to 2888) is for followers to connect to the leader; the next *port2* (default to 3888) is for leader selection.
 
    Standalone mode does not require the 'server.X' directive, but can also specify a single line like 'server.1=localhost:2888:3888'.
 
-If multiple servers run on a single host, choose separate ports, directroies etc. The name *tick* is the basic unit in measuring timeout. When setting up ZooKeeper in standalone mode (1 server only), 'initLimit' and 'syncLimit' are ignored as there is not synchronization requirement. Standalone mode is handy when testing development.
+If multiple servers run on a single host, choose separate ports, directroies etc. The name *tick* is the basic unit in measuring timeout. When setting up ZooKeeper in standalone mode (1 server only), 'initLimit' and 'syncLimit' are ignored as there is no synchronization requirement. Standalone mode is handy when testing development.
 
 The configuration file uses [.properties](https://en.wikipedia.org/wiki/.properties) format, and can be any name, but often we use *conf/zoo.cfg* (check *bin/zkEnv.sh*). Here is a sample:
 
@@ -321,7 +324,7 @@ logger@container-logger1 ~ $ cat >> /etc/hosts <<EOF
 logger@container-logger1 ~ $ ping logger1
 ```
 
-We are very close to start ZooKeeper now. Before that, file *myid* must be created. Each ZooKeeper server has a unique ID that is used in two places: in the configuration file ('server.X') and in *dadaDir/myid*. Upon startup, a ZooKeeper server knows who it is by looking up the file *myid*.
+We are very close to start ZooKeeper now. Before that, file *myid* under 'dataDir' must be created to keep the unique identifier defined by 'server.X'. Upon startup, a ZooKeeper server gets its identifier by looking up *myid*.
 
 ```bash
 logger@container-logger1 ~ $ echo '1' > /var/opt/logger/z1-snapshots/myid
@@ -385,8 +388,8 @@ Start and create the containers in order:
 ```bash
 logger@tux ~ $ sudo docker start logger1
 
-logger@tux ~ $ sudo docker run --name logger2 -d -it --mount type=bind,source=/var/opt/logger,target=/var/opt/logger -w /var/opt/logger --net bridge --add-host docker-eth0:${HOSTIP} --user root:root centos-7.6:logger1 bash
-logger@tux ~ $ sudo docker run --name logger3 -d -it --mount type=bind,source=/var/opt/logger,target=/var/opt/logger -w /var/opt/logger --net bridge --add-host docker-eth0:${HOSTIP} --user root:root centos-7.6:logger1 bash
+logger@tux ~ $ sudo docker run --name logger2 -d -it --mount type=bind,source=/var/opt/logger,target=/var/opt/logger -w /var/opt/logger --net bridge --add-host host-eth0:${HOSTIP} --user root:root centos-7.6:logger1 bash
+logger@tux ~ $ sudo docker run --name logger3 -d -it --mount type=bind,source=/var/opt/logger,target=/var/opt/logger -w /var/opt/logger --net bridge --add-host host-eth0:${HOSTIP} --user root:root centos-7.6:logger1 bash
 ```
 
 Attach to *logger2* aned *logger3*, and adjust the following items:
@@ -462,7 +465,7 @@ logger@container-logger1 ~ $ cd /opt/zookeeper/
 logger@container-logger1 ~ $ java -cp zookeeper-3.4.14.jar:lib/slf4j-api-1.7.25.jar:lib/slf4j-log4j12-1.7.25.jar:lib/log4j-1.2.17.jar:conf org.apache.zookeeper.server.PurgeTxnLog <datadir> <snapdir> -n <count>
 ```
 
-1. *datadir* ('dataLogDir') and *snapdir* ('dataDir') can be found either from *zookeeper.log* or in *zoo.cfg*. Or send the *conf* command to ZooKeeper.
+1. *datadir* ('dataLogDir') and *snapdir* ('dataDir') can be found either from *zookeeper.log*, in *zoo.cfg*, or by the four-letter command `conf`.
 2. `-n <count>` means to keep the last 'count' snapshots and transaction logs, which should be no less than 3 conventionally.
 3. Make sure the correct classpath is provided.
 4. Create a *cron* job.
@@ -477,7 +480,7 @@ logger@container-logger1 ~ $ zkCleanup.sh --help
 
 ## Connecting to ZooKeeper
 
-Similar to the *nc* command, the built-in 'zkCli.sh' connects to servers and perform file-like operations:
+Similar to the *nc* command, the built-in 'zkCli.sh' connects to servers and perform filesystem-like operations:
 
 ```bash
 logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 help     # print help message
