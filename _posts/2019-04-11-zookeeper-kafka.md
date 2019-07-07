@@ -406,7 +406,6 @@ Now, it is time to start the servers. A customized configuration file can be sup
 
 ```bash
 logger@container-logger1 ~ $ zkServer.sh start [/path/to/zoo.cfg]
-logger@container-logger1 ~ $ zkServer.sh stop
 
 logger@container-logger1 ~ $ zkServer.sh status
 ```
@@ -496,6 +495,12 @@ logger@container-logger1 ~ $ zkCli.sh -server localhost:2181          # interact
 [zk: localhost:2181(CONNECTED) 0] delete /zk_test
 [zk: localhost:2181(CONNECTED) 0] ls /
 [zk: localhost:2181(CONNECTED) 0] quit
+```
+
+## Stop ZooKeeper
+
+```bash
+logger@container-logger1 ~ $ zkServer.sh stop
 ```
 
 ## ZooKeeper Systemd Unit
