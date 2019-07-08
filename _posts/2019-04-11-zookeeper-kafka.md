@@ -103,9 +103,9 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
 7. Producer
 
    A producer publish data to the records of its choice and decide the partition to which a record is assigned to. The assignment can be done in a round robin fashion to load balance or based on key values.
-8. Consumer
+8. Consumer Group
 
-   A topic can have zero or more consumers which are also assigned to labels, forming *consumer group*s (also called *subscriber group*). That is to say, all consumers subscribing to a topic are divided into groups. That makes a sense as there may exist multiple entities interested in the same topic, with each entity forms a subscriber group. *Consumer instance*s within a group can be separate processes or on separate machines.
+   A topic can have zero or more consumers which are also assigned to labels, forming *consumer group*s (also called *subscriber group*). That is to say, all consumers subscribing to a topic are divided into groups. That makes a sense as there may exist multiple entities interested in the same topic, with each entity forms a subscriber group. *Consumer instance*s within a group can be separate threads, processes or machines.
 
    Partitions of a topic are effectively load-balanced over the consumer instances of a subscribing group, in a granularity of partitions. Each instance *exclusively* consumes zero or more of the partitions at any given time. If there are more instances than partitions, then some of them may be in idle state, consuming nothing. In the other way around, each partition is *broadcasted* in a granularity of subscribing groups.
 
@@ -122,6 +122,8 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
 
    1. Groups can also leave and join the system.
    2. Instances can dynamically join (get a share from other instances) and/or leave (i.e. die) a group (its partitions are transferred to others).
+
+   By the way, consumer group has a unique identifier that is [created by Java consumer API](https://stackoverflow.com/q/43118671), *not* by ZooKeeper or Kafka producer.
 
 # [Deployment](https://progressive-code.com/post/17/Setup-a-Kafka-cluster-with-3-nodes-on-CentOS-7)
 
@@ -480,7 +482,7 @@ logger@container-logger1 ~ $ zkCleanup.sh --help
 
 ## Connecting to ZooKeeper
 
-Similar to the *nc* command, the built-in 'zkCli.sh' connects to servers and perform filesystem-like operations:
+Apart from four-letter commands, the built-in 'zkCli.sh' connects to servers and perform filesystem-like operations:
 
 ```bash
 logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 help     # print help message
@@ -729,6 +731,9 @@ logger@container-logger1 ~ $ kafka-server-stop.sh
 
 The script does *not* accept any options and just sends 'SIGTERM' signal to the Kafka process. So don't try to pass `--help` as it inevitably stops the service.
 
+1. Stop Kafka before ZooKeeper;
+2. However, this script does not stop Kafka. 'SIGTERM' is not enough. Use 'SIGKILL' instead. Dunno Why. May be a bug!
+
 ## Dynamic Update Mode
 
 From Kafka 1.1 onwards, directives could be [updated/overriden dynamically](https://kafka.apache.org/documentation/#dynamicbrokerconfigs). The [Broker's Dynamic Update Mode](https://kafka.apache.org/documentation/#configuration) column may be:
@@ -784,11 +789,11 @@ A directive may be configured at multiple levels in the follow order of preceden
 
 Post [introduction-to-apache-kafka-security](https://medium.com/@stephane.maarek/introduction-to-apache-kafka-security-c8951d410adf) gives a clear outline on Kafka security mechanisms. It recommends [SASL/SCRAM](https://docs.confluent.io/4.0.0/kafka/authentication_sasl_scram.html) method.
 
-## Console Producer and Consumer
+## Topic Creation
 
 Kafka provides a simple console producer and consumer script, quite handy for test.
 
-In earlier Kafka versions, built-in scripts require the option `--zookeeper` to specify one or more ZooKeeper servers to connect to as *offset* data is stored within ZooKeeper. The offset data is now moved into Kafka itself (the built-in `__consumer_offset` topic). So `--zookeeper` option is [depcreated](https://stackoverflow.com/q/46173003) in favor of option `--bootstrap-server` using brokers.
+Before Kafka version 0.9, built-in scripts require the option `--zookeeper` to specify one or more ZooKeeper servers to connect to as *offset* data is stored within ZooKeeper. The offset data is now moved into Kafka itself (the built-in `__consumer_offset` topic). So `--zookeeper` option is [depcreated](https://stackoverflow.com/q/46173003) in favor of option `--bootstrap-server` using brokers.
 
 Firstly, create a test topic:
 
@@ -813,14 +818,18 @@ logger@container-logger1 ~ $ kafka-topics.sh --bootstrap-server logger2:9092 --d
 3. The topic has 3 partitions.
 4. From the output of `--describe`, replicas in all followers are in-sync replicas.
 
+## Console Producer and Consumer
+
 Next, we launch a consumer on the topic:
 
 ```bash
-logger@container-logger1 ~ $ kafka-console-consumer.sh --help
+logger@container-logger1 ~ $ kafka-console-consumer.sh
 logger@container-logger1 ~ $ kafka-console-consumer.sh --bootstrap-server logger2:9092 --topic test-topic
 ```
 
-Start a producer with `--broker-list`:
+No explicit consumer group is created here. By default, 'kafka-console-consumer.sh' will create a random group ID through Java consumer API.
+
+Then start a producer with `--broker-list`:
 
 ```bash
 logger@container-logger2 ~ $ kafka-console-producer.sh --help
@@ -837,6 +846,49 @@ logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 get /brokers/topics
 
 Use `^C` to stop the consumer and producer.
 
+## [Consumer Group](https://stackoverflow.com/a/36910791)
+
+Let's play around consumer group.
+
+Firstly, we want a list of existing consumer groups either by ZooKeeper interface or by Kafka interfaces.
+
+```bash
+logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 ls /consumers
+
+# < 0.9: consumers contact ZooKeeper
+logger@container-logger1 ~ $ kafka-consumer-groups.sh --zookeeper logger1:2181  --list
+# >= 0.9: consumers contact Kafka directly by Java consumer API
+logger@container-logger1 ~ $ kafka-consumer-groups.sh --bootstrap-server logger1:9092 --list
+
+logger@container-logger1 ~ $ kafka-consumer-groups.sh --bootstrap-server logger1:9092 --describe --group consumer-group-name
+```
+
+Next, we try to create an explicit consumer group. A consumer can join an existing group (implicit default included) or create a new one:
+
+1. `--group consumer-group-name1`
+
+   This is the most obvious option.
+2. `--consumer.config filename`;
+
+   ```
+   # /path/to/filename
+   group.id=consumer-group-name2
+   ```
+
+3. `--consumer-property group.id=consumer-group-name3`
+
+   These two options are done through direct Java property.
+4. If the provided name exsit, then the new consumer join the group, otherwise the group would be created.
+
+```bash
+logger@container-logger1 ~ $ kafka-console-consumer.sh --bootstrap-server logger1:9092 --topic test-topic --group consumer-group-12345
+logger@container-logger1 ~ $ kafka-console-consumer.sh --bootstrap-server logger1:9092 --topic test-topic --consumer.config consumer-group-12346
+logger@container-logger1 ~ $ kafka-console-consumer.sh --bootstrap-server logger1:9092 --topic test-topic --consumer-property group.id=consumer-group-12347
+
+logger@container-logger2 ~ $ kafka-consumer-groups.sh --bootstrap-server logger2:9092 --describe --group consumer-group-12345
+```
+
 # Note
 
-Whenever one or more servers are supplied to `--zookeeper`, `--broker-list` etc., only a subset of the total servers is required as they serve only as seeds from which the full server list is retrieved.
+1. Whenever one or more servers are supplied to `--zookeeper`, `--broker-list` etc., only a subset of the total servers is required as they serve only as seeds from which the full server list is retrieved.
+2. It seems many built-in scripts does not accept `-h, --help` arguments. Zero arguments will bring about the help message.
