@@ -263,7 +263,7 @@ The installation is quite easy: just [download](http://zookeeper.apache.org/rele
 Install ZooKeeper to */opt*:
 
 ```bash
-logger@container-logger1 ~ $ curl -o /var/opt/logger https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/stable/zookeeper-3.4.14.tar.gz
+logger@container-logger1 ~ $ curl -O /var/opt/logger https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/stable/zookeeper-3.4.14.tar.gz
 logger@container-logger1 ~ $ sudo tar -xzpvf /var/opt/logger/zookeeper-3.4.14.tar.gz -C /opt/
 logger@container-logger1 ~ $ cd /opt
 logger@container-logger1 ~ $ sudo ln -sv zookeeper-3.4.14 zookeeper
@@ -303,7 +303,10 @@ dataDir=/var/opt/logger/z1-snapshots      # persistent in-memory snapshots
 dataLogDir=/var/opt/logger/z1-txnLogs     # persistent transaction logs
 clientPort=2181
 autopurge.snapRetainCount=3               # keep lastest 3 versions
-autopurge.purgeInterval=24                # cleanup daily
+autopurge.purgeInterval=2                 # cleanup every 2 hours
+
+4lw.commands.whitelist=*                  # new in 3.5.3, enable all four-letter commands
+
 server.1=logger1:2888:3888
 server.2=logger2:2888:3888
 server.3=logger3:2888:3888
@@ -326,15 +329,17 @@ logger@container-logger1 ~ $ cat >> /etc/hosts <<EOF
 logger@container-logger1 ~ $ ping logger1
 ```
 
-We are very close to start ZooKeeper now. Before that, file *myid* under 'dataDir' must be created to keep the unique identifier defined by 'server.X'. Upon startup, a ZooKeeper server gets its identifier by looking up *myid*.
+We are very close to start ZooKeeper now. Before that, file *myid* under 'dataDir' must be created to define the unique identifier in accord with 'server.X'. Upon startup, a ZooKeeper server gets its identifier by looking up *myid*. The only content of this file will be interger X:
 
 ```bash
 logger@container-logger1 ~ $ echo '1' > /var/opt/logger/z1-snapshots/myid
 ```
 
+For standalone mode, if directive 'server.X' is omitted, 'myid' should be omitted either.
+
 ## ZooKeeper Startup
 
-ZooKeeper ships with startup scripts *bin/zkStart.sh* which sources *bin/zkEnv.sh* to set runtime variables. Have a read at the two scripts before executing. Here is an excerpt from 'zkServer.sh':
+ZooKeeper ships with startup scripts *bin/zkServer.sh* which sources *bin/zkEnv.sh* to set runtime variables. Have a read at the two scripts before executing. Here is an excerpt from 'zkServer.sh':
 
 ```
 nohup "$JAVA" "-Dzookeeper.log.dir=${ZOO_LOG_DIR}" "-Dzookeeper.root.logger=${ZOO_LOG4J_PROP}" \
@@ -346,7 +351,7 @@ Add 'zookeeper/bin' to 'PATH':
 ```bash
 logger@container-logger1 ~ $ sudo chmod -x /opt/zookeeper/bin/*.cmd
 logger@container-logger1 ~ $ echo 'PATH=/opt/zookeeper/bin:${PATH}' >> ~/.bashrc ; source ~/.bashrc
-logger@container-logger1 ~ $ zkServer.sh --help
+logger@container-logger1 ~ $ zkServer.sh
 logger@container-logger1 ~ $ zkServer.sh print-cmd
 ```
 
@@ -433,10 +438,11 @@ Created server with tickTime 2000 minSessionTimeout 4000 maxSessionTimeout 40000
 
 *datadir* refers to the location where transaction logs are stored; *snapdir* refers to that of in-memory snapshots. Please pay attention that these two name is different than those in *zoo.cfg*. *datadir* corresponds to directive 'dataLogDir' while 'snapdir' corresponds to directive 'dataDir'. Read [PurgeTxnLog API](https://zookeeper.apache.org/doc/r3.4.14/api/org/apache/zookeeper/server/PurgeTxnLog.html).
 
-## [ZooKeeper Maintenance](https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html)
+## [ZooKeeper Status](https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html)
 
 ```bash
-logger@container-logger1 ~ $ zkServer.sh --help
+logger@container-logger1 ~ $ zkServer.sh
+logger@container-logger1 ~ $ pgrep -u logger -P 1 -ac -f 'java.*\/home\/logger\/zookeeper\/bin'
 logger@container-logger1 ~ $ zkServer.sh status
 
 # zkServer.sh status
@@ -447,12 +453,32 @@ logger@container-logger1 ~ $ zkServer.sh status
 
 The 'Mode' line tells if a server is a leader or a follower.
 
-Apart from subcommands of 'zkServer.sh', ZooKeeper can respond to a predefined set of [four-letter commands](https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html#sc_zkCommands). We issue the commands to servers' (TCP/UDP) sockets via *telnet* or *nc*, at the client port (default 2181)
+Apart from the script wrapper 'zkServer.sh', ZooKeeper can respond to a predefined set of [four-letter commands](https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html#sc_zkCommands). We issue the commands to servers' (TCP/UDP) sockets via *telnet* or *nc*, at the client port (default 2181):
 
 ```bash
 logger@container-logger1 ~ $ rpm -q nmap-ncat.x86_64
-logger@container-logger1 ~ $ nc localhost 2181 <<< 'conf'
+logger@container-logger1 ~ $ nc localhost 2181 <<< 'dump'
 logger@container-logger1 ~ $ echo 'srvr | stat | envi' | nc localhost 2181
+```
+
+From ZooKeeker 3.5.3 onwards, by default only 'srvr' is enabled. We should configure property '4lw.commands.whitelist' to turn on desired commands.
+
+Another wrapper script 'zkCli.sh' connects to servers and perform filesystem-like operations:
+
+```bash
+logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 help     # print help message
+
+logger@container-logger1 ~ $ zkCli.sh -server localhost:2181          # interactive ZooKeeper shell
+
+# [zk: localhost:2181(CONNECTED) 0] help                         # print help message
+# [zk: localhost:2181(CONNECTED) 0] ls /                         # list the 'root' znode
+# [zk: localhost:2181(CONNECTED) 0] create /zk_test my_data      # creat a new znode directory
+# [zk: localhost:2181(CONNECTED) 0] ls /
+# [zk: localhost:2181(CONNECTED) 0] set /zk_test my_new_data
+# [zk: localhost:2181(CONNECTED) 0] get /zk_test
+# [zk: localhost:2181(CONNECTED) 0] delete /zk_test
+# [zk: localhost:2181(CONNECTED) 0] ls /
+# [zk: localhost:2181(CONNECTED) 0] quit
 ```
 
 ## [ZooKeeper Storage](https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html#sc_administering)
@@ -480,25 +506,6 @@ logger@container-logger1 ~ $ zkCleanup.sh --help
 
 'zkCleanup.sh' accepts the same arguments as above and makes cron jobs much eaiser. However, ZooKeeper 3.4.0 onwards already supports *autopurge*, why not just use the built-in feature?
 
-## Connecting to ZooKeeper
-
-Apart from four-letter commands, the built-in 'zkCli.sh' connects to servers and perform filesystem-like operations:
-
-```bash
-logger@container-logger1 ~ $ zkCli.sh -server localhost:2181 help     # print help message
-logger@container-logger1 ~ $ zkCli.sh -server localhost:2181          # interactive ZooKeeper shell
-
-[zk: localhost:2181(CONNECTED) 0] help                         # print help message
-[zk: localhost:2181(CONNECTED) 0] ls /                         # list the 'root' znode
-[zk: localhost:2181(CONNECTED) 0] create /zk_test my_data      # creat a new znode directory
-[zk: localhost:2181(CONNECTED) 0] ls /
-[zk: localhost:2181(CONNECTED) 0] set /zk_test my_new_data
-[zk: localhost:2181(CONNECTED) 0] get /zk_test
-[zk: localhost:2181(CONNECTED) 0] delete /zk_test
-[zk: localhost:2181(CONNECTED) 0] ls /
-[zk: localhost:2181(CONNECTED) 0] quit
-```
-
 ## Stop ZooKeeper
 
 ```bash
@@ -518,7 +525,7 @@ Like that of ZooKeeper, the installation process of Kafka is quite straightforwa
 A kafka distribution is named as 'kafka_scalaVersion-kafkaVersion.tgz`. Each Kafka version may have multiple scala disbributions, and vice versa. As of the post, the Scala version is 2.12 while Kafka version is 2.2.0.
 
 ```bash
-logger@container-logger1 ~ $ curl -o /var/opt/logger/ https://www-eu.apache.org/dist/kafka/2.2.0/kafka_2.12-2.2.0.tgz
+logger@container-logger1 ~ $ curl -O /var/opt/logger/ https://www-eu.apache.org/dist/kafka/2.2.0/kafka_2.12-2.2.0.tgz
 logger@container-logger1 ~ $ sudo tar -xzpvf /var/opt/logger/kafka_2.12-2.2.0.tgz -C /opt/
 logger@container-logger1 ~ $ cd /opt
 logger@container-logger1 ~ $ sudo ln -sv kafka_2.12-2.2.0 kafka
@@ -531,32 +538,35 @@ logger@container-logger1 ~ $ ll kafka/config
 Now configure [server.properties](https://kafka.apache.org/documentation/#configuration):
 
 ```
+
 # similar to ZooKeeper 'myid'; a unique integer
 broker.id=1
 
-# comma-separated sockets
-listeners=PLAINTEXT://0.0.0.0:9092
+# comma-separated listeners
+listeners=PLAINTEXT://0.0.0.0:9092,EDGE://1.2.3.4:9093,USA://5.6.7.8:9094
+# advertised listners
+advertised.listeners=PLAINTEXT://0.0.0.0:9092,EDGE://1.2.3.4:9093,USA://5.6.7.8:9094
+# listner for inter-broker communication
+inter.broker.listener.name=PLAINTEXT
+# listener name mapping to security prototol
+listener.security.protocol.map=PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL,EDGE:PLAINTEXT,USA:PLAINTEXT
 
-# default to listeners
-advertised.listeners=PLAINTEXT://logger1:9092
-
-# commit log
-# high speed SSDs
+# commit logs location; high speed SSDs
 #log.dir=/tmp/kafka-logs
 # default to 'log.dir'
-log.dirs=/var/opt/logger/k1-logs
+log.dirs=/home/zk/kafka/commitLogs
 
-# default number of partitions for topics created on this broker
-num.partitions=2
+# default partitions per topic
+num.partitions=3
 
-# replication factor for internal topics
-# "__consumer_offsets" and "__transaction_state"
+# replication factor for internal topics like "__consumer_offsets"
 offsets.topic.replication.factor=2
 transaction.state.log.replication.factor=2
 transaction.state.log.min.isr=2
 
 # ZooKeeper servers
-zookeeper.connect=logger1:2181,logger2:2181,logger3:2181
+zookeeper.connect=zk1:2181,zk2:2181,zk3:2181
+zookeeper.connection.timeout.ms=3000
 ```
 
 1. listeners
@@ -567,17 +577,9 @@ zookeeper.connect=logger1:2181,logger2:2181,logger3:2181
 
    ```
    # listeners = listener_name://my.host.name:port
-   
-   # two sockets on LAN and public IPs
-   listeners=PLAINTEXT://192.168.1.100:9092,SSL://12.34.56.78:9092
-
-   # bound to all interfaces
-   listeners=INTERNAL://0.0.0.0:9092
-   # bound to default interface
-   listeners=EXTERNAL://:9093
    ```
 
-   Specify hostname as '0.0.0.0' to bind to all interfaces. Leave hostname empty to bind to the default interface. A hostname can be resolved to multiple IPs to do load balance. If this directive is not set, it defaults to 'PLAINTEXT://0.0.0.0:9093'.
+   Specify hostname as '0.0.0.0' to bind to all interfaces. Leave hostname empty to bind to the *default* interface. A hostname can be resolved to multiple IPs to do load balance. If this directive is not set, it defaults to 'PLAINTEXT://0.0.0.0:9092'.
 
    A listener should be mapped to a security protocol by its name for connection authentication, and thus often named after a security protocol:
 
@@ -587,6 +589,13 @@ zookeeper.connect=logger1:2181,logger2:2181,logger3:2181
    ```
 
    So we cannot define two listeners with the same name.
+
+   ```
+   # error: two listners with the same name
+   listeners=PLAINTEXT://192.168.1.100:9092,PLAINTEXT://12.34.56.78:9092
+   ```
+
+   Multiple listeners MUST have different ports.
 2. advertised.listeners
 
    >Advertised listeners are what interfaces a client (producer/consumer) connects to.
@@ -598,11 +607,7 @@ zookeeper.connect=logger1:2181,logger2:2181,logger3:2181
 
    ```
    listeners=PLAINTEXT://0.0.0.0:9092
-
-   # error: two listners with the same name
-   listeners=PLAINTEXT://192.168.1.100:9092,PLAINTEXT://12.34.56.78:9092
    
-   # correct
    advertised.listeners=PLAINTEXT://12.34.56.78:9092
    ```
 
@@ -613,6 +618,8 @@ zookeeper.connect=logger1:2181,logger2:2181,logger3:2181
    ```
 
    If not properly advertised, a client may fail to produce or consumer data. For example, if a listener is bound to '0.0.0.0:9092' but only advertise the LAN address '192.168.1.100:9092', clients could still initiate a connection to the broker through '12.34.56.78:9092' (public IP), fetching metadata about brokers. When it comes to read and/or write data, clients can only contact the advertised addresses enclosed in metadata. That demonstrates the difference between [reachable socket and reachable service](https://rmoff.net/2018/08/02/kafka-listeners-explained/).
+
+   We CANNOT advertise a listener with '0.0.0.0'.
 2. 'log.dirs' is a list comma-separated locations to store commit logs. If not set, it [defaults to 'log.dir'](https://stackoverflow.com/q/40369238) that is a single location. 'log.dir' defaults to */tmp/kafka-logs*.
 3. ZooKeeper listens for Kafka connections at port 2181; Kafka listens at port 9092.
 
@@ -625,7 +632,7 @@ logger@container-logger1 ~ $ mkdir -p /var/opt/logger/k1-logs
 logger@container-logger1 ~ $ echo 'PATH=/opt/kafka/bin:${PATH}' >> ~/.bashrc ; source ~/.bashrc
 ```
 
-Kafka has a bunch of built-in scripts, of which 'kafka-server-start.sh' and 'kafka-run-class.sh' are responsible for starting the service. In the scripts, there is a special variable 'base_dir' setting the base directory (like 'ZOO_LOG_DIR' of ZooKeeper).
+Kafka has a bunch of built-in scripts, of which 'kafka-server-start.sh' and 'kafka-run-class.sh' are responsible for starting the service. In the scripts, there is a special variable 'base_dir' setting the base directory (recall 'ZOO_LOG_DIR' of ZooKeeper) that defaults to Kafka installation directory.
 
 Similar to ZooKeeper, Kafka also utilize 'Log4j' to trace broker logs affected by environment variables 'LOG_DIR', and 'KAFKA_LOG4J_OPTS', and Java property 'kafka.logs.dir'
 
@@ -636,12 +643,11 @@ export KAFKA_LOG4J_OPTS="-Dlog4j.configuration=file:$base_dir/../config/log4j.pr
 
 # Script 'kafka-run-class.sh'
 LOG_DIR="$base_dir/logs"
-KAFKA_LOG4J_OPTS="-Dkafka.logs.dir=$LOG_DIR $KAFKA_LOG4J_OPTS"
 ```
 
-From the definition, broker logs default to */opt/kafka/logs*, like 'server.log', 'state-change.log' and 'controller.log' (recording leader election).
+From the definition, broker logs default to *kafka/logs* where Kafka is installed, including 'server.log', 'state-change.log' and 'controller.log' (recording leader election).
 
-OK, start the server:
+We can just leave brokers logging to the defauts. OK, start the server:
 
 ```bash
 logger@container-logger1 ~ $ kafka-server-start.sh
@@ -671,6 +677,7 @@ We can verify if the server was started correctly through ZooKeeper dump:
 ```
 logger@container-logger1 ~ $ ps -eF | grep '[k]akfka'
 logger@container-logger1 ~ $ ss -npelt
+logger@container-logger1 ~ $ pgrep -u logger -P 1 -ac -f 'java.*\/home\/logger\/kafka\/bin'
 logger@container-logger1 ~ $ tail -F /var/opt/br1-logs/server.log
 
 logger@container-logger1 ~ $ nc localhost 2181 <<< "dump"
@@ -732,7 +739,7 @@ logger@container-logger1 ~ $ kafka-server-stop.sh
 The script does *not* accept any options and just sends 'SIGTERM' signal to the Kafka process. So don't try to pass `--help` as it inevitably stops the service.
 
 1. Stop Kafka before ZooKeeper;
-2. However, this script does not stop Kafka. 'SIGTERM' is not enough. Use 'SIGKILL' instead. Dunno Why. May be a bug!
+2. It takes time to stop Kafka cluster, so wait for while!
 
 ## Dynamic Update Mode
 
