@@ -54,7 +54,7 @@ Elastic Stack is called ELK previously. Due new products like Beats and X-Pack, 
 1. Java 8
 2. Use the same version across the entire stack.
 3. Follow the order: Elasticsearch, Kibana, Logstash, Beats etc.
-4. Each component can be installed by justing extracting tarballs or through 'yum' repository.
+4. Each component can be installed by justing extracting tarballs or through official 'yum' repository.
 
 ## [Repo](https://www.elastic.co/guide/en/beats/filebeat/7.0/setup-repositories.html)
 
@@ -90,7 +90,7 @@ Congfiguration file format is writen in a format similar to Json.
 
 # Filebeat
 
-1. Filebeat support various outputs but we usually just send the events directly to Elasticsearch or to Logstash for additional processing.
+1. Filebeat support various outputs but we usually just send the events directly to Elasticsearch or to Logstash for additional processing. Events can also be sent to products out of the Elastic Stack like Kafka.
 2. Filebeat uses *backpressure-sensative* protocol to do congestion control, adjusting the speed of reading log entries in accord with Logstash or Elasticsearch staus.
 3. 'inputs' generate 'event's in Json format; 'processors' filters events; 'output' ships events out.
 
@@ -104,28 +104,44 @@ user@tux ~ $ yum install filebeat
 user@tux ~ $ rpm -ql filebeat
 ```
 
-The package includes a *sysvinit* script, namely */etc/init.d/filebeat*. In the 'Filebeat Start' section, we will discuss how to utlize this script for startup.
+The package includes a *sysvinit* script, namely */etc/init.d/filebeat*. In the 'Filebeat Start' section, we will discuss how to utlize this script for Sytemd startup.
 
 ## Beats [YAML](https://www.elastic.co/guide/en/beats/libbeat/7.0/config-file-format.html)
 
 >This applies to all beats applications.
 
-Configuration is writen in YAML format, demanding strict indentation. Please use the same number of spaces and avoid tabs for dictionary pairs and list items. The structured form collapse [namespaced](https://www.elastic.co/guide/en/beats/libbeat/7.0/config-file-format-namespacing.html) settings.
+Configuration is writen in YAML format, demanding *strict indentation*. All settings are structured using dictionaries and lists. Please use the same number of spaces and avoid tabs for dictionary pairs and list items. The structured form collapses to a [namespaced](https://www.elastic.co/guide/en/beats/libbeat/7.0/config-file-format-namespacing.html) naming method.
 
-Dictionary is a list of `key: value` pairs, with the ':' separator followed by a space or newline. Multiple pairs cna be put on the same line like JSON:
+Dictionary is represented with `key: value` pairs in the same indentation level, with the ':' separator followed by a space or newline. Multiple pairs can be put on the same line in an abbreviated form:
 
 ```
+# Enclosed by braces
 person: {name: "John Doe", age: 34, country: "Canada"}
 ```
 
-List is `- value`, and on the same line it is:
+A list item takes the form: `- `, namely a dash followed by a space. All list items of a list should be at the same indetation level. In the following example, 'colors' is a dictionary 'key' with the value part a list consisted of three items.
 
+```yml
+colors:
+  - Red
+  - Green
+  - Blue
 ```
+
+Multiple list items can also be abbreviated as:
+
+```yml
+# Enclosed by square brackets
 colors: ["Red", "Green", "Blue"]
 ```
 
+Whenever a semicolon appears followed by a space, it is a dictionary pair. Whenever a dash followed by a space, it is a list item.
+
+Configuration Notice:
+
 1. Please use single quotes for regex and pathnames that containing spaces or special characters.
-2. Environment variables and configuration variables (defined within YML itself) are referenced in the form `${VAR:default-value}`. Environment variables are expanded before YAML parsing. The `-E` option can be used to override variables like `-E key=value`.
+2. Environment variables and configuration variables (defined within YML itself) are referenced in the form `${VAR:default-value}`. Environment variables are expanded before YAML parsing.
+3. The command line `-E` option can be used to override variables like `-E key=value`.
 
 ## [Filebeat Configuration](https://www.elastic.co/guide/en/beats/filebeat/master/configuring-howto-filebeat.html)
 
@@ -147,16 +163,20 @@ The following are hands-on configuration practice:
 
 1. Paths
 
-   ```
+   ```yml
    # default to the location of the Filebeat binary
    path.home: "/opt/filebeat"
+
    # configuration location
    path.config: ${path.home}
+
    # data location
    path.data: ${path.home}/data
-   # agent logs location
+
+   # Agent logs
    path.logs: ${path.home}/logs
 
+   # By yum repo
    path.home: /usr/share/filebeat
    path.config: /etc/filebeat
    path.data: /var/lib/filebeat
@@ -166,32 +186,33 @@ The following are hands-on configuration practice:
    'path.home' is usually set to the installation location.
 2. Miscellanea
 
-   ```
-   # Global
+   ```yml
+   # If a relative path is used, it is considered relative to the data path.
    filebeat.registry.path: ${path.data}/registry
 
    # General
-   name: "filebeat-1"
-   tags: ["logs", "nginx"]
+   name: "filebeat-log-project"
+   tags: ["project-X", "nginx"]
    ```
 
    The *registry* file stores the state and location information that Filebeat uses to track where it was last reading.
 3. Logging
 
    ```
-   logging.level: info
-   logging.selectors: [*]
-   logging.to_syslog: false
+   logging.level: debug
+   logging.selectors: ["*"]
    logging.to_files: true
-   logging.json: true
+   logging.to_syslog: false
+   logging.json: false
    logging.files:
-     path: /var/log/filebeat
+     path: ${path.home}/logs
      name: filebeat.log
      rotateeverybytes: 10485760
      keepfiles: 7
+     permissions: 0644
    ```
 
-   Log settings for the beat process. If the 'path' is a relative pathname, it would be relative to the 'path.home'.
+   Log settings for the Filebeat agent itself. If the 'path' is a relative pathname, it would be relative to the 'path.home'.
 4. HTTP Server
 
    ```
@@ -207,76 +228,12 @@ The following are hands-on configuration practice:
    curl http://localhost:5066/stats?pretty
    ```
 
-5. Load external Inputs and Modules
-
-   Like many other services, Filebeat can load configurations from external files. In 'filebeat.yml', we can set values of key 'filebeat.inputs' and key 'filebeat.modules' from extra YAML files.
-
-   For inputs:
-   
-   ```
-   filebeat.config.inputs:
-     enabled: true
-     path: inputs.d/*.yml
-     reload.enabled: true
-     reload.period: 10s     
-   ```
-
-   Each file matched by the 'path' glob must contain a list of one or more input definitions (`-type:`) like:
-
-   ```
-   # /etc/filebeat/inputs.d/nginx.log
-   - type:
-     paths:
-       - /var/log/mysql.log
-     scan_frequency: 10s
-   ```
-
-   For modules:
-   
-   ```
-   filebeat.config.modules:
-     enabled: true
-     path: ${path.config}/modules.d/*.yml
-     reload.enabled: true
-     reload.period: 10s
-   ```
-
-   If the subcommand 'filebeat module' is used to disable or enable modules, then 'path' **MUST** point a location called *modules.d*. Similarly, each matched globbing must contain a list of one or more module definitions (`-module`) like:
-
-   ```
-   - module: nginx
-     access:
-       enabled: true
-       var.paths: /var/log/nginx/access.log
-     error:
-       enabled: true
-       var.paths: /var/log/nginx/error.log
-   ```
-
-   Here is an equivalent configuration with [live reloading](https://www.elastic.co/guide/en/beats/filebeat/current/_live_reloading.html) enabled:
-   
-   ```
-   filebeat.config:
-     inputs:
-       enabled: true
-       path: inputs.d/*.yml
-       reload.enabled: true
-       reload.period: 10s
-     modules:
-       enabled: true
-       path: ${path.config}/modules.d/*.yml
-       reload.enabled: true
-       reload.period: 10s
-   ```
-
-   However, dynamic loading is limited sometimes. For example, if a system environment variable is specified, the process wound not know about it unless restarted.
-6. Inputs
+5. Inputs
 
    Filebeat reads logs from either 'filebeat.inputs' or 'filebeat.modules'. 'filebeat.inputs' is mainly used to read arbitrary log files while modules read common service logs with predefined settings that is quite handy.
 
    ```
    filebeat.modules:
-     - module: system
      - module: nginx
        access:
          enabled: true
@@ -297,24 +254,79 @@ The following are hands-on configuration practice:
      - type: tcp
    ```
    
-   1. 'paths' must be **unique** among multiple inputs. If more than one input harvests the same log file, it would lead to unexpected behavior.
+   1. 'paths' must be **unique** among multiple inputs. If more than one inputs harvests the same file, it would lead to unexpected behavior.
    2. Only lines matching the 'include_lines' will be harvested.
-   3. Regex 'include_lines' is applied before regex 'exclude_lines' regardless of the order they appear.
+   3. 'include_lines' is applied before 'exclude_lines' regardless of the order they appear.
    4. Read more about [modules configuration](https://www.elastic.co/guide/en/beats/filebeat/7.0/configuration-filebeat-modules.html).   
+6. [Live Reloading](https://www.elastic.co/guide/en/beats/filebeat/current/_live_reloading.html)
+
+   Like many other services, Filebeat can load configurations from external files. In 'filebeat.yml', we can set values of key 'filebeat.inputs' and key 'filebeat.modules' from extra YAML files.
+
+   For inputs:
+   
+   ```
+   filebeat.config.inputs:
+     enabled: true
+     path: inputs.d/*.yml
+     reload.enabled: true
+     reload.period: 10s     
+   ```
+
+   Each file matched by the 'path' glob must contain a list of one or more input definitions (`-type:`) like:
+
+   ```
+   - type: log
+     enabled: true
+     paths:
+       - /var/log/myJson.log
+     fields:
+       hostname: "${HOSTNAME:-}"
+     fields_under_root: true
+     scan_frequency: 10s
+     json.keys_under_root: true
+     json.overwrite_keys: false
+
+     json.message_key: "hostHeader"
+     exclude_files: ['.gz$','~$']
+     include_lines: ['www.bing.com','www.example.com']
+     exclude_lines: ['a-shit-line','another-shit-line']
+   ```
+
+   For modules:
+   
+   ```
+   filebeat.config.modules:
+     enabled: true
+     path: ${path.config}/modules.d/*.yml
+     reload.enabled: true
+     reload.period: 10s
+   ```
+
+   If the subcommand `filebeat modules` is used to disable or enable modules, then 'path' **MUST** point to a location called *modules.d*. Similarly, each matched globbing must contain a list of one or more module definitions (i.e. `- module: nginx`).
+
+   However, live reloading is limited sometimes. For example, if a system environment variable is modified or defined, the process wound not know about it unless restarted.
 7. Processors
 
-   A processor filters input logs by adding/dropping/modifying fields and/or events. It is much more powerful than 'exlude_files', 'include_lines' and 'exclude_lines'. An event can go through a chain of processors in *the exact order* they are defined, before sending out.
+   A processor filters input logs by adding/dropping/modifying fields and/or events. It resembles 'exlude_files', 'include_lines' and 'exclude_lines' which are applied upon inputs. Processors, on the other hand, applies to fields/events after inputs and before put to outputs.
+
+   An event can go through a chain of processors in *the exact order* they are defined, before sending out.
 
    ```
    processors:
      - include_fields:
          fields: ["cpu"]
      - drop_fields:
-         fields: ["cpu.user", "cpu.system"]
+         fields: ['@timestamp', '@metadata', "log", "tags", "input", "ecs", "host", "agent", "message"]
      - drop_event:
          when:
            equals:
              http.code: 200
+     - decode_json_fields:
+	 fields: ["message"]
+	 process_array: false
+	 max_depth: 1
+	 target: ""
+	 overwrite_keys: false
    ```
 
    More about processors, please check the 'Filebeat Processors' section below.   
@@ -344,8 +356,8 @@ The following are hands-on configuration practice:
      client_id: ${HOSTNAME:localhost}
    ```
 
-   1. The 'hosts' provides only the initial list of Kafka brokers from which to fetch the whole cluster metadata, including the full list of brokers where events are published to.
-   2. Besides the 'topic' directive, there is also a 'topics' sub-directive that filters events and publish them to different Kafka topics. It is a useful feature is not constrained by the *one and only one* output rule. That is to say, 'output.kafka' can publish events to multiple topics.
+   1. The 'hosts' provides only the initial list of Kafka `listeners` from which to fetch the whole cluster metadata, including the full list of `advertised.listeners` where events are published to.
+   2. Besides the 'topic' directive, there is also a 'topics' sub-directive that filters events and publish them to different Kafka topics. It is a useful feature is not constrained by the *one and only one* `output` rule. That is to say, 'output.kafka' can publish events to multiple topics.
 
    Like the console consumer/producer of Kafka, Filebeat can output events into console and/or files.
 
@@ -367,7 +379,7 @@ The following are hands-on configuration practice:
        escape_html: false
    ```
 
-   Beats support one and only one *output*. If you desire multiple outputs, then send to Logstash.
+   Beats support one and only one *output*. If you desire multiple outputs, then send to Logstash or Kafka first.
 
 ## [Filebeat Pre-start](https://www.elastic.co/guide/en/beats/filebeat/7.0/setting-up-and-running.html)
 
@@ -397,7 +409,7 @@ user@tux ~ $ filebeat modules enable nginx
 user@tux ~ $ filebeat modules disable nginx
 ```
 
-Command *export* exports current config to STDOUT without any annoying comments:
+Command *export* exports current config to STDOUT without comments:
 
 ```bash
 user@tux ~ $ filebeat export config
@@ -412,7 +424,7 @@ user@tux ~ $ sudo chkconfig --add filebeat
 user@tux ~ $ sudo chkconfig --list filebeat
 ```
 
-*chkconfig* creates corresponding symlinks under */etc/rc.x/* according to the [Chkconfig Header](https://fedoraproject.org/wiki/EPEL:SysVInitScripts#Chkconfig_Header). */usr/lib/systemd/system-generators/systemd-sysv-generator* of Systemd then will auto-create the unit file according to [LSB Header](https://fedoraproject.org/wiki/EPEL:SysVInitScripts#LSB_Header).
+*chkconfig* creates corresponding symlinks under */etc/rc.x/* according to the [Chkconfig Header](https://fedoraproject.org/wiki/EPEL:SysVInitScripts#Chkconfig_Header). */usr/lib/systemd/system-generators/systemd-sysv-generator* of Systemd will then auto-create the unit file according to [LSB Header](https://fedoraproject.org/wiki/EPEL:SysVInitScripts#LSB_Header).
 
 Start Filebeat:
 
@@ -478,7 +490,10 @@ processors:
 
 1. 'processor_name' is a one of the pre-defined processor name.
 2. *when* is a filter condition.
-3. Both 'when' and 'parameters' **must** be defined [under the namespace](https://discuss.elastic.co/t/error-initializing-processors/99247/8) of 'processor_name' which is a list item. Consequently, they are indented further compared with 'processor_name'. Otherwise, the three would be in the same level under namespace of the dash, treated as three 'key=value' pairs in that list item. This is a general rule.
+3. 'when' and 'parameters' **must** be defined [under the namespace](https://discuss.elastic.co/t/error-initializing-processors/99247/8) of 'processor_name' which is a list item. The abbreviated form is `- <processor_name>: {when: {<condition>},<parameters>}`. Consequently, they are indented further compared with 'processor_name'.
+   1. It a list item.
+   2. The item value is a dictionary 'key: value' pair.
+   3. The value of the pair comprises lists and dictionaries.
 
 Processors are applied in the order they are defined and are valid at different levels:
 
@@ -525,15 +540,15 @@ processors:
 2. Regarding per-input level, as long as any one of the 'json.keys_under_root', 'json.overwrite_keys' and 'json.message_key' directives appear, Json decoding is applied.
    1. 'json.keys_under_root' places the decode Json at the root level.
    2. Decoded 'key: value' pairs will overwrite built-in pairs that share the same key if 'json.overwrite_keys' is enabled.
-   3. Json decoding happens *before* line (i.e. 'exclude_lines') and multiline filtering. Hence, line and multiline filtering does not affect the original Json event as it is transformed.
+   3. Json decoding happens **before** line (i.e. 'exclude_lines') and multiline filtering. Hence, line and multiline filtering does not affect the original Json event as it is transformed.
 
-      The 'json.message_key' specifies a decoded Json key and applies line and multiline filtering to the original Json event according the key value.
-4. 'decode_json_field' is a global processor that applies to all inputs, with the 'fields' directive pointing to fileds that require Json decoding.
+      The 'json.message_key' specifies a decoded Json key and applies line and multiline filtering to the **original** Json event according the key value.
+4. 'decode_json_fields' is a global processor that applies to all inputs, with the 'fields' directive pointing to fileds that require Json decoding.
    1. 'target: ""' is equivalent to 'json.keys_under_root'.
    2. 'overwrite_keys' and 'json.overwrite_keys' are equivalent as well.
 5. '@metadata' and '@timestamp' cannot be dropped even they appear in in the list. Filebeat requires '@metadata' when sending out events (i.e. to Logstash).
 
-   Please filter out the two fields in Logstash instead.
+   A particular setup flow is like 'Filebeat - Kafka - Logstash'. We filter out the two fields in Logstash.
 6. **IMPORTANT**: Filebeat refuses to launch on some systems when either 'overwrite_keys' or 'json.overwrite_keys' is enabled. Check [issue 6381](https://github.com/elastic/beats/issues/6381) and [issue 1378](https://github.com/elastic/beats/issues/1378).
 
    Therefore, it is recommended to leave those two directives disabled.
