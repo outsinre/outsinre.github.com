@@ -94,7 +94,7 @@ Congfiguration file format is writen in a format similar to Json.
 2. Filebeat uses *backpressure-sensative* protocol to do congestion control, adjusting the speed of reading log entries in accord with Logstash or Elasticsearch staus.
 3. 'inputs' generate 'event's in Json format; 'processors' filters events; 'output' ships events out.
 
-   'field' refers to the key part of a Json 'key: value' pair.
+   'field' refers to the key part of an event 'key: value' pair.
 
 ## [Install Filebeat](https://www.elastic.co/guide/en/beats/filebeat/7.0/directory-layout.html)
 
@@ -140,8 +140,8 @@ Whenever a semicolon appears followed by a space, it is a dictionary pair. Whene
 Configuration Notice:
 
 1. Please use single quotes for regex and pathnames that containing spaces or special characters.
-2. Environment variables and configuration variables (defined within YML itself) are referenced in the form `${VAR:default-value}`. Environment variables are expanded before YAML parsing.
-3. The command line `-E` option can be used to override variables like `-E key=value`.
+2. Environment variables and configuration variables (defined within YML itself) are referenced in the form `${VAR:default-value}`. Environment variables are expanded before YAML parsing. The [command line](https://www.elastic.co/guide/en/beats/filebeat/current/command-line-options.html) `-E` option can be used to override variables like `-E key=value`.
+3. Aside environment and configuration variable reference, event field can be referenced in the form `%{[field-name]:default-value}`. Pay attention please, the prefix symbol is `%`. Event fields are accessed using field references `[field-name]`. This is called [Format String (sprintf)](https://www.elastic.co/guide/en/beats/libbeat/current/config-file-format-type.html).
 
 ## [Filebeat Configuration](https://www.elastic.co/guide/en/beats/filebeat/master/configuring-howto-filebeat.html)
 
@@ -184,23 +184,28 @@ The following are hands-on configuration practice:
    ```
 
    'path.home' is usually set to the installation location.
-2. Miscellanea
+2. [Global and General options](https://www.elastic.co/guide/en/beats/filebeat/current/configuration-general-options.htm)
 
    ```yml
-   # If a relative path is used, it is considered relative to the data path.
+   # Filebeat's global options
    filebeat.registry.path: ${path.data}/registry
 
-   # General
+   # General options that are supported by all Elastic beats
    name: "filebeat-log-project"
    tags: ["project-X", "nginx"]
+
+   fields_under_root: false
+   fields: {project: "X", instance-id: "574734885120952459"}
    ```
 
-   The *registry* file stores the state and location information that Filebeat uses to track where it was last reading.
+   The *registry* file stores the state and location information that Filebeat uses to track where it was last reading. If a relative path is passed, it is considered relative to the data path. It defaults to `${path.data}/registry`.
+
+   The general 'fields_under_root' field applies to field 'fields' that is added to the event.
 3. Logging
 
-   ```
-   logging.level: debug
-   logging.selectors: ["*"]
+   ```yml
+   logging.level: info
+   #logging.selectors: ["*"]
    logging.to_files: true
    logging.to_syslog: false
    logging.json: false
@@ -212,7 +217,8 @@ The following are hands-on configuration practice:
      permissions: 0644
    ```
 
-   Log settings for the Filebeat agent itself. If the 'path' is a relative pathname, it would be relative to the 'path.home'.
+   1. Log settings for the Filebeat agent itself. If the 'path' is a relative pathname, it would be relative to the 'path.home'.
+   2. Log options can be modified on command line directly. For example, `-d '*'` enables *debug* level for all components.
 4. HTTP Server
 
    ```
@@ -228,37 +234,7 @@ The following are hands-on configuration practice:
    curl http://localhost:5066/stats?pretty
    ```
 
-5. Inputs
-
-   Filebeat reads logs from either 'filebeat.inputs' or 'filebeat.modules'. 'filebeat.inputs' is mainly used to read arbitrary log files while modules read common service logs with predefined settings that is quite handy.
-
-   ```
-   filebeat.modules:
-     - module: nginx
-       access:
-         enabled: true
-         var.paths: /var/log/nginx/access.log
-       error:
-         enabled: true
-         var.paths: /var/log/nginx/error.log
-
-   filebeat.inputs:
-     - type: log
-       paths:
-         - /var/log/*.log
-       exclude_files: ['.gz$','~$']
-       include_lines: ['real-log$','^Hello','timestamp']
-       exclude_lines: ['^DBG','apl-test']
-       scan_frequency: 10s
-     - type: stdin
-     - type: tcp
-   ```
-   
-   1. 'paths' must be **unique** among multiple inputs. If more than one inputs harvests the same file, it would lead to unexpected behavior.
-   2. Only lines matching the 'include_lines' will be harvested.
-   3. 'include_lines' is applied before 'exclude_lines' regardless of the order they appear.
-   4. Read more about [modules configuration](https://www.elastic.co/guide/en/beats/filebeat/7.0/configuration-filebeat-modules.html).   
-6. [Live Reloading](https://www.elastic.co/guide/en/beats/filebeat/current/_live_reloading.html)
+5. [Live Reloading](https://www.elastic.co/guide/en/beats/filebeat/current/_live_reloading.html)
 
    Like many other services, Filebeat can load configurations from external files. In 'filebeat.yml', we can set values of key 'filebeat.inputs' and key 'filebeat.modules' from extra YAML files.
 
@@ -272,25 +248,7 @@ The following are hands-on configuration practice:
      reload.period: 10s     
    ```
 
-   Each file matched by the 'path' glob must contain a list of one or more input definitions (`-type:`) like:
-
-   ```
-   - type: log
-     enabled: true
-     paths:
-       - /var/log/myJson.log
-     fields:
-       hostname: "${HOSTNAME:-}"
-     fields_under_root: true
-     scan_frequency: 10s
-     json.keys_under_root: true
-     json.overwrite_keys: false
-
-     json.message_key: "hostHeader"
-     exclude_files: ['.gz$','~$']
-     include_lines: ['www.bing.com','www.example.com']
-     exclude_lines: ['a-shit-line','another-shit-line']
-   ```
+   Each file matched by the 'path' glob must contain a list of one or more inputs.
 
    For modules:
    
@@ -305,9 +263,49 @@ The following are hands-on configuration practice:
    If the subcommand `filebeat modules` is used to disable or enable modules, then 'path' **MUST** point to a location called *modules.d*. Similarly, each matched globbing must contain a list of one or more module definitions (i.e. `- module: nginx`).
 
    However, live reloading is limited sometimes. For example, if a system environment variable is modified or defined, the process wound not know about it unless restarted.
+6. Inputs
+
+   Filebeat reads logs from either 'filebeat.inputs' or 'filebeat.modules'. 'filebeat.inputs' is mainly used to read arbitrary log files while modules read common service logs with predefined settings that is quite handy.
+
+   ```
+   filebeat.modules:
+     - module: nginx
+       access:
+         enabled: true
+         var.paths: /var/log/nginx/access.log
+       error:
+         enabled: true
+         var.paths: /var/log/nginx/error.log
+
+   filebeat.inputs:
+     - type: stdin
+     - type: tcp
+     - type: log
+       enabled: true
+       paths:
+	 - /var/log/myJson.log
+       scan_frequency: 10s
+       exclude_files: ['.gz$','~$']
+
+       fields:
+	 hostname: "${HOSTNAME:-}"
+       fields_under_root: true
+
+       json.keys_under_root: true
+       json.overwrite_keys: false
+
+       json.message_key: "hostHeader"
+       include_lines: ['www.bing.com','www.example.com']
+       exclude_lines: ['a-shit-hostHeader','b-shit-HostHeader']
+   ```
+   
+   1. 'paths' must be **unique** among multiple inputs. If more than one inputs harvests the same file, it would lead to unexpected behavior.
+   2. Only log entries whose 'hostHeader' value matching 'include_lines' will be harvested.
+   3. 'include_lines' is applied before 'exclude_lines' regardless of the order they appear.
+   4. Read more about [modules configuration](https://www.elastic.co/guide/en/beats/filebeat/7.0/configuration-filebeat-modules.html).   
 7. Processors
 
-   A processor filters input logs by adding/dropping/modifying fields and/or events. It resembles 'exlude_files', 'include_lines' and 'exclude_lines' which are applied upon inputs. Processors, on the other hand, applies to fields/events after inputs and before put to outputs.
+   Processor is probably one of the most important *general* option. A processor filters input logs by adding/dropping/modifying fields and/or events. It resembles 'exlude_files', 'include_lines' and 'exclude_lines' which are applied upon inputs. Processors, on the other hand, applies to fields/events after inputs and before put to outputs.
 
    An event can go through a chain of processors in *the exact order* they are defined, before sending out.
 
@@ -345,7 +343,7 @@ The following are hands-on configuration practice:
      partition.round_robin:
        reachable_only: true
        group_events: 1
-     version: '0.10.0.0'
+     version: '2.0.0'
      codec.json:
        pretty: false
        escape_html: false
@@ -540,7 +538,7 @@ processors:
 2. Regarding per-input level, as long as any one of the 'json.keys_under_root', 'json.overwrite_keys' and 'json.message_key' directives appear, Json decoding is applied.
    1. 'json.keys_under_root' places the decode Json at the root level.
    2. Decoded 'key: value' pairs will overwrite built-in pairs that share the same key if 'json.overwrite_keys' is enabled.
-   3. Json decoding happens **before** line (i.e. 'exclude_lines') and multiline filtering. Hence, line and multiline filtering does not affect the original Json event as it is transformed.
+   3. Json decoding happens **before** line (i.e. 'exclude_lines') filtering and [multiline filtering](https://www.elastic.co/guide/en/beats/filebeat/current/multiline-examples.html). Hence, line and multiline filtering does not affect the original Json event as it is transformed.
 
       The 'json.message_key' specifies a decoded Json key and applies line and multiline filtering to the **original** Json event according the key value.
 4. 'decode_json_fields' is a global processor that applies to all inputs, with the 'fields' directive pointing to fileds that require Json decoding.
