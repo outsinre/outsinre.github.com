@@ -221,7 +221,7 @@ The following are hands-on configuration practice:
    2. Log options can be modified on command line directly. For example, `-d '*'` enables *debug* level for all components.
 4. HTTP Server
 
-   ```
+   ```yml
    http.enabled: true
    http.host: localhost
    http.port: 5066
@@ -229,9 +229,9 @@ The following are hands-on configuration practice:
 
    Filebeat has a built-in HTTP server, exposing internal metrics.
 
-   ```
-   curl http://localhost:5066/?pretty
-   curl http://localhost:5066/stats?pretty
+   ```bash
+   ~$ curl http://localhost:5066/?pretty
+   ~$ curl http://localhost:5066/stats?pretty
    ```
 
 5. [Live Reloading](https://www.elastic.co/guide/en/beats/filebeat/current/_live_reloading.html)
@@ -263,7 +263,7 @@ The following are hands-on configuration practice:
    If the subcommand `filebeat modules` is used to disable or enable modules, then 'path' **MUST** point to a location called *modules.d*. Similarly, each matched globbing must contain a list of one or more module definitions (i.e. `- module: nginx`).
 
    However, live reloading is limited sometimes. For example, if a system environment variable is modified or defined, the process wound not know about it unless restarted.
-6. Inputs
+6. Modules and Inputs
 
    Filebeat reads logs from either 'filebeat.inputs' or 'filebeat.modules'. 'filebeat.inputs' is mainly used to read arbitrary log files while modules read common service logs with predefined settings that is quite handy.
 
@@ -278,8 +278,6 @@ The following are hands-on configuration practice:
          var.paths: /var/log/nginx/error.log
 
    filebeat.inputs:
-     - type: stdin
-     - type: tcp
      - type: log
        enabled: true
        paths:
@@ -287,9 +285,9 @@ The following are hands-on configuration practice:
        scan_frequency: 10s
        exclude_files: ['.gz$','~$']
 
-       fields:
-	 hostname: "${HOSTNAME:-}"
        fields_under_root: true
+       fields:
+         hostname: "${HOSTNAME:-}"
 
        json.keys_under_root: true
        json.overwrite_keys: false
@@ -309,7 +307,7 @@ The following are hands-on configuration practice:
 
    An event can go through a chain of processors in *the exact order* they are defined, before sending out.
 
-   ```
+   ```yml
    processors:
      - include_fields:
          fields: ["cpu"]
@@ -320,11 +318,11 @@ The following are hands-on configuration practice:
            equals:
              http.code: 200
      - decode_json_fields:
-	 fields: ["message"]
-	 process_array: false
-	 max_depth: 1
-	 target: ""
-	 overwrite_keys: false
+         fields: ["message"]
+         process_array: false
+         max_depth: 1
+         target: ""
+         overwrite_keys: true
    ```
 
    More about processors, please check the 'Filebeat Processors' section below.   
@@ -335,19 +333,19 @@ The following are hands-on configuration practice:
    ```
    output.kafka:
      enabled: true
-     # initial broker seeds to retrieve metadata of Kafka and Zookeeper
-     hosts: ["logger1:9092", "logger2:9092", "logger3:9092"]
+     hosts: ["logger1:9092", "logger2:9092", "logger3:9092"] # initial broker seeds to retrieve metadata of Kafka and Zookeeper
+
      topic: "cdn-sre"
      #topics:
-     key: ''
+
      partition.round_robin:
        reachable_only: true
-       group_events: 1
+       group_events: 3
      version: '2.0.0'
      codec.json:
        pretty: false
        escape_html: false
-     worker: 2
+     worker: 3
      compression: gzip
      required_acks: 1
      max_message_bytes: 1000000
@@ -356,6 +354,8 @@ The following are hands-on configuration practice:
 
    1. The 'hosts' provides only the initial list of Kafka `listeners` from which to fetch the whole cluster metadata, including the full list of `advertised.listeners` where events are published to.
    2. Besides the 'topic' directive, there is also a 'topics' sub-directive that filters events and publish them to different Kafka topics. It is a useful feature is not constrained by the *one and only one* `output` rule. That is to say, 'output.kafka' can publish events to multiple topics.
+   3. 'group_events' and 'worker' can be set the same value.
+   4. 'max_message_bytes' should be equal to or less than the Kafka broker's 'message.max.bytes'
 
    Like the console consumer/producer of Kafka, Filebeat can output events into console and/or files.
 
@@ -365,7 +365,7 @@ The following are hands-on configuration practice:
      codec.json:
        pretty: true
        escape_html: false
-     path: "/tmp/filebeat"
+     path: ${path.logs}
      filename: filebeat.out
      rotate_every_kb: 10000
      number_of_files: 7
@@ -514,11 +514,11 @@ Here is a hands-on schema on how to correctly decode collected Json logs under t
 - type: log
   # ...
 
+  exclude_files: ['.gz$','~$']
+
   json.keys_under_root: true
   json.overwrite_keys: false
-  # apply line and multiline filtering in accord with the specified Json key
-  json.message_key: "host"
-  exclude_files: ['.gz$','~$']
+  json.message_key: "host" # apply line and multiline filtering in accord with the specified Json key
   include_lines: ['www.example.com']
   exclude_lines: ['shit']
   # ...
@@ -534,19 +534,17 @@ processors:
     fields: ['@timestamp', '@metadata', "log", "tags", "input", "ecs", "host", "agent", "message"]
 ```
 
-1. Json Decoding can be configured at either 'inputs' level or root level.
+1. Json Decoding can be configured at either 'inputs' level or 'processors' level.
 2. Regarding per-input level, as long as any one of the 'json.keys_under_root', 'json.overwrite_keys' and 'json.message_key' directives appear, Json decoding is applied.
    1. 'json.keys_under_root' places the decode Json at the root level.
    2. Decoded 'key: value' pairs will overwrite built-in pairs that share the same key if 'json.overwrite_keys' is enabled.
    3. Json decoding happens **before** line (i.e. 'exclude_lines') filtering and [multiline filtering](https://www.elastic.co/guide/en/beats/filebeat/current/multiline-examples.html). Hence, line and multiline filtering does not affect the original Json event as it is transformed.
 
-      The 'json.message_key' specifies a decoded Json key and applies line and multiline filtering to the **original** Json event according the key value.
-4. 'decode_json_fields' is a global processor that applies to all inputs, with the 'fields' directive pointing to fileds that require Json decoding.
+      The 'json.message_key' specifies a decoded Json key and applies line and multiline filtering to the event according the key value.
+4. 'decode_json_fields' is a global processor that applies to all inputs, with the 'fields' directive pointing to event fileds that require Json decoding.
    1. 'target: ""' is equivalent to 'json.keys_under_root'.
    2. 'overwrite_keys' and 'json.overwrite_keys' are equivalent as well.
 5. '@metadata' and '@timestamp' cannot be dropped even they appear in in the list. Filebeat requires '@metadata' when sending out events (i.e. to Logstash).
 
    A particular setup flow is like 'Filebeat - Kafka - Logstash'. We filter out the two fields in Logstash.
-6. **IMPORTANT**: Filebeat refuses to launch on some systems when either 'overwrite_keys' or 'json.overwrite_keys' is enabled. Check [issue 6381](https://github.com/elastic/beats/issues/6381) and [issue 1378](https://github.com/elastic/beats/issues/1378).
-
-   Therefore, it is recommended to leave those two directives disabled.
+6. **IMPORTANT**: Filebeat refuses to launch on some systems when either 'overwrite_keys' or 'json.overwrite_keys' is enabled. Check [issue 6381](https://github.com/elastic/beats/issues/6381) and [issue 1378](https://github.com/elastic/beats/issues/1378). Therefore, it is recommended to leave those two directives disabled.
