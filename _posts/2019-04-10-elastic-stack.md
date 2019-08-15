@@ -140,7 +140,9 @@ Whenever a semicolon appears followed by a space, it is a dictionary pair. Whene
 Configuration Notice:
 
 1. Please use single quotes for regex and pathnames that containing spaces or special characters.
-2. Environment variables and configuration variables (defined within YML itself) are referenced in the form `${VAR:default-value}`. Environment variables are expanded before YAML parsing. The [command line](https://www.elastic.co/guide/en/beats/filebeat/current/command-line-options.html) `-E` option can be used to override variables like `-E key=value`.
+2. System environment variables and configuration variables (defined within YML itself) are referenced in the form `${VAR:default-value}`. Environment variables are expanded before YAML parsing. So we CANNOT refer to system environment variables within YAML files of 'Live Reloading' as those files are reloaded periodically but after the main YAML parsing.
+
+   The [command line](https://www.elastic.co/guide/en/beats/filebeat/current/command-line-options.html) `-E` option can be used to override variables like `-E key=value`.
 3. Aside environment and configuration variable reference, event field can be referenced in the form `%{[field-name]:default-value}`. Pay attention please, the prefix symbol is `%`. Event fields are accessed using field references `[field-name]`. This is called [Format String (sprintf)](https://www.elastic.co/guide/en/beats/libbeat/current/config-file-format-type.html).
 
 ## [Filebeat Configuration](https://www.elastic.co/guide/en/beats/filebeat/master/configuring-howto-filebeat.html)
