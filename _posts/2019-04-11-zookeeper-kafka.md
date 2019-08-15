@@ -18,7 +18,7 @@ ZooKeeper defines a hierarchical namespace similar to the structure and a Linux 
 
 ![zknamespace](/assets/zknamespace.jpg)
 
-As ZooKeeper is designed to coordinate data (like metadata, configuration, location etc.), so the data stored in each znode is usually small in the byte to kilobyte range. ZooKeeper keeps the data in memory for high throughput and low latency. Meanwhile, snapshots of the in-memory data and transaction logs are kept in a persistent storage (disk).
+As ZooKeeper is designed to coordinate data (like metadata, configuration, location etc.), so the data stored in each znode is usually small in the byte to kilobyte range. ZooKeeper keeps the data in memory for high throughput and low latency. Meanwhile, snapshots of the in-memory data is kept in a persistent storage (disk) along with transaction logs. Transaction logs refer to logs of clients' read and write operations.
 
 Like the applications it coordinates, ZooKeeper itself is also distributed and replicated across a cluster of hosts - ZooKeeper *ensemble*. The in-memory data and persistent data are replicated among the ZooKeeper servers.
 
@@ -38,9 +38,12 @@ ZooKeeper is functional only when a quorum of the servers are available. Recall 
 
 Take 4 ZooKeeper servers for example, a quorum is 3 (> 4/2) which allows 1 server failure and writes should be synced among 3 servers. If there are only 3 servers, the quorum is 2 (> 3/2) which is able to allow 1 server failure as well. So the additional 4th server does not bring in any improvement in terms of stability. However, it benefits load balancing. But what if the number is increased to 5? This requires 3 (> 5/2) servers to form a quorum, the same as a 4-server ZooKeeper. However, the system allows 2 server failure and is more fault-tolerant. Usually, either 3 or 5, not 4 - choose an **odd** number, namely 1, 3, 5, etc.
 
-ZooKeeper elects the leader from at least of a quorum of the servers. Therefore, proper choice of the number of servers is essential for deployment.
+ZooKeeper elects the leader from at least of a quorum of the servers. Therefore, proper choice of the number of servers is essential for deployment. If there is only 1 server, it forms the *standalone mode*, otherwise, it is *replicated mode*.
 
-If there is only 1 server, it forms the *standalone mode*, otherwise, it is *replicated mode*.
+A basic rule:
+
+1. At least a quorum of ZooKeeper servers are online (active);
+2. At least a quorum of active ZooKeeper servers are synched on a 'write' operation.
 
 Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.corejavaguru.com/blog/bigdata/why-zookeeper-on-odd-number-nodes.php)
 
@@ -281,8 +284,10 @@ Next, we focus on the configuration. A sample configuration file is located at *
 4. dataDir: persistent storage for both snapshots of in-memory data and trasaction logs.
 4. dataLogDir: a dedicated directive that defines a different location to store transactions logs.
 
-   A separate physical storage device for transaction logs can significantly reduce latencies of updating.
+   A separate physical storage device for transaction logs can significantly improve performance of ZooKeeper.
 5. clientPort: the port to listen for client (Kafka brokers in this case) connections. By default, it is 2181.
+
+   clientPortAddress is the address to listen for client connections. By default, it is '0.0.0.0'.
 6. autopurge.snapRetainCount: when doing storage cleanup, only retain the most recent version. No less than 3!
 7. autopurge.purgeInterval: cleanup interval in hour unit.
 8. server.X=hostname:port1:port2:
@@ -354,6 +359,8 @@ logger@container-logger1 ~ $ echo 'PATH=/opt/zookeeper/bin:${PATH}' >> ~/.bashrc
 logger@container-logger1 ~ $ zkServer.sh
 logger@container-logger1 ~ $ zkServer.sh print-cmd
 ```
+
+From 'zkEnv.sh', the Java max heap size is set to 1000m by variable 'ZK_SERVER_HEAP' and 'ZK_CLIENT_HEAP', reflected by `java -Xmx` option. An overwhelming heap size will seriously degrade ZooKeeper performance due to frequent *disk swap*. The minimal guarantee is that heap size is *smaller* than memory size.
 
 ## ZooKeeper Logging
 
@@ -515,6 +522,35 @@ logger@container-logger1 ~ $ zkServer.sh stop
 ## ZooKeeper Systemd Unit
 
 Read the post [Zookeeper install on CentOS 7](https://blog.redbranch.net/2018/04/19/zookeeper-install-on-centos-7/) first.
+
+## Zookeeper Advanced Tips
+
+### Dynamic Reconfiguration
+
+From 3.5.0 onwards, directives 'clientPort' and 'clientPortAddress' can be integrated into the 'Server.X' directive as:
+
+```
+# server.X = <address1>:port1:port2[:role];[<client port address>:]<client port>
+
+server.1 = 12.34.56.78:2888:3888;2181
+server.2 = 12.34.56.78:2888:3888:participant;2181
+server.3 = 192.168.0.105:2888:3888:observer;12.34.56.78:2181
+```
+
+Dynamic Reconfiguration means to update confiuration on the fly without restarting ZooKeeper servers.
+
+### Observer Server
+
+As mentioned earlier, at least a quorum of the active servers are synched on a 'write' operation. However, this requirement make it hard to scale the number of ZooKeeper servers and/or the number of clients as write sync takes time and resources.
+
+ZooKeeper now introduces a new type of server called *observer* to improve scalability, distinguished from the common *participant* servers. Observers are almost the same as participant followers except that they does not participate in write sync and only receive the sync results.
+
+Therefore, we can increase the number of observers as much as we like without harming the write sync performance. To specify an observer server, the configuration looks like:
+
+```
+peerType=observer
+server.1=localhost:2888:3888:observer;2181
+```
 
 # Kafka
 
