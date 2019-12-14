@@ -3,140 +3,158 @@ layout: post
 title: Git Architecture
 ---
 
-<span style="color:blue">The central is commits.</span>
+1. toc
+{:toc:}
 
 # ABCs
 
-![Git Architecure]({{ site.baseurl }}/assets/git2.png)
+![Git Architecure]({{ site.baseurl }}/assets/git1.png)
 
 Basically three components:
 
 1. working space, working directory, local directory
-  * the real project files on hard disk
+
+   The files we edit on hard disk.
 2. staging area, index
-3. local repository, repository, history
-  * the 2nd and 3rd ones are stored in `.git` folder
 
-`git add` not only add files that are not yet known to Git, but also files that you have just modified. This is because Git takes content for next **commit not from your working copy, but from a special temporary area, called index**. This allows finer control over what is going to be committed. You can not only exclude some files from commit, you can exclude even certain pieces of files from commit (try `git add -i`). This helps developers stick to `atomic commits principle`.
+   Temperary place that holds updates from working space and _commit_s the updates to repository.
+3. repo, local repository, git repository, history
 
-How do we know what is the current state of things? What was the latest commit in the history? To answer that let’s look at Git refs (short for references). They are basically named references for Git commits. There are two major types of refs: `tags`, `heads`, and `remotes`.
+   Besides local repositories, we also have remote repositories.
+4. _index_ and _repository_ reside in the _.git/_ directory.
 
-1. `Tags` are fixed references that mark a specific point in history, for example v2.6.29.
-2. On the contrary, `heads` are always moved to reflect the current position of project development.
-3. Another special kind of refs are `remotes`. Whenever you run git fetch, it asks the remote repository, what heads and tags does it have, downloads missing objects (if any) and stores remote refs under refs/remotes prefix. The remote heads are displayed if you run `git branch -r`.
+`git add` can not only add files that are not yet known to Git, but files that we have just modified. Git takes contents for next **commit not from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
 
+How do we know what is the current state of things? What was the latest commit in the history? To answer that let's look at _refs_ (short for _references_) to commits like _tag_, _head_ (_branch_), and _remote_. Tag is a fixed reference that marks a specific point in commit history, for example "v2.6.29". On the contrary, _head_ always moves forward to reflect the lastest commit. When it comes to commit history, we use term 'head' more than 'branch'. But when we emphasize project design, we use branch more often. Whenever we `git fetch`, it asks the remote repository, what heads and tags does it have, downloads missing objects (if any) and stores remote refs under _.git/refs/_. The remote heads are displayed if we run `git branch -r`.
 
-For the sake of simplicity, let’s forget about trees and blobs for now, and look at commits only.
+For the sake of simplicity, let's forget about _tree_ and _blob_ now, and look at commits illustration:
 
 ![Git Architecure]({{ site.baseurl }}/assets/git3.png)
 
-They are acutall three heads above called `old`, `master`, and `stable`. They represents the latest commits (heads) of the three **branches** respectively. `heads` here can be called `branches` as well. Open `\.git\refs\heads` directory, you will many heads there.
+There are three _named head_s above, namely _old_, _master_, and _stable_ representing the latest commits of the three _branch_es respectively. Just open _.git/refs/heads_ directory to inspect heads.
 
-But to know what is happening right here, right now there is a special reference called `HEAD`. Normally HEAD points to one of the heads, so everything works out just fine. It serves two major purposes:
-
-1. It tells Git which commit to take files from when you checkout
-  * When you run `git checkout ref` it makes `HEAD` to the `ref` you’ve designated and extracts files from it. 
-2. It tells Git where to put new commits when you commit.
-  * When you run git commit it creates a new commit object, which becomes a child of current HEAD.
-
-We can say **branch is pointer to the latest commits** while **HEAD is pointer to the currrent working branch pointer**. That is to say **HEAD is a 2nd level commit pointer**.
-
-![Git Architecure]({{ site.baseurl }}/assets/git6.jpg)
+But to know what is happening right here, right now? There is a special reference 'HEAD' (uppercase). Normally HEAD links to one of the heads as _current head_ and does not refer to commit directly unless it is told to do so. HEAD serves two major purposes:
 
 ![Git Architecure]({{ site.baseurl }}/assets/git4.png)
 
-`HEAD` normally refers to a named branch (e.g. `master`). Meanwhile, each branch refers to a specific commit. Let’s look at a repo with three commits, one of them tagged, and with branch `master` checked out:
+1. It tells Git which commit to take files from when we `checkout`.
 
-	       HEAD (refers to branch 'master')
-		|
-		v
-    a---b---c  branch 'master' (refers to commit 'c')
-	^
-	|
-      tag 'v2.0' (refers to commit 'b')
+   When we run `git checkout <ref>`, it makes HEAD point to the ref and extracts files from it. 
+2. It tells Git where to store new commits.
 
+Let's look at a repo with three commits with one tag and one head:
 
-When a commit is created in this state, the branch is updated to refer to the new commit. Specifically, git commit creates a new commit `d`, whose parent is commit `c`, and then updates branch `master` to refer to new commit `d`. `HEAD` still refers to branch master and so indirectly now refers to commit `d`:
+```
+               HEAD (ref to master)
+                |
+                v
+   a<---b<---c head master (ref to commit 'c')
+        ^
+        |
+      tag 'v2.0' (ref to commit 'b')
+```
 
+When Git creates a new commit 'd' whose parent is commit 'c', and then updates branch 'master' to point to commit 'd'. HEAD still links to 'master':
+
+```
     $ edit; git add; git commit
 
-		   HEAD (refers to branch 'master')
-		    |
-		    v
-    a---b---c---d  branch 'master' (refers to commit 'd')
-	^
-	|
-      tag 'v2.0' (refers to commit 'b')
+                    HEAD (ref to master)
+                     |
+                     v
+   a<---b---c<---d head master (ref to commit 'd')
+        ^
+        |
+      tag 'v2.0' (ref to commit 'b')
+```
 
-It is sometimes useful to be able to checkout a commit that is not at the tip of any named branch, or even to create a new commit that is not referenced by a named branch. Let’s look at what happens when we checkout commit `b` (here we show two ways this may be done):
+It is sometimes useful to be able to checkout a commit that is not at the tip of any named head, or even to create a new commit that is not referenced by any named head. Let's look at what happens when we checkout commit 'b' (here we show three ways this may be done):
 
-    $ git checkout v2.0  # or
+```
+    $ git checkout v2.0
+    # -or-
     $ git checkout master^^
+    #
+    $ git checkout <hash-of-b>
 
-       HEAD (refers to commit 'b')
-	|
-	v
-    a---b---c---d  branch 'master' (refers to commit 'd')
-	^
-	|
-      tag 'v2.0' (refers to commit 'b')
+       HEAD (ref to commit 'b')
+        |
+        v
+   a<---b<---c<---d head master (ref to commit 'd')
+        ^
+        |
+      tag 'v2.0' (ref to commit 'b')
+```
 
-Notice that regardless of which checkout command we use, HEAD now refers directly to commit `b`. This is known as being in **detached HEAD** state (which is also discussed below). It means simply that HEAD refers to a specific commit, as opposed to referring to a named branch. Let’s see what happens when we create a commit:
+Notice that regardless of which checkout command we use, HEAD now refers directly to commit 'b'. This is known as being in __detached HEAD__ state (more details below). This simply means that HEAD refers to a specific commit, as opposed to referring to a named head. Let's see what happens when we create a commit 'e':
 
+```
     $ edit; git add; git commit
 
-	 HEAD (refers to commit 'e')
-	  |
-	  v
-	  e
-	 /
-    a---b---c---d  branch 'master' (refers to commit 'd')
-	^
-	|
-      tag 'v2.0' (refers to commit 'b')
+      HEAD (ref to commit 'e')
+        |
+        v
+        e
+        |
+        v
+   a<---b<---c<---d head master (ref to commit 'd')
+        ^
+        |
+      tag 'v2.0' (ref to commit 'b')
+```
 
-There is now a new commit `e`, but it is referenced only by HEAD. We can of course add yet another commit in this state:
+Commit 'e' is referenced only by HEAD and is not named. We can add yet another commit in this state:
 
+```
     $ edit; git add; git commit
 
-	     HEAD (refers to commit 'f')
-	      |
-	      v
-	  e---f
-	 /
-    a---b---c---d  branch 'master' (refers to commit 'd')
-	^
-	|
-      tag 'v2.0' (refers to commit 'b')
+           HEAD (ref to commit 'f')
+             |
+             v
+        e<---f
+        |
+        v
+   a<---b<---c<---d head master (ref to commit 'd')
+        ^
+        |
+      tag 'v2.0' (ref to commit 'b')
+```
 
-In fact, we can perform all the normal Git operations. But, let’s look at what happens when we then checkout master:
+But, let's look at what happens when we then checkout head master:
 
+```
     $ git checkout master
 
-		   HEAD (refers to branch 'master')
-	  e---f     |
-	 /          v
-    a---b---c---d  branch 'master' (refers to commit 'd')
-	^
-	|
-      tag 'v2.0' (refers to commit 'b')
+        e<---f       HEAD (ref to master)
+        |              |
+        v              v
+   a<---b<---c<---d head master (ref to commit 'd')
+        ^
+        |
+      tag 'v2.0' (ref to commit 'b')
+```
 
-It is important to realize that at this point nothing refers to commit `f`. Eventually commit `f` (and by extension commit `e`) will be deleted by the routine Git garbage collection process, unless we create a reference before that happens. If we have not yet moved away from commit `f` (not `git checkout master`), any of these will create a reference to it:
+It is important to realize that at this point nothing refers to commit 'f' and it becomes orphaned. Eventually commit 'f' and 'e' be deleted by Git _garbage collection_ process, unless we create a reference before checking out 'master':
 
-    $ git checkout -b foo   <1>
-    $ git branch foo        <2>
-    $ git tag foo           <3>
+```bash
+~ $ git checkout -b foo   <1>
+~ $ git branch foo        <2>
+~ $ git tag foo           <3>
+```
 
-1. creates a new branch `foo`, which refers to commit `f`, and then updates HEAD to refer to branch `foo`. In other words, we'll no longer be in detached HEAD state after this command.
-2. similarly creates a new branch `foo`, which refers to commit f, but leaves HEAD detached.
-3. creates a new tag foo, which refers to commit f, leaving HEAD detached.
+1. Creates a new branch 'foo', which refers to commit 'f', and then updates HEAD to refer to branch 'foo'. In other words, we'll no longer be in detached HEAD state after this command.
+2. Similarly, creates a new branch 'foo', but leaves HEAD detached.
+3. Like above, creates a new tag 'foo', leaving HEAD detached.
 
-If we have moved away from commit `f` (by `git checkout master` etc) without creating reference to it, then we must first recover its object name (typically by using `git reflog`), and then we can create a reference to it. For example, to see the last two commits to which HEAD referred, we can use either of these commands:
+Even we have moved away from commit 'f' (like `git checkout master`), we can still create a head for it. We must first recover its object name (typically by using `git reflog`). For example, to see the last two commits to which HEAD referred, we can use either of these commands:
 
-    $ git reflog -2 HEAD # or
-    $ git log -g -2 HEAD
+```
+$ git reflog -2 HEAD # or
+$ git log -g -2 HEAD
+```
 
 Here is another illustration:
+
 ![Git Architecure]({{ site.baseurl }}/assets/git5.png)
 
 # Commands Comprehension
