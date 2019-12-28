@@ -19,11 +19,7 @@ Now let's move on to Shell. Terminal is where input and output happen (like typi
 
 With Shell, we can _suspend_ the current _job_ to background with `Ctrl-Z`. On the contratry, `fg` put the first background job _foreground_ running again. Alternatively, `bg` send the job running background instead of suspending it. To start a program running in background, we can append `&` to program like `program-name &`. Different Shells may have different syntax to manage jobs.
 
-Job is distinct from _process_, but both of them relate to _program_. A program is a static executable binary while a process is a running program. Job is only meaningful to Shell. Jobs refer to a _pipeline_ of processes that run interactively. For example, `ls | head` launches two processes but the pipeline defines a single job. Therefore, a job of Shell corresponds to a _process group_ of OS.
-
-A _daemon_ does not belong to job as it _detach_es from Shell and gets out of Shell management. Process suspended or running in background belong to job. Putting a job background allows starting another job as the Shell is _release_d.
-
-Shell assign each job a job ID apart from process PID assigned by the OS. To list existing jobs, just run `jobs -l` like:
+Job is distinct from _process_, but both of them relate to _program_. A program is a static executable binary while a process is a running program. Job is only meaningful to Shell. Jobs refer to a _pipeline_ of processes that run interactively. For example, `ls | head` launches two processes but the pipeline defines a single job. Therefore, a job of Shell corresponds to a _process group_ of OS. Shell assign each job a job ID apart from process PID assigned by the OS. To list existing jobs, just run `jobs -l` like:
 
 ```bash
 user@tux ~ $ sleep 300 &
@@ -38,6 +34,8 @@ user@tux ~/workspace/outsinre.github.com $ jobs -l
 [3]+ 21812 Running                 sleep 302 &
 ```
 
-Numbers in brackets are job IDs while numbers that follow job IDs are PID.
+Numbers in brackets are job IDs while numbers that follow job IDs are PID. More about job control, please refer to [Manual 7.1 Job Control Basics ](http://www.faqs.org/docs/bashman/bashref_78.html).
+
+BTW, a _daemon_ does not belong to job as it _detach_es from Shell and gets out of Shell management. Process suspended or running in background belong to job. Putting a job background allows starting another job as the Shell is _release_d.
 
 Finally, we go to `sed`. It is just a sample of the many programs managed by Shell. Nothing more required to clarify.
