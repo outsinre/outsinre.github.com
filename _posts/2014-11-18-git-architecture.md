@@ -4,28 +4,32 @@ title: Git Architecture
 ---
 
 1. toc
-{:toc:}
+{:toc}
 
 # ABCs
 
-![Git Architecure]({{ site.baseurl }}/assets/git1.png)
+![Git Architecure]({{ site.baseurl }}/assets/git2.png)
 
 Basically three components:
 
 1. working space, working directory, local directory
 
    The files we edit on hard disk.
-2. staging area, index
+2. staging area, index area
 
-   Temperary place that holds updates from working space and _commit_s the updates to repository.
-3. repo, local repository, git repository, history
+   Temperary place that holds updates from working space and _commit_s the updates to repository. When talking about Git commands, we prefer 'stage' but when talking about Git itself, we use 'index' more often.
+3. repo, git repository, history
 
    Besides local repositories, we also have remote repositories.
 4. _index_ and _repository_ reside in the _.git/_ directory.
 
 `git add` can not only add files that are not yet known to Git, but files that we have just modified. Git takes contents for next **commit not from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
 
-How do we know what is the current state of things? What was the latest commit in the history? To answer that let's look at _refs_ (short for _references_) to commits like _tag_, _head_ (_branch_), and _remote_. Tag is a fixed reference that marks a specific point in commit history, for example "v2.6.29". On the contrary, _head_ always moves forward to reflect the lastest commit. When it comes to commit history, we use term 'head' more than 'branch'. But when we emphasize project design, we use branch more often. Whenever we `git fetch`, it asks the remote repository, what heads and tags does it have, downloads missing objects (if any) and stores remote refs under _.git/refs/_. The remote heads are displayed if we run `git branch -r`.
+# ref
+
+How do we know what is the current state of things? What was the latest commit in the history? To answer that let's look at _ref_ (short for _reference_) to commits like _tag_, _head_ (_branch_), and _remote_. _ref_ is actually a symbolic link to real object.
+
+Tag is a fixed reference that marks a specific point in commit history, for example "v2.6.29". On the contrary, _head_ always moves forward to reflect the lastest commit. When it comes to commit history, we use term 'head' more than 'branch'. But when we emphasize project design, we use branch more often. Read [How do I create tag with certain commits and push it to origin?](https://stackoverflow.com/a/25755777) for detailed difference between _tag_ and _head_. Whenever we `git fetch`, it asks the _remote_ repository, what heads and tags does it have, downloads missing objects (if any) and stores  under _.git/refs/remotes_. The remote heads are displayed if we run `git branch -r`.
 
 For the sake of simplicity, let's forget about _tree_ and _blob_ now, and look at commits illustration:
 
@@ -74,7 +78,9 @@ It is sometimes useful to be able to checkout a commit that is not at the tip of
     $ git checkout v2.0
     # -or-
     $ git checkout master^^
-    #
+    # -or-
+    $ git checkout master~2
+    # -or-
     $ git checkout <hash-of-b>
 
        HEAD (ref to commit 'b')
@@ -146,30 +152,32 @@ It is important to realize that at this point nothing refers to commit 'f' and i
 2. Similarly, creates a new branch 'foo', but leaves HEAD detached.
 3. Like above, creates a new tag 'foo', leaving HEAD detached.
 
-Even we have moved away from commit 'f' (like `git checkout master`), we can still create a head for it. We must first recover its object name (typically by using `git reflog`). For example, to see the last two commits to which HEAD referred, we can use either of these commands:
+Even we have moved away from commit 'f' (like `git checkout master`), we can still create a head for it. We must first find out its object name (typically by using `git reflog`). For example, to see the last two commits to which HEAD referred, we can use either of these commands:
 
+```bash
+$ git reflog -2 HEAD
+# -or-
+$ git log -g --abbrev-commit --pretty=oneline -2 HEAD
 ```
-$ git reflog -2 HEAD # or
-$ git log -g -2 HEAD
-```
 
-Here is another illustration:
+Remember that heads are dynamic refs that move along with new commits. `git reflog` or `git log` can find the old value of heads.
 
-![Git Architecure]({{ site.baseurl }}/assets/git5.png)
+# Git Commands Illustration
 
-# Commands Comprehension
 ![Git Architecure]({{ site.baseurl }}/assets/git1.png)
 
-The four commands above copy files between the working directory, the stage (also called the index), and the history (in the form of commits).
+The four commands above copy files between the working directory, the stage, and the history:
 
-1. *git add files* copies files (at their current state) to the stage.
-2. *git commit* saves a snapshot of the stage as a commit.
-3. *git reset -- files* unstages files; that is, it copies files from the latest commit to the stage. Use this command to "undo" a git add files. You can also git reset to unstage everything.
-4. *git checkout -- files* copies files from the stage to the working directory. Use this to throw away local changes.
+1. `git add` copies files (at their current state) to the stage area. We call it a _staging process_.
+2. `git commit` saves a snapshot of the stage to the history. We call it a _committing process_.
+3. `git reset -- files` unstages files; that is, it copies files from the history to the stage. Use this command to "undo" a `git add`. You can also `git reset` to unstage everything. It does not affect the working directory or the history, but the the opposite of `git add`.
 
-You can use `git reset -p, git checkout -p, or git add -p` instead of (or in addition to) specifying particular files to interactively choose which hunks copy.
+   We call it a _unstaging process_.
+4. `git checkout -- files` copies files from the stage to the working directory. Use this to throw away local changes.
+5. We can add `-p` option to these commands to interactively choose which files to operate on.
 
 It is also possible to jump over the stage and check out files directly from the history or commit files without staging first.
+
 ![Git Architecure]({{ site.baseurl }}/assets/git7.svg)
 
 1. `git commit -a` is equivalent to running git add on all filenames that existed in the latest commit, and then running git commit. But new files you have not told Git about are not affected.
