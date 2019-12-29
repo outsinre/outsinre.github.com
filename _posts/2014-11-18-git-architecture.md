@@ -12,24 +12,24 @@ title: Git Architecture
 
 Basically three components:
 
-1. working space, working directory, local directory
+1. working/local space/directory
 
    The files we edit on hard disk.
-2. staging area, index area
+2. staging/index area
 
-   Temperary place that holds updates from working space and _commit_s the updates to repository. When talking about Git commands, we prefer 'stage' but when talking about Git itself, we use 'index' more often.
-3. repo, git repository, history
+   Temperary place that holds updates from working space and _commit_s the updates to repository. When talking about Git commands, we prefer 'staging' ('stage') but when talking about Git itself, we use 'index' more often.
+3. history/repository
 
    Besides local repositories, we also have remote repositories.
-4. _index_ and _repository_ reside in the _.git/_ directory.
+4. _index_ and _repository_ reside under the _.git/_ directory.
 
-`git add` can not only add files that are not yet known to Git, but files that we have just modified. Git takes contents for next **commit not from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
+`git add` can not only add files that are not yet known to Git, but files that we have just created. Git takes contents for next **commit NOT from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
 
 # ref
 
-How do we know what is the current state of things? What was the latest commit in the history? To answer that let's look at _ref_ (short for _reference_) to commits like _tag_, _head_ (_branch_), and _remote_. _ref_ is actually a symbolic link to real object.
+How do we know what is the current state of things? What was the latest commit in the history? To answer that let's look at _ref_ (short for _reference_) to commits like _tag_, _head_ (_branch_), and _remote_.
 
-Tag is a fixed reference that marks a specific point in commit history, for example "v2.6.29". On the contrary, _head_ always moves forward to reflect the lastest commit. When it comes to commit history, we use term 'head' more than 'branch'. But when we emphasize project design, we use branch more often. Read [How do I create tag with certain commits and push it to origin?](https://stackoverflow.com/a/25755777) for detailed difference between _tag_ and _head_. Whenever we `git fetch`, it asks the _remote_ repository, what heads and tags does it have, downloads missing objects (if any) and stores  under _.git/refs/remotes_. The remote heads are displayed if we run `git branch -r`.
+Tag is a fixed reference that marks a specific point in commit history, for example "v2.6.29". On the contrary, _head_ always moves forward to reflect the lastest commit. When it comes to commit history, we use term 'head' more than 'branch'. But when we emphasize a module of the project, we use 'branch' more often. Read [How do I create tag with certain commits and push it to origin?](https://stackoverflow.com/a/25755777) for detailed difference between _tag_ and _head_. Whenever we `git fetch`, it asks the _remote_ repository, what heads and tags does it have, downloads missing objects (if any) and stores  under _.git/refs/remotes_. The remote heads are displayed if we run `git branch -r`.
 
 For the sake of simplicity, let's forget about _tree_ and _blob_ now, and look at commits illustration:
 
@@ -46,13 +46,13 @@ But to know what is happening right here, right now? There is a special referenc
    When we run `git checkout <ref>`, it makes HEAD point to the ref and extracts files from it. 
 2. It tells Git where to store new commits.
 
-Let's look at a repo with three commits with one tag and one head:
+Let's look at a repo with three commits with one tag ("v2.0") and one head ('master'):
 
 ```
                HEAD (ref to master)
                 |
                 v
-   a<---b<---c head master (ref to commit 'c')
+   a<---b<---c master (ref to commit 'c')
         ^
         |
       tag 'v2.0' (ref to commit 'b')
@@ -66,7 +66,7 @@ When Git creates a new commit 'd' whose parent is commit 'c', and then updates b
                     HEAD (ref to master)
                      |
                      v
-   a<---b---c<---d head master (ref to commit 'd')
+   a<---b---c<---d master (ref to commit 'd')
         ^
         |
       tag 'v2.0' (ref to commit 'b')
@@ -86,7 +86,7 @@ It is sometimes useful to be able to checkout a commit that is not at the tip of
        HEAD (ref to commit 'b')
         |
         v
-   a<---b<---c<---d head master (ref to commit 'd')
+   a<---b<---c<---d master (ref to commit 'd')
         ^
         |
       tag 'v2.0' (ref to commit 'b')
@@ -95,7 +95,7 @@ It is sometimes useful to be able to checkout a commit that is not at the tip of
 Notice that regardless of which checkout command we use, HEAD now refers directly to commit 'b'. This is known as being in __detached HEAD__ state (more details below). This simply means that HEAD refers to a specific commit, as opposed to referring to a named head. Let's see what happens when we create a commit 'e':
 
 ```
-    $ edit; git add; git commit
+    $ <edit>; git add; git commit
 
       HEAD (ref to commit 'e')
         |
@@ -103,16 +103,16 @@ Notice that regardless of which checkout command we use, HEAD now refers directl
         e
         |
         v
-   a<---b<---c<---d head master (ref to commit 'd')
+   a<---b<---c<---d master (ref to commit 'd')
         ^
         |
       tag 'v2.0' (ref to commit 'b')
 ```
 
-Commit 'e' is referenced only by HEAD and is not named. We can add yet another commit in this state:
+HEAD points to commit 'e' now. We can add yet another commit in this state:
 
 ```
-    $ edit; git add; git commit
+    $ <edit>; git add; git commit
 
            HEAD (ref to commit 'f')
              |
@@ -120,13 +120,13 @@ Commit 'e' is referenced only by HEAD and is not named. We can add yet another c
         e<---f
         |
         v
-   a<---b<---c<---d head master (ref to commit 'd')
+   a<---b<---c<---d master (ref to commit 'd')
         ^
         |
       tag 'v2.0' (ref to commit 'b')
 ```
 
-But, let's look at what happens when we then checkout head master:
+But, let's look at what happens when we then checkout master:
 
 ```
     $ git checkout master
@@ -134,13 +134,13 @@ But, let's look at what happens when we then checkout head master:
         e<---f       HEAD (ref to master)
         |              |
         v              v
-   a<---b<---c<---d head master (ref to commit 'd')
+   a<---b<---c<---d master (ref to commit 'd')
         ^
         |
       tag 'v2.0' (ref to commit 'b')
 ```
 
-It is important to realize that at this point nothing refers to commit 'f' and it becomes orphaned. Eventually commit 'f' and 'e' be deleted by Git _garbage collection_ process, unless we create a reference before checking out 'master':
+It is important to realize that at this point nothing refers to commit 'f' and it becomes _orphaned commits_. Eventually commit 'f' and 'e' would be deleted by Git _garbage collection_ process. To preserve the commits, we can create a ref to commit 'f' before checking out 'master':
 
 ```bash
 ~ $ git checkout -b foo   <1>
@@ -148,11 +148,11 @@ It is important to realize that at this point nothing refers to commit 'f' and i
 ~ $ git tag foo           <3>
 ```
 
-1. Creates a new branch 'foo', which refers to commit 'f', and then updates HEAD to refer to branch 'foo'. In other words, we'll no longer be in detached HEAD state after this command.
+1. Creates a new branch 'foo', which refers to commit 'f', and then make HEAD link to branch 'foo'. In other words, we'll no longer be in detached HEAD state after this command.
 2. Similarly, creates a new branch 'foo', but leaves HEAD detached.
 3. Like above, creates a new tag 'foo', leaving HEAD detached.
 
-Even we have moved away from commit 'f' (like `git checkout master`), we can still create a head for it. We must first find out its object name (typically by using `git reflog`). For example, to see the last two commits to which HEAD referred, we can use either of these commands:
+Even after we have moved away from commit 'f' without a ref, we can still create a head for it. We must first find out the object name (typically by using `git reflog`). For example, to see the last two commits to which HEAD referred, we can use either of these commands:
 
 ```bash
 $ git reflog -2 HEAD
@@ -160,7 +160,7 @@ $ git reflog -2 HEAD
 $ git log -g --abbrev-commit --pretty=oneline -2 HEAD
 ```
 
-Remember that heads are dynamic refs that move along with new commits. `git reflog` or `git log` can find the old value of heads.
+Remember that heads are dynamic refs that move along with new commits. `git reflog` or `git log` can show the moving path.
 
 # Git Commands Illustration
 
@@ -168,64 +168,70 @@ Remember that heads are dynamic refs that move along with new commits. `git refl
 
 The four commands above copy files between the working directory, the stage, and the history:
 
-1. `git add` copies files (at their current state) to the stage area. We call it a _staging process_.
-2. `git commit` saves a snapshot of the stage to the history. We call it a _committing process_.
-3. `git reset -- files` unstages files; that is, it copies files from the history to the stage. Use this command to "undo" a `git add`. You can also `git reset` to unstage everything. It does not affect the working directory or the history, but the the opposite of `git add`.
+1. `git add` copies files (at their current state) to the staging area. We call it a _staging process_.
+2. `git commit` saves a snapshot of the staging area to the history. We call it a _committing process_.
+3. `git reset -- files` unstages files; that is, it copies files from the history to the staging area, namely reset the stage to the preceding state.
 
-   We call it a _unstaging process_.
-4. `git checkout -- files` copies files from the stage to the working directory. Use this to throw away local changes.
+   Use this command to "undo" a `git add`. You can also use `git reset` alone to unstage everything. It does not affect the working directory or the history. We call it a _unstaging process_.
+4. `git checkout -- files` copies files from the staging area to the working directory. Use this to throw away local changes.
 5. We can add `-p` option to these commands to interactively choose which files to operate on.
 
-It is also possible to jump over the stage and check out files directly from the history or commit files without staging first.
+It is also possible to skip the index and updates files directly between the working tree and history without staging first.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git7.svg)
 
-1. `git commit -a` is equivalent to running git add on all filenames that existed in the latest commit, and then running git commit. But new files you have not told Git about are not affected.
-2. `git commit files` creates a new commit containing the contents of the latest commit, plus a snapshot of `files` taken from the working directory. Additionally, `files` are copied to the stage.
-3. `git checkout HEAD -- files` copies `files` from the latest commit to **both** the stage and the working directory.
+1. `git commit -a` is equivalent to running git add on all filenames that already exist in the latest commit, and then running git commit. However, new files we have not told Git about are not affected.
 
-A more detailed illustraion:
+   `git commit <files>` does the same thing but only affect files specified on the command line.
+2. `git checkout HEAD -- <files>` copies files from the latest commit to **both** the stage and the working directory. Attention please, there is the HEAD _ref_.
+
+The figure below will be used as a start point of the following sections.
+
 ![Git Architecure]({{ site.baseurl }}/assets/git8.svg)
 
-Commits are shown in green as 5-character IDs, and they point to their parents. Branches are shown in orange, and they point to particular commits. The current branch is identified by the special reference HEAD, which is "attached" to that branch. In this image, the five latest commits are shown, with ed489 being the most recent. `master` (the current branch) points to this commit, while `maint` (another branch) points to an ancestor of master's commit.
-
-## Diff
+## diff
 
 There are various ways to look at differences between commits. Below are some common examples. Any of these commands can optionally take extra filename arguments that limit the differences to the named files.
 
+Generally, `git diff` shows changes between working tree and staging area, unless a commit is present.
+
 ![Git Architecure]({{ site.baseurl }}/assets/git9.svg)
 
-## Commit
+## commit
 
-When you commit, git creates a new commit object using the files from the stage and sets the parent to the current commit. It then points the current branch to this new commit. In the image below, the current branch is master. Before the command was run, master pointed to ed489. Afterward, a new commit, f0cec, was created, with parent ed489, and then master was moved to the new commit.
+When you commit, git creates a new commit object using the files from the index and sets the parent to the current commit. It then points the current branch (namely the HEAD) to this new commit. In the image below, the current branch is 'master'. Before the command was created, 'master' points to 'ed489'. Afterwards, a new commit, 'f0cec', and then the 'master' ref moved to the new commit.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git10.svg)
 
-This same process happens even when the current branch is an ancestor of another. Below, a commit occurs on branch maint, which was an ancestor of master, resulting in 1800b. Afterward, maint is no longer an ancestor of master. To join the two histories, a merge (or rebase) will be necessary.
+Pay attention to the index arrow. Here is another example, a commit occurs on branch 'maint', which was an ancestor of 'master', resulting in '1800b'. Afterwards, 'maint' is no longer an ancestor of 'master'. To join the two histories, a `git merge` or `git rebase` will help.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git11.svg)
 
-Sometimes a mistake is made in a commit, but this is easy to correct with git commit --amend. When you use this command, git creates a new commit with the same parent as the current commit. (The old commit will be discarded if nothing else references it.)
+Sometimes a mistake is made when committing, but it is easy to rectify with `git commit --amend`. When you use this command, git creates a new commit with the same parent as the current commit (would be discarded by garbage collection).
 
 ![Git Architecure]({{ site.baseurl }}/assets/git12.svg)
 
 A fourth case is committing with a detached HEAD, as explained later.
 
-## Checkout
+## checkout
 
-The checkout command is used to copy files from the history (or stage) to the working directory, and to optionally switch branches.
+The checkout command is used to copy files from the history or the index to the working directory, and to optionally switch branches.
 
-When a filename (and/or -p) is given, git copies those files from the given commit to the stage and the working directory. For example, git checkout HEAD~ foo.c copies the file foo.c from the commit called HEAD~ (the parent of the current commit) to the working directory, and also stages it. (If no commit name is given, files are copied from the stage.) Note that the current branch is not changed.
+When a commit given, it updates both the working directory and the index from the history. For example, `git checkout HEAD~ foo.c` copies 'foo.c' from the 'HEAD~' commit (the parent of the current commit) to the working directory, and also stages it. If no commit name is given, files are copied from the stage to working tree, without any involvement of the history part.
+
+Whichever mode is invoked, that the history is left untouched.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git13.svg)
 
-When a filename is not given but the reference is a (local) branch, HEAD is moved to that branch (that is, we "switch to" that branch), and then the stage and working directory are set to match the contents of that commit. Any file that exists in the new commit (a47c3 below) is copied; any file that exists in the old commit (ed489) but not in the new one is deleted; and any file that exists in neither is ignored.
+When a filename is not given but the reference is a branch, HEAD is linked to that branch (that is, we _switch_ to that branch), and then the stage and working tree are set to match that branch. Any file that exists in the new commit ('a47c3') is copied; any file that exists in the old commit ('ed489') but not in the new one is deleted; and any file that exists in neither is ignored.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git14.svg)
 
-When a filename is not given and the reference is not a (local) branch — say, it is a tag, a remote branch, a SHA-1 ID, or something like master~3 — we get an anonymous branch, called a detached HEAD. This is useful for jumping around the history. Say you want to compile version 1.6.6.1 of git. You can git checkout v1.6.6.1 (which is a tag, not a branch), compile, install, and then switch back to another branch, say git checkout master. However, committing works slightly differently with a detached HEAD; this is covered below.
+When a filename is not given and the reference is not a (local) branch (a tag, a remote branch, a SHA-1 ID, or something like 'master~3'), we get an anonymous branch, resulting detached HEAD. This is useful for jumping around the history. To compile version 1.6.6.1, we can `git checkout v1.6.6.1` (a tag, not a branch), compile, install, and then switch back to 'master' by `git checkout master`.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git15.svg)
+
+However, committing works slightly different for a detached HEAD, discussed next.
 
 ## Committing with a Detached HEAD
 
