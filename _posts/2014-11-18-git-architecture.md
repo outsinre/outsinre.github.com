@@ -15,10 +15,10 @@ Basically three components:
 1. working/local space/directory
 
    The files we edit on hard disk.
-2. staging/index area
+2. stage/index area
 
    Temperary place that holds updates from working space and _commit_s the updates to repository.
-3. history/repository
+3. commit history
 
    Besides local repositories, we also have remote repositories.
 4. _index_ and _repository_ reside under the _.git/_ directory.
@@ -27,17 +27,17 @@ Basically three components:
 
 The four commands above copy files between the working directory, the stage, and the history:
 
-1. `git add` copies files (at their current state) to the staging area. We call it a _staging process_.
-2. `git commit` saves a snapshot of the staging area to the history. We call it a _committing process_.
-3. `git reset -- files` unstages files; that is, it copies files from the history to the staging area, namely reset the stage to the preceding state.
+1. `git add` copies files (at their current state) to the stage area. We call it a _staging process_.
+2. `git commit` saves a snapshot of the stage area to the history. We call it a _committing process_.
+3. `git reset -- files` unstages files; that is, it copies files from the history to the stage area, namely reset the stage to the preceding state.
 
    Use this command to "undo" a `git add`. You can also use `git reset` alone to unstage everything. It does not affect the working directory or the history. We call it a _unstaging process_.
-4. `git checkout -- files` copies files from the staging area to the working directory. Use this to throw away local changes.
+4. `git checkout -- files` copies files from the stage area to the working directory. Use this to throw away local changes.
 5. We can add `-p` option to these commands to interactively choose which files to operate on.
 
 `git add` can not only add files that are not yet known to Git, but files that we have just created. Git takes contents for next **commit NOT from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
 
-It is also possible to skip the index and updates files directly between the working tree and history without staging first.
+It is also possible to skip the index and updates files directly between the working directory and history.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git7.svg)
 
@@ -197,7 +197,7 @@ Remember that heads are dynamic refs that move along with new commits. `git refl
 
 There are various ways to look at differences between commits. Below are some common examples. Any of these commands can optionally take extra filename arguments that limit the differences to the named files.
 
-Generally, `git diff` shows changes between working tree and staging area, unless a commit is present.
+Generally, `git diff` shows changes between working directory and staging area, unless a commit is present.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git9.svg)
 
@@ -221,13 +221,13 @@ A fourth case is committing with a detached HEAD, as explained later.
 
 The checkout command is used to copy files from the history or the index to the working directory, and to optionally switch branches.
 
-When a commit given, it updates both the working directory and the index from the history. For example, `git checkout HEAD~ foo.c` copies 'foo.c' from the 'HEAD~' commit (the parent of the current commit) to the working directory, and also stages it. If no commit name is given, files are copied from the stage to working tree, without any involvement of the history part.
+When a commit given, it updates both the working directory and the index from the history. For example, `git checkout HEAD~ foo.c` copies 'foo.c' from the 'HEAD~' commit (the parent of the current commit) to the working directory, and also stages it. If no commit name is given, files are copied from the stage to working directory, without any involvement of the history part.
 
 Whichever mode is invoked, that the history is left untouched.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git13.svg)
 
-When a filename is not given but the reference is a branch, HEAD is linked to that branch (that is, we _switch_ to that branch), and then the index and working tree are set to match that branch. Any file that exists in commit 'a47c3' is copied; any file that exists in commit 'ed489' but not in the new one is deleted; and any file that exists in neither is ignored.
+When a filename is not given but the reference is a branch, HEAD is linked to that branch (that is, we _switch_ to that branch), and then the index and working directory are set to match that branch. Any file that exists in commit 'a47c3' is copied; any file that exists in commit 'ed489' but not in the new one is deleted; and any file that exists in neither is ignored.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git14.svg)
 
@@ -237,7 +237,7 @@ When a filename is not given and the reference is not a (local) branch (a tag, a
 
 However, committing works slightly different for a detached HEAD, discussed next.
 
-# Committing with a Detached HEAD
+## Committing with a Detached HEAD
 
 When HEAD is detached, commits work like normal, except no head ref (think of this as an anonymous branch).
 
@@ -257,7 +257,7 @@ This is already discussed earlier in this post.
 
 The reset command modifies the history by moving the current branch to another position. It is updates the stage from history accordingly.
 
-If a commit is given with no filenames, the current branch is moved to that commit, and then the stage is updated to match this commit. If `--hard` is given, the working directory is also updated. If `--soft` is given, neither the stage nor the working tree is updated.
+If a commit is given with no filenames, the current branch is moved to that commit, and then the stage is updated to match this commit. If `--hard` is given, the working directory is also updated. If `--soft` is given, neither the stage nor the working directory is updated.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git19.svg)
 
@@ -303,9 +303,17 @@ To limit how far back to go, use the `--onto` option. The following command repl
 
 There is also the `--interactive` option, which allows one to do more complicated things than simply replaying commits, namely dropping, reordering, modifying, and squashing commits. There is no obvious picture to draw for this; see "git-rebase(1)" for more details.
 
-## Location
+# .git/ directory
 
-The contents of files are stored in the object database ('.git/objects/') as _blob_, identified by its SHA-1 hash. The '.git/index' file lists filenames along with the identifier of the associated blob, as well as some other data.
+There are three kinds of '.git/objects':
+
+1. blob for file
+2. tree for directory
+3. commit.
+
+All objects are compressed in binary format, but Git provides `git cat-file -t|-p|-s` command to examine objects.
+
+The '.git/index' file lists filenames along with the identifier of the associated blob, as well as some other data.
 
 Commit objects have an additional data type, _a tree_, identified by SHA-1 hash too. Trees correspond to directories in the working directory, and contain a list of trees and blobs corresponding to each filename within that directory. Each commit stores the identifier of its top-level tree, which in turn contains all of the blobs and other trees associated with that commit.
 
