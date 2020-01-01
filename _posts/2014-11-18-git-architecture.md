@@ -6,7 +6,7 @@ title: Git Architecture
 1. toc
 {:toc}
 
-# ABCs
+# Three Components
 
 ![Git Architecure]({{ site.baseurl }}/assets/git2.png)
 
@@ -17,7 +17,7 @@ Basically three components:
    The files we edit on hard disk.
 2. staging/index area
 
-   Temperary place that holds updates from working space and _commit_s the updates to repository. When talking about Git commands, we prefer 'staging' ('stage') but when talking about Git itself, we use 'index' more often.
+   Temperary place that holds updates from working space and _commit_s the updates to repository.
 3. history/repository
 
    Besides local repositories, we also have remote repositories.
@@ -25,11 +25,38 @@ Basically three components:
 
 `git add` can not only add files that are not yet known to Git, but files that we have just created. Git takes contents for next **commit NOT from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
 
+![Git Architecure]({{ site.baseurl }}/assets/git1.png)
+
+The four commands above copy files between the working directory, the stage, and the history:
+
+1. `git add` copies files (at their current state) to the staging area. We call it a _staging process_.
+2. `git commit` saves a snapshot of the staging area to the history. We call it a _committing process_.
+3. `git reset -- files` unstages files; that is, it copies files from the history to the staging area, namely reset the stage to the preceding state.
+
+   Use this command to "undo" a `git add`. You can also use `git reset` alone to unstage everything. It does not affect the working directory or the history. We call it a _unstaging process_.
+4. `git checkout -- files` copies files from the staging area to the working directory. Use this to throw away local changes.
+5. We can add `-p` option to these commands to interactively choose which files to operate on.
+
+It is also possible to skip the index and updates files directly between the working tree and history without staging first.
+
+# Illustration
+
+![Git Architecure]({{ site.baseurl }}/assets/git7.svg)
+
+1. `git commit -a` is equivalent to running git add on all filenames that already exist in the latest commit, and then running git commit. However, new files we have not told Git about are not affected.
+
+   `git commit <files>` does the same thing but only affect files specified on the command line.
+2. `git checkout HEAD -- <files>` copies files from the latest commit to **both** the stage and the working directory. Attention please, there is the HEAD _ref_.
+
+The figure below will be used as a start point of the following sections.
+
+![Git Architecure]({{ site.baseurl }}/assets/git8.svg)
+
 # ref
 
 How do we know what is the current state of things? What was the latest commit in the history? To answer that let's look at _ref_ (short for _reference_) to commits like _tag_, _head_ (_branch_), and _remote_.
 
-Tag is a fixed reference that marks a specific point in commit history, for example "v2.6.29". On the contrary, _head_ always moves forward to reflect the lastest commit. When it comes to commit history, we use term 'head' more than 'branch'. But when we emphasize a module of the project, we use 'branch' more often. Read [How do I create tag with certain commits and push it to origin?](https://stackoverflow.com/a/25755777) for detailed difference between _tag_ and _head_. Whenever we `git fetch`, it asks the _remote_ repository, what heads and tags does it have, downloads missing objects (if any) and stores  under _.git/refs/remotes_. The remote heads are displayed if we run `git branch -r`.
+Tag is a fixed reference that marks a specific point in commit history, for example "v2.6.29". On the contrary, _head_ always moves forward to reflect the lastest commit. When it comes to commit history, we use term 'head' more than 'branch'. But when we emphasize a module of the project, we use 'branch' more often. Read [How do I create tag with certain commits and push it to origin?](https://stackoverflow.com/a/25755777) for detailed difference between _tag_ and _head_. Whenever we `git fetch`, it asks the _remote_ repository, what heads and tags does it have, downloads missing objects (if any) and stores under _.git/refs/remotes_. The remote heads are displayed if we run `git branch -r`.
 
 For the sake of simplicity, let's forget about _tree_ and _blob_ now, and look at commits illustration:
 
@@ -162,32 +189,7 @@ $ git log -g --abbrev-commit --pretty=oneline -2 HEAD
 
 Remember that heads are dynamic refs that move along with new commits. `git reflog` or `git log` can show the moving path.
 
-# Git Commands Illustration
-
-![Git Architecure]({{ site.baseurl }}/assets/git1.png)
-
-The four commands above copy files between the working directory, the stage, and the history:
-
-1. `git add` copies files (at their current state) to the staging area. We call it a _staging process_.
-2. `git commit` saves a snapshot of the staging area to the history. We call it a _committing process_.
-3. `git reset -- files` unstages files; that is, it copies files from the history to the staging area, namely reset the stage to the preceding state.
-
-   Use this command to "undo" a `git add`. You can also use `git reset` alone to unstage everything. It does not affect the working directory or the history. We call it a _unstaging process_.
-4. `git checkout -- files` copies files from the staging area to the working directory. Use this to throw away local changes.
-5. We can add `-p` option to these commands to interactively choose which files to operate on.
-
-It is also possible to skip the index and updates files directly between the working tree and history without staging first.
-
-![Git Architecure]({{ site.baseurl }}/assets/git7.svg)
-
-1. `git commit -a` is equivalent to running git add on all filenames that already exist in the latest commit, and then running git commit. However, new files we have not told Git about are not affected.
-
-   `git commit <files>` does the same thing but only affect files specified on the command line.
-2. `git checkout HEAD -- <files>` copies files from the latest commit to **both** the stage and the working directory. Attention please, there is the HEAD _ref_.
-
-The figure below will be used as a start point of the following sections.
-
-![Git Architecure]({{ site.baseurl }}/assets/git8.svg)
+# Git Commands
 
 ## diff
 
@@ -223,11 +225,11 @@ Whichever mode is invoked, that the history is left untouched.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git13.svg)
 
-When a filename is not given but the reference is a branch, HEAD is linked to that branch (that is, we _switch_ to that branch), and then the stage and working tree are set to match that branch. Any file that exists in the new commit ('a47c3') is copied; any file that exists in the old commit ('ed489') but not in the new one is deleted; and any file that exists in neither is ignored.
+When a filename is not given but the reference is a branch, HEAD is linked to that branch (that is, we _switch_ to that branch), and then the index and working tree are set to match that branch. Any file that exists in commit 'a47c3' is copied; any file that exists in commit 'ed489' but not in the new one is deleted; and any file that exists in neither is ignored.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git14.svg)
 
-When a filename is not given and the reference is not a (local) branch (a tag, a remote branch, a SHA-1 ID, or something like 'master~3'), we get an anonymous branch, resulting detached HEAD. This is useful for jumping around the history. To compile version 1.6.6.1, we can `git checkout v1.6.6.1` (a tag, not a branch), compile, install, and then switch back to 'master' by `git checkout master`.
+When a filename is not given and the reference is not a (local) branch (a tag, a remote branch, a SHA-1 ID, or something like 'master~3'), we get an anonymous branch, resulting detached HEAD. This is useful for jumping around the history.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git15.svg)
 
@@ -235,7 +237,7 @@ However, committing works slightly different for a detached HEAD, discussed next
 
 ## Committing with a Detached HEAD
 
-When HEAD is detached, commits work like normal, except no named branch gets updated. (You can think of this as an anonymous branch.)
+When HEAD is detached, commits work like normal, except no head (think of this as an anonymous branch).
 
 ![Git Architecure]({{ site.baseurl }}/assets/git16.svg)
 
