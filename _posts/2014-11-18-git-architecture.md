@@ -46,6 +46,10 @@ It is also possible to skip the index and updates files directly between the wor
    `git commit <files>` does the same thing but only affect files specified on the command line.
 2. `git checkout HEAD -- <files>` copies files from the latest commit to **both** the stage and the working directory. Attention please, there is the HEAD _ref_.
 
+Here is a brief summary of the commands mentioned above:
+
+![Git Architecure]({{ site.baseurl }}/assets/git7.jpg)
+
 The figure below will be used as a start point of the following sections.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git8.svg)
