@@ -23,8 +23,6 @@ Basically three components:
    Besides local repositories, we also have remote repositories.
 4. _index_ and _repository_ reside under the _.git/_ directory.
 
-`git add` can not only add files that are not yet known to Git, but files that we have just created. Git takes contents for next **commit NOT from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
-
 ![Git Architecure]({{ site.baseurl }}/assets/git1.png)
 
 The four commands above copy files between the working directory, the stage, and the history:
@@ -37,9 +35,9 @@ The four commands above copy files between the working directory, the stage, and
 4. `git checkout -- files` copies files from the staging area to the working directory. Use this to throw away local changes.
 5. We can add `-p` option to these commands to interactively choose which files to operate on.
 
-It is also possible to skip the index and updates files directly between the working tree and history without staging first.
+`git add` can not only add files that are not yet known to Git, but files that we have just created. Git takes contents for next **commit NOT from the working directory, but from a special temporary area, called index**. This allows finer control over what is going to be committed. We can exclude even certain pieces of files from commit (try `git add -i`), which helps developers stick to _atomic commits principle_.
 
-# Illustration
+It is also possible to skip the index and updates files directly between the working tree and history without staging first.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git7.svg)
 
@@ -235,9 +233,9 @@ When a filename is not given and the reference is not a (local) branch (a tag, a
 
 However, committing works slightly different for a detached HEAD, discussed next.
 
-## Committing with a Detached HEAD
+# Committing with a Detached HEAD
 
-When HEAD is detached, commits work like normal, except no head (think of this as an anonymous branch).
+When HEAD is detached, commits work like normal, except no head ref (think of this as an anonymous branch).
 
 ![Git Architecure]({{ site.baseurl }}/assets/git16.svg)
 
@@ -249,57 +247,63 @@ If, on the other hand, you want to save this state, you can create a new named b
 
 ![Git Architecure]({{ site.baseurl }}/assets/git18.svg)
 
-## Reset
+This is already discussed earlier in this post.
 
-The reset command moves the current branch to another position, and optionally updates the stage and the working directory. It also is used to copy files from the history to the stage without touching the working directory.
+## reset
 
-If a commit is given with no filenames, the current branch is moved to that commit, and then the stage is updated to match this commit. If --hard is given, the working directory is also updated. If --soft is given, neither is updated.
+The reset command modifies the history by moving the current branch to another position. It is updates the stage from history accordingly.
+
+If a commit is given with no filenames, the current branch is moved to that commit, and then the stage is updated to match this commit. If `--hard` is given, the working directory is also updated. If `--soft` is given, neither the stage nor the working tree is updated.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git19.svg)
 
-If a commit is not given, it defaults to HEAD. In this case, the branch is not moved, but the stage (and optionally the working directory, if --hard is given) are reset to the contents of the last commit.
+If a commit is not given, it defaults to HEAD. In this case, the branch is not moved, but the stage (and optionally the working directory, if `--hard` is given) is reset to the contents of the last commit.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git20.svg)
 
-If a filename (and/or -p) is given, then the command works similarly to checkout with a filename, except only the stage (and not the working directory) is updated. (You may also specify the commit from which to take files, rather than HEAD.)
+If a filenames (and/or `-p`) is given, only that file is reset.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git21.svg)
 
-## Merge
+## merge
 
-A merge creates a new commit that incorporates changes from other commits. Before merging, the stage must match the current commit. The trivial case is if the other commit is an ancestor of the current commit, in which case nothing is done. The next most simple is if the current commit is an ancestor of the other commit. This results in a fast-forward merge. The reference is simply moved, and then the new commit is checked out.
+A merge creates a new commit that incorporates changes from other commits. Before merging, the stage must match the current commit. A trivial case is if the other commit is an ancestor of the current commit, in which case nothing is done.
+
+Another simple scenario is if the current commit is an ancestor of the other commit, the ref is simply moved forward and the other commit is checked out. This results in a _fast-forward merge_. 
 
 ![Git Architecure]({{ site.baseurl }}/assets/git22.svg)
 
-Otherwise, a "real" merge must occur. You can choose other strategies, but the default is to perform a "recursive" merge, which basically takes the current commit (ed489 below), the other commit (33104), and their common ancestor (b325c), and performs a three-way merge. The result is saved to the working directory and the stage, and then a commit occurs, with an extra parent (33104) for the new commit. 
+Otherwise, Git performs a _recursive_ merge that basically takes the current commit 'ed489', the other commit '33104', and their common ancestor 'b325c', and performs a three-way merge. A new commit 'f8bc5' is created with two parents, '33104' and 'ed489'. The result is saved to the the stage and working directory.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git23.svg)
 
-## Cherry Pick
+## cherry-pick
 
-The cherry-pick command "copies" a commit, creating a new commit on the current branch with the same message and patch as another commit.
+The cherry-pick command applies patches of existing commits to the current branch with the while preserving the message.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git24.svg)
 
-## Rebase
+It is more of a simplified version of 'merge'.
 
-A rebase is an alternative to a merge for combining multiple branches. Whereas a merge creates a single commit with two parents, leaving a non-linear history, a rebase replays the commits from the current branch onto another, leaving a linear history. In essence, this is an automated way of performing several cherry-picks in a row.
+## rebase
+
+Rebase is similar to merge but operates on branch level. A merge creates a single commit with two parents, leaving a non-linear history, whereas a rebase replays the commits of the current branch onto another, and move the current head there, leaving a linear history. In essence, this is an automated way of performing several cherry-picks in a row.
+
+The figure below takes all the commits that exist in 'topic' but not in 'master', replays them onto 'master' and then updates 'topic' to the new tip. Note that the old commits will be garbage collected if they are no longer referenced.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git25.svg)
 
-The above command takes all the commits that exist in topic but not in master (namely 169a6 and 2c33a), replays them onto master, and then moves the branch head to the new tip. Note that the old commits will be garbage collected if they are no longer referenced.
-
-To limit how far back to go, use the --onto option. The following command replays onto master the most recent commits on the current branch since 169a6 (exclusive), namely 2c33a.
+To limit how far back to go, use the `--onto` option. The following command replays onto master the most recent commits on the current 'topic' since '169a6' (exclusive).
 
 ![Git Architecure]({{ site.baseurl }}/assets/git26.svg)
 
-There is also git rebase --interactive, which allows one to do more complicated things than simply replaying commits, namely dropping, reordering, modifying, and squashing commits. There is no obvious picture to draw for this; see git-rebase(1) for more details.
+There is also the `--interactive` option, which allows one to do more complicated things than simply replaying commits, namely dropping, reordering, modifying, and squashing commits. There is no obvious picture to draw for this; see "git-rebase(1)" for more details.
 
-## Technical Notes
+## Location
 
-The contents of files are not actually stored in the index (.git/index) or in commit objects. Rather, each file is stored in the object database (.git/objects) as a blob, identified by its SHA-1 hash. The index file lists the filenames along with the identifier of the associated blob, as well as some other data. For commits, there is an additional data type, a tree, also identified by its hash. Trees correspond to directories in the working directory, and contain a list of trees and blobs corresponding to each filename within that directory. Each commit stores the identifier of its top-level tree, which in turn contains all of the blobs and other trees associated with that commit.
+The contents of files are stored in the object database ('.git/objects/') as _blob_, identified by its SHA-1 hash. The '.git/index' file lists filenames along with the identifier of the associated blob, as well as some other data.
 
-If you make a commit using a detached HEAD, the last commit really is referenced by something: the reflog for HEAD. However, this will expire after a while, so the commit will eventually be garbage collected, similar to commits discarded with git commit --amend or git rebase.
+Commit objects have an additional data type, _a tree_, identified by SHA-1 hash too. Trees correspond to directories in the working directory, and contain a list of trees and blobs corresponding to each filename within that directory. Each commit stores the identifier of its top-level tree, which in turn contains all of the blobs and other trees associated with that commit.
 
 # A successful Git branching model
 
