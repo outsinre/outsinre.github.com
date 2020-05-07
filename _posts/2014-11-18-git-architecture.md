@@ -271,13 +271,13 @@ If a filenames (and/or `-p`) is given, only that file is reset.
 
 ## merge
 
-A merge creates a new commit that incorporates changes from other commits. Before merging, the stage must match the current commit. A trivial case is if the other commit is an ancestor of the current commit, in which case nothing is done.
+A merge creates a new commit that incorporates changes from another branch into the current branch. Before merging, the stage must match the current commit. A trivial case is if the other commit is an ancestor of the current commit, in which case nothing is done.
 
 Another simple scenario is if the current commit is an ancestor of the other commit, the ref is simply moved forward and the other commit is checked out. This results in a _fast-forward merge_. 
 
 ![Git Architecure]({{ site.baseurl }}/assets/git22.svg)
 
-Otherwise, Git performs a _recursive_ merge that basically takes the current commit 'ed489', the other commit '33104', and their common ancestor 'b325c', and performs a three-way merge. A new commit 'f8bc5' is created with two parents, '33104' and 'ed489'. The result is saved to the the stage and working directory.
+Otherwise, Git would replay all commits until the head of the other branch. Take the following figure for example, it basically takes the current commit 'ed489', the other commit '33104', and their common ancestor 'b325c', and performs a three-way merge. A new commit 'f8bc5' is created with two parents, namely '33104' and 'ed489'. The result is saved to the the stage and working directory.
 
 ![Git Architecure]({{ site.baseurl }}/assets/git23.svg)
 
