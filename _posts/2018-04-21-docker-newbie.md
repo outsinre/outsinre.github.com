@@ -287,6 +287,10 @@ Just two lines! FROM imports the base image on which we will create the new laye
 
 Usually, in the end of image, [exec form or sh (/bin/sh) form](https://www.cnblogs.com/sparkdev/p/8461576.html) instruction sets commands and arguments. *docker container inspect* show the default commands and arguments. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`. We can pass custom commands and arguments when invoking *docker run*. Apart from the difference between *exec* form and *sh* form, there are command instructions like [RUN, ENTRYPOINT and CMD](http://goinbigdata.com/docker-run-vs-cmd-vs-entrypoint/). ENTRYPOINT configures a container that will run as an executable in that we can pass explicit arguments when running the container, making it looks like a normal command. The RUN instruction prefers the *sh* form while ENTRYPOINT and CMD prefer the *exec* form. If */bin/bash* is preferred to */bin/sh*, then choose the *exec* form like `["/bin/bash", "-c", "echo 'Hello, world.'"]`.
 
+Details about the difference between CMD and ENTRYPOINT, please the image below:
+
+![cmd-entrypoint](/assets/cmd-entrypoint.png)
+
 Now we build the image:
 
 ```bash
