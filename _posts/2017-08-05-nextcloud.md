@@ -753,8 +753,8 @@ Mainly, we should backup *folders* and *database*.
 3. During upgrading, the Nextcloud installation folder is backed up automatically. If you trust it, that's fine.
 
 ```bash
-~ # rsync -aAx nextcloud/ nextcloud-dirbkp_`date +"%Y%m%d"`/ 
-~ # rsync -aAx nextcloud-data/ nextcloud-data-dirbkp_`date +"%Y%m%d"`/ 
+~ # rsync -avzP --delete nextcloud/ nextcloud-dirbkp_`date +"%Y%m%d"`/ 
+~ # rsync -avzP --delete nextcloud-data/ nextcloud-data-dirbkp_`date +"%Y%m%d"`/ 
 ```
 
 Optionally, we can synchroize data to PC just in case.
