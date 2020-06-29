@@ -193,7 +193,7 @@ Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
 2. 设置当前用户的 HOME 环境变量为 *%APPDATA%*, 即为 *c:\users\username\appdata\roaming*. 在 *HOME\.emacs.d\* 下建 *init.el* 配制文件。
 
    注意这里是给当前用户设置，而不是给系统设置。
-3. 设置快捷键。在桌面新建快捷键，设置为 *c:\programs files\emacs\emacsclientw.exe -c -n -a ""*.
+3. 设置快捷键。在桌面新建快捷键，设置为 *c:\programs files\emacs\bin\emacsclientw.exe -n -c --alternate-editor=*.
 
    同时，修改属性里的 Start In 为 *%USERPROFILE%\Documents*, 这样 `c-x c-f` 时默认目录是 Start In. 同时，把快捷键放一份到 *C:\ProgramData\Microsoft\Windows\Start Menu* 下。
 
@@ -206,7 +206,7 @@ Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
    这个办法的缺点是，没法灵活设置不同的默认目录。
 4. [文件关联](https://blogs.technet.microsoft.com/windowsinternals/2017/10/25/windows-10-how-to-configure-file-associations-for-it-pros/)
 
-   千万不要用双雄参考文献里的 *ftype* 和 *assoc*, 不仅没有效果，还会搞乱注册表。
+   千万不要用参考文献里的 *ftype* 和 *assoc*, 不仅没有效果，还会搞乱注册表。最简单的方法是用 Windows 10, Settings, Apps, Default apps.
 
-   最简单的方法是用 Windows 10, Settings, Apps, Default apps.
+   右键 Open With 需要第一次打开快捷键的位置，下次才会出现。不要运行那个 `addpm.exe`, 完全是一个废物。
 5. [Caps to Ctrl](https://superuser.com/questions/949385/map-capslock-to-control-in-windows-10)
