@@ -6,7 +6,37 @@ title: VirtualBox
 1. toc
 {:toc}
 
-This post indroduces installing VirtualBox in Gentoo host, and then create a Windows XP 32-bit virtual machine.
+This post indroduces installing VirtualBox in Gentoo host.
+
+# Terminology
+
+1. Host OS
+
+   Operating system where VMM runs.
+2. Guest OS
+
+   Operating system runs over VirtualBox.
+3. VirtualBox
+
+   A virtual machine manager (VMM) owned by Orcale, also named as _Base package_.
+
+   Once installed, it will insert VirtualBox kernel modules into the host OS, like _vboxdrv_.
+4. Oracle VM VirtualBpx Extension Packs
+
+   A proprietary bundle of packages that extends the functionality of the Base Package, like USB 3.0, VirtualBox Remote Desktop Protocol (VRDP), webcam etc.
+
+   Extension Packs is optional. However, if you choose to install, then make sure it has the same version as the Base Package.
+
+   Similar to the Base, Package, Extension Packs also presents as kernel modules on host OS, like _vboxnetadp_ and _vboxnetflt_.
+5. Oracle VM VirtualBox Guest Additions
+
+   Package to be installed _inside_ the guest OS that optimizes performance and usability, like mouse pointer integration, shared folders, shared clipboard, seamless windows, time synchroniation with host OS etc.
+
+   Guest Additions also serve as kernel modules but in guest OS, like _vboxsf_, _vboxvideo_, and _vboxguest_.
+6. Make sure relevant versions match.
+   1. Versions of Base Package, Extension Packs and Guest Additions must match.
+   2. Kernel modules are built against the _current_ kernel. When VirtualBox is upgraded, kernel modules on host OS is re-built automatically. However, if guest OS kernel is changed, we should re-built the guest kernel modules manually.
+   3. Kernel version of guest OS matches that of _kernel-headers_ and _kernel-devel_.
 
 # Installation
 
@@ -20,19 +50,10 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    ```
 
    1. *headless* builds VirtualBox without any graphic frontend.
-   2. *attitions* makes interaction between host and guest easier, which draws in *app-emulation/virtualbox-additions*.
+   2. *attitions* for Guest Addtitions.
 
       Since VirtualBox 5, this USE is removed. Emerge *app-emulation/virtualbox-additions* manually.
-   3. *extension* pulls in proprietary binary VirtualBox Extension Pack *app-emulation/virtualbox-extpack-oracle*.
-
-      Since VirtualBox 5, this USE is removed.  Emerge *app-emulation/virtualbox-extpack-oracle* manually. Mostly, it supports:
-
-      1. Virtual USB 2.0 (EHCI) and 3.0 (xHCI) device;
-      2. VirtualBox Remote Desktop Protocol (VRDP) support.
-
-         Actually *vnc* USE is an alternative to VRDP but sucks.
-      3. Host webcam passthrough. 
-      4. Refer to [Installing VirtualBox and extension packs](https://www.virtualbox.org/manual/ch01.html#intro-installing).
+   3. *extension* for Extension Packs.
 
 3. Build
 
@@ -48,10 +69,10 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
 4. Group - vboxusers
 
    ```bash
-   root@tux / # gpasswd -a username vboxusers
+   root@tux / # gpasswd -a <username> vboxusers
    ```
 
-   Add current *username* to *vboxusers* group. Check *newgrp* in Wireshark post.
+   Add current *username* to *vboxusers* group. Refer to in [newgrp in Wireshark post](/2017/12/12/wireshark/).
 5. Kernel modules
 
    ```bash
@@ -60,7 +81,7 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    ```
 
    1. If you launch VirtualBox frequently, add these modules to */etc/conf.d/modules* for automatic loading on boot.
-   2. *vboxdrv* is the core module and must always be present. *vboxnetadp* and *vboxnetflt* are required for any VM networking beyond the default NAT mode (i.e. host-only, bridged etc.).
+   2. *vboxdrv* is the core module for host OS and must always be present. *vboxnetadp* and *vboxnetflt* are required for any VM networking beyond the default NAT mode (i.e. host-only, bridged etc.).
 
    When booting into a new Linux kernel (i.e kernel upgrading), you could no longer load modules like *vobxdrv*.
 
@@ -69,8 +90,16 @@ This post indroduces installing VirtualBox in Gentoo host, and then create a Win
    modprobe: FATAL: Module vboxdrv not found.
    ```
 
-   Read the first reference on *Kernel driver not installed* section. The solution is to rebuild VirtualBox external modules `emerge -avt1 app-emulation/virtualbox-modules` or `emerge -avt1 @module-rebuild`. More details in [Upgrade kernel to unstable 4.0.0](/2015/03/25/gentoo-installation/).
-6. Up to now everyting related to VirtualBox itself is prepared. Next is to create VM through CLI.
+   Read the first reference on *Kernel driver not installed* section. The solution is to rebuild VirtualBox external modules:
+
+   ```bash
+   # emerge -avt1 app-emulation/virtualbox-modules
+   # -or-
+   # emerge -avt1 @module-rebuild
+   ```
+
+   More details in [Upgrade kernel to unstable 4.0.0](/2015/03/25/gentoo-installation/).
+6. Up to now everyting related to VirtualBox VMM is prepared on host OS. Next is to create VM through CLI.
 
 # Scheme
 
@@ -78,7 +107,7 @@ VM won't even start without QT GUI support. But VRDP helps! VRDP is a replacemen
 
 1. First create VM with VirtualBox CLI;
 2. Enable VRDP support for VM;
-3. Connect to VM by VRDP.
+3. Connect to VM by VRDP client FreeRDP.
 
 Notice:
 
@@ -136,7 +165,13 @@ Here, I re-use an existing *.vdi* instead of guest installation ISO, thus avoidi
    *VBoxGuestAddiontions.iso* supports file sharing, mouse switch etc between *host* and *guest*. WE will install this toolbox after entering *WindowsXP* VM.
 8. sharedfolder
 
-   Create a folder for share on host and mount it on guest. After entering VM, open Windows Explorer and look for it under "My Networking Places", "Entire Network", "VirtualBox Shared Folders", "\\\Vboxsvr". By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder. If don't assign a drive letter, each time to access the shared, we have to find it under "\\\Vboxsvr".
+   Create a folder for share on host and mount it on guest.
+
+   After entering VM, open Windows Explorer and look for it under "My Networking Places", "Entire Network", "VirtualBox Shared Folders", "\\\Vboxsvr".
+
+   By right-clicking on a shared folder and selecting "Map network drive" from the menu that pops up, you can assign a drive letter to that shared folder.
+
+   If you don't assign a drive letter, each time to access the shared, we have to find it under "\\\Vboxsvr".
 
    If you cannot locate the shared folder under Windows Explorer/Network, check if Network Discovery is turned on in Control Panel (default for Home networking type). You can also try CMD:
 
@@ -146,16 +181,14 @@ Here, I re-use an existing *.vdi* instead of guest installation ISO, thus avoidi
    net use z: \\vboxsrv\WLshare
    ```
 
-9. Up to now, the VM is prepared!
-
-   We need RDP client.
+9. Up to now, the VM is prepared! We need a RDP client.
 
 
 # RDP / VRDP / VRDE
 
 VirtualBox Remote Display Protocol (VRDP) is a backwards-compatible extension to Microsoft's Remote Desktop Protocol (RDP). VirtualBox Remote Desktop Extension (VRDE) is an Oracle VRDP implementation. Apart from TCP/Ports and TCP/Address, we have:
 
-+ `--vrdemulticon on` allows multiple simultaneous connections to the same VM, withou which we can resort to `--vrdereusecon on` that can cut off the current client for sake of a new one.
++ `--vrdemulticon on` allows multiple simultaneous connections to the same VM, without which we can resort to `--vrdereusecon on` that can cut off the current connection for the new one.
 + `--vrdeauthtype external` requires username and password of the host before connection.
 
 Here is FreeRDP setup details:
@@ -434,71 +467,80 @@ First boot takes several minutes to initialize system preparation.
 
 VirtualBox Guest Additions consists of device drivers and system applications that optimize the guest operating system for better performance and usability.
 
-1. Some Linux distributions (i.e. Gentoo, Arch Linux) already come with all or part of the VirtualBox Guest Additions. On such Linux guests just install the corresponding package, for example:
+1. Some Linux guest OSes (i.e. Gentoo, Arch Linux) already come with all or part of the VirtualBox Guest Additions.
+
+   Just install the corresponding package. For example:
 
    ```bash
-   [root@host ~]# emerge -avt app-emulation/virtualbox-guest-additions (Gentoo)
-   [root@host ~]# pacman -S virtualbox-guest-utils/virtualbox-guest-utils-nox (archlinux)
+   [root@host ~]# emerge -avt app-emulation/virtualbox-guest-additions # Gentoo
+   [root@host ~]# pacman -S virtualbox-guest-utils/virtualbox-guest-utils-nox # archlinux
    ```
 
    This method is always preferred!
-2. Alternatively, like Windows guest, we can mount the VBoxGuestAdditions.iso file and invoke the relevant installation script manually.
+2. Alternatively, we can mount the ISO of Guest Additions and invoke the relevant installation script manually.
 
-   Firstly, we should obtain the ISO from host (i.e. *vboxmanage storageattach*), from guest package repository (if available) or more simply from VirtualBox official website.
+   Firstly, make sure development tools like _gcc_, _make_, _kernel-headers_, _kernel-devel_ etc. are present on guest OS. Also confirm the guest OS kernel version matches that of _kernel-headers_ and _kernel-devel_.
+
+   Then, we can obtain the ISO from host by `vboxmanage storageattach`.
 
    ```bash
    [root@host ~]# lsblk -f
-   [root@host ~]# mkdir -p /mnt/vbox
-   [root@host ~]# mount -o loop /dev/sr1 /mnt/vbox
-   [root@host ~]# ls /mnt/vbox
-   [root@host ~]# sh ./VBoxLinuxAdditions.run
    ```
 
-   This is an example of gettin VBoxLinuxAdditions.iso from host. To get ISO file from Arch Linux package repository:
+   We can also get ISO file from guest OS (Arch Linux) package repository:
 
    ```bash
    [root@host ~]# pacman -S virtualbox-guest-iso
    [root@host ~]# ls /usr/lib/virtualbox/additions/VBoxGuestAdditions.iso
    ```
 
-3. Lastly but not least, guest additions on guest OS and VirtualBox application on host OS should have matching version, otherwise some guest addtions functionalities (i.e. shared clipboard) *may* stop working. Update of guest additions or VirtualBox application on one OS assumes the counterpart on the other OS.
-4. Environment:
+   Another method, is to download the ISO from VirtualBox official website. Whatever methods you choose to get the ISO, make sure it has the same version as VirtualBox VMM on host OS.
+
+   Once the ISO is obtained, we mount the ISO:
+
+   ```bash
+   [root@host ~]# ll /dev/cdrom
+   [root@host ~]# mkdir -p /mnt/vbox
+   [root@host ~]# mount -o loop /dev/cdrom /mnt/vbox
+   [root@host ~]# ll /mnt/vbox
+   ```
+
+   Lastly, install Guest Additions:
+
+   ```bash
+   [root@host ~]# sh /mnt/vbox/VBoxLinuxAdditions.run
+   ```
+
+   Restart guest OS before VirtualBox guest additions take effect.
+3. A real pactice on Arch guest
    1. Gentoo host: kernel-4.12.5, VirtualBox 5.1.26.
    2. Arch guest: kernel-4.13.12,  VirtualBox 5.2.2.
 
-   Gentoo is relatively conservative on package rolling update compared to Arch Linux. There is a remarkable gap between VirtualBox packages and kernel versions. Latest Linux kernel version always expect newer Virutalbox packages. So installing VBoxGuestAdditions-5.1.26.iso from Gentoo host *may* break things.
-5. In this post, I choose the one from Arch Linux repository:
+   Gentoo is relatively conservative on package rolling update compared to Arch Linux. So installing Guest Additions directly from Arch repository is beffer.
 
    ```bash
-   [root@host ~]# pacman -S virtualbox-guest-utils (X environment)
+   [root@host ~]# pacman -S virtualbox-guest-utils (X Window)
    # or
    [root@host ~]# pacman -S virtualbox-guest-utils-nox (no X)
    ```
 
-6. Enable *vboxservice*
+   Enable _vboxservice_ unit service to load _vboxguest_, _vboxsf_, and _vboxvideo_ kernel modules.
 
    ```bash
    [root@host ~]# systemctl enable vboxservice
    ```
 
-   This service loads *vboxguest*, *vboxsf*, and *vboxvideo* kernel modules. It's also responsible for synchronizing system time with host.
-7. VBoxClient
-
-   VBoxClient (or the wrapper *VBoxClient-all*) is the core VirtualBox guest additions service. It manages clipboard, seamless window display, etc. Package *virtualbox-guest-utils* installs */etc/xdg/autostart/vboxclient.desktop* that launches VBoxClient-all on logon.
-
-   VBoxClient-all script launches VBoxClient as:
+   VBoxClient (or the *VBoxClient-all* wrapper) is another unit service from the Guest Additions. It manages clipboard, seamless window display, etc. The associated _/etc/xdg/autostart/vboxclient.desktop_ launches VBoxClient-all on logon. VBoxClient-all script launches VBoxClient as:
 
    ```bash
    [user@host ~]$ VBoxClient --clipboard --draganddrop --seamless --display --checkhostversion
    ```
 
    Check Autostart section above on how to launch VBoxclient alongside with awesome.
-8. Notice: you should guest system before VirtualBox guest additions take effect.
 
 ## VirtualBox sharedfolder
 
-1. Make sure *vboxservice* is enabled and started.
-2. Add user account to *vboxsf* group: *usermod -aG vboxsf username*.
+Make sure *vboxservice* is enabled and started.
 
 Add shared folder:
 
@@ -506,14 +548,20 @@ Add shared folder:
 user@host ~ $ VBoxManage sharedfolder add archlinux --name share_name --hostpath /path/to/host/folder [--automount]
 ```
 
-Arch Linux guest can mount the shared folder manually (mount -t vboxsf), automatically (vboxmanage --automount), or by *fstab*. Here is an example of *fstab* method:
+Arch Linux guest can mount the shared folder manually (`mount -t vboxsf`), automatically (`vboxmanage --automount`), or by *fstab*. If `--automount` provided, then by default, the folder is mounted for `root:vboxsf`. For other accounts to read and write, do `usermod -aG vboxsf <username>`.
+
+Alternatively, use *fstab* to flexibly control mount options:
 
 ```
 # /etc/fstab
-share_name	/mount/point	vboxsf	uid=user,gid=group,rw,dmode=700,fmode=600,noauto,x-systemd.automount 
+
+wlshare	/media/wlshare	vboxsf	noauto,user,rw,iocharset=utf8,dmode=0770,fmode=0760,x-systemd.automount
+
+wlshare	/media/wlshare	vboxsf	noauto,uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0760,x-systemd.automount
 ```
 
-The last two arguments *noauto,x-systemd.automount* avoid service racing on booting (i.e. guest additions are not loaded yet while systemd mounts partitions in *fstab*).
+1. The _noauto_ option is to avoid service racing on booting. For example, Guest Additions are not loaded yet while _fstab_ tries to mount it.
+2. The _x-systemd.automount_ will create _media-wlshare_ unit upon `systemctl daemon-reload`.
 
 # Expand VDI size
 
