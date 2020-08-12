@@ -555,13 +555,14 @@ Alternatively, use *fstab* to flexibly control mount options:
 ```
 # /etc/fstab
 
-wlshare	/media/wlshare	vboxsf	noauto,user,rw,iocharset=utf8,dmode=0770,fmode=0760,x-systemd.automount
+wlshare        /media/wlshare        vboxsf        rw,iocharset=utf8,dmode=0770,fmode=0660        0 0
 
-wlshare	/media/wlshare	vboxsf	noauto,uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0760,x-systemd.automount
+wlshare        /media/wlshare        vboxsf        noauto,uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0660,x-systemd.automount        0 0
 ```
 
 1. The _noauto_ option is to avoid service racing on booting. For example, Guest Additions are not loaded yet while _fstab_ tries to mount it.
 2. The _x-systemd.automount_ will create _media-wlshare_ unit upon `systemctl daemon-reload`.
+3. Only _root_ is allowed to mount shared folders. So the _user_ option is permissible.
 
 # Expand VDI size
 
