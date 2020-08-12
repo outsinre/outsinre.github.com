@@ -167,7 +167,7 @@ menuentry 'KS Install CentOS 7' --class fedora --class gnu-linux --class gnu --c
 2. EFI grub.cfg 部分与 legacy BIOS 部分没有什么区别，主要是增加 ks.cfg 位置。
 3. 'hd:LABEL=' 同上。
 
-虽然这里生成了 EFI 的 boot menu, 但是 ks.cfg 里没有创建对应的 ESP 分区，所以是实际无法以 EFI 启动安装。可以先手动用 UEFI 安装一次，再找修改，请参考 https://forums.centos.org/viewtopic.php?t=71030
+这里虽然生成了 EFI 的 boot menu, 但是 ks.cfg 里没有创建对应的 ESP 分区，所以是实际无法以 EFI 启动安装。可以先手动用 UEFI 安装一次，再找修改，请参考 [UEFI Kickstart centos.org](https://forums.centos.org/viewtopic.php?t=71030) 和 [Kickstart Example for EFI-based system](https://docs.openvz.org/openvz_installation_using_pxe_guide.webhelp/_kickstart_file_example_for_installing_on_efi_based_systems.html)
 
 ### 7 Generate repodata
 
@@ -191,7 +191,7 @@ createrepo 会复制一份 comps.xml 进 repodata 目录，因此自定义的 co
 ```bash
 cd /mnt/iso
 
-genisoimage -v -joliet-long -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -J -cache-inodes -T -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -V 'CentOS7' -o /home/zachary/workspace/CentOS-7-dy.iso /mnt/iso/
+genisoimage -v -joliet-long -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -J -cache-inodes -T -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -V 'CentOS7' -o /home/jim/workspace/CentOS-7-dy.iso /mnt/iso/
 ```
 
 1. genisoimage 的参数顺序非常重要，不能随变改动。
@@ -213,7 +213,7 @@ genisoimage -v -joliet-long -b isolinux/isolinux.bin -c isolinux/boot.cat -no-em
 The isohybrid utility modifies a an ISO 9660 image generated with mkisofs, genisoimage, or compatible utilities, to be bootable as a CD-ROM or as a hard disk.
 
 ```bash
-isohybrid -v /home/zachary/workspace/CentOS-7.8-dy.iso
+isohybrid -v /home/jim/workspace/CentOS-7.8-dy.iso
 ```
 
 ### 10 Embed MD5 into ISO
@@ -221,9 +221,9 @@ isohybrid -v /home/zachary/workspace/CentOS-7.8-dy.iso
 ISO 文件里有一个 section 为空，没有有效内容，因此正好用来填充该 ISO 其它有效内容的 MD5 值。implantisomd5 把 MD5 值注入 ISO 中，会修改 ISO 的内容。对应地，可以用 checkisomd5 命令检验 ISO 文件完整性。
 
 ```bash
-implantisomd5 /home/zachary/workspace/CentOS-7.8-dy.iso
+implantisomd5 /home/jim/workspace/CentOS-7.8-dy.iso
 
-checkisomd5 /home/zachary/workspace/CentOS-7.8-dy.iso
+checkisomd5 /home/jim/workspace/CentOS-7.8-dy.iso
 ```
 
 implantisomd5 只计算原始有效内容的 MD5 值，不是计算整个 ISO 的 MD5 值。同一 ISO 只能注入一次 MD5.
