@@ -3,6 +3,9 @@ layout: post
 title: Kickstart
 ---
 
+1. toc
+{:toc}
+
 # Kickstart
 
 ## Outline
@@ -236,7 +239,7 @@ implantisomd5 只计算原始有效内容的 MD5 值，不是计算整个 ISO �
 
 1. https://o-my-chenjian.com/2017/11/20/DIY-A-CentOS7-System/
 
-## todos
+## Todos
 
 1. https://superuser.com/a/359247 https://superuser.com/a/359247
 2. openssl passwd /etc/shadow hash 原理。
