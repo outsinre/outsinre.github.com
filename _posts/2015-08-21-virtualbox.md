@@ -555,9 +555,9 @@ Alternatively, use *fstab* to flexibly control mount options:
 ```
 # /etc/fstab
 
-wlshare        /media/wlshare        vboxsf        uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0660        0 0
+wlshare        /media/wlshare        vboxsf        nodev,nosuid,noexec,uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0660        0 0
 
-wlshare        /media/wlshare        vboxsf        noauto,uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0660,x-systemd.automount        0 0
+wlshare        /media/wlshare        vboxsf        nodev,nosuid,noexec,noauto,uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0660,x-systemd.automount        0 0
 ```
 
 1. The _noauto_ option is to avoid service racing on booting. For example, Guest Additions are not loaded yet while _fstab_ tries to mount it.
