@@ -1,6 +1,6 @@
 ---
 layout: post
-title: CentOS 7
+title: CentOS
 ---
 
 1. toc
@@ -11,22 +11,36 @@ title: CentOS 7
 1. Fedora is a Linux distribution released under GPL.
 2. Red Hat, Inc. copy the source code from Fedora, make modifications, release it as Red Hat Enterprise Linux (RHEL) distribution.
 
-   Due to GPL, Red Hat, Inc. is obligated to disclose RHEL source code.
-3. CentOS (Community ENTerprise OS) is another Linux distribution built from the source of RHEL directly, with the intention of making CentOS binary compatible with RHEL (library versions are the same; binaries work on RHEL also work on CentOS).
-   1. The main purpose of CentOS is to make RHEL available to pulbic users.
+   Due to GPL, Red Hat, Inc. is obligated to disclose RHEL source code. But Red Hat can make money from its professional after-sale services.
+3. CentOS (Community ENTerprise OS) is a Linux distribution built from the source of RHEL directly without any modification, with the intention of making CentOS binary compatible with RHEL such that library versions the same and binaries work on RHEL also work on CentOS.
+   1. The main purpose of CentOS is to make RHEL available to pulbic users, benefitting from Red Hat's professional Linux service.
    2. Remove Red Hat, Inc. logo.
 4. Fedora - RHEL - CentOS.
 
-# YUM RPM
+# Module
 
-The relation between *rpm* (Redhat Package Manager) command and *yum* (Yellow dog Updater, Modified) command is analogous to *dpkg* and *apt-get*.
+Module is a new packaging feature brought in from RHEL 8.
 
-Basically, *yum* is more inteliggent than *rpm*. *rpm* wants to know the exact location of target *.rpm* file while *yum* only needs the package name. *yum* also takes care of dependencies. However, *rpm* is somehow a lightweight tool with concise output.
+1. Package
+
+   Traditional _.rpm_ file.
+2. Group and Environment
+
+   A large set of packages as a whole for specific system categories like X window, desktop, security, development, etc.
+3. Module is a collection of a few packages, as a logical unit for a specific project, like Php and Nginx.
+   1. Stream is the Version of a module, similar to Gentoo's slot. Only one stream is allowed to install.
+   2. Profile is the sub-functionality of a module, similar to Gentoo's tag.
+
+# rpm yum dnf
+
+The relation between *rpm* (Redhat Package Manager) command and *yum* (Yellow dog Updater, Modified) command is analogous to *dpkg* and *apt-get*. *dnf* is the new version of *yum* with performance improvement and *module* feature. From RHEL 8 onwards, *dnf* replaces *yum* as the default manager.
+
+Basically, *yum* is more intelligent than *rpm*. *rpm* wants to know the exact location of target *.rpm* file while *yum* only needs the package name. *yum* also takes care of dependencies. However, *rpm* is somehow a lightweight tool with concise output.
 
 Check 'SPECIFYING PACKAGE NAMES' in the man page of *yum* to check how to pass globs arguments. The full name of a *.rpm* package is as follows:
 
 ```
-name-version-release.os.arch.rpm
+# <name>-<version>-<release>.<os>.<arch>.rpm
 
 vim-enhanced-7.4.160-4.el7.x86_64
 # name:     vim-enhanced
@@ -47,9 +61,59 @@ centos-release-7-4.1708.el7.centos.x86_64
 1. Package *version* is also called *major version*, indicating the upstream source version from developers. Package *release* is also called *minor version*, indicating the final *.rpm* file by RHEL compliling/building/patching. Especially, RHEL may add customized patches or bug fixes to the major version, building a new *.rpm* package to the repository.
 2. *os* may be el6 (rhel6), centos6, el5, suse11 etc.
 
+By design, it is not possible to install difference versions of the same package alongside. The workaround is to make the new version a different package. For example, _python2_ and _python3_ are actually different package names.
+
 ## rpm
 
-RPM manages a database of package information located under */var/lib/rpm/*.
+_rpm_ manages package file directly, maintaining a database of package information located under */var/lib/rpm/*. It does not care too much the package version but the RPM file you provided.
+
+Query installed packages:
+
+```bash
+~ # rpm -qa name='globbing'
+~ # rpm -qa | grep 'regex'
+
+~ # rpm -qi pkg; rpm -qip pkg.rpm                     # query pkg information
+~ # rpm -ql pkg; rpm -qlp pkg.rpm                     # list pkg files
+~ # rpm -qR pkg; rpm -qRp pkg.rpm                     # list package it requires - dependencies
+
+~ # rpm -qf /path/to/file                             # file owner
+~ # rpm -qdf /path/to/file                            # file owner's man pages
+```
+
+Verify:
+
+```bash
+~ # rpm -V pkg; rpm -Vp pkg.rpm                       # verify
+```
+
+Verifying a package compares information about files installed locally with information about files taken from the package _metadata_ stored in the RPM database. Any discrepancies are displayed.
+
+Install:
+
+```bash
+~ # rpm -ivvh --test /path/to/pkg.rpm      # dry run
+~ # rpm -ivh /path/to/pkg.rpm              # install
+~ # rpm --reinstall -vh /path/to/same.rom  # reinstall
+
+~ # rpm -Uvh /path/to/pkg.rpm              # upgrade
+~ # rpm -Fvh /path/to/pkg.rpm              # refresh
+~ # rpm -Fvh --force /path/to/old.rpm      # downgrade
+```
+
+1. The path can be an ftp/http URL.
+2. `-i, --install` is the general form of installing a package.
+3. `-U, --upgrade` is the combination of `-i, --install` and `-e`. It firstly install a package and then erase earlier versions if present.
+
+   `-U` does not require an earlier version is installed, so it can be a replacement of `-i`.
+4. `-F, --freshen` is similar to `-U` but mandates an earlier version is already installed.
+5. `--force`, `--replacepkgs`, `--replacefiles` and `--oldpackage` do the same thing.
+
+Uninstall/Erase:
+
+```bash
+~ # rpm -evv pkg                     # uninstall a pkg
+```
 
 Kering:
 
@@ -58,7 +122,7 @@ Kering:
 ~ # rpmkeys --import http://www.example.com/key.pub
 ```
 
-Once imported, all public keys in the keyring can be managed as a package. Commands applied to a package can also be applied to a key like query, erase, information etc.
+Once imported, all public keys in the keyring can be managed as a package. Commands applied to a package also apply to a key like query, erase, information etc.
 
 ```bash
 ~ # ls /etc/pki/rpm-gpg/
@@ -67,87 +131,51 @@ Once imported, all public keys in the keyring can be managed as a package. Comma
 ~ # rpm -qi gpg-pubkey-db42a60e
 ```
 
-Install:
-
-```bash
-~ # rpm -ivvh --test /path/to/pkg.rpm     # test before insall
-~ # rpm -ivh /path/to/pkg.rpm             # install
-~ # rpm -Uvh /path/to/pkg.rpm             # upgrade
-~ # rpm -Fvh /path/to/pkg.rpm             # refresh
-```
-
-1. The path can be an ftp/http URL.
-2. `-i, --install` is the general form of installing a package, and can be used to install multiple versions of the same package, like Gentoo's *slot* concept.
-3. `-U, --upgrade` is similar to `-i, --install` except that all other version(s) of the package are removed after the new package is installed.
-
-   The package may be or may not be installed locally.
-4. `-F, --freshen` requires an earlier version is already installed.
-
-Uninstall/Erase:
-
-```bash
-~ # rpm -evv pkg                     # uninstall a pkg
-```
-
-Query:
-
-```bash
-~ # rpm -qa | grep 'regex'
-~ # rpm -qi pkg; rpm -qip pkg.rpm                     # query pkg information
-~ # rpm -ql pkg; rpm -qlp pkg.rpm                     # list pkg files
-~ # rpm -qR pkg; rpm -qRp pkg.rpm                     # list dependencies
-~ # rpm -qf /path/to/file                             # file owner
-~ # rpm -qdf /path/to/file                            # file owner's man pages
-```
-
-Verify:
-
-```bash
-~ # rpm -V pkg; rpm -vp pkg.rpm                       # verify
-```
-
-Verifying a package compares information about files installed locally with information about files taken from the package metadata stored in the RPM database. Any discrepancies are displayed.
-
 ## yum
 
 The *main* configuration of YUM is */etc/yum.conf* and specific repository configuration files are placed in */etc/yum.repos.d/*. Within the main configuration file, *cachedir* defines the location of cached *.rpm* packages (defaults to */var/cache/yum/$basearch/$releasever*).
 
-By default, of the built-in repositories, only 'CentOS-Base.repo' is *enabled=1*:
+By default, of the built-in repositories, only 'CentOS-Base.repo' is enabled.
 
 1. `$releasever` indicates the main version. For example, the main version of CentOS 5.8 is 5.
 2. `$arch` indicates the architecture like `x8_64`, `i386/i586/i686`.
 3. `$basearch` is similar to `$arch`, but is *base* architecture: either `x86_64` or `i386`.
 
->After any edits of these configuration files, in order to clear any cached information, and make sure the changes are immediately recoginized, as root run `yum clean all`.
+Cache:
 
-Information:
+```bash
+~ # yum clean [ all | packages | metadata | expire-cache | rpmdb | plugins ]
+~ # yum makecache
+```
+
+After any edits of _repo_ files, in order to clear any cached information, and make sure the changes are immediately recoginized, as root run `yum clean all`.
+
+Query:
 
 ```bash
 ~ # yum history
 
-~ # yum list [all | installed | available | updates] [pkg]
+~ # yum list [--all | --installed | --available | --upgrades] [pkg]
+~ # yum info [--all | --installed | --available | --upgrades] [pkg] # more details
+~ # yum search pkg
+
+~ # yum repolist [--all | --enabled | --disabled]
 ~ # yum check-update
+~ # yum upgrade [pkg]
 
-~ # yum repolist [all | enabled | disabled]
+~ # yum provides /path/to/file             # rpm -qf
 
-~ # yum [search | info] pkg
-
-~ # yum provides/whatprovides /path/to/file             # rpm -qf
 ~ # repoquery --whatprovides '*bin/grep'
 ~ # repoquery --list pkg
 ```
 
-1. *list updates* is almost the same as *check-update*. As the command form implies, *check-update* is useful in Shell scripting while *list updates* is for humans. Please pay attention, their exit status code difference.
-2. 'yum provides' only search which package provides the pathname. 'rpm -qf' requires that the package is installed or existence of the *.rpm* file.
+1. _update_ is synonym to _upgrade_.
+2. *list --updates* is almost the same as *check-update*. As the command form implies, *check-update* is useful in Shell script while *list --updates* is for humans on the command line.
 
-   Speed up the search, use 'repoquery' from 'yum-utils' package. Especially, it list all files provided by a package even it is not installed.
+   Please pay attention, their exit status code difference.
+3. 'yum provides' only search which package provides the pathname. 'rpm -qf' requires that the package is installed or existence of the *.rpm* file.
 
-Cache:
-
-```bash
-~ # yum clean [ packages | metadata | expire-cache | rpmdb | plugins | all ]
-~ # yum makecache
-```
+   Tp speed up the search, use 'repoquery' from 'yum-utils' package. Especially, it list all files provided by a package even it is not installed.
 
 Install:
 
@@ -155,40 +183,45 @@ Install:
 ~ # yum [-y] install pkg1 pkg2
 ~ # yum reinstall pkg1 pkg2
 
-~ # yum update pkg1 pkg2
-~ # yum update-to pkg1-ver1 pkg2-ver2
+~ # yum upgrade pkg1 pkg2
 
 ~ # yum remove pkg1 pkg2
 ```
 
-Multiple RPM packages can be grouped and installed:
+To install packages for _group_ or _environment_ set:
 
 ```bash
-~ # yum group [list | info | summary |install | upgrade | remove | mark ] grp
+~ # yum group summary
+~ # yum group [ list | info |install | upgrade | remove | mark ] [grp]
+```
 
-~ # yum [-y] groupinstall grp1 grp2
-~ # yum [-y] groupupdate grp1 grp2
-~ # yum [-y] groupremove grp1 grp2
+## dnf
+
+_dnf_ is compatible with but more powerful than _yum_. One of the newest feature provided is _module_.
+
+
+```bash
+~ # dnf module -h
 ```
 
 # 3rd-party [Repositories](https://wiki.centos.org/AdditionalResources/Repositories)
 
 Of the 3rd party repositories, IUS and Remi (both depend on EPEL) is recommended over Webtatic.
 
-## EPEL
+## EPEL not from RHEL
 
 EPEL (Extra Packages for Enterprise Linux) is open source and free community based repository project from [Fedora](https://fedoraproject.org/wiki/EPEL) team which provides 100% high quality add-on software packages.
 
 ```bash
-~ # yum [search | info] epel-release
-~ # yum --enablerepo=extras install epel-release
+~ # yum info epel-release
+~ # yum install epel-release
 ~ # yum repolist enabled
 ```
 
 To specify repository when installing package:
 
 ```bash
-~ # yum --enablerepo=epel search/info/install nginx
+~ # yum --enablerepo=epel install nginx
 ```
 
 The `--enablerepo` option overides the permanent option setting in the */etc/yum/\*.repo* files for only the current command. `--disablerepo` does the opposite for enabled repos.
@@ -307,6 +340,8 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 # Packaging
 
+For how to build RPM package, refer to "logging/filebeat-zookeeper-kafka".
+
 ## Extracting RPM
 
 Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *cipo*:
@@ -320,7 +355,7 @@ Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *ci
 1. `-i`: extract;
 2. `-d`: make directories;
 3. `-m`: preserve modification time;
-4. `-v': verbose.
+4. `-v`: verbose.
 
 # systemd
 

@@ -122,7 +122,7 @@ ks.cfg 模版参考 '7.8\7.8-ks_auto3.cfg'.
 
 ### 5 Customize Boot Menu
 
-生成 ks.cfg 后，修改 lagacy BIOS isolinux.cfg 与 EFI grub.cfg, 定制 ISO 安装程序的启动参数，类似于 Grub 启动项。
+生成 ks.cfg 后，修改启动项模版 legacy BIOS isolinux.cfg 与 EFI grub.cfg.
 
 Legacy BIOS 启动：
 
