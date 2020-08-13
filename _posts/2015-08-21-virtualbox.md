@@ -562,7 +562,8 @@ wlshare        /media/wlshare        vboxsf        nodev,nosuid,noexec,noauto,ui
 
 1. The _noauto_ option is to avoid service racing on booting. For example, Guest Additions are not loaded yet while _fstab_ tries to mount it.
 2. The _x-systemd.automount_ will create _media-wlshare_ unit upon `systemctl daemon-reload`.
-3. Only _root_ is allowed to mount shared folders. So the _user_ option is permissible.
+3. Only _root_ is allowed to mount _vboxsf_ device. So the _user_ option is not permissible.
+4. Read [Why nodev,nosuid,noexe are important?](https://unix.stackexchange.com/a/188604).
 
 # Expand VDI size
 
