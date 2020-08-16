@@ -119,6 +119,10 @@ Emacs is a sophisticated self-documenting editor. Every facet of Emacsis searcha
 
    You can prefix it with `C-u C-x TAB` or `C-u 6 C-x TAB`. Alternatively, after `C-x TAB`, use left/right key to move the selected region.
 5. `M-m`: move point to the first non-whitespace character on this line.
+6. `c-q c-l` insert a *page break* (also named *form feed*, ASCII
+   `^L`) character. A page break character is respected by many
+   printers. Emacs uses it as a logical separation of source
+   code. To navigate through pages, use `C-x ]` or `C-x [`.
 
 # Universal arguments
 
