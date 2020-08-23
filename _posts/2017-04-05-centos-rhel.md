@@ -28,8 +28,9 @@ Module is a new packaging feature brought in from RHEL 8.
 
    A large set of packages as a whole for specific system categories like X window, desktop, security, development, etc.
 3. Module is a collection of a few packages, as a logical unit for a specific project, like Php and Nginx.
-   1. Stream is the Version of a module, similar to Gentoo's slot. Only one stream is allowed to install.
-   2. Profile is the sub-functionality of a module, similar to Gentoo's tag.
+   1. Stream is the *upstream version*.
+   2. Version is the *build version*.
+   3. Profile is the sub-functionality of a module, similar to Gentoo's *tag*.
 
 # rpm yum dnf
 
@@ -202,7 +203,22 @@ _dnf_ is compatible with but more powerful than _yum_. One of the newest feature
 
 ```bash
 ~ # dnf module -h
+~ # dnf module list nginx
+~ # dnf module info nginx
+
+# NAME:STREAM:VERSION:CONTEXT:ARCH/PROFILE
+~ # dnf module info nginx:1.16:8010020191122190044:cdc1202b:x86_64/common
+~ # dnf module install nginx:1.14/common
 ```
+
+The purpose of *module* is to manage package versions and profiles in an integrated way. The following two methods is equivalent:
+
+```bash
+~ # dnf module install nginx
+~ # dnf install nginx
+```
+
+The only difference is that `dnf module` can provide better control when selecting pakage stream, version, arch etc.
 
 # 3rd-party [Repositories](https://wiki.centos.org/AdditionalResources/Repositories)
 
