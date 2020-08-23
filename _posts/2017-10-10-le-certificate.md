@@ -3,32 +3,35 @@ layout: post
 title: Let's Encrypt Certificate
 ---
 
+1. toc
+{:toc}
+
 # [Certbot](https://certbot.eff.org/docs/using.html)
 
 ```bash
 ~ # yum search certbot
-~ # yum install certbot [python-certbot-nginx] (optional Nginx plugin)
-~ # certbot -h [all]
-~ # certbot certificates
+~ # yum install certbot
+
+~ # certbot -h
+~ # certbot certificates # List existing certificates
 ```
 
 # [Outline](https://certbot.eff.org/docs/using.html#getting-certificates-and-choosing-plugins)
 
-1. To run certbot, we supply a subcommand like *certonly*, *install*, *run* etc.
-2. A subcommand accepts different types of plugin, namely *authenticator* and *installer*.
-3. *authenticator* plugins verify domain owership and issue a certificate (*/etc/letsencrypt/*). *installer* plugins modify webserver's configuration automatically. Most of the time, we want authenticator plugins and then update web server configuration manually.
-4. *certonly* and *install* accept *authenticator* plugins and *installer* plugins respectivelly while *run* accepts plugins that are of both types.
-5. Examples of *authenticator* plugin are `--webroot` and `--standalone`. `--apache` and `--nginx` are intersection of *authenticator* and *installer*.
+To run *certbot*, we supply a subcommand like *certonly*, *install*, *run* etc. A subcommand accepts different types of plugin, namely *authenticator* plugins and *installer* plugins.
 
-   There is not exclusive *installer* plugin yet.
+*authenticator* plugins verify domain owership and issue a certificate under (*/etc/letsencrypt/*). *installer* plugins modify webserver's configuration automatically. Most of the time, we want *authenticator* plugins and then update web server configuration manually.
 
-# Tips
+The *certonly* subcommand and *install* subcommand accept *authenticator* plugins and *installer* plugins respectivelly, while the *run* subcommand can accept both type of plugins.
 
-1. A simple Nginx template:
+Examples of *authenticator* plugins are `--webroot` and `--standalone`. There does not exist plugins exclusively belonging to the *installer* type. However, `--apache` and `--nginx` are intersections of *authenticator* and *installer*, and can be used with the *run* subcommand.
+
+# Nginx Template
+
+Template for `--webroot` plugin to obtain a certificate.
+
 
 ```
-# Template for '--webroot' plugin to obtain a certificate
-
 server {
     listen 80;
     listen [::]:80;
@@ -41,9 +44,11 @@ server {
 }
 ```
 
-2. Use *fullchain.pem* instead of *cert.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
+Use *fullchain.pem* instead of *cert.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
 
-# webroot/standalone plugin
+# Obtain a Certificate
+
+We show how to get a certificate by *authenticator* plugins.
 
 ```bash
 ~ # certbot certonly --webroot -w /usr/share/nginx/html -d www.example.com --dry-run
@@ -51,47 +56,52 @@ server {
 ~ # certbot certonly --standalone -d irc.example.com --dry-run
 ```
 
-1. Use `--webroot` plugin if you have full control over the web server.
-2. Use `--standalone` plugin to obtain a certificate if you don't want to use (or don't currently have) existing server software. It does not rely on any other server software running on the machine where you obtain the certificate.
+1. Use `--webroot` plugin if you have full control over the web server. It tries to write additional files under the root of your web server. The file URL is `http://domain/.well-known/acme-challenge/<file>`. It then tries to download the file by that URL.
 
-# expand
+   Therefore, make sure the domain name is resolved to current server IP.
+2. Use `--standalone` plugin to obtain a certificate if you don't want to use (or don't currently have) existing web server. It does not rely on any web servers running on the machine where you obtain the certificate.
+
+# Expand a Certificate
+
+Add a new domain to an existing certificate.
 
 ```bash
 ~ # certbot certonly --expand --cert-name irc.example.com --webroot -w /usr/share/nginx/html/ -d blog.example.com,www.example.com --dry-run
 ```
 
-Add a new domain (blog) to existing certificate (www).
+# Renew a Certificate
 
-# Renewal
+Manually renew a certificate:
 
 ```bash
 ~ # cerbot renew --deploy-hook "systemctl reload nginx.service" --dry-run
 ```
 
-1. `--deploy-hook` tells *nginx* to reload *if* renewal is successful. Another way is to put the hook into *renew* configuration file:
+The `--deploy-hook` tells Nginx to reload if the certificate is successfully renewed. We can configure the hook under */etc/letsencrypt/renewal/* directory:
 
-   ```
-   # /etc/letsencrypt/renewal/www.example.conf
-   [renewalparams]
-   renew_hook = systemctl reload nginx.service
-   ```
+```
+# /etc/letsencrypt/renewal/www.example.conf
+ 
+[renewalparams]
+renew_hook = systemctl reload nginx.service
+```
 
-2. Renewal certificates of [standalone](https://certbot.eff.org/docs/using.html#standalone) plugin requires port 80 and/or 443 to be available. You may need to stop web server during renewal.
+Renewal of [standalone certificates](https://certbot.eff.org/docs/using.html#standalone) requires either port 80 or 443 to be available. In other words, Nginx should not listen on both 80 and 443. If that's the case, we can stop Nginx first. Alternatively, we use `--pre-hook` and `--post-hook`.
 
-   We can do this by `--pre-hook` and `--post-hook`.
+```bash
+~ # cerbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" --dry-run
+```
 
-   ```bash
-   ~ # cerbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" --dry-run
-   ```
+The two hooks will be executed no matter of sucess or failure.
 
-   These two hooks will be executed *always* no matter of sucess or failure.
-3. We can use *crontab* or *systemd* timer to automate certificate renewal.
+Manual renewal is undesirable. We can automate the process by *crontab* or *systemd* timer.
 
-   ```bash
-   ~ # crontab -u root -e/-l
-   # /var/spool/cron/root
-   30 0,12 * * * /usr/bin/certbot renew --deploy-hook "/usr/bin/systemctl reload nginx.service" --quiet
-   ```
+```bash
+# /var/spool/cron/root
 
-   Twice a day.
-4. Make sure relevant ports 80/443 are allowed by firewall.
+~ # crontab -u root -e
+~ # crontab -u root -l
+
+30 0,12 * * * /usr/bin/certbot renew --deploy-hook "/usr/bin/systemctl reload nginx.service" --quiet
+```
+
