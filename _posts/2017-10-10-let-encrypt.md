@@ -64,11 +64,13 @@ server {
 
 We will show you how to get a certificate by the *certonly* subcommand. Run the Certbot client where you host the web server.
 
+## Webroot Authenticator ##
+
 ```bash
-~ # certbot certonly --webroot -w /var/www/example.com -d example.com,www.example.com -w /var/www/b.example.com -d b.example.com --dry-run --email "name@example.com"
+~ # certbot certonly --webroot -w /var/www/example.com -d example.com,www.example.com -w /var/www/b.example.com -d b1.example.com -d b2.example.com --dry-run --email "name@example.com"
 ```
 
-As the name implies, *certonly* only obtains certificates but does not install them. When requesting a certificate for multiple domains, each domain will use the most recently specified `--webroot-path, -w`. The `--email` option is to receive notification like expiration message.
+As the name implies, *certonly* only obtains certificates but does not install them. When requesting a certificate for multiple domains, each domain will use the most recently specified `--webroot-path, -w`. The `--email` option is to receive notification like expiration message. Multiple domain names can be separated by comma in the `-d` argument or by individual `-d` arguments. 
 
 Use the `--webroot` authenticator if you have full control over the *running* web server and the domain. Let's Encrypt's ACME server tells the Certbot client to write *unique* files under the root of your web server (i.e. */usr/share/nginx/html/*). This step is challenge you whether you do own the web server (i.e. write access). The file URL takes the form:
 
@@ -84,15 +86,15 @@ Once downloaded, the ACME server also compares the file hashes of the fetched co
 ~ # certbot certonly --standalone -d www.example.com,blog.example.com --dry-run
 ```
 
+## Standalone Authenticator ##
+
 To the contrary, use the `--standalone` authenticator uses a different challenge method. It obtains a certificate when there is *no* web server running on the host. It starts a *temporary standalone web server* to talk to Let’s Encrypt. Therefore, it does not verify web server. You must make sure the server port 80 is not occupied by any services. You may have to turn down existing web servers to release port 80.
 
 Recall that `--webroot` challenge domain onwership by HTTP, GETting an unique URL. Then how does `--standalone` challenge the domain onwership? By HTTP too! You must make sure the domain name is *directly* resolved to the host IP where you apply for certificates, namely where run the *certbot* client. If the domain name is resolved to the host IP, it means you manage the domain. You cannot cover your domain with CDN!
 
 The `--standalone` authenticator is usually used when the host you use to apply for certificates is not the one you would like to host your web server.
 
-No matter which plugins you use, the generated certificates are placed under */etc/letsencrypt/*. You will find a certificate has two versions, namely the *fullchain.pem* and the *cert.pem*. The formmer one contains intermediate certificates, and provide full validation chain. So use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
-
-# Wildcard Certificate #
+## DNS Authenticator ##
 
 With the *certbot* client, the only way to obtain a wildcard certificate from Let's Encrypt is using DNS Plugins. DNS plugins belong to the *authenticator* type but challenge you by DNS protocol.
 
@@ -100,32 +102,60 @@ For each DNS platform (i.e. [Cloudflare](https://certbot-dns-cloudflare.readthed
 
 Basically, a DNS plugin uses a API token from the DNS platform to first add a TXT record and then remove that record, such that you are proved to own the domain name.
 
-# Install a Certificate
+# Manage a Certificate #
 
-Update your web server's vhost configuration accordingly.
+No matter which plugins you use, the generated certificates are placed under */etc/letsencrypt/*. Also the arguments used to generate the certificates are stored alongside for [latter renwal](#renew-a-certificate).
+
+You will find a certificate has two versions, namely the *fullchain.pem* and the *cert.pem*. The formmer one contains intermediate certificates, and provide full validation chain. So use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
+
+First, list existing certificates:
 
 ```bash
-~ # nginx -t
-~ # systemctl reload nginx
+~ # certbot certificates
+~ # certbot certificates --cert-name example.com
 ```
 
-# Expand a Certificate
+From the output, you will find each certificate has a name. Pass argument `--cert-name` to specify a particular certificate for subcommands like *certonly*, *run*, *certificates*, *renew*, *delete* etc. You can have multiple certificates containing some of the same domains.
 
-Add new domains to an existing certificate.
+When *certonly* is provided the `--cert-name` argument, it will update that certificate. Most of the time, you can combine `--cert-name` with the `--expand` argument to add domain names into the certificate. Alternatively, you can combine it with the `--force-renewal` argument to create a new copy of the existing certificate.
+
+```bash
+~ # certbot certonly --cert-name example.com [--expand | --force-renewal ] ...
+```
+
+# Change a Certificate's Domains
+
+Add new domains to an existing certificate with argument `--expand`.
 
 ```bash
 ~ # certbot certonly --expand --cert-name example.com --webroot -w /var/www/log.example.com -d blog.example.com --dry-run
 ```
 
+But the it is recommended to abandon the `--expand` option such that you can either add or remove domains by supplying a complete new list domains to the `-d` argument.
+
+```bash
+~ # certbot certonly --cert-name example.com --webroot -w /var/www/log.example.com -d blog.example.com --dry-run
+```
+
+After the above operation, the certificate *example.com* only contains domain name *blog.example.com*.
+
 # Renew a Certificate
 
-A certificate can be manually renewed or automatically renewed. To manually renew a certificate, use the *renwe* subcommand.
+Let's Encrypt certificates expire after 90 days. Renewing a certificate is actually to generate a new identical copy of the original certificate. The only difference is the expiration date.
+
+A certificate can be manually renewed or automatically renewed.
+
+## Manual Renewal ##
+
+To manually renew all existing certificates, just invoke the *renew* subcommand.
+
+The *renew* subcommand automatically renew all certificates that expire in less than 30 days using the same arguments which they are created with.
 
 ```bash
 ~ # cerbot renew --deploy-hook "systemctl reload nginx.service" --dry-run
 ```
 
-The `--deploy-hook` tells Nginx to reload if the certificate is successfully renewed. We can configure the hook under */etc/letsencrypt/renewal/* directory:
+The --deploy-hook` to reload the web server if the certificate is successfully renewed. We can add the hook to its configuration file under */etc/letsencrypt/renewal/*:
 
 ```
 # /etc/letsencrypt/renewal/www.example.com.conf
@@ -134,15 +164,26 @@ The `--deploy-hook` tells Nginx to reload if the certificate is successfully ren
 renew_hook = systemctl reload nginx.service
 ```
 
-Renewal of [standalone certificates requires port 80 to be available. In other words, Nginx should not listen on HTTP 80. If that's the case, you can stop Nginx first. Alternatively, we use `--pre-hook` and `--post-hook` arguments.
+Then just run:
+
+
+```bash
+~ # cerbot renew --dry-run
+```
+
+Renewal of [standalone certificates](#standalone-authenticator) requires port 80 to be available. In other words, Nginx should not listen on HTTP 80. If that's the case, you can stop Nginx first. Alternatively, we use `--pre-hook` and `--post-hook` arguments.
 
 ```bash
 ~ # cerbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" --dry-run
 ```
 
+Similarly, you can put the hooks into its renewal configuration file.
+
 Attention please; the two hooks will be executed no matter of sucess or failure.
 
-Manual renewal is inefficient. We can automate the process by *crontab* or *systemd* timer.
+## Automatic Renwal ##
+
+We can automate the process by *crontab* or *systemd* timer.
 
 ```bash
 # /var/spool/cron/root
@@ -150,6 +191,14 @@ Manual renewal is inefficient. We can automate the process by *crontab* or *syst
 ~ # crontab -u root -e
 ~ # crontab -u root -l
 
-30 0,12 * * * /usr/bin/certbot renew --deploy-hook "/usr/bin/systemctl reload nginx.service" --quiet
+30 0,12 * * * /usr/bin/certbot renew --quiet
 ```
 
+# Install a Certificate
+
+Update your web server's vhost configuration accordingly once the certificate is ready.
+
+```bash
+~ # nginx -t
+~ # systemctl reload nginx
+```
