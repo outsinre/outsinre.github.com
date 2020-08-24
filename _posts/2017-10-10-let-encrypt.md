@@ -6,7 +6,11 @@ title: Let's Encrypt Certificate
 1. toc
 {:toc}
 
-# [Certbot](https://certbot.eff.org/docs/using.html)
+# ACME and Certbot
+
+In order to manage [Let's Encrypt](https://letsencrypt.org/) certificates, we need a client tool that supports the [RFC 8555 Automated Certificate Management Environm (ACME) protocol](https://tools.ietf.org/html/rfc8555). When managing certificates, the client communicates with Let's Encrypt server using ACME protocol.
+
+Let's Encrypt officially recommends the [Certbot](https://certbot.eff.org/docs/using.html) client.
 
 ```bash
 ~ # yum search certbot
@@ -16,15 +20,23 @@ title: Let's Encrypt Certificate
 ~ # certbot certificates # List existing certificates
 ```
 
-# [Outline](https://certbot.eff.org/docs/using.html#getting-certificates-and-choosing-plugins)
-
-To run *certbot*, we supply a subcommand like *certonly*, *install*, *run* etc. A subcommand accepts different types of plugin, namely *authenticator* plugins and *installer* plugins.
-
-*authenticator* plugins verify domain owership and issue a certificate under (*/etc/letsencrypt/*). *installer* plugins modify webserver's configuration automatically. Most of the time, we want *authenticator* plugins and then update web server configuration manually.
+To run *certbot*, we supply a subcommand like *certonly*, *install*, *run* etc. A subcommand accepts different types of plugin, namely *authenticator* plugins and *installer* plugins. The general usage looks like `certbot subcommand --plugin-name ...`.
 
 The *certonly* subcommand and *install* subcommand accept *authenticator* plugins and *installer* plugins respectivelly, while the *run* subcommand can accept both type of plugins.
 
+*authenticator* plugins verify domain owership and issue a certificate under */etc/letsencrypt/*. *installer* plugins modify web server's configuration with specified certificate. Most of the time, we firstly use *authenticator* plugins to obtain a certificate and then manually update configurations of the web server.
+
 Examples of *authenticator* plugins are `--webroot` and `--standalone`. There does not exist plugins exclusively belonging to the *installer* type. However, `--apache` and `--nginx` are intersections of *authenticator* and *installer*, and can be used with the *run* subcommand.
+
+The following table simply presents their relationship:
+
+| --- | --- | --- |
+| subcommand | type | plugin |
+| :--- | :--- | :--- |
+| certonly | authenticator | webroot, standalone |
+| install | installer | n/a |
+| run | both | apache, nginx |
+| --- | --- | --- |
 
 # Nginx Template
 
