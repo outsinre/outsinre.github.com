@@ -1,12 +1,12 @@
 ---
 layout: post
-title: [Let's Encrypt Certificate](https://www.linuxbabe.com/security/letsencrypt-webroot-tls-certificate)
+title: Let's Encrypt
 ---
 
 1. toc
 {:toc}
 
-# ACME and Certbot
+# [ACME and Certbot](https://www.linuxbabe.com/security/letsencrypt-webroot-tls-certificate)
 
 In order to manage [Let's Encrypt](https://letsencrypt.org/) certificates, we need a client tool that supports the [RFC 8555 Automated Certificate Management Environm (ACME) protocol](https://tools.ietf.org/html/rfc8555). When managing certificates, the client communicates with Let's Encrypt server using ACME protocol.
 
