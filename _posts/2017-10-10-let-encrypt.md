@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Let's Encrypt Certificate
+title: [Let's Encrypt Certificate](https://www.linuxbabe.com/security/letsencrypt-webroot-tls-certificate)
 ---
 
 1. toc
@@ -20,13 +20,17 @@ Let's Encrypt officially recommends the [Certbot](https://certbot.eff.org/docs/u
 ~ # certbot certificates # List existing certificates
 ```
 
-To run *certbot*, we supply a subcommand like *certonly*, *install*, *run* etc. A subcommand accepts different types of plugin, namely *authenticator* plugins and *installer* plugins. The general usage looks like `certbot subcommand --plugin-name ...`.
+To run *certbot*, we supply a subcommand like *certonly*, *install*, *run* etc. A subcommand accepts different types of plugin, namely *authenticator* plugins and *installer* plugins. The general usage looks like:
+
+```
+certbot subcommand --plugin-name ...
+```
 
 The *certonly* subcommand and *install* subcommand accept *authenticator* plugins and *installer* plugins respectivelly, while the *run* subcommand can accept both type of plugins.
 
-*authenticator* plugins verify domain owership and issue a certificate under */etc/letsencrypt/*. *installer* plugins modify web server's configuration with specified certificate. Most of the time, we firstly use *authenticator* plugins to obtain a certificate and then manually update configurations of the web server.
+*authenticator* plugins verify domain owership and issue a certificate - to challenge you when applying for certificates. *installer* plugins automatically modify web server's configuration with specified certificate. Most of the time, we firstly use *authenticator* plugins to obtain a certificate and then manually update configurations of the web server.
 
-Examples of *authenticator* plugins are `--webroot` and `--standalone`. There does not exist plugins exclusively belonging to the *installer* type. However, `--apache` and `--nginx` are intersections of *authenticator* and *installer*, and can be used with the *run* subcommand.
+Examples of *authenticator* plugins are `--webroot` and `--standalone`. There does not exist plugins exclusively belonging to the *installer* type. However, `--apache` and `--nginx` are intersections of *authenticator* and *installer*, and can be used with the *run* subcommand to automate the management process.
 
 The following table simply presents their relationship:
 
@@ -40,7 +44,7 @@ The following table simply presents their relationship:
 
 # Nginx Template
 
-Template for `--webroot` plugin to obtain a certificate.
+A simple Nginx HTTP template.
 
 
 ```
@@ -56,22 +60,33 @@ server {
 }
 ```
 
-Use *fullchain.pem* instead of *cert.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
-
 # Obtain a Certificate
 
-We show how to get a certificate by *authenticator* plugins.
+We will show you how to get a certificate by *authenticator* plugins. Run the Certbot client on your web server host.
 
 ```bash
 ~ # certbot certonly --webroot -w /usr/share/nginx/html -d www.example.com --dry-run
-# or
+# -or-
 ~ # certbot certonly --standalone -d irc.example.com --dry-run
 ```
 
-1. Use `--webroot` plugin if you have full control over the web server. It tries to write additional files under the root of your web server. The file URL is `http://domain/.well-known/acme-challenge/<file>`. It then tries to download the file by that URL.
+Use the `--webroot` authenticator if you have full control over the *running* web server and the domain. Let's Encrypt's ACME server tells the Certbot client to write *unique* files under the root of your web server (i.e. */usr/share/nginx/html/*). This step is challenge you whether you do own the web server (i.e. write access). The file URL takes the form:
 
-   Therefore, make sure the domain name is resolved to current server IP.
-2. Use `--standalone` plugin to obtain a certificate if you don't want to use (or don't currently have) existing web server. It does not rely on any web servers running on the machine where you obtain the certificate.
+```
+http://domain/.well-known/acme-challenge/<file>
+```
+
+Afterwards, the ACME server tries to fetch the URL, verifying you own the domain. Therefore, make sure the domain name is finally resolved to the web server IP and the web server is running on HTTP 80. You can cover your web server with CDN, as the challenge method is to download the unique file.
+
+Once downloaded, the ACME server also compares the file hashes of the fetched copy with its local store.
+
+To the contrary, use the `--standalone` authenticator uses a different challenge method. It obtains a certificate when there is *no* web server running on the host. It starts an *temporary* standalone web server to talk to Let’s Encrypt. Therefore, it does not verify web server. You must make sure the server port 80 is not occupied by any services. You may have to turn down existing web servers to release port 80.
+
+Recall that `--webroot` challenge domain onwership by HTTP URL. Then how does `--standalone` challenge the domain onwership? By DNS! You must make sure the domain name is directly resolved to the host IP where you apply for certificates and run the *certbot* client. If the domain name is resolved to the host IP, it means you manage the domain.
+
+The `--standalone` authenticator is usually used when the host you use to apply for certificates is not the one you would like to host your web server.
+
+No matter which plugins you use, the generated certificates are placed under */etc/letsencrypt/*. You will find a certificate has two versions, namely the *fullchain.pem* and the *cert.pem*. The formmer one contains intermediate certificates, and provide full validation chain. So use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
 
 # Expand a Certificate
 
