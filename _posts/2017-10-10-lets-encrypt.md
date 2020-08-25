@@ -37,7 +37,7 @@ The following table simply presents their relationship:
 | --- | --- | --- |
 | subcommand | type | plugin |
 | :--- | :--- | :--- |
-| certonly | authenticator | webroot, standalone, dns-cloudflare, dns-digitalocean |
+| certonly | authenticator | webroot, standalone, dns-cloudflare |
 | install | installer | n/a |
 | run (default) | both | apache, nginx |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ server {
 
 # Obtain a Certificate
 
-We will show you how to get a certificate by the *certonly* subcommand. Run the Certbot client where you host the web server.
+ACME challenge is a complex process, you'd better turn off CDN caching before applying for a certificate.
 
 ## Webroot Authenticator ##
 
@@ -88,21 +88,23 @@ Use the `--webroot` authenticator if you have full control over the *running* we
 http://domain/.well-known/acme-challenge/<file>
 ```
 
-Afterwards, the ACME server tries to fetch the URL, verifying you own the domain. Therefore, make sure the domain name is finally resolved to the web server IP and the web server is running on HTTP 80. Though, the *webroot* authenticator use HTTP to challenge the ownership, the communication security is guranteed by ACME protocol.
+Afterwards, the ACME server tries to fetch the URL, verifying you own the domain. Therefore, make sure the domain name is finally resolved to the web server IP and the web server is running on HTTP 80 (NOT HTTPS 443). Though, the *webroot* authenticator use HTTP to challenge the ownership, the security of Certbot itself is guranteed by ACME protocol. We call this kind of challenge *http-01*.
 
 You can cover your web server with CDN (i.e. Cloudflare), as the challenge method is to download the unique file. However, if the CDN enables HSTS, then temporarily turn it off by removing the caching capability in DNS settting.
 
 Once downloaded, the ACME server also compares the file hashes of the fetched copy with its local store.
 
+## Standalone Authenticator ##
+
 ```bash
 ~ # certbot certonly --standalone -d www.example.com,blog.example.com --dry-run
 ```
 
-## Standalone Authenticator ##
+To the contrary, use the `--standalone` authenticator to obtain a certificate when there is *no* web server running on the host. It starts a *temporary standalone web server* to talk to Let’s Encrypt. Therefore, it does not verify web server.
 
-To the contrary, use the `--standalone` authenticator uses a different challenge method. It obtains a certificate when there is *no* web server running on the host. It starts a *temporary standalone web server* to talk to Let’s Encrypt. Therefore, it does not verify web server. You must make sure the server port 80 is not occupied by any services. You may have to turn down existing web servers to release port 80.
+Recall that `--webroot` challenge domain onwership by *http-01*, GETting an unique URL. Then how does `--standalone` challenge the domain onwership? By *http-01* too! You must make sure [port 80 (default)](https://tools.ietf.org/html/draft-ietf-acme-acme-03#section-7.2). You may have to turn down existing web servers to release port 80.
 
-Recall that `--webroot` challenge domain onwership by HTTP, GETting an unique URL. Then how does `--standalone` challenge the domain onwership? By HTTP too! You must make sure the domain name is *directly* resolved to the host IP where you apply for certificates, namely where run the *certbot* client. If the domain name is resolved to the host IP, it means you manage the domain. You cannot cover your domain with CDN!
+Though ACME protocol supports challenge with [tls-01](https://tools.ietf.org/html/draft-ietf-acme-acme-03#section-7.3) by verifying the *temporarily* self-generated certificate, but Certbot only implements HTTP 80. If you have chosen to use *tls-o1*, then you must make sure the domain name is *directly* resolved to the host IP where you apply for certificates *certbot* client. If the domain name is resolved to the host IP, it means you manage the domain. You cannot cover your domain with CDN, otherwise the ACME server would got the CDN's certificate instead of the temporary one by Certbot.
 
 The `--standalone` authenticator is usually used when the host you use to apply for certificates is not the one you would like to host your web server.
 
