@@ -250,7 +250,39 @@ Your account credentials have been saved in your Certbot configuration directory
 
 # Install a Certificate
 
-Update your web server's vhost configuration accordingly once the certificate is ready.
+Update your web server's vhost configuration accordingly once the certificate is ready. Here is a template:
+
+```
+server {
+    listen       443 ssl http2 default_server;
+    listen       [::]:443 ssl http2 default_server;
+    server_name  www.example.com;
+    root         /usr/share/nginx/html;
+
+    ssl_certificate "/etc/letsencrypt/live/en.zhstar.win/fullchain.pem";
+    ssl_certificate_key "/etc/letsencrypt/live/en.zhstar.win/privkey.pem";
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_timeout  10m;
+    ssl_ciphers PROFILE=SYSTEM;
+    ssl_prefer_server_ciphers on;
+
+    # Load configuration files for the default server block.
+    include /etc/nginx/default.d/*.conf;
+
+    location / {
+    }
+
+    error_page 404 /404.html;
+        location = /40x.html {
+    }
+
+    error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+    }
+}
+```
+
+Then reload the web server:
 
 ```bash
 ~ # nginx -t
