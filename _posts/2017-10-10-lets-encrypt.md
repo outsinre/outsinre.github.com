@@ -259,7 +259,7 @@ Your account credentials have been saved in your Certbot configuration directory
 
 # Install a Certificate
 
-Update your web server's vhost configuration accordingly once the certificate is ready. Here is a template:
+You can update web server's SSL vhost configuration accordingly once the certificate is ready. Here is a template:
 
 ```
 server {
@@ -296,4 +296,10 @@ Then reload the web server:
 ```bash
 ~ # nginx -t
 ~ # systemctl reload nginx
+```
+
+Additionaly, you can redirect all HTTP traffic to HTTPS:
+
+```
+return 301 https://$server_name$request_uri;
 ```
