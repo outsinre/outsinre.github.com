@@ -303,3 +303,7 @@ Additionaly, you can redirect all HTTP traffic to HTTPS:
 ```
 return 301 https://$server_name$request_uri;
 ```
+
+This does not influence certificate renewal but may hinder new certificate application.
+
+If everything goes as expected, turn back on CDN coverage.
