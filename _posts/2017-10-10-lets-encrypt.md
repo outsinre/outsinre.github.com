@@ -77,6 +77,9 @@ ACME challenge is a complex process, you'd better turn off CDN caching before ap
 ## Webroot Authenticator ##
 
 ```bash
+~ # certbot -h certonly
+~ # certbot -h webroot
+
 ~ # certbot certonly --webroot -w /var/www/example.com -d example.com,www.example.com -w /var/www/b.example.com -d b1.example.com -d b2.example.com --email "name@example.com" --dry-run
 ```
 
@@ -97,6 +100,7 @@ Once downloaded, the ACME server also compares the file hashes of the fetched co
 ## Standalone Authenticator ##
 
 ```bash
+~ # certbot -h standalone
 ~ # certbot certonly --standalone -d www.example.com,blog.example.com --dry-run
 ```
 
@@ -185,6 +189,7 @@ To manually renew an individual certificate, just re-run the command used to obt
 To interactively renew *all* of your certificates, invoke the *renew* subcommand.
 
 ```bash
+~ # certbot -h renew
 ~ # cerbot renew --deploy-hook "systemctl reload nginx.service" --dry-run
 ~ # cerbot renew --deploy-hook /path/to/hook-script.sh --dry-run
 ```
