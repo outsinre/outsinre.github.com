@@ -67,10 +67,10 @@ We will show you how to get a certificate by the *certonly* subcommand. Run the 
 ## Webroot Authenticator ##
 
 ```bash
-~ # certbot certonly --webroot -w /var/www/example.com -d example.com,www.example.com -w /var/www/b.example.com -d b1.example.com -d b2.example.com --dry-run --email "name@example.com"
+~ # certbot certonly --webroot -w /var/www/example.com -d example.com,www.example.com -w /var/www/b.example.com -d b1.example.com -d b2.example.com --email "name@example.com" --dry-run
 ```
 
-As the name implies, *certonly* only obtains certificates but does not install them. When requesting a certificate for multiple domains, each domain will use the most recently specified `--webroot-path, -w`. The `--email` option is to receive notification like expiration message. Multiple domain names can be separated by comma in the `-d` argument or by individual `-d` arguments. 
+As the name implies, *certonly* only obtains certificates but does not install them. When requesting a certificate for multiple domains, each domain will use the most recently specified `--webroot-path, -w`. The `--email` option is to receive notification like expiration message. Multiple domain names can be separated by comma in the `-d` argument or by individual `-d` arguments. Always append the `--dry-run` before any real operation.
 
 Use the `--webroot` authenticator if you have full control over the *running* web server and the domain. Let's Encrypt's ACME server tells the Certbot client to write *unique* files under the root of your web server (i.e. */usr/share/nginx/html/*). This step is challenge you whether you do own the web server (i.e. write access). The file URL takes the form:
 
@@ -94,7 +94,7 @@ Recall that `--webroot` challenge domain onwership by HTTP, GETting an unique UR
 
 The `--standalone` authenticator is usually used when the host you use to apply for certificates is not the one you would like to host your web server.
 
-## DNS Authenticator ##
+## DNS Authenticator for Wildcard Certificate ##
 
 With the *certbot* client, the only way to obtain a wildcard certificate from Let's Encrypt is using DNS Plugins. DNS plugins belong to the *authenticator* type but challenge you by DNS protocol.
 
@@ -106,7 +106,7 @@ Basically, a DNS plugin uses a API token from the DNS platform to first add a TX
 
 No matter which plugins you use, the generated certificates are placed under */etc/letsencrypt/*. Also the arguments used to generate the certificates are stored alongside for [latter renwal](#renew-a-certificate).
 
-You will find a certificate has two versions, namely the *fullchain.pem* and the *cert.pem*. The formmer one contains intermediate certificates, and provide full validation chain. So use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
+You will find a certificate has two versions, namely the *fullchain.pem* and the *cert.pem*. The formmer one contains intermediate certificates, and provide the full validation chain. So use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
 
 First, list existing certificates:
 
@@ -115,15 +115,17 @@ First, list existing certificates:
 ~ # certbot certificates --cert-name example.com
 ```
 
-From the output, you will find each certificate has a name. Pass argument `--cert-name` to specify a particular certificate for subcommands like *certonly*, *run*, *certificates*, *renew*, *delete* etc. You can have multiple certificates containing some of the same domains.
+It's not unusual that multiple certificates containe some of the same domains.
 
-When *certonly* is provided the `--cert-name` argument, it will update that certificate. Most of the time, you can combine `--cert-name` with the `--expand` argument to add domain names into the certificate. Alternatively, you can combine it with the `--force-renewal` argument to create a new copy of the existing certificate.
+From the output, you will find each certificate has a name. Pass argument `--cert-name` to specify a particular certificate for subcommands like *certonly*, *run*, *certificates*, *renew*, *delete* etc.
+
+When *certonly* is provided the `--cert-name` argument, it will update that particular certificate or create a new one based on that certificate. You can combine `--cert-name` with the `--expand` argument to add domain names into the certificate. Alternatively, you can combine it with the `--force-renewal` argument to create a new copy of the existing certificate.
 
 ```bash
 ~ # certbot certonly --cert-name example.com [--expand | --force-renewal ] ...
 ```
 
-# Change a Certificate's Domains
+## Change a Certificate's Domains ##
 
 Add new domains to an existing certificate with argument `--expand`.
 
@@ -131,7 +133,7 @@ Add new domains to an existing certificate with argument `--expand`.
 ~ # certbot certonly --expand --cert-name example.com --webroot -w /var/www/log.example.com -d blog.example.com --dry-run
 ```
 
-But the it is recommended to abandon the `--expand` option such that you can either add or remove domains by supplying a complete new list domains to the `-d` argument.
+But the it is recommended to abandon the `--expand` option such that you can either add or remove domains by supplying a complete new list of domains to the `-d` argument.
 
 ```bash
 ~ # certbot certonly --cert-name example.com --webroot -w /var/www/log.example.com -d blog.example.com --dry-run
@@ -139,13 +141,13 @@ But the it is recommended to abandon the `--expand` option such that you can eit
 
 After the above operation, the certificate *example.com* only contains domain name *blog.example.com*.
 
-# Renew a Certificate
+## Renew a Certificate ##
 
 Let's Encrypt certificates expire after 90 days. Renewing a certificate is actually to generate a new identical copy of the original certificate. The only difference is the expiration date.
 
 A certificate can be manually renewed or automatically renewed.
 
-## Manual Renewal ##
+### Manual Renewal ###
 
 To manually renew all existing certificates, just invoke the *renew* subcommand.
 
@@ -181,7 +183,7 @@ Similarly, you can put the hooks into its renewal configuration file.
 
 Attention please; the two hooks will be executed no matter of sucess or failure.
 
-## Automatic Renwal ##
+### Automatic Renwal ###
 
 We can automate the process by *crontab* or *systemd* timer.
 
