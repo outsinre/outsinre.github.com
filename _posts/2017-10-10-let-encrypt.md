@@ -78,7 +78,7 @@ Use the `--webroot` authenticator if you have full control over the *running* we
 http://domain/.well-known/acme-challenge/<file>
 ```
 
-Afterwards, the ACME server tries to fetch the URL, verifying you own the domain. Therefore, make sure the domain name is finally resolved to the web server IP and the web server is running on HTTP 80. You can cover your web server with CDN, as the challenge method is to download the unique file.
+Afterwards, the ACME server tries to fetch the URL, verifying you own the domain. Therefore, make sure the domain name is finally resolved to the web server IP and the web server is running on HTTP 80. You can cover your web server with CDN (i.e. Cloudflare), as the challenge method is to download the unique file. However, if the CDN enables HSTS, then temporarily turn it off.
 
 Once downloaded, the ACME server also compares the file hashes of the fetched copy with its local store.
 
