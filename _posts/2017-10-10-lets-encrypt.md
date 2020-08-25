@@ -259,8 +259,8 @@ server {
     server_name  www.example.com;
     root         /usr/share/nginx/html;
 
-    ssl_certificate "/etc/letsencrypt/live/en.zhstar.win/fullchain.pem";
-    ssl_certificate_key "/etc/letsencrypt/live/en.zhstar.win/privkey.pem";
+    ssl_certificate "/etc/letsencrypt/live/www.example.com/fullchain.pem";
+    ssl_certificate_key "/etc/letsencrypt/live/www.example.com/privkey.pem";
     ssl_session_cache shared:SSL:1m;
     ssl_session_timeout  10m;
     ssl_ciphers PROFILE=SYSTEM;
