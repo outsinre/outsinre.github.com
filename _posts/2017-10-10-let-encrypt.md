@@ -78,7 +78,9 @@ Use the `--webroot` authenticator if you have full control over the *running* we
 http://domain/.well-known/acme-challenge/<file>
 ```
 
-Afterwards, the ACME server tries to fetch the URL, verifying you own the domain. Therefore, make sure the domain name is finally resolved to the web server IP and the web server is running on HTTP 80. You can cover your web server with CDN (i.e. Cloudflare), as the challenge method is to download the unique file. However, if the CDN enables HSTS, then temporarily turn it off.
+Afterwards, the ACME server tries to fetch the URL, verifying you own the domain. Therefore, make sure the domain name is finally resolved to the web server IP and the web server is running on HTTP 80. Though, the *webroot* authenticator use HTTP to challenge the ownership, the communication security is guranteed by ACME protocol.
+
+You can cover your web server with CDN (i.e. Cloudflare), as the challenge method is to download the unique file. However, if the CDN enables HSTS, then temporarily turn it off by removing the caching capability in DNS settting.
 
 Once downloaded, the ACME server also compares the file hashes of the fetched copy with its local store.
 
@@ -104,7 +106,24 @@ Basically, a DNS plugin uses a API token from the DNS platform to first add a TX
 
 # Manage a Certificate #
 
-No matter which plugins you use, the generated certificates are placed under */etc/letsencrypt/*. Also the arguments used to generate the certificates are stored alongside for [latter renwal](#renew-a-certificate).
+No matter which plugins you use, the generated certificates are placed under */etc/letsencrypt/*. Also the arguments used to generate the certificates are stored alongside for [latter renwal](#renew-a-certificate). The directory tree looks like:
+
+```
+# tree /etc/letsencrypt/
+/etc/letsencrypt/
+├── accounts
+│   └── acme-staging-v02.api.letsencrypt.org
+│       └── directory
+│           └── abcdq383ndh08457vnlazc234c
+│               ├── meta.json
+│               ├── private_key.json
+│               └── regr.json
+├── renewal
+└── renewal-hooks
+    ├── deploy
+    ├── post
+    └── pre
+```
 
 You will find a certificate has two versions, namely the *fullchain.pem* and the *cert.pem*. The formmer one contains intermediate certificates, and provide the full validation chain. So use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
 
