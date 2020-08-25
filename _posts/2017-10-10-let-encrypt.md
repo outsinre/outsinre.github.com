@@ -215,6 +215,10 @@ We can automate the process by *crontab* or *systemd* timer.
 30 0,12 * * * /usr/bin/certbot renew --quiet
 ```
 
+### Backup Certificate ###
+
+Your account credentials have been saved in your Certbot configuration directory at */etc/letsencrypt/*. You should make a secure backup of this folder now. This configuration directory will also contain certificates and private keys obtained by Certbot so making regular backups of this folder is ideal.
+
 # Install a Certificate
 
 Update your web server's vhost configuration accordingly once the certificate is ready.
