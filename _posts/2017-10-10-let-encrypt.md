@@ -26,7 +26,7 @@ To run *certbot*, we supply a subcommand like *certonly* (obtain a certificate),
 certbot subcommand --plugin-name ...
 ```
 
-The *certonly* subcommand and *install* subcommand accept *authenticator* plugins and *installer* plugins respectivelly, while the *run* subcommand accepts plugins belonging to both types.
+The *certonly* subcommand and *install* subcommand accept *authenticator* plugins and *installer* plugins respectivelly, while the *run* subcommand accepts plugins belonging to both types, whcih is the default when no subcommand is provided.
 
 *authenticator* plugins challenge you whether you are eligible for a certificate by verifying the domain owership. *installer* plugins automatically modify web server's configuration with specified certificate. Most of the time, we firstly use *authenticator* plugins to obtain a certificate and then manually update configurations of the web server.
 
@@ -39,7 +39,7 @@ The following table simply presents their relationship:
 | :--- | :--- | :--- |
 | certonly | authenticator | webroot, standalone, dns-cloudflare, dns-digitalocean |
 | install | installer | n/a |
-| run | both | apache, nginx |
+| run (default) | both | apache, nginx |
 | --- | --- | --- |
 
 # Nginx Template
@@ -125,7 +125,7 @@ No matter which plugins you use, the generated certificates are placed under */e
     └── pre
 ```
 
-You will find a certificate has two versions, namely the *fullchain.pem* and the *cert.pem*. The formmer one contains intermediate certificates, and provide the full validation chain. So use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002).
+You will find a certificate has different version, namely *fullchain.pem*, *chain.pem* and *cert.pem*. Use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002) as it is a superset of *chain* and *cert.pem*.
 
 First, list existing certificates:
 
@@ -162,30 +162,41 @@ After the above operation, the certificate *example.com* only contains domain na
 
 ## Renew a Certificate ##
 
-Let's Encrypt certificates expire after 90 days. Renewing a certificate is actually to generate a new identical copy of the original certificate. The only difference is the expiration date.
+Let's Encrypt certificates expire after 90 days and can be renewed if a certificiate expires in less than 30 days. Renewing a certificate is actually to generate a new identical copy of the original certificate, using the same arguments which they are created with. The only difference is the expiration date is updated.
 
 A certificate can be manually renewed or automatically renewed.
 
 ### Manual Renewal ###
 
-To manually renew all existing certificates, just invoke the *renew* subcommand.
+To manually renew an individual certificate, just re-run the command used to obtain it, as in section [Obtain a Certificate](#obtain-a-certificate).
 
-The *renew* subcommand automatically renew all certificates that expire in less than 30 days using the same arguments which they are created with.
+To interactively renew *all* of your certificates, invoke the *renew* subcommand.
 
 ```bash
 ~ # cerbot renew --deploy-hook "systemctl reload nginx.service" --dry-run
+~ # cerbot renew --deploy-hook /path/to/hook-script.sh --dry-run
 ```
 
-The --deploy-hook` to reload the web server if the certificate is successfully renewed. We can add the hook to its configuration file under */etc/letsencrypt/renewal/*:
+The `--deploy-hook` reloads the web server if and only if the certificate is successfully renewed. You can add the hook to its configuration file under */etc/letsencrypt/renewal/*:
 
 ```
-# /etc/letsencrypt/renewal/www.example.com.conf
+# /etc/letsencrypt/renewal/example.com.conf
  
 [renewalparams]
-renew_hook = systemctl reload nginx.service
+deploy_hook = systemctl reload nginx.service
 ```
 
-Then just run:
+You can also put the hook command in an *executable* script under */etc/letsencrypt/renewal-hooks/deploy/*:
+
+```bash
+#!/usr/bin/env bash
+
+systemctl reload nginx.service
+```
+
+Or more generally, you can put the hook in Certbot's configuration file located at */etc/letsencrypt/cli.ini* or *~/.config/letsencrypt/cli.ini*.
+
+Once hooks is configured, just run:
 
 
 ```bash
@@ -198,13 +209,13 @@ Renewal of [standalone certificates](#standalone-authenticator) requires port 80
 ~ # cerbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" --dry-run
 ```
 
-Similarly, you can put the hooks into its renewal configuration file.
-
-Attention please; the two hooks will be executed no matter of sucess or failure.
+Attention please; the two hooks will be executed no matter of sucessful or failed renewal. Similarly, you can put the hooks into configuration files or script files.
 
 ### Automatic Renwal ###
 
-We can automate the process by *crontab* or *systemd* timer.
+We can automate the process by *crontab* or *systemd timer*.
+
+Crontab:
 
 ```bash
 # /var/spool/cron/root
@@ -215,7 +226,15 @@ We can automate the process by *crontab* or *systemd* timer.
 30 0,12 * * * /usr/bin/certbot renew --quiet
 ```
 
-### Backup the Account and Certificates ###
+Systemd timer:
+
+```bash
+~ # systemctl list-unit-files --type timer
+~ # systemctl status certbot-renew.timer
+~ # systemctl enable certbot-renew.timer
+~ # systemctl start certbot-renew.timer
+```
+## Backup the Account and Certificates ##
 
 Your account credentials have been saved in your Certbot configuration directory at */etc/letsencrypt/*. You should make a secure backup of this folder now. This configuration directory will also contain certificates and private keys obtained by Certbot so making regular backups of this folder is ideal.
 
