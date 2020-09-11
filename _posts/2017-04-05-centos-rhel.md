@@ -354,6 +354,15 @@ enabled=0
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 ```
 
+## Upgrade System ##
+
+```bash
+~ # dnf check-update
+~ # dnf upgrade kernel
+~ # dnf upgrade
+~ # reboot
+```
+
 # Packaging
 
 For how to build RPM package, refer to "logging/filebeat-zookeeper-kafka".
