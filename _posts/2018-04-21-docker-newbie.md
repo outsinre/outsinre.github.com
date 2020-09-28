@@ -63,7 +63,7 @@ root@tux ~ # docker image ls ubuntu
    An image name is composed of three parts:
 
    ```
-   registry.domain[:port]/[user/]name
+   registry.fqdn[:port]/[user/]img
    ```
 
    The search command line does not print imange tags or digests (SHA256 hash). Instead, go to the registry website or check third party tool [DevOps-Python-tools](https://github.com/HariSekhon/DevOps-Python-tools).
@@ -270,7 +270,7 @@ Use the `--net` or `--network` option. To the 'host' networking driver, just pas
 
 From *commit* example above, we can create new image layer but many negligible commands like *ls*, *pwd*, etc. are recourded as well.
 
-Similar to Makefile, Docker uses Dockerfile to define image with specified *instruction*s like FROM, COPY, RUN etc. Each instruction defines a layer. In order to minimize image number of layers and maintain clear logics, we can merge instructions.
+Similar to Makefile, Docker uses Dockerfile to define image with specified *instruction*s like FROM, COPY, RUN etc. Each instruction creates a new layer and a new image. In order to minimize number of layers and images, we'd better merge instructions.
 
 In this section, we use Dockerfile to create image *nginx:v2*.
 
