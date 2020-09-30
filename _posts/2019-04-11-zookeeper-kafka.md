@@ -228,9 +228,9 @@ root@container ~ # passwd logger
 # <new password>
 
 root@container ~ # visudo [-c] -f /etc/sudoers.d/logger
-
 # logger $(hostname) = (root) ALL
 
+root@container ~ # visudo -cf /etc/sudoers.d/logger
 root@container ~ # sudo -ll -U logger
 ```
 
