@@ -20,13 +20,13 @@ Let's Encrypt officially recommends the [Certbot](https://certbot.eff.org/docs/u
 ~ # certbot certificates # List existing certificates
 ```
 
-To run *certbot*, we supply a subcommand like *certonly* (obtain a certificate), *install* (update vhost), *run* (both) etc. A subcommand accepts different types of plugin, namely *authenticator* plugins and *installer* plugins. The general usage looks like:
+To run *certbot*, we supply a subcommand like *certonly* (obtain a certificate), *install* (update vhost), *run* (both) etc. If no subcommand is given, then *run* is assumed. A subcommand accepts different types of plugins, namely *authenticator* plugins and *installer* plugins. The general usage looks like:
 
 ```
 certbot subcommand --plugin-name ...
 ```
 
-The *certonly* subcommand and *install* subcommand accept *authenticator* plugins and *installer* plugins respectivelly, while the *run* subcommand accepts plugins belonging to both types, whcih is the default when no subcommand is provided.
+The *certonly* subcommand and *install* subcommand accept *authenticator* plugins and *installer* plugins respectivelly, while the *run* subcommand accepts plugins belonging to both types.
 
 *authenticator* plugins challenge you whether you are eligible for a certificate by verifying the domain owership. *installer* plugins automatically modify web server's configuration with specified certificate. Most of the time, we firstly use *authenticator* plugins to obtain a certificate and then manually update configurations of the web server.
 
@@ -106,7 +106,7 @@ Once downloaded, the ACME server also compares the file hashes of the fetched co
 
 To the contrary, use the `--standalone` authenticator to obtain a certificate when there is *no* web server running on the host. It starts a *temporary standalone web server* to talk to Let’s Encrypt. Therefore, it does not verify web server.
 
-Recall that `--webroot` challenge domain onwership by *http-01*, GETting an unique URL. Then how does `--standalone` challenge the domain onwership? By *http-01* too! You must make sure [port 80 (default)](https://tools.ietf.org/html/draft-ietf-acme-acme-03#section-7.2). You may have to turn down existing web servers to release port 80.
+Recall that `--webroot` challenge domain onwership by *http-01*, GETting an unique URL. Then how does `--standalone` challenge the domain onwership? By *http-01* too! You must make sure [port 80](https://tools.ietf.org/html/draft-ietf-acme-acme-03#section-7.2) is available. You may have to turn down existing web servers to release port 80.
 
 Though ACME protocol supports challenge with [tls-01](https://tools.ietf.org/html/draft-ietf-acme-acme-03#section-7.3) by verifying the *temporarily* self-generated certificate, but Certbot only implements HTTP 80. If you have chosen to use *tls-o1*, then you must make sure the domain name is *directly* resolved to the host IP where you apply for certificates *certbot* client. If the domain name is resolved to the host IP, it means you manage the domain. You cannot cover your domain with CDN, otherwise the ACME server would got the CDN's certificate instead of the temporary one by Certbot.
 
@@ -307,3 +307,44 @@ return 301 https://$server_name$request_uri;
 This does not influence certificate renewal but may hinder new certificate application.
 
 If everything goes as expected, turn back on CDN coverage.
+
+# ECDSA Certificate and RSA Certificate #
+
+When it comes to certificates and Signature Algorithms, we categorize them into Elliptic Curve Digital Signature Algorithm (ECDSA) certificate and RSA certificate. ECDSA certificate is also named Elliptic Curve Cryptography (ECC) cerficiate.
+
+ECDSA method outweighs RSA method in two ways:
+
+1. Under certain level of security (in bits), ECDSA has much shorter key length.
+2. Less CPU computation and networking load.
+
+Therefore, it is always recommended to obtain a ECDSA certificate as it vastly reduce the time taken to perform TLS handshake and load web pages faster.
+
+For a long, Let's Encrypt does not support ECDSA certificate. However, the situation changed recdently (2020-09).
+
+To obtain a certificate from Let's Encrypt, we have to resort to other ACME clients [other than Certbot](https://community.letsencrypt.org/t/certbot-support-for-ecdsa-certificates/132857). I choose [acme.sh](https://github.com/acmesh-official/acme.sh).
+
+Under *root* account, install *acme.sh*:
+
+```bash
+~ # curl https://get.acme.sh | sh
+~ # ll ~/.acme.sh/
+~ # crontab -u root -l
+```
+
+Everthing about *acme.sh* is placed under *~/.acme.sh/* by default.
+
+Now, obtain an ECDSA certificate by [Webroot Authenticator](#webroot-authenticator):
+
+```bash
+~ # acme.sh --issue -w /usr/share/nginx/html/ -d blog.example.com --keylength ec-256
+```
+
+The parameter `--keylength ec-256` specifies the length of ECDSA key.
+
+Finally, check if the certificate is ECDSA:
+
+```bash
+~ # openssl x509 -inform pem -noout -text -fingerprint -md5 < ~/.acme.sh/blog.example.com_ecc/blog.example.com.cer
+```
+
+Make sure the value of "Public Key Algorithm" is "id-ecPublicKey".
