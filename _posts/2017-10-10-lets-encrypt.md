@@ -327,13 +327,12 @@ Under *root* account, install *acme.sh*:
 
 ```bash
 ~ # curl https://get.acme.sh | sh
+
 ~ # ll ~/.acme.sh/
 ~ # crontab -u root -l
 ```
 
-Everthing about *acme.sh* is placed under *~/.acme.sh/* by default.
-
-Now, obtain an ECDSA certificate by [Webroot Authenticator](#webroot-authenticator):
+Then, obtain an ECDSA certificate by [Webroot Authenticator](#webroot-authenticator):
 
 ```bash
 ~ # acme.sh --issue -w /usr/share/nginx/html/ -d blog.example.com --keylength ec-256
@@ -341,10 +340,41 @@ Now, obtain an ECDSA certificate by [Webroot Authenticator](#webroot-authenticat
 
 The parameter `--keylength ec-256` specifies the length of ECDSA key.
 
-Finally, check if the certificate is ECDSA:
+Check if the certificate is ECDSA and make sure the value of "Public Key Algorithm" is *id-ecPublicKey* as follows:
 
 ```bash
 ~ # openssl x509 -inform pem -noout -text -fingerprint -md5 < ~/.acme.sh/blog.example.com_ecc/blog.example.com.cer
 ```
 
-Make sure the value of "Public Key Algorithm" is "id-ecPublicKey".
+By default, everthing about *acme.sh* is placed under *~/.acme.sh/* by default. This directory is only for internal usage. To make use of the certificate, we should install the cert to Apache/Nginx etc.
+
+The following Nginx configuration is error-prone:
+
+```
+ssl_certificate /root/.acme.sh/blog.example.com_cc/fullchain.cer;
+ssl_certificate_key /root/.acme.sh/blog.example.com_cc/blog.example.com.key;
+```
+
+Nginx will report permission error:
+
+```
+[emerg] BIO_new_file ... (SSL: error:0200100D:system library:fopen:Permission denied:fopen('/root/.acme.sh/blog.example.com_ecc/fullchain.cer','r')
+```
+
+Instead, execute *acme.sh --install-cert <domain>* to copy the certificate and key into another directory, like:
+
+```bash
+~ # mkdir -p /etc/acme.sh/blog.example.com_ecc
+
+~ # acme.sh --install-cert --ecc -d blog.example.com --cert-file /etc/acme.sh/blog.example.com_ecc/cert.pem --key-file /etc/acme.sh/blog.example.com_ecc/key.pem --fullchain-file /etc/acme.sh/blog.example.com_ecc/fullchain.pem --reloadcmd "systemctl reload nginx.service"
+```
+
+The destination can be anywhare sensible but the `-d` demands domain. Attention please; the `--ecc` option tells *acme.sh* to copy ECC certificate instead of RSA certificate.
+
+The `--reloadcmd` is critical to tell Nginx reload renewed certificates. Check *~/.acme.sh/en.zhstar.win_ecc/en.zhstar.win.conf* , we will find the reload command is encoded by base64:
+
+```
+Le_ReloadCmd='__ACME_BASE64__START_c3lzdGVtY3RsIHJlbG9hZCBuZ2lueC5zZXJ2aWNl__ACME_BASE64__END_'
+```
+
+Finally, update Nginx to make use of certificate and key under */etc/acme.sh/blog.example.com/*.
