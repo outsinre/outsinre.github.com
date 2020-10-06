@@ -8,7 +8,11 @@ title: Let's Encrypt
 
 # [ACME and Certbot](https://www.linuxbabe.com/security/letsencrypt-webroot-tls-certificate)
 
-In order to manage [Let's Encrypt](https://letsencrypt.org/) certificates, we need a client tool that supports the [RFC 8555 Automated Certificate Management Environm (ACME) protocol](https://tools.ietf.org/html/rfc8555). When managing certificates, the client communicates with Let's Encrypt server using ACME protocol.
+In order to manage [Let's Encrypt](https://letsencrypt.org/) certificates, we need a client tool that supports the [RFC 8555 Automated Certificate Management Environm (ACME) protocol](https://tools.ietf.org/html/rfc8555). ACME clients communicate with servers of Let's Encrypt using ACME protocol, to automate the following jobs:
+
+1. Generate key pair.
+2. Create and send Certificate Signing Request (CSR).
+3. Challenge ownership of domain or web server.
 
 Let's Encrypt officially recommends the [Certbot](https://certbot.eff.org/docs/using.html) client.
 
@@ -323,7 +327,9 @@ For a long, Let's Encrypt does not support ECDSA certificate. However, the situa
 
 To obtain a certificate from Let's Encrypt, we have to resort to other ACME clients [other than Certbot](https://community.letsencrypt.org/t/certbot-support-for-ecdsa-certificates/132857). I choose [acme.sh](https://github.com/acmesh-official/acme.sh).
 
-Under *root* account, install *acme.sh*:
+When managing certificates with *acme.sh*, please switch to *root* instead of the *sudo*, *su* method.
+
+Firstly, we install *acme.sh*:
 
 ```bash
 ~ # curl https://get.acme.sh | sh
@@ -355,9 +361,11 @@ ssl_certificate /root/.acme.sh/blog.example.com_cc/fullchain.cer;
 ssl_certificate_key /root/.acme.sh/blog.example.com_cc/blog.example.com.key;
 ```
 
-Nginx will report permission error:
+Nginx will report *permission* error:
 
 ```
+~ # systemctl reload nginx
+
 [emerg] BIO_new_file ... (SSL: error:0200100D:system library:fopen:Permission denied:fopen('/root/.acme.sh/blog.example.com_ecc/fullchain.cer','r')
 ```
 
@@ -377,4 +385,4 @@ The `--reloadcmd` is critical to tell Nginx reload renewed certificates. Check *
 Le_ReloadCmd='__ACME_BASE64__START_c3lzdGVtY3RsIHJlbG9hZCBuZ2lueC5zZXJ2aWNl__ACME_BASE64__END_'
 ```
 
-Finally, update Nginx to make use of certificate and key under */etc/acme.sh/blog.example.com/*.
+Finally, update Nginx to make use of the copy of the certificate and key under */etc/acme.sh/blog.example.com/*.
