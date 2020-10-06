@@ -316,7 +316,9 @@ If everything goes as expected, turn back on CDN coverage.
 
 When it comes to certificates and Signature Algorithms, we categorize them into Elliptic Curve Digital Signature Algorithm (ECDSA) certificate and RSA certificate. ECDSA certificate is also named Elliptic Curve Cryptography (ECC) cerficiate.
 
-ECDSA method outweighs RSA method in two ways:
+The two kinds of certificate differ in the type of public/private keys. When generating a key pair, we can choose ECDSA algorithm or RSA algorithm. In return, the key algorithm affecrs almost any security operations, like encryption, signature etc.
+
+[ECDSA outweighs RSA](https://hackernoon.com/rsa-and-ecdsa-hybrid-nginx-setup-with-letsencrypt-certificates-ee422695d7d3) in two ways:
 
 1. Under certain level of security (in bits), ECDSA has much shorter key length.
 2. Less CPU computation and networking load.
@@ -346,11 +348,13 @@ Then, obtain an ECDSA certificate by [Webroot Authenticator](#webroot-authentica
 
 The parameter `--keylength ec-256` specifies the length of ECDSA key.
 
-Check if the certificate is ECDSA and make sure the value of "Public Key Algorithm" is *id-ecPublicKey* as follows:
+How do I know if the certificate is ECDSA-based or RSA-based? Just check the "Public Key Algorithm" field, and make sure the field value is *id-ecPublicKey*, as follows:
 
 ```bash
 ~ # openssl x509 -inform pem -noout -text -fingerprint -md5 < ~/.acme.sh/blog.example.com_ecc/blog.example.com.cer
 ```
+
+You may find that, the public key is just 256-bit long.
 
 By default, everthing about *acme.sh* is placed under *~/.acme.sh/* by default. This directory is only for internal usage. To make use of the certificate, we should install the cert to Apache/Nginx etc.
 
