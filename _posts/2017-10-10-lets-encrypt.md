@@ -373,7 +373,7 @@ Nginx will report *permission* error:
 [emerg] BIO_new_file ... (SSL: error:0200100D:system library:fopen:Permission denied:fopen('/root/.acme.sh/blog.example.com_ecc/fullchain.cer','r')
 ```
 
-Instead, execute *acme.sh --install-cert <domain>* to copy the certificate and key into another directory, like:
+Instead, execute *acme.sh --install-cert <domain>* to *copy* the certificate and key into another directory, like:
 
 ```bash
 ~ # mkdir -p /etc/acme.sh/blog.example.com_ecc
@@ -382,6 +382,8 @@ Instead, execute *acme.sh --install-cert <domain>* to copy the certificate and k
 ```
 
 The destination can be anywhare but the `-d` demands domain. Attention please; the `--ecc` option tells *acme.sh* to copy ECC certificate instead of RSA certificate, by looking form a directory named `blog.example.com_ecc`.
+
+*acme.sh* maintains two copies of a certificate, one for internal usage, one for webserver. On the contrary, *certbot* use symblic!
 
 The `--reloadcmd` is critical to tell Nginx reload renewed certificates. Check *~/.acme.sh/en.zhstar.win_ecc/en.zhstar.win.conf* , we will find the reload command is encoded by base64:
 
