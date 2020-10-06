@@ -381,7 +381,7 @@ Instead, execute *acme.sh --install-cert <domain>* to copy the certificate and k
 ~ # acme.sh --install-cert --ecc -d blog.example.com --cert-file /etc/acme.sh/blog.example.com_ecc/cert.pem --key-file /etc/acme.sh/blog.example.com_ecc/key.pem --fullchain-file /etc/acme.sh/blog.example.com_ecc/fullchain.pem --reloadcmd "systemctl reload nginx.service"
 ```
 
-The destination can be anywhare sensible but the `-d` demands domain. Attention please; the `--ecc` option tells *acme.sh* to copy ECC certificate instead of RSA certificate.
+The destination can be anywhare but the `-d` demands domain. Attention please; the `--ecc` option tells *acme.sh* to copy ECC certificate instead of RSA certificate, by looking form a directory named `blog.example.com_ecc`.
 
 The `--reloadcmd` is critical to tell Nginx reload renewed certificates. Check *~/.acme.sh/en.zhstar.win_ecc/en.zhstar.win.conf* , we will find the reload command is encoded by base64:
 
