@@ -8,7 +8,7 @@ title: VirtualBox
 
 This post indroduces installing VirtualBox in Gentoo host.
 
-# Terminology
+# Terminology #
 
 1. Host OS
 
@@ -28,17 +28,16 @@ This post indroduces installing VirtualBox in Gentoo host.
    Extension Packs is optional. However, if you choose to install, then make sure it has the same version as the Base Package.
 
    Similar to the Base, Package, Extension Packs also presents as kernel modules on host OS, like _vboxnetadp_ and _vboxnetflt_.
-5. Oracle VM VirtualBox Guest Additions
+5. Oracle VM VirtualBox GuestAdditions
 
    Package to be installed _inside_ the guest OS that optimizes performance and usability, like mouse pointer integration, shared folders, shared clipboard, seamless windows, time synchroniation with host OS etc.
 
-   Guest Additions also serve as kernel modules but in guest OS, like _vboxsf_, _vboxvideo_, and _vboxguest_.
+   GuestAdditions also serve as kernel modules but in guest OS, like _vboxsf_, _vboxvideo_, and _vboxguest_.
 6. Make sure relevant versions match.
-   1. Versions of Base Package, Extension Packs and Guest Additions must match.
-   2. Kernel modules are built against the _current_ kernel. When VirtualBox is upgraded, kernel modules on host OS is re-built automatically. However, if guest OS kernel is changed, we should re-built the guest kernel modules manually.
-   3. Kernel version of guest OS matches that of _kernel-headers_ and _kernel-devel_.
+   1. VirtualBox. Versions of Base Package, Extension Packs and GuestAdditions must match.
+   2. Guest OS. Kernel modules are built against the _current_ kernel. When VirtualBox is upgraded, kernel modules on host OS is re-built automatically. However, if guest OS kernel is changed, we should re-build the guest kernel modules manually (i.e. GuestAdditions).
 
-# Installation
+# Installation #
 
 1. VirtualBox depends on QT as GUI. But I would like a XFCE4 desktop without any QT packages. QT related USE flags are disabled in Gentoo *make.conf*.
 
@@ -101,20 +100,32 @@ This post indroduces installing VirtualBox in Gentoo host.
    More details in [Upgrade kernel to unstable 4.0.0](/2015/03/25/gentoo-installation/).
 6. Up to now everyting related to VirtualBox VMM is prepared on host OS. Next is to create VM through CLI.
 
-# Scheme
+   On MacOS, use `brew cask install` to install *virtualbox* and *virtualbox-extension-pack*.
+7. Remove quotes around sysmbol `~` and symbol `$`.
+
+   ```
+   # /etc/udev/rules.d
+
+   # Correct /dev/{vboxdrv,vboxdrvu,vboxnetctl} permissions to 0600
+   KERNEL=="vboxdrv", NAME="vboxdrv", OWNER="root", GROUP="vboxusers", MODE="0660"
+   KERNEL=="vboxdrvu", NAME="vboxdrvu", OWNER="root", GROUP="vboxusers", MODE="0660"
+   KERNEL=="vboxnetctl", NAME="vboxnetctl", OWNER="root",GROUP="vboxusers", MODE="0660"
+   ```
+
+   To load the new rule, execute `udevadm trigger`.
+# Schema #
+
+1. Avoid 64-bit guest OS. 64-bit OS occupies one third more resources (disk, memory) than the 32-bit version. What was worse, it seems *VBoxGuestAddtions-amd64.exe* makes no difference on the guest (double mouse, weird resolution etc.).
+2. The less snapshots we create, the better is the performance.
+3. Put VDI file on host's home partition for better performance.
+
+# Windows XP 32-bit VM
 
 VM won't even start without QT GUI support. But VRDP helps! VRDP is a replacement of QT GUI!
 
 1. First create VM with VirtualBox CLI;
 2. Enable VRDP support for VM;
 3. Connect to VM by VRDP client FreeRDP.
-
-Notice:
-
-1. The less snapshots we create, the better is the performance.
-2. Put *.vdi* file on host home partition for better performance.
-
-# Windows XP 32-bit
 
 [VBoxManage createvm](https://www.virtualbox.org/manual/ch07.html#idm3213):
 
@@ -184,7 +195,7 @@ Here, I re-use an existing *.vdi* instead of guest installation ISO, thus avoidi
 9. Up to now, the VM is prepared! We need a RDP client.
 
 
-# RDP / VRDP / VRDE
+## Start VM with VRDE ##
 
 VirtualBox Remote Display Protocol (VRDP) is a backwards-compatible extension to Microsoft's Remote Desktop Protocol (RDP). VirtualBox Remote Desktop Extension (VRDE) is an Oracle VRDP implementation. Apart from TCP/Ports and TCP/Address, we have:
 
@@ -207,9 +218,13 @@ Here is FreeRDP setup details:
    user@tux ~ $ VBoxHeadless --startvm WinXP32
    ```
 
-   *VBoxHeadless* is a tool the launch VM as a server mode without GUI. If you buy a VPS, the OS mostly runs in a similar mode (maybe VNC browser).
+   *VBoxHeadless* is a tool the launch VM as a server mode without GUI. If you buy a VPS, the OS mostly runs in a similar mode (maybe VNC browser). Now the VM is started, but not showing up! We need to use FreeRDP to get X.
+   
+   On MacOS host, the GUI mode may [report error](https://forums.virtualbox.org/viewtopic.php?f=8&t=99676):
+   
+   >You must specify a machine to start, using the command line.
 
-   Now the VM is started, but not showing up! We need to use FreeRDP to get X.
+   Please disable Audio is guest VM setting. You may also want to read [VirtualBox crashes after upgrading to macOS Catalina](https://forums.virtualbox.org/viewtopic.php?f=8&t=95041).
 3. FreeRDP
 
    The RDP TCP port is set to an optional list *5001,5010-5012* (default *3389*).
@@ -220,7 +235,7 @@ Here is FreeRDP setup details:
 
     1. The server IP is *vrdeaddress*, NOT IP of *guest*. Since I connect to VM locally, so it *127.0.0.1*. *xfreerdp* can add many other parameters, like window size, audio, video etc.
     2. 'Ctrl + Alt + Enter' to toggle full screen.
-    3. You might found there are two mouse pointers, one for *host* while another for *guest*. Also the screen resolution is not correctly set. Install *VBoxGuestAdditions* we've attached the Vm. Open file explorer, installer is located in partition *(D:) VirtualBox Guest Additions*, *VBoxWindowsAdditions.exe*. Disable *Direct3D* component on a low end VM.
+    3. You might found there are two mouse pointers, one for *host* while another for *guest*. Also the screen resolution is not correctly set. Install *VBoxGuestAdditions* we've attached the Vm. Open file explorer, installer is located in partition *(D:) VirtualBox GuestAdditions*, *VBoxWindowsAdditions.exe*. Disable *Direct3D* component on a low end VM.
 4. Shutdown
 
     ```bash
@@ -245,9 +260,9 @@ Here is FreeRDP setup details:
 
     Detach ISO file after *VBoxGuestAddtions* is installed.
 
-# Scripts
+## Manage VMs on Command Line ##
 
-1. */usr/local/sbin/vboxmodule*
+1. Load kernel modules.
 
    ```bash
    #!/bin/bash
@@ -255,11 +270,10 @@ Here is FreeRDP setup details:
    echo 'VirtualBox modules loaded!'
    ```
 
-2. *${HOME}/bin/winXP32*
+2. Startup script.
 
    ```bash
-   #!/bin/bash
-   # Bash Menu Script Example
+   #!/usr/bin/env bash
 
    PS3='Please enter your choice on VM WinXP32: '
    options=("startvm" "rdp" "poweroff" "acpipowerbutton" "savestate" "quit")
@@ -299,19 +313,17 @@ Here is FreeRDP setup details:
        esac
    ```
 
-   Pay attention `PS3` and `case` *bash* usage.
+## Guest OS Configurations ##
 
-# Configurations.
+After getting into the Windows XP system, we can adjust some system configurations to minimize resource consumption:
 
-After getting into the XP system, we can still tune some of the configurations including:
-
-1. If English XP, then set *non-Unicode* language to *Chinese* and set the *Regional Options* values.
+1. For English OS, then set *non-Unicode* language to *Chinese* and set the *Regional Options* values.
 2. Disable *soundman* etc. with *msconfig*.
-3. Set *Wireless Zero Configuration*, *Windows Audio*, *Windows Themes* etc. services to *Disabled* or *Manual*. Refer to [windows xp终极优化](http://blog.sciencenet.cn/blog-76534-508692.html).
+3. Set *Wireless Zero Configuration*, *Windows Audio*, *Windows Themes* etc. services to *Disabled* or *Manual*. Refer to [Windows XP 终极优化](http://blog.sciencenet.cn/blog-76534-508692.html).
 4. If installed '迅雷', then set *XLServicePlatform* to *Manual*.
 5. My Computer, Properties, Advanced, Performance, Settings, Adjust for best performance.
 
-# USB
+## USB Supoort ##
 
 Attach plugged in USB device to VM. First make sure USB 1.0/2.0/3.0 is enabled for VM. Then:
 
@@ -330,15 +342,14 @@ user@tux ~ $ vboxmanage controlvm WinXP32 usbdetach USB-UUID
 
 We can also make this attachment permanent by creating a *usbfilter*.
 
-# Host-only networking
+## Host-only networking ##
 
-Take Android-x86 for example:
+Take [Android-x86](#android-x86) for example, the very first step is to create a *hostonlyif* interface, as follows:
 
 ```bash
 user@tux ~ $ VBoxManage hostonlyif create/remove vboxnet0
-user@tux ~ $ ip link
-user@tux ~ $ VBoxManage list hostonlyifs
-user@tux ~ $ VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1 ('--dhcp' is not supported currently)
+user@tux ~ $ ip link; VBoxManage list hostonlyifs
+user@tux ~ $ VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1 # '--dhcp' is not supported currently
 user@tux ~ $ VBoxManage modifyvm Android51 --nic2 hostonly --hostonlyadapter2 vboxnet0
 user@tux ~ $ VBoxManage dhcpserver add/modify --ifname vboxnet0 (--netname HostInterfaceNetworking-vboxnet0) --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.110 --enable
 user@tux ~ $ VBoxManage list dhcpservers
@@ -347,9 +358,6 @@ user@tux ~ $ ip address
 user@tux ~ # netcfg eth1 dhcp
 ```
 
-1. By default, the new WES7x86 adapter (Local Area Connection 2) is 'Unidentified network' as 'Public network' type. Host cannot connect to (i.e. *ping*) WES7x86.
-
-   Either 'turn on network discovery' or use security policy 'secpol.msc' to set 'Unidentified network' as 'Private'.
 2. Check *iptables* and/or firewall.
 
    ```bash
@@ -388,7 +396,22 @@ user@tux ~ # netcfg eth1 dhcp
    user@tux ~ # iptables -A FORWARD -i vboxnet0 -o vboxnet0 -j ACCEPT
    ```
 
-# Delete VM
+7. On MacOS, the *vboxnet0* interface is not created automatically, we need to create manually like that of Android-x86 above.
+7. IF the host OS or the guest OS is Windows system, then Host-only refuses connection.
+
+   Either *turn on network discovery' or use security policy *secpol.msc* to set *Unidentified network* as *Private*.
+
+## IDE Drive Port Limit ##
+
+Windows XP `--port 2 --device 0` refuses to attach extra ISO:
+
+>VBoxManage: error: No drive attached to device slot 0 on port 2 of controller 'IDE Controller'
+
+Windows XP guest uses IDE PIIX4 disk drive that supports at most 2 ports. Each port supports two devices , namely (0, 0), (0, 1), (1, 0) and (1, 1). If you have a strong reason to use port 2, then create SATA disk drive like Win 7 guest.
+
+Especially, each port of SATA disk drive only supports one device, namely (0, 0), (1, 0), (2, 0) etc.
+
+## Delete VM ##
 
 ```bash
 user@tux ~ $ vboxmanage list vms
@@ -397,7 +420,7 @@ user@tux ~ $ vboxmanage unregistervm WinXP32 --delete
 
 Amost everything related to the VM is deleted, especially the virtual disk image file (*.vdi*), snapshots, saved state files, VM xml file etc.
 
-# Windows Embedded Standard 7 x86
+# Windows Embedded Standard 7 x86 #
 
 ```bash
 ~ $ VBoxManage list ostypes (Windows7)
@@ -415,9 +438,13 @@ Amost everything related to the VM is deleted, especially the virtual disk image
 ~ $ VBoxManage storageattach WES7x86 --storagectl "SATA Controller" --port 2 --device 0 --type dvddrive --medium none
 ```
 
-For details on choosing template and components during installation, read the Windows post. Since the ISO image is till attached to SATA Controller, booting will be directed to installation process again. Either update VM boot order or F12 at early phase.
+For details on choosing template and components during installation, read the Windows post.
 
-# Android-x86
+ Since the ISO image is till attached to SATA Controller, booting will be directed to installation process again. Either update VM boot order or F12 at early phase.
+ 
+There is no sound in WES7x86 guest. Please change `--audiocontroller` to [Intel *hda* instead of default *ac97*](https://www.virtualbox.org/manual/ch03.html#ftn.idm1540).
+
+# Android-x86 #
 
 ```bash
 ~ $ VBoxManage createvm --name Android51 --ostype Linux26 --register --basefolder /media/Misc/VirtualBox/Machines
@@ -444,8 +471,8 @@ For details on choosing template and components during installation, read the Wi
 
 First boot takes several minutes to initialize system preparation.
 
-# Arch Linux x86_64
-
+# Arch Linux x86_64 #
+	
 ```bash
 ~ $ VBoxManage list ostypes (ArchLinux_64)
 ~ $ VBoxManage createvm --name archlinux_64 --ostype ArchLinux_64 --register --basefolder /media/Misc/VirtualBox/Machines
@@ -463,11 +490,11 @@ First boot takes several minutes to initialize system preparation.
 1. The VDI file is [resized](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) after creation. Then follow the [installation guide](https://wiki.archlinux.org/index.php/Installation_guide).
 2. VBoxGuestAdditions in Linux guest requires extra effors. Details refer to Arch Linux post.
 
-## [VirtualBox Guest Additions](https://www.virtualbox.org/manual/ch04.html#idm2096)
+## [VirtualBox GuestAdditions](https://www.virtualbox.org/manual/ch04.html#idm2096)
 
-VirtualBox Guest Additions consists of device drivers and system applications that optimize the guest operating system for better performance and usability.
+VirtualBox GuestAdditions consists of device drivers and system applications that optimize the guest operating system for better performance and usability.
 
-1. Some Linux guest OSes (i.e. Gentoo, Arch Linux) already come with all or part of the VirtualBox Guest Additions.
+1. Some Linux guest OSes (i.e. Gentoo, Arch Linux) already come with all or part of the VirtualBox GuestAdditions.
 
    Just install the corresponding package. For example:
 
@@ -477,7 +504,7 @@ VirtualBox Guest Additions consists of device drivers and system applications th
    ```
 
    This method is always preferred!
-2. Alternatively, we can mount the ISO of Guest Additions and invoke the relevant installation script manually.
+2. Alternatively, we can mount the ISO of GuestAdditions and invoke the relevant installation script manually.
 
    Firstly, make sure development tools like _gcc_, _make_, _kernel-headers_, _kernel-devel_ etc. are present on guest OS. Also confirm the guest OS kernel version matches that of _kernel-headers_ and _kernel-devel_.
 
@@ -505,7 +532,7 @@ VirtualBox Guest Additions consists of device drivers and system applications th
    [root@host ~]# ll /mnt/vbox
    ```
 
-   Lastly, install Guest Additions:
+   Lastly, install GuestAdditions:
 
    ```bash
    [root@host ~]# sh /mnt/vbox/VBoxLinuxAdditions.run
@@ -516,7 +543,7 @@ VirtualBox Guest Additions consists of device drivers and system applications th
    1. Gentoo host: kernel-4.12.5, VirtualBox 5.1.26.
    2. Arch guest: kernel-4.13.12,  VirtualBox 5.2.2.
 
-   Gentoo is relatively conservative on package rolling update compared to Arch Linux. So installing Guest Additions directly from Arch repository is beffer.
+   Gentoo is relatively conservative on package rolling update compared to Arch Linux. So installing GuestAdditions directly from Arch repository is beffer.
 
    ```bash
    [root@host ~]# pacman -S virtualbox-guest-utils (X Window)
@@ -530,7 +557,7 @@ VirtualBox Guest Additions consists of device drivers and system applications th
    [root@host ~]# systemctl enable vboxservice
    ```
 
-   VBoxClient (or the *VBoxClient-all* wrapper) is another unit service from the Guest Additions. It manages clipboard, seamless window display, etc. The associated _/etc/xdg/autostart/vboxclient.desktop_ launches VBoxClient-all on logon. VBoxClient-all script launches VBoxClient as:
+   VBoxClient (or the *VBoxClient-all* wrapper) is another unit service from the GuestAdditions. It manages clipboard, seamless window display, etc. The associated _/etc/xdg/autostart/vboxclient.desktop_ launches VBoxClient-all on logon. VBoxClient-all script launches VBoxClient as:
 
    ```bash
    [user@host ~]$ VBoxClient --clipboard --draganddrop --seamless --display --checkhostversion
@@ -560,12 +587,12 @@ wlshare        /media/wlshare        vboxsf        nodev,nosuid,noexec,uid=root,
 wlshare        /media/wlshare        vboxsf        nodev,nosuid,noexec,noauto,uid=root,gid=vboxsf,rw,iocharset=utf8,dmode=0770,fmode=0660,x-systemd.automount        0 0
 ```
 
-1. The _noauto_ option is to avoid service racing on booting. For example, Guest Additions are not loaded yet while _fstab_ tries to mount it.
+1. The _noauto_ option is to avoid service racing on booting. For example, GuestAdditions are not loaded yet while _fstab_ tries to mount it.
 2. The _x-systemd.automount_ will create _media-wlshare_ unit upon `systemctl daemon-reload`.
 3. Only _root_ is allowed to mount _vboxsf_ device. So the _user_ option is not permissible.
 4. Read [Why nodev,nosuid,noexe are important?](https://unix.stackexchange.com/a/188604).
 
-# Expand VDI size
+## Expand VDI Size ##
 
 Occasionally, the guest OS warns running out of disk space when you should [resize](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) the VM disk and parition thereof.
 
@@ -607,31 +634,23 @@ The backup GPT table is not at the end of the disk, as it should be. This might 
 1. Some posts write *resizepart* can be done on guest OS directly as long as swap partition/file is turned off.
 2. For Windows guest, use enclosed *disk management* to finish the job.
 
-# Troublshooting.
+# CentOS 8.2 AMD64 #
 
-1. Re-install VirtualBox. `emerge -av1 $(qlist -IC virtualbox)`.
-2. Check *VBoxSVC.log* and *VBox.log*.
-3. Avoid quotes on bash symbols `~` and `$`.
+This section describes procedures to manage CentOS 8.2 VM:
 
-   ```
-   # /etc/udev/rules.d
+1. Start the VM.
 
-   # Correct /dev/{vboxdrv,vboxdrvu,vboxnetctl} permissions to 0600
-   KERNEL=="vboxdrv", NAME="vboxdrv", OWNER="root", GROUP="vboxusers", MODE="0660"
-   KERNEL=="vboxdrvu", NAME="vboxdrvu", OWNER="root", GROUP="vboxusers", MODE="0660"
-   KERNEL=="vboxnetctl", NAME="vboxnetctl", OWNER="root",GROUP="vboxusers", MODE="0660"
-   ```
+   Enable the Host-only interface */etc/sysconfig/network-scripts/ifcfg-enp0s8*.
+2. Start the VM in headless mode either on command line or by GUI.
 
-   To load the new rule, execute `udevadm trigger`.
-4. Avoid 64-bit guest OS. 64-bit OS occupies one third more resources (disk, memory) than the 32-bit version. What was worse, it seems *VBoxGuestAddtions-amd64.exe* makes no difference on the guest (double mouse, weird resolution etc.).
-6. WES7x86 no sound. Change `--audiocontroller` to [Intel *hda* instead of default *ac97*](https://www.virtualbox.org/manual/ch03.html#ftn.idm1540).
-7. Windows XP `--port 2 --device 0` refuses to attach extra ISO:
+   SSH into the VM.
+3. Configure repository mirror.
 
-   >VBoxManage: error: No drive attached to device slot 0 on port 2 of controller 'IDE Controller'
+   `dnf group install 'Development Tools'`.
 
-   Windows XP guest uses IDE PIIX4 disk drive that supports at most 2 ports. Each port supports two devices , namely (0, 0), (0, 1), (1, 0) and (1, 1). If you have a strong reason to use port 2, then create SATA disk drive like Win 7 guest.
+4. Insert GuestAdditions CD; mount *sr0*; install GuestAdditions.
 
-   Especially, each port of SATA disk drive only supports one device, namely (0, 0), (1, 0), (2, 0) etc.
+   Add shared folder.
 
 # References
 
