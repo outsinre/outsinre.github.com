@@ -1,6 +1,6 @@
 ---
 layout: post
-title: CentOS
+title: CentOS RHRL
 ---
 
 1. toc
@@ -220,11 +220,11 @@ The purpose of *module* is to manage package versions and profiles in an integra
 
 The only difference is that `dnf module` can provide better control when selecting pakage stream, version, arch etc.
 
-# 3rd-party [Repositories](https://wiki.centos.org/AdditionalResources/Repositories)
+# Repositories
 
-Of the 3rd party repositories, IUS and Remi (both depend on EPEL) is recommended over Webtatic.
+Of the [3rd party repositories](https://wiki.centos.org/AdditionalResources/Repositories), IUS and Remi (both depend on EPEL) is recommended over Webtatic.
 
-## EPEL not from RHEL
+## EPEL not from RHEL ##
 
 EPEL (Extra Packages for Enterprise Linux) is open source and free community based repository project from [Fedora](https://fedoraproject.org/wiki/EPEL) team which provides 100% high quality add-on software packages.
 
@@ -363,7 +363,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 ~ # reboot
 ```
 
-# Packaging
+# rpmbuild
 
 For how to build RPM package, refer to "logging/filebeat-zookeeper-kafka".
 
@@ -382,7 +382,11 @@ Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *ci
 3. `-m`: preserve modification time;
 4. `-v`: verbose.
 
-# systemd
+# locale #
+
+Redhad-based distributions places *locale* customization in */etc/locale.conf*. Check `man locale.conf`.
+
+# systemd #
 
 ```bash
 ~ # systemctl show/cat unit.service
@@ -393,7 +397,7 @@ Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *ci
 ~ # systemctl enable/disable unit@sub.service
 ```
 
-# log
+## logging ##
 
 ```bash
 ~ # journalctl -xef
@@ -401,7 +405,7 @@ Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *ci
 ~ # systemctl status unit.service
 ```
 
-# systemctl mask
+## systemctl mask ##
 
 ```bash
 ~ # systemctl stop iptables-services
@@ -484,11 +488,9 @@ Fill in the fileds without any comments:
 ~ # ssserver -c /etc/shadowsocks/server.json --user nobody -d start -vv
 ```
 
-## [Server Systemd service](https://yuyii.com/2015/12/28/shadowsocks-systemd/)
+## Systemd Unit ##
 
->Please reinstall Shadowsocks into system-wide location. The above *virtualenv* version was a test.
-
-This is another useful reference [compiling shadowsocks-libev on CentOS 6](http://www.leyar.me/Compile-shadowsocks-libev-in-CentOS7/).
+>Please reinstall Shadowsocks into system-wide location. The above *virtualenv* version was just a test.
 
 ```bash
 # vi /etc/systemd/system/shadowsocks.service
@@ -521,8 +523,9 @@ Please be noted that:
 
 1. *simple* Type is used so that Shadowsocks does not *forking* itself so that daemon mode is handed over to *systemd*.
    1. Do *not* add `-d start/stop/restart` arguments to ExecStart
-   2. No PIDFile and `--pid-file`  required. Read more on [doesn't make sense to set PIDFile= by simple services](https://bugzilla.redhat.com/show_bug.cgi?id=723942#c4).
+   2. No PIDFile and `--pid-file` required. Read more on [doesn't make sense to set PIDFile= by simple services](https://bugzilla.redhat.com/show_bug.cgi?id=723942#c4).
 2. You may find a special line with *kcptun*. Neglect it now for it will be discussed later on.
+3. [ref1](https://yuyii.com/2015/12/28/shadowsocks-systemd/) and [ref2](http://www.leyar.me/Compile-shadowsocks-libev-in-CentOS7/).
 
 ### forking Type
 
@@ -560,15 +563,3 @@ ExecStartPre=/usr/bin/su -s /bin/bash -c "/usr/local/bin/kcptun-server -c /etc/s
 
 Attention to trailing `&` of `-c` argument.
 
-# erase/remove
-
-```bash
-~ # yum erase/remove pkg-name
-~ # yum autoremove
-```
-
-*erase* is an alias to *remove*.
-
-# Notes
-
-1. Remember to backup */etc/letsencrypt/* that contains Let's Encrypt key and certificates, especially the account sub-directly.

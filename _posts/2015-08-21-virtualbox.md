@@ -119,13 +119,13 @@ This post indroduces installing VirtualBox in Gentoo host.
 2. The less snapshots we create, the better is the performance.
 3. Put VDI file on host's home partition for better performance.
 
-# Windows XP 32-bit VM
+# Windows XP 32-bit VM #
 
 VM won't even start without QT GUI support. But VRDP helps! VRDP is a replacement of QT GUI!
 
 1. First create VM with VirtualBox CLI;
 2. Enable VRDP support for VM;
-3. Connect to VM by VRDP client FreeRDP.
+3. Connect to headless VM by VRDP client FreeRDP.
 
 [VBoxManage createvm](https://www.virtualbox.org/manual/ch07.html#idm3213):
 
@@ -420,7 +420,7 @@ user@tux ~ $ vboxmanage unregistervm WinXP32 --delete
 
 Amost everything related to the VM is deleted, especially the virtual disk image file (*.vdi*), snapshots, saved state files, VM xml file etc.
 
-# Windows Embedded Standard 7 x86 #
+# Windows Embedded Standard 7 x86 VM #
 
 ```bash
 ~ $ VBoxManage list ostypes (Windows7)
@@ -444,7 +444,7 @@ For details on choosing template and components during installation, read the Wi
  
 There is no sound in WES7x86 guest. Please change `--audiocontroller` to [Intel *hda* instead of default *ac97*](https://www.virtualbox.org/manual/ch03.html#ftn.idm1540).
 
-# Android-x86 #
+# Android-x86 VM #
 
 ```bash
 ~ $ VBoxManage createvm --name Android51 --ostype Linux26 --register --basefolder /media/Misc/VirtualBox/Machines
@@ -471,7 +471,7 @@ There is no sound in WES7x86 guest. Please change `--audiocontroller` to [Intel 
 
 First boot takes several minutes to initialize system preparation.
 
-# Arch Linux x86_64 #
+# Arch Linux x86_64 VM #
 	
 ```bash
 ~ $ VBoxManage list ostypes (ArchLinux_64)
@@ -487,12 +487,14 @@ First boot takes several minutes to initialize system preparation.
 ~ $ VBoxManage startvm archlinux_64 --type headless
 ```
 
-1. The VDI file is [resized](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) after creation. Then follow the [installation guide](https://wiki.archlinux.org/index.php/Installation_guide).
+1. The VDI file is [resized](https://forums.virtualbox.org/viewtopic.php?f=35&t=50661) after creation.
+
+   Then follow the [Arch Linux post](https://www.zhstar.win/2017/11/28/archlinux/).
 2. VBoxGuestAdditions in Linux guest requires extra effors. Details refer to Arch Linux post.
 
-## [VirtualBox GuestAdditions](https://www.virtualbox.org/manual/ch04.html#idm2096)
+## VirtualBox GuestAdditions ##
 
-VirtualBox GuestAdditions consists of device drivers and system applications that optimize the guest operating system for better performance and usability.
+[VirtualBox GuestAdditions](https://www.virtualbox.org/manual/ch04.html#idm2096) consists of device drivers and system applications that optimize the guest operating system for better performance and usability.
 
 1. Some Linux guest OSes (i.e. Gentoo, Arch Linux) already come with all or part of the VirtualBox GuestAdditions.
 
@@ -506,7 +508,7 @@ VirtualBox GuestAdditions consists of device drivers and system applications tha
    This method is always preferred!
 2. Alternatively, we can mount the ISO of GuestAdditions and invoke the relevant installation script manually.
 
-   Firstly, make sure development tools like _gcc_, _make_, _kernel-headers_, _kernel-devel_ etc. are present on guest OS. Also confirm the guest OS kernel version matches that of _kernel-headers_ and _kernel-devel_.
+   Firstly, make sure development tools like _gcc_, _make_, _kernel-headers_, _kernel-devel_ etc. are present on guest OS. Also confirm the guest OS kernel version matches that of package *kernel-headers* and package *kernel-devel*.
 
    Then, we can obtain the ISO from host by `vboxmanage storageattach`.
 
@@ -565,7 +567,7 @@ VirtualBox GuestAdditions consists of device drivers and system applications tha
 
    Check Autostart section above on how to launch VBoxclient alongside with awesome.
 
-## VirtualBox sharedfolder
+## VirtualBox sharedfolder ##
 
 Make sure *vboxservice* is enabled and started.
 
@@ -634,7 +636,7 @@ The backup GPT table is not at the end of the disk, as it should be. This might 
 1. Some posts write *resizepart* can be done on guest OS directly as long as swap partition/file is turned off.
 2. For Windows guest, use enclosed *disk management* to finish the job.
 
-# CentOS 8.2 AMD64 #
+# CentOS 8.2 Amd64 #
 
 This section describes procedures to manage CentOS 8.2 VM:
 
