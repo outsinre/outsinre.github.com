@@ -100,7 +100,7 @@ This post indroduces installing VirtualBox in Gentoo host.
    More details in [Upgrade kernel to unstable 4.0.0](/2015/03/25/gentoo-installation/).
 6. Up to now everyting related to VirtualBox VMM is prepared on host OS. Next is to create VM through CLI.
 
-   On MacOS, use `brew cask install` to install *virtualbox* and *virtualbox-extension-pack*.
+   On [macOS](2020/10/12/macos.md), use `brew cask` to install *virtualbox* and *virtualbox-extension-pack*.
 7. Remove quotes around sysmbol `~` and symbol `$`.
 
    ```
@@ -113,6 +113,7 @@ This post indroduces installing VirtualBox in Gentoo host.
    ```
 
    To load the new rule, execute `udevadm trigger`.
+
 # Schema #
 
 1. Avoid 64-bit guest OS. 64-bit OS occupies one third more resources (disk, memory) than the 32-bit version. What was worse, it seems *VBoxGuestAddtions-amd64.exe* makes no difference on the guest (double mouse, weird resolution etc.).
