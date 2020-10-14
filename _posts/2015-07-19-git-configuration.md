@@ -32,7 +32,7 @@ title: Git Configuration
    You can configure the default text editor that will be used when Git needs you to type in a message (without `-m` opton on push). If not configured, Git uses your system’s default editor, which is generally one of Vim, Emacs and Nano.
 5. `git config --system credential.helper 'cache --timeout=3600'`
 
-   If you're [cloning GitHub repositories using HTTPS](https://help.github.com/articles/which-remote-url-should-i-use), you can use a *credential helper* to tell Git to remember your GitHub username and password for a while every time it talks to GitHub. By default, Git will cache your password for 15 minutes (900 seconds).
+   If you're [managing GitHub repositories using HTTPS](https://help.github.com/articles/which-remote-url-should-i-use) due to SSH blocked by company firewall, you can use a *credential helper* to tell Git to [remember](https://stackoverflow.com/q/5343068) your GitHub username, password or API token for a while every time it talks to GitHub. By default, Git will cache your password for 15 minutes (900 seconds).
 6. `git config --system push.default simple`
 7. For EOL conversion, refer to [git line ending conversion](/2014/09/08/git-line-ending-conversion/).
 8. `git config --system -l`
