@@ -21,10 +21,10 @@ title: Git Configuration
    If you'd like a per-user config, create this file first.
 
    In Gentoo Xfce4, `$XDG_CONFIG_HOME` is not set by default. Without touching this file manually, it would defaults to `~/.gitconfig` instead.
-2. `git config --system user.name "<id+username>@users.noreply.github.com"`
+2. `git config --system user.name  "<username>"`
 
    Specify a name so your commits will be properly labeled. It can be anything that is meaningful to you.
-3. `git config --system user.email "<username>"`
+3. `git config --system user.email "<id+username>@users.noreply.github.com"`
 
    Tell Git the email address that will be associated with your Git commits. The email you specify should be the same one found in your email settings. To keep your email address hidden, see [Keeping your email address private](https://help.github.com/articles/keeping-your-email-address-private/).
 4. `git config --system core.editor emc`
