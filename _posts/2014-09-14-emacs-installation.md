@@ -189,11 +189,11 @@ Refer to [从零开始——Emacs 安装配置使用教程 2015](http://www.jian
 
 Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
 
-1. 只需解圧即可，放到 *c:\programs files\emacs* 下。首先把 *c:\programs files\emacs\bin" 加进 PATH, 这样可在 CMD 或 PowerShell 下运行。凡涉及到启动，运行 *runemacs.exe* 而不是 *emacs.exe*.
-2. 设置当前用户的 HOME 环境变量为 *%APPDATA%*, 即为 *c:\users\username\appdata\roaming*. 在 *HOME\.emacs.d\* 下建 *init.el* 配制文件。
+1. 只需解圧即可，放到 *c:\emacs\* 下。首先把 *c:\emacs\bin" 加进 PATH, 这样可在 CMD 或 PowerShell 下运行。凡涉及到运行，选 *runemacs.exe* 而非 *emacs.exe*.
+2. 设置当前用户的 HOME 环境变量为 `%APPDATA%`, 即为 *c:\users\username\appdata\roaming*. 在 `HOME\.emacs.d\` 下建 *init.el* 配制文件。
 
    注意这里是给当前用户设置，而不是给系统设置。
-3. 设置快捷键。在桌面新建快捷键，设置为 *c:\programs files\emacs\bin\emacsclientw.exe -n -c --alternate-editor=*.
+3. 设置快捷键。在桌面新建快捷键，设置为 *c:\emacs\bin\emacsclientw.exe -n -c --alternate-editor=""*.
 
    同时，修改属性里的 Start In 为 *%USERPROFILE%\Documents*, 这样 `c-x c-f` 时默认目录是 Start In. 同时，把快捷键放一份到 *C:\ProgramData\Microsoft\Windows\Start Menu* 下。
 
@@ -208,5 +208,5 @@ Windows 可在 Powershell 下或取系统的环境变量：`get-item env:`.
 
    千万不要用参考文献里的 *ftype* 和 *assoc*, 不仅没有效果，还会搞乱注册表。最简单的方法是用 Windows 10, Settings, Apps, Default apps.
 
-   右键 Open With 需要第一次打开快捷键的位置，下次才会出现。不要运行那个 `addpm.exe`, 完全是一个废物。
+   右键 Open With 需要第一次打开快捷键的位置，下次才会出现。不要运行那个 `addpm.exe`, 完全是一废物。
 5. [Caps to Ctrl](https://superuser.com/questions/949385/map-capslock-to-control-in-windows-10)
