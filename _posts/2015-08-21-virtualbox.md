@@ -652,8 +652,8 @@ This section describes procedures to manage CentOS 8.2 VM:
    `dnf group install 'Development Tools'`.
 
 4. Insert GuestAdditions CD; mount *sr0*; install GuestAdditions.
-
-   Add shared folder.
+   1. Add shared folder.
+   2. Add clipboard.
 
 # References
 
