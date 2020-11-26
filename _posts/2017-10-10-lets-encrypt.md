@@ -12,7 +12,7 @@ In order to manage [Let's Encrypt](https://letsencrypt.org/) certificates, we ne
 
 1. Generate key pair.
 2. Create and send Certificate Signing Request (CSR).
-3. Challenge ownership of domain or web server.
+3. [Domain Control Validation (DCV)](https://support.sectigo.com/Com_KnowledgeDetailPageFaq?Id=kA01N000000brbt). [Challenge ownership](https://docs.digicert.com/manage-certificates/organization-domain-management/managing-domains-cc-guide/domain-pre-validation-domain-control-validation/) of domain or web server.
 
 Let's Encrypt officially recommends the [Certbot](https://certbot.eff.org/docs/using.html) client.
 
