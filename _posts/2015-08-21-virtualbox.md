@@ -326,7 +326,7 @@ After getting into the Windows XP system, we can adjust some system configuratio
 
 ## USB Supoort ##
 
-Attach plugged in USB device to VM. First make sure USB 1.0/2.0/3.0 is enabled for VM. Then:
+Attach plugged in USB device to VM. First set the USB version to 1.0, 2.0 or 3.0 for VM.
 
 ```bash
 user@tux ~ $ vboxmanage list usbhost
@@ -341,7 +341,7 @@ user@tux ~ $ vboxmanage controlvm WinXP32 usbdetach USB-UUID
 4. Detach from VM.
 5. Get UUID from *vboxmanage list usbhost* instead of *blkid*.
 
-We can also make this attachment permanent by creating a *usbfilter*.
+We can also make this attachment *permanent* by creating a *usbfilter*.
 
 ## Host-only networking ##
 
