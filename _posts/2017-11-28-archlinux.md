@@ -36,6 +36,8 @@ root@archiso / # wipefs --all /dev/sdb
 
 Disable Secure Boot in UEFI BIOS setting to boot Linux distritions as most distributions do not buy digital certifits from Verisign.
 
+If the USB stick refuses to load, then try the [dd command](#usb-stick) once more.
+
 By default, Arch ISO uses Zsh shell. To log all commands, set in *~/.zshrc* the following to empty string:
 
 ```
