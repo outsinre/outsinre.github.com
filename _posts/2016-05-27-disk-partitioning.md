@@ -267,7 +267,8 @@ This tutorial shows how to manually create a Windows 8.1 bootable USB stick unde
    # umount /mnt/usbstick
    ```
 
-1. Refs
+1. For Windows 10 onwards, the "install.wim" file is over 4GB and cannot be copied to a FAT32 filesystem. So we need to [split the file](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/split-a-windows-image--wim--file-to-span-across-multiple-dvds) into smaller ones before copying.
+2. Refs
    1. [fedora create windows 8.1 USB stick](https://superuser.com/questions/729087/fedora-create-windows-8-1-bootable-usb)
    2. [howtogeek cd/dvd ISO mount](http://www.howtogeek.com/168137/mount-an-iso-image-in-linux/?PageSpeed=noscript)
 

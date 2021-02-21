@@ -36,7 +36,7 @@ root@archiso / # wipefs --all /dev/sdb
 
 Disable Secure Boot in UEFI BIOS setting to boot Linux distritions as most distributions do not buy digital certifits from Verisign.
 
-If the USB stick refuses to load, then try the [dd command](#usb-stick) once more.
+If the USB stick refuses to load, then try the [dd command](#usb-stick) once more. If directory `/sys/firmware/efi/efivars` exists, then it's booted in UEFI mode, otherwise it is legacy BIOS mode.
 
 By default, Arch ISO uses Zsh shell. To log all commands, set in *~/.zshrc* the following to empty string:
 
@@ -45,7 +45,11 @@ HISTSIZE=
 HISTFILESIZE=
 ```
 
-## Time Network
+And then run `source .zshrc`.
+
+Next, use Alt-*arrow* or Ctrl-Alt-Fx to switch virtual console and read installation guide there.
+
+## Time and Network
 
 Once booting into the live Arch system, check network connection and rectify system clock:
 
@@ -82,6 +86,7 @@ Firstly, to identify disk devices:
 
 ```bash
 root@archiso ~ # fdisk -l
+root@archiso ~ # lsblk
 ```
 
 For Grub, BIOS/GPT scheme, we must create the [BIOS boot partition](https://wiki.archlinux.org/index.php/BIOS_boot_partition) to hold Grub *core.img*. Around 1 MiB (2048 sectors) is enough. Partition number can be in any position order but has to be on the first 2 TiB of the disk. This partition should be flagged as *bios_grub* for *parted*, *ef02* for *gdisk*, or select *BIOS boot* and partition type *4* for *fdisk*.
@@ -117,7 +122,7 @@ Leave the swap file part after booting into new system.
 
 ### File system
 
-There is not need to create file system for BIOS boot parititon. Hence, just create an *ext4* on the single *root* parition:
+There is no need to create file system for the partition `bios_grub`. Hence, just create an *ext4* on the single *root* parition:
 
 ```bash
 root@archiso ~ # mkfs.ext4 /dev/sda2
@@ -133,15 +138,7 @@ As there is only the *root* parition, we would not create any other mount points
 
 ## UEFI GPT scheme
 
-Almost all modern systems take UEFI booting schema. The old BIOS legacy mode discussed above is almost deprecated. To set the PC booting in only UEFI mode in BIOS setting (disable legacy BIOS).
-
-To verify if the live Arch Linux is booted in UEFI mode, check by:
-
-```bash
-root@archiso / # ls /sys/firmware/efi/efivars
-```
-
-If directory *efivars* exists, then Yes. By default, Arch Linux uses [system-boot](https://wiki.archlinux.org/index.php/Systemd-boot).
+Almost all modern systems take UEFI booting schema. The old BIOS legacy mode discussed above is almost deprecated. To set the PC booting in only UEFI mode in BIOS setting (disable legacy BIOS). Also make sure the ISO is [booted in UEFI mode](#usb-booting).
 
 ### Disk Preparation
 
