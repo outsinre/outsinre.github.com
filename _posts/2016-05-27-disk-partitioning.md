@@ -186,7 +186,9 @@ The final booting scheme depends on:
 
 # Manually creating Windows UEFI bootable USB stick
 
-This tutorial shows how to manually create a Windows 8.1 bootable USB stick under Linux. **gpt does NOT ask for confirmation on each command like fdisk**. On Windows, we use *diskpart*.
+This tutorial shows how to manually create a Windows 8.1 bootable USB stick under Linux. **parted does NOT ask for confirmation on each command like fdisk**.
+
+On Windows, we use *diskpart*. Alternatively, format the USB to FAT32 and copy all ISO files to the USB - quite simple!
 
 1. Create partition table - GPT
 

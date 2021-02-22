@@ -253,7 +253,7 @@ Create Luks containers:
 
 ```bash
 root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --type luks1 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file - --use-random luksFormat /dev/sda3
-root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file -  ~/arch-luks --use-random luksFormat /dev/sda4
+root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-file - --use-random luksFormat /dev/sda4
 ```
 
 In this case, both the containers use the same key file but different LUKS type.
@@ -261,24 +261,20 @@ In this case, both the containers use the same key file but different LUKS type.
 For safety, add a fallback passphrase in addition to the key file. It always asks for an existing passphrase or key file before adding a new one.
 
 ```bash
-root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --key-file - --iter-time 5000 luksAddKey /dev/sda3 --key-slot 0
-root@archiso ~ # gpg --decrypt ~/arch-luks.gpg | cryptsetup -v --key-file - --iter-time 5000 luksAddKey /dev/sda4 --key-slot 0
+root@archiso ~ # cryptsetup -v --key-file arch-luks --iter-time 5000 luksAddKey /dev/sda3 --key-slot 0
+root@archiso ~ # cryptsetup -v --key-file arch-luks --iter-time 5000 luksAddKey /dev/sda4 --key-slot 0
+```
+
+Apart from *luksAddKey*, we can also *luksRemoveKey*, *luksKillSlot* etc. 
+
+Now, we can use *luksDump* command to verify the LUKS header information:
+
+```bash
 root@archiso ~ # cryptsetup luksDump /dev/sda3
 root@archiso ~ # cryptsetup luksDump /dev/sda4
 ```
 
-Apart from *luksAddKey*, we can also *luksRemoveKey*, *luksKillSlot* etc. Once created, it is time to open the containers. The first open command, uses the fallback passphrase while the second uses key file.
-
-```bash
-root@archiso ~ # cryptsetup open /dev/sda3 cryptboot
-root@archiso ~ # cryptsetup --key-file ~/arch-luks open /dev/sda4 cryptlvm
-root@archiso ~ # ls -al /dev/mapper/
-root@archiso ~ # lsblk
-```
-
-Now, we can use *luksDump* command to verify the LUKS header information. The decrypted containers are now available at */dev/mapper/*.
-
-Next, we should backup the LUKS header.
+Next, we should backup the LUKS header:
 
 ```bash
 root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda3 --header-backup-file ~/sda3-luks-header.img /dev/sda3
@@ -286,6 +282,17 @@ root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda4 --header-backup-file ~/sd
 ```
 
 Of course, we have a counterpart command *luksHeaderRestore* to restore header file. Once backuped, the the LUKS header may be deleted from the container. Details, refer to Arch wiki.
+
+Once created, it is time to open the containers. The first open command, uses the fallback passphrase while the second uses key file.
+
+```bash
+root@archiso ~ # cryptsetup open /dev/sda3 cryptboot
+root@archiso ~ # cryptsetup --key-file ~/arch-luks open /dev/sda4 cryptlvm
+root@archiso ~ # lsblk
+root@archiso ~ # ls -al /dev/mapper/
+```
+
+The decrypted containers are now available at */dev/mapper/*.
 
 ### LVM
 
@@ -358,11 +365,15 @@ curl -vo mirrorlist https://www.archlinux.org/mirrorlist/?country=all&protocol=h
 ## base packages
 
 ```bash
-root@archiso ~ # pacstrap /mnt base [base-devel]
+# base
+root@archiso ~ # pacstrap /mnt base base-devel
+# optional
+root@archiso ~ # pacstrap /mnt nano
 ```
 
 1. This will install all packages from *base* group to *root* partition. Around 200 MiB packages will be downloaded and 700 MiB disk space consumed. Ignore the warning on *locale* failure that will be handled after *chroot*.
-2. Other optional groups (i.e. *base-devel*) can be appended. We can also install packages after *chroot*.
+2. The *base* group does not even has a text editor. So we install *nano* first.
+3. Other groups or packages can also be appended to the *pacstrap* command. However, we'd better install only necessary packages at this stage. We can also install packages within [chroot](#chroot) by *pacman* or when the OS is completely installed.
 
 ## fstab
 
@@ -427,6 +438,7 @@ zh_TW BIG5
 #
 [root@archiso / #] grep '^[^#]'/etc/locale.gen
 [root@archiso / #] locale-gen
+[root@archiso / #] locale -a
 [root@archiso / #] echo LANG=en_US.UTF-8 >> /etc/locale.conf
 ```
 
@@ -459,40 +471,44 @@ Attention, this only affects keyboard layout in virtual console. X keyboard layo
 
 The third line in the request uses *127.0.1.1* instead of *127.0.0.1*. It does not matter which one is used, actually. But [hostname resolution](https://www.debian.org/doc/manuals/debian-reference/ch05.en.html#_the_hostname_resolution) provide some information.
 
-## *root* password
-
-```bash
-[root@archiso / #] passwd
-```
-
 ## Initramfs by mkinitcpio
 
 ```
 # /etc/mkinitcpio.conf
 MODULES=(vfat)
-HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck)
+HOOKS=(base udev autodetect modconf block filesystems keyboard fsck keymap encrypt lvm2)
 ```
 
 hook | info
 --- | ---
-udev | a must
-keyboard | a must; place it after *autodetect*
 keymap | needed as custom keymap (*emacs*) is set in *vconsole.conf*.
 encrypt | LUKS
 lvm2 | LVM
 
-1. This is a *busybox* based *initramfs* configuration. It is different from *systemd init* booting process, which is the next phase.
-2. Use *mkinitpico -H hook_name* to check hooks info. Only add necessary hooks to keep a minimal *initramfs* image.
-3. Remove *consolefont* hook as it is unnecessary.
-4. Add **vfat** module, otherwise *initramfs* fails load the key file.
+1. Add **vfat** module, otherwise *initramfs* fails load the key file.
+2. This is a *busybox* based *initramfs* configuration. It is different from *systemd init* booting process, which is the next phase.
+3. Use `mkinitpico -H <hook-name>` to check hooks info. Use `mkinitcpio -L` to list available hooks.
+4. Remove *consolefont* hook as it is unnecessary.
 
-Now we will re-create the *initramfs* to include the new hooks, though *pacstrap* above already created it upon installation of *linux* package (pulled in by the *base* group)
+Before creating the new *initramfs*, we should install *lvm2*, otherwise *mkinitcpio* cannot find the hook:
 
 ```bash
-[root@archiso / #] mkinitcpio -p linux
+[root@archiso / #] pacman -S lvm2
+```
+
+Now we will re-create the *initramfs* to include the new hooks, though *pacstrap* above already created it upon installation of *linux* package (pulled in by the *base* group).
+
+```bash
+[root@archiso / #] mkinitcpio -P
 ```
 
 *mkinitcpio* will install generate two images, a *default* and a *fallback* that skips the autodetect hook thus including a full range of mostly-unneeded modules. Obviously, the fallback image is much bigger in size than the default one as it attempts to pull in as many modules as possible. Therefore, *fallback* image generation usually reports [missing firmware](https://wiki.archlinux.org/index.php/Mkinitcpio#Possibly_missing_firmware_for_module_XXXX). If the system does not have such hardware, it can be safely ignored. Otherwise, just install the relevant modules like 'wd719x-firmware'.
+
+## root password
+
+```bash
+[root@archiso / #] passwd
+```
 
 ## Boot loader - Grub
 
@@ -528,7 +544,7 @@ GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptkey=/dev/sda2:fat32:/arc
 3. [Kernel parameter](https://wiki.archlinux.org/index.php/Kernel_parameters)
 
    *resume* is used to *suspend to disk*. *root* is optional as long as *grub-mkconfig* is used to generate the boot menu.
-4. *mkinitpico* by default, doe not support GnuPG-1.0 hook. Therefore, we cannot use a gpg-procted key file unless [mkinitcpio-gnupg](https://aur.archlinux.org/packages/mkinitcpio-gnupg/) is adopted.
+4. *mkinitpico* by default, doe not support *gpg* hook. Therefore, we cannot use a gpg-procted key file unless [mkinitcpio-gnupg](https://aur.archlinux.org/packages/mkinitcpio-gnupg/) is adopted. However, using a gpg-protected key file does not add security level compared to [passphrase](#luks) as the protected key file is also protected by passphrase.
 
 Once the configured, we can install the bootloader to ESP partition:
 
