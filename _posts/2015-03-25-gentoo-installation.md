@@ -926,7 +926,7 @@ Boot with LiveDVD, then
    ```
 
    since *root* does not launch X. If really need, set in *~/.bash_profile* (detailed below). It is referenced by */etc/X11/chooser.sh* to determine *command* in */etc/X11/xinit/xinitrc*.
-3. Display Manager: GDM, LightDM, SDDM etc.
+3. Display Manager: GDM, LightDM, SDDM etc. DM presents we a graphical login window, equivalen of *startx*.
 
    Most display managers source */etc/xprofile*, *~/.xprofile* and */etc/X11/xinit/xinitrc.d/*.
 4. xinit

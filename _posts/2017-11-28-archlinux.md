@@ -277,8 +277,8 @@ root@archiso ~ # cryptsetup luksDump /dev/sda4
 Next, we should backup the LUKS header:
 
 ```bash
-root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda3 --header-backup-file ~/sda3-luks-header.img /dev/sda3
-root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda4 --header-backup-file ~/sda4-luks-header.img /dev/sda4
+root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda3 --header-backup-file ~/sda3-luks-header.img
+root@archiso ~ # cryptsetup luksHeaderBackup /dev/sda4 --header-backup-file ~/sda4-luks-header.img
 ```
 
 Of course, we have a counterpart command *luksHeaderRestore* to restore header file. Once backuped, the the LUKS header may be deleted from the container. Details, refer to Arch wiki.
@@ -384,10 +384,10 @@ root@archiso ~ # cat /mnt/etc/fstab
 
 1. `-U` and `-L` use UUID and label respectively.
 
-Attention that, the separate *cryptboot* container is also included in */etc/fstab*. To support automount of */boot* partition, we should resort to [/etc/crypttab](https://wiki.archlinux.org/index.php/Dm-crypt/System_configuration#crypttab):
+Attention that, the separate *cryptboot* container is also included in */etc/fstab*. To support automount of */boot* partition, we should resort to [/mnt/etc/crypttab](https://wiki.archlinux.org/index.php/Dm-crypt/System_configuration#crypttab):
 
 ```
-# /etc/crypttab
+# /mnt/etc/crypttab
 cryptboot	/dev/sda2	/efi/arch-luks.gpg	cipher=aes-xts-plain64:sha512,size=512
 ```
 
@@ -458,18 +458,32 @@ root@archiso ~ # loadkeys emacs
 
 Attention, this only affects keyboard layout in virtual console. X keyboard layout is discuessed below.
 
-## Hostname
+## Networking
+
+Set hostname:
 
 ```bash
 # Create /etc/hostname
 [root@archiso / #] echo "myhostname" >> /etc/hostname
-# add a line to /etc/hosts accordingly
+```
+
+Update */etc/hosts*:
+
+```bash
 127.0.0.1	localhost
 ::1		localhost
 127.0.1.1	myhostname.localdomain	myhostname
 ```
 
 The third line in the request uses *127.0.1.1* instead of *127.0.0.1*. It does not matter which one is used, actually. But [hostname resolution](https://www.debian.org/doc/manuals/debian-reference/ch05.en.html#_the_hostname_resolution) provide some information.
+
+Install NetworkManager:
+
+```bash
+[root@archiso / #] pacman -S networkmanager
+```
+
+NetworkManager has built-in DHCP client, so we don't need to install *dhcpcd*. Aslo, it will pull in *wpa_supplicant*.
 
 ## Initramfs by mkinitcpio
 
@@ -534,7 +548,7 @@ This option is used by *grub-install* to generate *core.img*. Then we set the ke
 # or PARTUUID
 GRUB_CMDLINE_LINUX="cryptdevice=UUID=of-sda4:cryptlvm cryptkey=UUID=of-sda2:auto:/arch-luks resume=UUID=of-volgrp-swap root=UUID=of-volgrp-root"
 # or /dev/mapper/volgrp-root
-GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptkey=/dev/sda2:fat32:/arch-luks.gpg resume=/dev/volgrp/swap root=/dev/volgrp/root"
+GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptkey=/dev/sda2:vfat:/arch-luks resume=/dev/volgrp/swap root=/dev/volgrp/root"
 ```
 
 1. It is error-prone to input UUID/PARTUUID without GUI, we can replace UUID with the device pathname.
@@ -544,7 +558,7 @@ GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptkey=/dev/sda2:fat32:/arc
 3. [Kernel parameter](https://wiki.archlinux.org/index.php/Kernel_parameters)
 
    *resume* is used to *suspend to disk*. *root* is optional as long as *grub-mkconfig* is used to generate the boot menu.
-4. *mkinitpico* by default, doe not support *gpg* hook. Therefore, we cannot use a gpg-procted key file unless [mkinitcpio-gnupg](https://aur.archlinux.org/packages/mkinitcpio-gnupg/) is adopted. However, using a gpg-protected key file does not add security level compared to [passphrase](#luks) as the protected key file is also protected by passphrase.
+4. *mkinitpico* by default, doe not support *gpg* hook. Therefore, we cannot use a gpg-procted key file unless [mkinitcpio-gnupg](https://aur.archlinux.org/packages/mkinitcpio-gnupg/) is adopted. However, using a gpg-protected key file does not add security level compared to [passphrase](#luks) as the protected key file is also protected by passphrase. Hence, we use file *arch-luks* directly.
 
 Once the configured, we can install the bootloader to ESP partition:
 
@@ -579,15 +593,7 @@ The following is for BIOS/GPT schema:
 
 Although we install *x86_64* Arch Linux, the `--target` should be *i386-pc* due to BIOS booting scheme.
 
-## Before reboot
-
-As the base group lacks *wpa_supplicant*, we cannot connect to wireless network after rebooting.
-
-```bash
-[root@archiso / #] pacman -S wpa_supplicant
-```
-
-## Do Reboot
+## Reboot
 
 ```bash
 [root@archiso / #] cp .bash_history /path/to/usb-stick/bash.log (optionally as it remains after reboot but maybe overriden)
@@ -601,19 +607,22 @@ We'd better unmount all partitions under */mnt* to determine busy partitions and
 
 # [Post-installation](https://wiki.archlinux.org/index.php/General_recommendations)
 
-1. *dhcpcd* is not *wap_supplicant* by default.
+1. Enable NetworkManager
 
    ```bash
-   [root@host ~]# systemctl enable/start dhcpcd
+   # optional, networkmanager will detect Wi-Fi interface and ask for Wi-Fi configuration on demand
    [root@host ~]# wpa_passphrase ssid psk > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-   [root@host ~]# systemctl enable/start wpa_supplicant@wlan0
+   
+   [root@host ~]# systemctl enable/start NetworkManager
    ```
 
 2. New user account
 
    ```bash
+   # check all accounts
    [root@host ~]# passwd -Sa
-   [root@host ~]# useradd -m username
+   # create a new one
+   [root@host ~]# useradd -ms /bin/bash username
    [root@host ~]# passwd username
    ```
 
@@ -634,17 +643,6 @@ We'd better unmount all partitions under */mnt* to determine busy partitions and
 
    1. We must use the exact swap file path instead of UUID or Label.
    2. To cease manual operation bother, try *systemd-swap* that automates swap management.
-
-
-
-
-
-
-
-
-
-
-
 
 # GPU Driver
 
@@ -671,21 +669,7 @@ Install Intel driver:
 [root@host ~]# pacman -S xf86-video-intel
 ```
 
-
-
-2. Video drivers. If this Arch Linux is VirtualBox guest, then install VirtualBox guest additions.
-
-
-
-
-
-
-
-
-
-
-
-
+1. Video drivers. If this Arch Linux is VirtualBox guest, then install VirtualBox guest additions.
 
 ## Configuration
 
@@ -709,9 +693,8 @@ As stated before, dual boot with Windows should set Linux system to treat RTC as
 Check time:
 
 ```bash
-[root@host ~ #] hwclock/timedatectl -h
+[root@host ~ #] timedatectl set-ntp true
 [root@host ~ #] timedatectl status
-[root@host ~ #] hwclock --show
 ```
 
 Here is an example of *timedatectl* output:
@@ -735,7 +718,7 @@ Set time:
 [root@host ~ #] timedatectl set-local-rtc 0/1
 ```
 
-### time zone
+### timezone
 
 ```bash
 [root@host ~ #] ln -sf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime (set system time zone manually)
