@@ -548,7 +548,7 @@ This option is used by *grub-install* to generate *core.img*. Then we set the ke
 # or PARTUUID
 GRUB_CMDLINE_LINUX="cryptdevice=UUID=of-sda4:cryptlvm cryptkey=UUID=of-sda2:auto:/arch-luks resume=UUID=of-volgrp-swap root=UUID=of-volgrp-root"
 # or /dev/mapper/volgrp-root
-GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptkey=/dev/sda2:vfat:/arch-luks resume=/dev/volgrp/swap root=/dev/volgrp/root"
+GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda4:cryptlvm cryptkey=/dev/sda2:vfat:/arch-luks resume=/dev/volgrp/swap root=/dev/mapper/volgrp-root"
 ```
 
 1. It is error-prone to input UUID/PARTUUID without GUI, we can replace UUID with the device pathname.
