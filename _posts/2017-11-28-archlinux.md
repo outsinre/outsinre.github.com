@@ -574,6 +574,8 @@ Then, generate boot menu:
 [root@archiso / #] grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
+In order for Grub to find Windows 10 system, please [turn off Fast Startup](https://wiki.archlinux.org/index.php/GRUB#Windows_8/10_not_found).
+
 If the *grub-mkconfig* hangs there, probably read [LVM need access to /run/lvm under new root](https://bugs.archlinux.org/task/61040) and use the [suggested hack](https://bbs.archlinux.org/viewtopic.php?pid=1820949#p1820949).
 
 ```
