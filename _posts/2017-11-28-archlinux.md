@@ -662,7 +662,7 @@ Intel HD Graphics 520
 NVIDIA GeForce 920M
 ```
 
-So the computer has an integrated Intel video card and a discrete NVIDIA video card respectivelly: it is called [NVIDIA Optimus](https://wiki.archlinux.org/index.php/NVIDIA_Optimus). We have several choices to deal with NVIDIA Optimus: turn of one of the video card, use [Bumbelee](https://wiki.archlinux.org/index.php/Bumblebee), use [Nvidia-xrun](https://wiki.archlinux.org/index.php/Nvidia-xrun) etc. I will set up the system to _switch_ the two cards intelligently:
+So the computer has an integrated Intel video card and a discrete NVIDIA video card respectivelly: it is called [NVIDIA Optimus](https://wiki.archlinux.org/index.php/NVIDIA_Optimus). We have several choices to deal with NVIDIA Optimus: turn off one of the video card, use [Bumbelee](https://wiki.archlinux.org/index.php/Bumblebee), use [Nvidia-xrun](https://wiki.archlinux.org/index.php/Nvidia-xrun) etc. I will set up the system to _switch_ the two cards intelligently:
 
 >Nvidia-xrun is a utility to allow Nvidia optimus enabled laptops run X server with discrete nvidia graphics on demand. This solution offers full GPU utilization, compatibility and better performance than Bumblebee.
 
@@ -674,13 +674,19 @@ Install Intel driver:
 
 1. Video drivers. If this Arch Linux is VirtualBox guest, then install VirtualBox guest additions.
 
-## Configuration
-
-The configuration API varies often across awesome updates. So, repeat these configuration whenever something goes strange, or you want to modify the configuration.
+# KDE #
 
 ```bash
-[user@host ~]$ mkdir -p ~/.config/awesome
-[user@host ~]$ cp /etc/xdg/awesome/rc.lua ~/.config/awesome/
+~ $ sudo pacman -S xorg xf86-video-amdgpu mesa
+
+~ $ reboot
+
+~ $ sudo pacman -S plasma-meta
+~ $ sudo pacman -S kde-applications-meta
+~ $ sudo pacman -S sddm
+~ $ systemctl enable sddm
+
+~ $ reboot
 ```
 
 # Time
@@ -735,13 +741,16 @@ Set time:
 # pacman
 
 ```bash
-[root@host ~ #] pacman -Ss pkg      # search for pkg
-[root@host ~ #] pacman -Si pkg      # show pkg information
-[root@host ~ #] pacman -S pkg1 pkg2 # install pkg1 and pkg2
-[root@host ~ #] pacman -Qs pkg      # search for locally installed pkg 
-[root@host ~ #] pacman -Qi pkg      # show locally installed pkg information
-[root@host ~ #] pacman -R pkg       # remove pkg but leave dependencies alone
-[root@host ~ #] pacman -Rs pkg      # remove pkg and orphan dependencies
+[root@host ~ #] pacman -Ss pkg               # search for pkg
+[root@host ~ #] pacman -Si pkg               # show pkg information
+[root@host ~ #] pacman -S pkg1 pkg2          # install pkg1 and pkg2
+[root@host ~ #] pacman -Qs pkg               # search for locally installed pkg 
+[root@host ~ #] pacman -Qi pkg               # show locally installed pkg information
+[root@host ~ #] pacman -Qe                   # list explicitly installed pkgs
+[root@host ~ #] pacman -D --asdeps pkg       # mark a package as non-explicitly installed
+[root@host ~ #] pacman -D --asexplicit pkg   # mark a package as non-explicitly installed
+[root@host ~ #] pacman -R pkg                # remove pkg but leave dependencies alone
+[root@host ~ #] pacman -Rs pkg               # remove pkg and orphan dependencies
 ```
 
 # [Xterm](https://wiki.archlinux.org/index.php/Xterm)
