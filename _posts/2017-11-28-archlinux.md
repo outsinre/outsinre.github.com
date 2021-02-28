@@ -885,10 +885,8 @@ You can get the Identifier value from *xrandr* output.
 # Fcitx
 
 ```bash
-[root@host ~ #] pacman -S fcitx fcitx-configtool [ fcitx-gtk3 | fcitx-qt4 ]
+[root@host ~ #] pacman -S fcitx fcitx-rime kcm-fcitx
 ```
-
-*fcitx-gtk* and *fcitx-qt* is optional. You only want it when GTK/QT applications cannot input Chinese.
 
 Append *run fcitx-autostart* into *~/.config/awesome/autostart.sh* and relaunch awesome.
 

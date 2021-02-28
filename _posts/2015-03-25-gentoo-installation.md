@@ -1226,7 +1226,7 @@ Boot with LiveDVD, then
    
    *table* USE will draw several built-in input methods (i.e. Wubi) which fail to meet my requirement. *rime* will be installed instead.
    
-   Make sure the following code resides before *exec* of *~/.xinitrc*.
+   Make sure the following code resides before *exec* of *~/.xinitrc* or *~/.xprofile*:
 
    ```
    export GTK_IM_MODULE=fcitx
