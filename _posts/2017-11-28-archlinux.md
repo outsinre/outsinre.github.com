@@ -688,17 +688,6 @@ If this Arch Linux is a VirtualBox guest, then install VirtualBox guest addition
 
 Refer to [Linux Time](/2021/03/03/linux-time).
 
-### timezone
-
-```bash
-[root@host ~ #] ln -sf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime (set system time zone manually)
-# or
-[root@host ~ #] timedatectl set-timezone Asia/Chongqiong
-```
-
-1. From the [past experience](https://www.zhstar.win/2015/09/10/lvm-luks-lvm/), it's better to set time first and then time zone.
-2. If all that fails, then resort to [ntpd](https://wiki.archlinux.org/index.php/Ntpd).
-
 # pacman
 
 ```bash

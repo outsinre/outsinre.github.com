@@ -32,6 +32,16 @@ systemd-timesyncd.service active: yes
 
 Don't be confused. Both *Local time* and *Universal time* are system time but with different time standards. The third one (RTC) is hardware time value. Obviously, RTC in this example is treated as Universal Time, which can be verified by the last line - RTC in local TZ: no
 
+Set timezone:
+
+```bash
+[root@host ~ #] ln -sf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime (set system time zone manually)
+# or
+[root@host ~ #] timedatectl set-timezone Asia/Chongqiong
+```
+
+From the [past experience](https://www.zhstar.win/2015/09/10/lvm-luks-lvm/), it's better to set time first and then time zone.
+
 Set time:
 
 ```bash
