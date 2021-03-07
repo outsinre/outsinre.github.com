@@ -674,18 +674,29 @@ If this Arch Linux is a VirtualBox guest, then install VirtualBox guest addition
 # KDE #
 
 ```bash
-~ $ sudo pacman -S xorg xf86-video-amdgpu
-
+~ $ sudo pacman -S xorg-server xf86-video-amdgpu
 ~ $ reboot
 
 ~ $ sudo pacman -S plasma-meta
-~ $ sudo pacman -S kde-applications-meta
 ~ $ sudo pacman -S sddm
 ~ $ systemctl enable sddm
 
 ~ $ reboot
 ```
 
+It seems that *sddm* is quite slow to launch Plasma. We need to increase system *entropy*:
+
+```bash
+~ $ sudo pacman -S rng-tools
+~ $ sudo systemctl enable rngd
+~ $ sudo systemctl start rngd
+
+~ $ sudo pacman -S haveged
+~ $ systemctl enable haveged
+~ $ systemctl start haveged
+```
+
+It might relate to a [kernel option unset](https://github.com/sddm/sddm/issues/1036#issuecomment-477633990).
 # Time
 
 Refer to [Linux Time](/2021/03/03/linux-time).
