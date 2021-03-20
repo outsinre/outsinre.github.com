@@ -855,6 +855,10 @@ You can get the Identifier value from *xrandr* output.
 
 # Fcitx
 
-First, install [Fcitx](/2015/03/25/gentoo-installation/).
+Check [Fcitx](/2015/03/25/gentoo-installation/):
+
+```bash
+user@host ~ $ pacman -S fcitx-im fcitx-configtool
+```
 
 Then, append *run fcitx-autostart* into *~/.config/awesome/autostart.sh* and relaunch awesome.
