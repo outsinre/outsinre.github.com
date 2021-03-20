@@ -605,27 +605,20 @@ root@archiso ~ # reboot
 
 We'd better unmount all partitions under */mnt* to determine busy partitions and diagnose with *fuser*.
 
-# [Post-installation](https://wiki.archlinux.org/index.php/General_recommendations)
+# General Settings
+
+Check [Post-installation](https://wiki.archlinux.org/index.php/General_recommendations).
 
 1. Enable NetworkManager
 
    ```bash
-   # optional, networkmanager will detect Wi-Fi interface and ask for Wi-Fi configuration on demand
+   # optional on desktop as networkmanager will detect Wi-Fi interface and ask for Wi-Fi password
    [root@host ~]# wpa_passphrase ssid psk > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
    
    [root@host ~]# systemctl enable/start NetworkManager
    ```
 
-2. New user account
-
-   ```bash
-   # check all accounts
-   [root@host ~]# passwd -Sa
-   # create a new one
-   [root@host ~]# useradd -ms /bin/bash username
-   [root@host ~]# passwd username
-   ```
-
+2. [New user account]()
 4. Swap file (opt)
 
    ```bash
@@ -684,7 +677,7 @@ If this Arch Linux is a VirtualBox guest, then install VirtualBox guest addition
 ~ $ reboot
 ```
 
-It seems that *sddm* is quite slow to launch Plasma. We need to increase system *entropy*:
+It seems that *sddm* is quite slow to launch Plasma. We need to increase system *entropy* by *haveged* and/or *rng-tools*:
 
 ```bash
 ~ $ sudo pacman -S rng-tools
@@ -696,7 +689,8 @@ It seems that *sddm* is quite slow to launch Plasma. We need to increase system 
 ~ $ systemctl start haveged
 ```
 
-It might relate to a [kernel option unset](https://github.com/sddm/sddm/issues/1036#issuecomment-477633990).
+It might relate to a [kernel option unset](https://github.com/sddm/sddm/issues/1036#issuecomment-477633990). However, such hack uses *pseudo-random* to increase entropy and may leave your system in risks.
+
 # Time
 
 Refer to [Linux Time](/2021/03/03/linux-time).
@@ -705,20 +699,27 @@ Refer to [Linux Time](/2021/03/03/linux-time).
 
 ```bash
 [root@host ~ #] pacman -Ss pkg               # search for pkg
-[root@host ~ #] pacman -Si pkg               # show pkg information
+[root@host ~ #] pacman -Si pkg               # show pkg info
+[root@host ~ #] pacman -Sg grp               # show group info
 [root@host ~ #] pacman -S pkg1 pkg2          # install pkg1 and pkg2
+
+[root@host ~ #] pacman -Syu                  # roll the system
+[root@host ~ #] pacman -Syu pkg              # roll the system and install pgk
+
 [root@host ~ #] pacman -Qs pkg               # search for locally installed pkg 
-[root@host ~ #] pacman -Qi pkg               # show locally installed pkg information
+[root@host ~ #] pacman -Qi pkg               # show locally installed pkg info
 [root@host ~ #] pacman -Qe                   # list explicitly installed pkgs
+
 [root@host ~ #] pacman -D --asdeps pkg       # mark a package as non-explicitly installed
-[root@host ~ #] pacman -D --asexplicit pkg   # mark a package as non-explicitly installed
+[root@host ~ #] pacman -D --asexplicit pkg   # mark a package as explicitly installed
+
 [root@host ~ #] pacman -R pkg                # remove pkg but leave dependencies alone
 [root@host ~ #] pacman -Rs pkg               # remove pkg and orphan dependencies
 ```
 
-# [Xterm](https://wiki.archlinux.org/index.php/Xterm)
+# Xterm
 
-Install *xterm* package. Add the following into *~/.Xresources*:
+Install [xterm](https://wiki.archlinux.org/index.php/Xterm) package. Add the following into *~/.Xresources*:
 
 ```
 XTerm.termName: xterm-256color
@@ -748,8 +749,7 @@ To take these settings into effect immediately:
 [root@host ~ #] xrdb ~/.Xresources
 ```
 
-_xrdb* without `-merge` option, will _reload_ _.Xresources_, replacing current settings.
-
+*xrdb* without the `-merge` option will reload _.Xresources_, replacing current settings.
 
 ## Copy/Paste
 

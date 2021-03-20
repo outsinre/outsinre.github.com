@@ -778,9 +778,13 @@ The next is to replace `$hints_string` and `$fs_uuid`. This is where `os-prober`
 
    The very first thing after getis to create a regular user account:
 
-   ```
-   # useradd -G wheel,video -m myUser
-   # passwd myUser
+   ```bash
+   # check all accounts
+   [root@host ~]# passwd -Sa
+
+   # create a new one
+   [root@host ~]# useradd -G wheel,video -ms /bin/bash <username>
+   [root@host ~]# passwd <username
    ```
 
    Compared to *useradd*, *adduser* has a nice interactive mode.
