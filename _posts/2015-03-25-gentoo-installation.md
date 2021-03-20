@@ -1227,12 +1227,12 @@ Boot with LiveDVD, then
    
    *table* USE will draw several built-in input methods (i.e. Wubi) which fail to meet my requirement. *rime* will be installed instead.
    
-   Make sure the following code resides before *exec* of *~/.xinitrc* or *~/.xprofile*:
+   Put the following lines before *exec* of *~/.xinitrc*:
 
    ```
    export GTK_IM_MODULE=fcitx
    export QT_IM_MODULE=xim
-   export XMODIFIERS=@im=fcitx
+   export XMODIFIERS="@im=fcitx"
    ```
 
    They should be *ahead* of *exec startxfce4* or *xfce4-session*. Commands after *exec* won't be executed! Refer to [xfce4安装fcitx不能激活！很简单的一个原因！](https://bbs.archlinuxcn.org/viewtopic.php?pid=13921).
