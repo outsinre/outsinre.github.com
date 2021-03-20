@@ -639,59 +639,9 @@ Check [Post-installation](https://wiki.archlinux.org/index.php/General_recommend
    1. We must use the exact swap file path instead of UUID or Label.
    2. To cease manual operation bother, try *systemd-swap* that automates swap management.
 
-# GPU Driver
+# X #
 
-Firstly, identify vedio cards:
-
-```
-[root@host ~]# lspci | grep -e VGA -e 3D
-```
-
-The command returns:
-
-```
-Intel HD Graphics 520
-NVIDIA GeForce 920M
-```
-
-So the computer has an integrated Intel video card and a discrete NVIDIA video card respectivelly: it is called [NVIDIA Optimus](https://wiki.archlinux.org/index.php/NVIDIA_Optimus). We have several choices to deal with NVIDIA Optimus: turn off one of the video card, use [Bumbelee](https://wiki.archlinux.org/index.php/Bumblebee), use [Nvidia-xrun](https://wiki.archlinux.org/index.php/Nvidia-xrun) etc. I will set up the system to _switch_ the two cards intelligently:
-
->Nvidia-xrun is a utility to allow Nvidia optimus enabled laptops run X server with discrete nvidia graphics on demand. This solution offers full GPU utilization, compatibility and better performance than Bumblebee.
-
-Install Intel driver:
-
-```bash
-[root@host ~]# pacman -S xf86-video-intel
-```
-
-If this Arch Linux is a VirtualBox guest, then install VirtualBox guest additions.
-
-# KDE #
-
-```bash
-~ $ sudo pacman -S xorg-server xf86-video-amdgpu
-~ $ reboot
-
-~ $ sudo pacman -S plasma-meta
-~ $ sudo pacman -S sddm
-~ $ systemctl enable sddm
-
-~ $ reboot
-```
-
-It seems that *sddm* is quite slow to launch Plasma. We need to increase system *entropy* by *haveged* and/or *rng-tools*:
-
-```bash
-~ $ sudo pacman -S rng-tools
-~ $ sudo systemctl enable rngd
-~ $ sudo systemctl start rngd
-
-~ $ sudo pacman -S haveged
-~ $ systemctl enable haveged
-~ $ systemctl start haveged
-```
-
-It might relate to a [kernel option unset](https://github.com/sddm/sddm/issues/1036#issuecomment-477633990). However, such hack uses *pseudo-random* to increase entropy and may leave your system in risks.
+[X](/2019/03/11/x/).
 
 # Time
 
@@ -734,6 +684,7 @@ Refer to [Linux Time](/2021/03/03/linux-time).
 ```
 
 To upgrade the package, repeat the above procedures.
+
 # Xterm
 
 Install [xterm](https://wiki.archlinux.org/index.php/Xterm) package. Add the following into *~/.Xresources*:
