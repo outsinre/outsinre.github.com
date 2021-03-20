@@ -9,11 +9,13 @@ This is long story. Let's begin with Terminal. At the very beginning, the only i
 
 ![vt100](/assets/vt100.jpg)
 
-Usually a computer allows multiple terminals online. Each terminal is capable of input (_punched tape_ was replaced with _keyboard_ then) and output. Specially, I want to emphasize the output part a little bit. Let's go back to the image above, the terminal has a screen with texts displayed, that is the exact output part, namely the _console_. When we talk console, we refer to the screen part of a physical terminal.
+Usually a computer allows multiple terminals online. Each terminal is connected to input devices (e.g. keyboard) and output devices (e.g. monitor screen). Hence, a terminal is more like a serial interface/port between the computer and its peripheral devices. Sometimes, we call the physical terminal as *console*.
 
-As time flies, standalone terminals were outdated and _virtual terminal_ emerged with smaller computer - Personal Compuer (PC). PC has only one screen and one keyboard embedded but allows switching (`Ctrl-Alt-Fn`) between multiple (12 by default) virtual terminals. Virtual terminal is kernel device that provides a means of input and output. It is not a software terminal instead of a physical one. Most often, a virtual terminal has a _login manager_ in front before an account can interact with his default _login shell_ (i.e. POSIX Bash).
+As time flies, standalone terminals were outdated and _virtual terminal_ emerged with smaller computer - Personal Compuer (PC). PC has only one screen and one keyboard embedded but allows switching (`Ctrl-Alt-Fn`) between multiple (vt1 - vt6) virtual terminals. Each virtual terminal has a kernel device (/dev/tty1-6) that provides a means of input and output. It is a software terminal instead of a physical one. Most often, a virtual terminal has a _login manager_ in front before an account can interact with his default _login shell_ (i.e. POSIX Bash).
 
-Apart from virtual terminal, we have _terminal emulator_ when X window presents. Terminal emulator is similar to a virtual emulator but managed by an X session instead of directly by the kernel.
+Apart from virtual terminal, we have _terminal emulator_ when X window presents. Terminal emulator is similar to a virtual terminal but managed by an X server instead of directly by the kernel.
+
+We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, *xterm* etc. When we *ssh* to a remote server, the remote *sshd* creates a pseudo terminal for my SSH client. After that, ssh/sshd transfer data between my local virtual terminal and remote pseudo terminal.
 
 Now let's move on to Shell. Terminal is where input and output happen (like typing program names), but Shell is a _job_ manager (desktop manager does the same thing). Nowadays, OS (Linux, Unix etc.) schedules multiple processes concurrently, namely _mutli-tasking_ support. Shell is the multi-tasking interface with end users, capable of starting, stopping, suspending, resuming etc. jobs. Upon login, the default Shell is ready for interaction.
 
