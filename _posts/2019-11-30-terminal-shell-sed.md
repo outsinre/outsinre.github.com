@@ -11,7 +11,7 @@ This is long story. Let's begin with Terminal. At the very beginning, the only i
 
 Usually a computer allows multiple terminals online. Each terminal is connected to input devices (e.g. keyboard) and output devices (e.g. monitor screen). Hence, a terminal is more like a serial interface/port between the computer and its peripheral devices. Sometimes, we call the physical terminal as *console*.
 
-As time flies, standalone terminals were outdated and _virtual terminal_ emerged with smaller computer - Personal Compuer (PC). PC has only one screen and one keyboard embedded but allows switching (`Ctrl-Alt-Fn`) between multiple (vt1 - vt6) virtual terminals. Each virtual terminal has a kernel device (/dev/tty1-6) that provides a means of input and output. It is a software terminal instead of a physical one. Most often, a virtual terminal has a _login manager_ in front before an account can interact with his default _login shell_ (i.e. POSIX Bash).
+As time flies, standalone terminals were outdated and _virtual terminal_ emerged with smaller computer - Personal Compuer (PC). PC has only one screen and one keyboard embedded but allows switching (`Ctrl-Alt-Fn`) between multiple (6 by default, vt1 - vt6) virtual terminals. Each virtual terminal has a kernel device (/dev/tty1-6) that provides a means of input and output. It is a software terminal instead of a physical one. Most often, a virtual terminal has a _login manager_ in front before an account can interact with his default _login shell_ (i.e. POSIX Bash).
 
 Apart from virtual terminal, we have _terminal emulator_ when X window presents. Terminal emulator is similar to a virtual terminal but managed by an X server instead of directly by the kernel.
 

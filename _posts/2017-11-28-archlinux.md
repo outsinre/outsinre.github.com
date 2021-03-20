@@ -453,7 +453,7 @@ Check */usr/share/keymaps/i386/qwerty* for predefined keymaps. Switch to a keyma
 root@archiso ~ # loadkeys emacs
 ```
 
-Attention, this only affects keyboard layout in virtual console. X keyboard layout is discuessed below.
+Attention, this only affects keyboard layout in virtual console. X keyboard layout is discuessed [here](/2019/03/11/x/#x-keyboard).
 
 ## Network
 
