@@ -1225,7 +1225,9 @@ Boot with LiveDVD, then
    # emerge -av fcitx fcitx-rime fcitx-configtool
    ```
    
-   *table* USE will draw several built-in input methods (i.e. Wubi) which fail to meet my requirement. *rime* will be installed instead.
+   1. *table* USE will draw several built-in input methods (i.e. Wubi) which fail to meet my requirement. *fcitx-rime* will be installed instead.
+   2. I have disabled the QT globally. So no *qt4* or *qt5* USE.
+   3. *fcitx-configtool* is a GTK configuration tool. To install QT configuration tool for KDE, install *kcm-fcitx*.
    
    Put the following lines before *exec* of *~/.xinitrc*:
 
