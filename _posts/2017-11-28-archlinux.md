@@ -723,13 +723,17 @@ Refer to [Linux Time](/2021/03/03/linux-time).
 ## AUR ##
 
 ```bash
+# get the PKGBUILD file
 ~ $ git clone https://aur.archlinux.org/st.git
 
+# build the package
 ~ $ makepkge
 
-~ # pacman -U st-0.
+# install the package
+~ # pacman -U st-0.8.4-1-x86_64.pkg.tar.zst
 ```
 
+To upgrade the package, repeat the above procedures.
 # Xterm
 
 Install [xterm](https://wiki.archlinux.org/index.php/Xterm) package. Add the following into *~/.Xresources*:
