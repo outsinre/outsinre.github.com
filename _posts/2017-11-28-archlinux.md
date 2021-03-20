@@ -720,6 +720,16 @@ Refer to [Linux Time](/2021/03/03/linux-time).
 [root@host ~ #] pacman -Qtdq | pacman -Rns -         # remove orphaned packages
 ```
 
+## AUR ##
+
+```bash
+~ $ git clone https://aur.archlinux.org/st.git
+
+~ $ makepkge
+
+~ # pacman -U st-0.
+```
+
 # Xterm
 
 Install [xterm](https://wiki.archlinux.org/index.php/Xterm) package. Add the following into *~/.Xresources*:
