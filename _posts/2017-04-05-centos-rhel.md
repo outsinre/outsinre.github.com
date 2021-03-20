@@ -423,9 +423,9 @@ Redhad-based distributions places *locale* customization in */etc/locale.conf*. 
 
 # Create User Account
 
+Check [useradd](/2015/03/25/gentoo-installation/).
+
 ```bash
-~ # useradd -ms /bin/bash -u 1000 username
-~ # passwd username
 ~ # ssh-copy-id -p 12345 username@12.34.56.78
 # add an entry to ~/.ssh/config
 ```

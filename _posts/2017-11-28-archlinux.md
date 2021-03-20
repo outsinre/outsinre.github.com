@@ -618,8 +618,10 @@ Check [Post-installation](https://wiki.archlinux.org/index.php/General_recommend
    [root@host ~]# systemctl enable/start NetworkManager
    ```
 
-2. [New user account]()
-4. Swap file (opt)
+2. [New user account](/2015/03/25/gentoo-installation/)
+4. Swap file
+
+   Optional if swap partition is created.
 
    ```bash
    [root@host ~]# dd bs=1M count=1024 if=/dev/zero of=/swapfile
@@ -630,7 +632,7 @@ Check [Post-installation](https://wiki.archlinux.org/index.php/General_recommend
    [root@host ~]# free -h
    ```
 
-   Finally, add an entry to */etc/fstab*:
+   Finally, addan entry to */etc/fstab*:
 
    >/swapfile none swap defaults 0 0
 
@@ -698,23 +700,24 @@ Refer to [Linux Time](/2021/03/03/linux-time).
 # pacman
 
 ```bash
-[root@host ~ #] pacman -Ss pkg               # search for pkg
-[root@host ~ #] pacman -Si pkg               # show pkg info
-[root@host ~ #] pacman -Sg grp               # show group info
-[root@host ~ #] pacman -S pkg1 pkg2          # install pkg1 and pkg2
-
-[root@host ~ #] pacman -Syu                  # roll the system
-[root@host ~ #] pacman -Syu pkg              # roll the system and install pgk
-
-[root@host ~ #] pacman -Qs pkg               # search for locally installed pkg 
-[root@host ~ #] pacman -Qi pkg               # show locally installed pkg info
-[root@host ~ #] pacman -Qe                   # list explicitly installed pkgs
-
-[root@host ~ #] pacman -D --asdeps pkg       # mark a package as non-explicitly installed
-[root@host ~ #] pacman -D --asexplicit pkg   # mark a package as explicitly installed
-
-[root@host ~ #] pacman -R pkg                # remove pkg but leave dependencies alone
-[root@host ~ #] pacman -Rs pkg               # remove pkg and orphan dependencies
+[root@host ~ #] pacman -Ss pkg                       # search for pkg
+[root@host ~ #] pacman -Si pkg                       # show pkg info
+[root@host ~ #] pacman -Sg grp                       # show group info
+[root@host ~ #] pacman -S pkg1 pkg2                  # install pkg1 and pkg2
+                                                     
+[root@host ~ #] pacman -Syu                          # roll the system
+[root@host ~ #] pacman -Syu pkg                      # roll the system and install pgk
+                                                     
+[root@host ~ #] pacman -Qs pkg                       # search for locally installed pkg 
+[root@host ~ #] pacman -Qi pkg                       # show locally installed pkg info
+[root@host ~ #] pacman -Qe                           # list explicitly installed pkgs
+                                                     
+[root@host ~ #] pacman -D --asdeps pkg               # mark a package as non-explicitly installed
+[root@host ~ #] pacman -D --asexplicit pkg           # mark a package as explicitly installed
+                                                     
+[root@host ~ #] pacman -R pkg                        # remove pkg but leave dependencies alone
+[root@host ~ #] pacman -Rs pkg                       # remove pkg and orphan dependencies
+[root@host ~ #] pacman -Qtdq | pacman -Rns -         # remove orphaned packages
 ```
 
 # Xterm
@@ -751,27 +754,27 @@ To take these settings into effect immediately:
 
 *xrdb* without the `-merge` option will reload _.Xresources_, replacing current settings.
 
-## Copy/Paste
+## Copy and Paste
 
-X11 has two kinds of buffer (also named as *selection*): PRIMARY and CLIPBOARD. Usually, to copy/paste to/from the CLIPBOARD , we select (highlight) text & press Ctrl-C and Ctrl-V. Selected text will be copied to PRIMARY automatically. To paste from PRIMARY, press the middle mouse button. *Shift-insert* also pastes from PRIMARY, but only support by terminal emulator. Implicitly, PRIMARY buffer lives a short period and will be replaced with new text selection.
+X11 has two kinds of buffers, namely PRIMARY and CLIPBOARD.
 
->Literally, we also call *paste* as *insert* from buffer.
+To copy/paste to/from the CLIPBOARD , we select (highlight) text, press Ctrl-C and Ctrl-V. Selected text will be copied to PRIMARY buffer automatically. To paste from PRIMARY, press the middle mouse button. *Shift-insert* also pastes from PRIMARY, but support only by terminal emulators. Implicitly, PRIMARY buffer lives a short period and will be replaced with new selection.
+
+Literally, we use *paste* and *insert*, *buffer* and *selection* interchangeably.
 
 Buffer/Selection | In/Copy | Out/Paste/Insert
 --- | --- | ---
 PRIMARY | select | MiddleMouse/Shift-Insert
 CLIPBOARD | select & Ctrl-C | Ctrl-V
 
-The actual buffer and key shortcut used are determined by X application. When it comes to Xterm, it select text to PRIMARY by default. Swtich between PRIMARY and CLIPBOARD by Ctrl-MiddbleMouse and tick/untick *Select to Clipboard* or:
+The actual buffer and key shortcut used are determined by X application. When it comes to Xterm, selection goes to PRIMARY by default. However, we can set selection to CLIPBOARD by Ctrl-MiddbleMouse and enable *Select to Clipboard*. Alternatively, we can adjust *~/.Xresources*:
 
 ```
 # ~/.Xresources
 XTerm.vt100.selectToClipboard: true/false
 ```
 
-The first switch method is preferred as it's easier to adjust buffer setting according to associated application. The switch only changes which buffer to use while keeps the default operations (select, middle mouse and/or Shift-Insert).
-
-To enable both PRIMARY and CLIPBOARD buffers, we leave the default while adding copy/paste operations. Thus both buffers are active:
+Such settings will abandom the PRIMARY buffer. Instead, we add copy/paste shortcuts:
 
 ```
 # ~/.Xresources
@@ -780,7 +783,7 @@ XTerm.vt100.translations: #override \n\
     Ctrl Shift <Key>V: insert-selection(CLIPBOARD)
 ```
 
-Notice: each key binding line must be separated by escape sequence *\n\*.
+Notice that each key binding line must be separated by `\n\`.
 
 # Resolution
 
