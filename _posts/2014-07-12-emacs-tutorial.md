@@ -177,7 +177,7 @@ Balanced expressions can span multiple lines – multi-line strings for instance
 
 The first two commands support *sexp* fully. The next four work on balanced expressions — but only brackets, and not strings. Emacs those expressions as 'list* which means *lisp* in the old times. But all cover a wide variaty of coding languages.
 
-*attention*: these key bindings might not work in Emacs due to *fcitx* occupying them.
+Attention please; these key bindings might not work in Emacs due to Fcitx occupying them.
 
 # Undo/Redo
 
@@ -814,7 +814,7 @@ There are many other Windows configs, but integrated into other features, like A
 
    里面的 `14 23 (face flx-highlight-face)` 好像可以去掉，不知道是不是因为我的 Emacs 里其它插件自动调整的。
 
-   It's important to configure a good phrase file (词库）. *chinese-pyim* phrase file *.pyim* is much the same as *.org* format except that it uses `-` instead of `'`. Both *org* and *pyim* are normal text file. More on *org* phrase file, refer to [fcitx](http://jimgray.tk/2016/01/01/fcitx-chinese-pyim/) post. By *org* phrase file, we can generate both phrase file for *fcitx .mb* and *chinese-pyim .pyim* format. But pay attention to their difference.
+   It's important to configure a good phrase file (词库）. *chinese-pyim* phrase file *.pyim* is much the same as *.org* format except that it uses `-` instead of `'`. Both *org* and *pyim* are normal text file. More on *org* phrase file, refer to [Fcitx](/2016/01/01/ime/) post. By *org* phrase file, we can generate both phrase file for *fcitx .mb* and *chinese-pyim .pyim* format. But pay attention to their difference.
 3. Refer to [github chinese-pyim](https://github.com/tumashu/chinese-pyim). 
 
 ## init-sdcv

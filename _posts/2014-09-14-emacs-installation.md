@@ -16,7 +16,7 @@ title: Emacs installation
 2. `LC_CTYPE` 要设置称 `zh_CN.UTF-8`.
 3. 安装 Fcitx 输入法。
 
-参考 [Gentoo Installation](http://jimgray.tk/2015/03/25/gentoo-installation/).
+参考 [Gentoo Installation](/2015/03/25/gentoo-installation/).
 
 ## Emacs 启动太慢
 

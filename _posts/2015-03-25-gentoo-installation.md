@@ -979,12 +979,9 @@ Boot with LiveDVD, then
    The default is enough to launch Xfce4 desktop. However we might require extra stuff like:
 
    ```
-   export XMODIFIERS="@im=fcitx"
-   export QT_IM_MODULE="fcitx"
-   export GTK_IM_MODULE="fcitx"
-
    # Refer to /etc/X11/xinit/xinitrc
    # or replace 'startxfce4' with 'xfce4-session':
+
    #exec ck-launch-session dbus-launch --sh-syntax --exit-with-session xfce4-session
    exec $command
    ```

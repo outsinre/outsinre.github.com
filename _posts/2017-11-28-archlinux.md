@@ -855,12 +855,6 @@ You can get the Identifier value from *xrandr* output.
 
 # Fcitx
 
-```bash
-[root@host ~ #] pacman -S fcitx fcitx-rime kcm-fcitx
-```
+First, install [Fcitx](/2015/03/25/gentoo-installation/).
 
-Append *run fcitx-autostart* into *~/.config/awesome/autostart.sh* and relaunch awesome.
-
-Fcitx has built-in Pinyin that is really fast. Open *fcitx-configtool* and add Pinyin to input list.
-
-Finally, Ctrl-Space.
+Then, append *run fcitx-autostart* into *~/.config/awesome/autostart.sh* and relaunch awesome.
