@@ -906,12 +906,10 @@ Boot with LiveDVD, then
    ```
 
    The last comman triggers over 60 packages rebuild.
-3. SysRq
-   1. `Alt - SysRq - argument` simutaneously; ThinkPad Fn is not required.
+3. [SysRq](https://wiki.archlinux.org/index.php/Keyboard_shortcuts#Kernel_(SysRq))
+   1. `Alt - SysRq/PrintScreen - <argument>` simutaneously; ThinkPad Fn is not required.
    2. Or press the key one by one: `Alt`, `[Fn] - SysRq`, and *argument*.
-   3. The detailed *arguments* can be found at [kernel sysrq](https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html).
-
-       I generally unraw(r), sync(s), umount(u), and/or reboot(b) when my system locks.
+   3. The detailed *arguments* can be found at [kernel sysrq](https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html). I generally unraw(r), sync(s), umount(u), and/or reboot(b) when my system is *dead*.
 
 # [X Window System](https://en.wikipedia.org/wiki/X_Window_System)
 
