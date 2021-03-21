@@ -12,8 +12,8 @@ title: Emacs installation
 
 ## 输入法
 
-1. 如果是 Gentoo，一定要安装 font-adobe-75dpi 和 font-adobe-100dpi 字体。
-2. `LC_CTYPE` 要设置称 `zh_CN.UTF-8`.
+1. 确保系统安装 adobe-75dpi 和 adobe-100dpi 字体。
+2. 如果是 Awesome, 则要把 `LC_CTYPE` 要设置称 `zh_CN.UTF-8`. 如果是 KDE 这样的 DE, 则不用。
 3. 安装 Fcitx 输入法。
 
 参考 [Gentoo Installation](/2015/03/25/gentoo-installation/).
