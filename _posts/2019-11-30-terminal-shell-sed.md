@@ -15,7 +15,7 @@ As time flies, standalone terminals were outdated and _virtual terminal_ emerged
 
 Apart from virtual terminal, we have _terminal emulator_ when X window presents. Terminal emulator is similar to a virtual terminal but managed by an X server instead of directly by the kernel.
 
-We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, *xterm* etc. When we *ssh* to a remote server, the remote *sshd* creates a pseudo terminal for my SSH client. After that, ssh/sshd transfer data between my local virtual terminal and remote pseudo terminal.
+We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, terminal emulator (e.g. *xterm*) etc. When we *ssh* to a remote server, the remote *sshd* creates a pseudo terminal for my SSH client. After that, ssh/sshd transfer data between my local virtual terminal and remote pseudo terminal. Similarly, terminal emulator also creates pseudo terminal upon startup.
 
 Now let's move on to Shell. Terminal is where input and output happen (like typing program names), but Shell is a _job_ manager (desktop manager does the same thing). Nowadays, OS (Linux, Unix etc.) schedules multiple processes concurrently, namely _mutli-tasking_ support. Shell is the multi-tasking interface with end users, capable of starting, stopping, suspending, resuming etc. jobs. Upon login, the default Shell is ready for interaction.
 
