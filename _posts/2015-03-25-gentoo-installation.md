@@ -1171,7 +1171,15 @@ Boot with LiveDVD, then
    2. ALSA includes both kernel sound card drivers and userspace package *media-libs/alsa-lib*, while PulseAudio builds on top of ALSA kernel part while offering userspace package *media-sound/pulseaudio*.
    3. PulseAudio is configured to automatically detect all sound cards and manage them. It takes control of all detected ALSA devices and redirect all audio streams to itself, making the PulseAudio daemon the central configuration point. 
 
-   Check if *alsa-lib* and *alsa-utils* are installed or not. By default, the `alsa` USE flag is enabled in profile, so these packages will be emerged by default.
+   Check if *alsa-lib* and *alsa-utils* are installed or not. By default, the `alsa` USE flag is enabled in profile, so these packages should be emerged already.
+   
+   By default system sound is muted. Use *alsamixer* to unmoute:
+   
+   ```bash
+   ~ $ alsamixer
+   ```
+   
+   To test sound:
 
    ```bash
    # speaker-test -t wav -c 2

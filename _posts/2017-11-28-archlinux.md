@@ -677,7 +677,7 @@ Refer to [Linux Time](/2021/03/03/linux-time).
 ~ $ git clone https://aur.archlinux.org/st.git
 
 # build the package
-~ $ makepkge
+~ $ makepkg
 
 # install the package
 ~ # pacman -U st-0.8.4-1-x86_64.pkg.tar.zst
