@@ -918,7 +918,7 @@ Boot with LiveDVD, then
    X originated at the Massachusetts Institute of Technology (MIT) in 1984. The protocol has been version 11 (hence "X11") since September 1987.
 2. [Xorg](https://wiki.gentoo.org/wiki/Xorg/Configuration) Server.
    1. Mainly *x11-base/xorg-server* (depending on *x11-base/xorg-drivers* and *x11-libs/mesa*).
-   2. *vaapi* USE is enabled to utilize hardware acceleration.
+   2. *vaapi* USE is enabled to utilize [hardware acceleration](/2019/03/11/x/#hardware-acceleration).
    3. The *i965* and *i915* drivers split at system application (*media-libs/mesa*) level. The kernel always enable *i915* instead.
 
    Do NOT do:
@@ -1254,7 +1254,7 @@ Boot with LiveDVD, then
    1. *ffmpeg* is emerged by some other packages, one of which might be Firefox or Mpv.
    4. Add *-libav* to *make.conf* in favor of system-wide *ffmpeg*.
    2. *v4l* and *libv4l*USE for the webcamera.
-   3. *vaapi* USE for hardware decoding.
+   3. *vaapi* USE for [hardware decoding](/2019/03/11/x/#hardware-acceleration).
    5. *librtmp* USE to replace the native RTMP implementation (bad performance).
    6. *network* (default) and *openssl* to support HTTP/HTTPS streaming.
 
