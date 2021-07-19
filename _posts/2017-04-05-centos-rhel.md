@@ -386,33 +386,6 @@ Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *ci
 
 Redhad-based distributions places *locale* customization in */etc/locale.conf*. Check `man locale.conf`.
 
-# systemd #
-
-```bash
-~ # systemctl show/cat unit.service
-~ # systemctl status/enable/start/stop/restart/disable unit@instance.service
-~ # systemctl list-unit-files/list-units/--failed/reset-failed
-~ # systemctl edit unit.service (overide system unit)
-~ # systemctl daemon-reload/reload
-~ # systemctl enable/disable unit@sub.service
-```
-
-## logging ##
-
-```bash
-~ # journalctl -xef
-~ # journalctl -u nginx
-~ # systemctl status unit.service
-```
-
-## systemctl mask ##
-
-```bash
-~ # systemctl stop iptables-services
-~ # sysremctl disable iptables-services
-~ # systemctl mask iptables-services
-```
-
 # SSH
 
 ```bash
