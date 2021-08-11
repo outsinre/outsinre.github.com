@@ -827,3 +827,25 @@ user@host ~ $ pacman -S fcitx-im fcitx-configtool
 ```
 
 Then, append *run fcitx-autostart* into *~/.config/awesome/autostart.sh* and relaunch awesome.
+
+# WPS #
+
+WPS on Linux has two version, namely *wps-office-cn* and *wps-office*. The CN version has much more features!
+
+```bash
+~ $ git clone https://aur.archlinux.org/wps-office-cn.git
+~ $ cd wps-office-cn
+~ $ makepkg
+~ $ sudo pacman -U wps-office-cn-11.1.0.10702-1-x86_64.pkg.tar.zst
+```
+
+To display math symbols, we need to install [AUR ttf-wps-fonts](https://aur.archlinux.org/packages/ttf-wps-fonts/).
+
+After closing WPS, the background process refuses to exit:
+
+```bash
+~ $ sudo chmod -x /usr/lib/office6/wpsoffice
+~ $ sudo chmod -x /usr/lib/office6/wpscloudsvr
+```
+
+However, remove the excution permission may disallow WPS login. It's a trade-off.
