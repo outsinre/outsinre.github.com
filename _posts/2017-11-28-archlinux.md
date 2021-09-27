@@ -647,27 +647,50 @@ Check [Post-installation](https://wiki.archlinux.org/index.php/General_recommend
 
 Refer to [Linux Time](/2021/03/03/linux-time).
 
-# pacman
+# pacman #
+
+*/etc/pacman.conf* sets almost everything regarding pacman, like database, cache, log, repos etc.
+
+pacman has two data warehouses:
+
+1. main repo. the synced database that stores package metadata (`pacman -S`).
+
+   ```bash
+   ~ $ tar -tzpvf /var/lib/pacman/sync/core.db
+   ```
+
+2. local repo. the locally installed packages (`pacman -Q`).
 
 ```bash
-[root@host ~ #] pacman -Ss pkg                       # search for pkg
-[root@host ~ #] pacman -Si pkg                       # show pkg info
-[root@host ~ #] pacman -Sg grp                       # show group info
-[root@host ~ #] pacman -S pkg1 pkg2                  # install pkg1 and pkg2
-                                                     
-[root@host ~ #] pacman -Syu                          # roll the system
-[root@host ~ #] pacman -Syu pkg                      # roll the system and install pgk
-                                                     
-[root@host ~ #] pacman -Qs pkg                       # search for locally installed pkg 
-[root@host ~ #] pacman -Qi pkg                       # show locally installed pkg info
-[root@host ~ #] pacman -Qe                           # list explicitly installed pkgs
-                                                     
-[root@host ~ #] pacman -D --asdeps pkg               # mark a package as non-explicitly installed
-[root@host ~ #] pacman -D --asexplicit pkg           # mark a package as explicitly installed
-                                                     
-[root@host ~ #] pacman -R pkg                        # remove pkg but leave dependencies alone
-[root@host ~ #] pacman -Rs pkg                       # remove pkg and orphan dependencies
-[root@host ~ #] pacman -Qtdq | pacman -Rns -         # remove orphaned packages
+[root@host ~ #] pacman -Ss regex                       # search for pkg
+[root@host ~ #] pacman -Si pkg                         # show pkg info
+[root@host ~ #] pacman -Sg grp                         # show group info
+[root@host ~ #] pacman -S pkg1 pkg2                    # install pkg1 and pkg2
+                                                       
+[root@host ~ #] pacman -Syu                            # roll the system
+[root@host ~ #] pacman -Syu pkg                        # roll the system and install pgk
+                                                       
+[root@host ~ #] pacman -Qs pkg                         # search for locally installed pkg 
+[root@host ~ #] pacman -Qi pkg                         # show locally installed pkg info
+[root@host ~ #] pacman -Qe                             # list explicitly installed pkgs
+                      
+[root@host ~ #] pactree pkg                            # show dependency
+
+[root@host ~ #] pacman -F /path/to/file                # pathname in main repo
+[root@host ~ #] pacman -Qo /path/to/file               # pathname in local repo
+                                                       
+[root@host ~ #] pacman -D --asdeps pkg                 # mark a package as non-explicitly installed
+[root@host ~ #] pacman -D --asexplicit pkg             # mark a package as explicitly installed
+                                                       
+[root@host ~ #] pacman -R pkg                          # remove pkg but leave dependencies alone
+[root@host ~ #] pacman -R grp
+[root@host ~ #] pacman -Rs pkg                         # remove pkg and orphan dependencies
+
+[root@host ~ #] pacman -Qtd                            # query orphaned packages
+[root@host ~ #] pacman -Qtdq | pacman -Rns -           # remove orphaned packages
+
+[root@host ~ #] paccache -ruk0                         # clean downloaded packages
+[root@host ~ #] pacman -Scc                            # more aggressive
 ```
 
 ## AUR ##
