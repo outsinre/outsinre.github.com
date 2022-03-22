@@ -271,6 +271,58 @@ root@tux ~ # docker network inspect mynet
 
 Use the `--net` or `--network` option. To the 'host' networking driver, just pass `--net host` option to *docker run*.
 
+# exec and shell #
+
+Usually, in the end of image, we have three kinds of *instruction*:
+
+1. RUN. Creates a new layer of image. Usually used to install package. It's recommended to install multiple packages in a single RUN instruction so that we have less image layers.
+2. CMD. Set the default command to run when *run* a container.
+3. ENTRYPOINT. *run* a container as a command, so that we can provide extra arguments when *run*.
+
+Refer to [RUN, ENTRYPOINT and CMD](http://goinbigdata.com/docker-run-vs-cmd-vs-entrypoint/) for more details.
+
+Each instruction has two kinds of running forms:
+
+1. shell form.
+
+   ```
+   <instruction> cmd para1 para2 ...
+   ```
+
+   By default, */bin/sh* will be used to run the *cmd* as:
+   
+   ```
+   /bin/sh -c 'cmd para1 para2 ...'
+   ```
+   
+   It is the preferred form of the RUN instruction.
+2. exec form.
+
+   The *cmd* is ran directly without any Shell involvement, which is the preferred form of CMD and ENTRYPOINT.
+   
+   ```
+   <instruction> ["cmd", "para1", "para2", ...]
+   ```
+   
+   We can hack by changing the *cmd* to */bin/bash*:
+   
+   ```
+   <instruction> ["/bin/bash", "-c", "cmd", "para1", "para2", ...]
+   ```
+
+Refer to [exec form or sh form](https://www.cnblogs.com/sparkdev/p/8461576.html) for more details.
+
+
+We can use *docker container inspect* to show the instructions and their forms. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`.
+
+We can pass custom commands and arguments when invoking *docker run*, which will override the CMD instruction. If there exists the ENTRYPOINT instruction in exec form, then custom arguments would be fed to entrypoint *cmd*. ENTRYPOINT in shell form would ignore custom arguments.
+
+Here is an illustration between CMD and ENTRYPOINT:
+
+![cmd-entrypoint](/assets/cmd-entrypoint.png)
+
+Refer to [Dockerfile reference](https://docs.docker.com/engine/reference/builder/) for more details.
+
 # Build Image by Dockerfile
 
 From *commit* example above, we can create new image layer but many negligible commands like *ls*, *pwd*, etc. are recourded as well.
@@ -289,12 +341,6 @@ RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
 ```
 
 Just two lines! FROM imports the base image on which we will create the new layer. If we do not want any base image, use the special null image *scratch*.
-
-Usually, in the end of image, [exec form or sh (/bin/sh) form](https://www.cnblogs.com/sparkdev/p/8461576.html) instruction sets commands and arguments. *docker container inspect* show the default commands and arguments. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`. We can pass custom commands and arguments when invoking *docker run*. Apart from the difference between *exec* form and *sh* form, there are command instructions like [RUN, ENTRYPOINT and CMD](http://goinbigdata.com/docker-run-vs-cmd-vs-entrypoint/). ENTRYPOINT configures a container that will run as an executable in that we can pass explicit arguments when running the container, making it looks like a normal command. The RUN instruction prefers the *sh* form while ENTRYPOINT and CMD prefer the *exec* form. If */bin/bash* is preferred to */bin/sh*, then choose the *exec* form like `["/bin/bash", "-c", "echo 'Hello, world.'"]`.
-
-Details about the difference between CMD and ENTRYPOINT, please the image below:
-
-![cmd-entrypoint](/assets/cmd-entrypoint.png)
 
 Now we build the image:
 
