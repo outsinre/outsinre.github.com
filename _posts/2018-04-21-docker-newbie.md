@@ -194,7 +194,7 @@ root@tux ~ # docker container prune                # remove all stopped containe
    CMD ["nginx", "-g", "daemon off;"]
    ```
 
-3. The `--mount` type is a Bind Mount directory.
+3. The `--mount` type is a [Bind Mount](#data-share) directory.
 4. Visit the Nginx container page at *http://host-ip:8080*.
 5. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by sending SIGKILL signal.
 

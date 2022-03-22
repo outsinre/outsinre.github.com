@@ -15,7 +15,7 @@ As time flies, standalone terminals were outdated and _virtual terminal_ emerged
 
 Apart from virtual terminal, we have _terminal emulator_ when X window presents. Terminal emulator is similar to a virtual terminal but managed by an X server instead of directly by the kernel.
 
-We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, terminal emulator (e.g. *xterm*) etc. When we *ssh* to a remote server, the remote *sshd* creates a pseudo terminal for my SSH client. After that, ssh/sshd transfer data between my local virtual terminal and remote pseudo terminal. Similarly, terminal emulator also creates pseudo terminal upon startup.
+We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, terminal emulator (e.g. *xterm*) etc. A pseudo terminal (e.g. /dev/pts/04) actually consists of a pair of character mode devices, the master device and the slave device. When we *ssh* to a remote server, the remote *sshd* creates a pseudo terminal for the session. *sshd* is associated with the master, while the server's Bash process is associated with the slave. After that, ssh/sshd transfer data between my local virtual terminal and remote pseudo terminal. Without the slave, how would the Bash process get its stdin/stdout/stderr? Similarly, terminal emulator also creates pseudo terminal upon startup.
 
 Now let's move on to Shell. Terminal is where input and output happen (like typing program names), but Shell is a _job_ manager (desktop manager does the same thing). Nowadays, OS (Linux, Unix etc.) schedules multiple processes concurrently, namely _mutli-tasking_ support. Shell is the multi-tasking interface with end users, capable of starting, stopping, suspending, resuming etc. jobs. Upon login, the default Shell is ready for interaction.
 
@@ -41,3 +41,5 @@ Numbers in brackets are job IDs while numbers that follow job IDs are PID. More 
 BTW, a _daemon_ does not belong to job as it _detach_es from Shell and gets out of Shell management. Process suspended or running in background belong to job. Putting a job background allows starting another job as the Shell is _release_d.
 
 Finally, we go to `sed`. It is just a sample of the many programs managed by Shell. Nothing more required to clarify.
+
+Refer to [the TTY demystified](http://www.linusakesson.net/programming/tty/index.php) and [Using pseudo-terminals (pty) to control interactive programs](http://www.rkoucha.fr/tech_corner/pty_pdip.html).
