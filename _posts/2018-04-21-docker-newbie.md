@@ -39,7 +39,7 @@ Install [docker-ce instead of docker-ee](https://docs.docker.com/install/linux/d
 
 The daemon manages everything!
 
-# [Metadata](https://docs.docker.com/engine/reference/commandline/docker/)
+# Command Sample #
 
 ```bash
 root@tux ~ # fgrep -qa docker /proc/1/cgroup; echo $?                    # check if it is a docker
@@ -48,6 +48,8 @@ root@tux ~ # docker image/container ls [-a]                              # list 
 root@tux ~ # docker [image] history                                      # show layers of an image
 root@tux ~ # docker inspect [ name | ID ]                                # display low-level details on any docker objects
 ```
+
+Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine/reference/commandline/docker/).
 
 # Pull
 
@@ -105,7 +107,7 @@ root@docker ~ # exit 13
 root@docker ~ # echo $?
 ```
 
-1. When we run an image, a container is created.
+1. When we run an image, a container is created with an extra layer of writable filesystem.
 2. With `-d` option, containers run in in background mode and terminal is released immediately, otherwise in foreground mode.
 3. `-i` keeps STDIN open even if not attached and runs the container interactively.
 
@@ -118,22 +120,23 @@ root@docker ~ # echo $?
 
 # Data Share
 
-Docker containers can read from or write to pathnames, either on host or on memory filesystem - to share data. There are three types:
+Docker containers can read from or write to pathnames, either on host or on memory filesystem - to share data. There are [three storage types](https://docs.docker.com/storage/):
 
 1. Volume, Data Volume, or Named Volume.
 
-   By default, running data of a container is layered on top of the image used to create it. A volume decouples that data from both the host or the container. Just think of a Windows partition or removable disk drive.
+   By default, running data of a container is layered on top of the image used to create it. A *volume* decouples that data from both the host or the container. Just think of a Windows partition or removable disk drive.
 
    Volumes are managed by Docker and persist. Data within can be shared among multiple containers, as well as between the host and a container.
 2. Bind Mount.
 
-   Bind a file or a mount directory of the host within a running container. The target can be read-only or read-write. For example, bind host */etc/resolv.conf* to a container, sharing name servers.
+   Bind-mount a file or directory in the host to a file or directory in the container. The target can be read-only or read-write. For example, bind host */etc/resolv.conf* to a container, sharing name servers.
+   
+   Usually, for personal use, we just use Bind Mount with option `--volume , -v` or option `--mount`. Option `--mount` is recommended as it is more verbose, though `--volume, -v` won't be deprecated.
+   
+   If the file or directory on the host does not exist. `--volume` and `--mount` behaves differently. `-v` would create the pathname as a *directory*, NOT a file, while `--mount` would report error.
 3. Tmpfs.
 
    Needless to say, *tmpfs* is a memory filesystem.
-4. The `--volume , -v` or `--mount` can be used. `--mount` is recommended though `--volume, -v` won't be deprecated.
-
-    The source pathname must exist beforehand! If `-v, --volume` is used, then the source pathname is created as a directory (NOT a file) on demand.
 
 ## [SELinux](https://stackoverflow.com/q/24288616)
 
