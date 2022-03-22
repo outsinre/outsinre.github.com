@@ -133,14 +133,16 @@ Docker containers can read from or write to pathnames, either on host or on memo
    
    Usually, for personal use, we just use Bind Mount with option `--volume , -v` or option `--mount`. Option `--mount` is recommended as it is more verbose, though `--volume, -v` won't be deprecated.
    
-   If the file or directory on the host does not exist. `--volume` and `--mount` behaves differently. `-v` would create the pathname as a *directory*, NOT a file, while `--mount` would report error.
+   If the file or directory on the host does not exist. `--volume` and `--mount` behaves differently. `--volume` would create the pathname as a *directory*, NOT a file, while `--mount` would report error. On the contrary, if the target pathname already exists in the container, both options would *obsecure* contents over there. This is useful if we'd like to test a new version of file/directory without rebuild a new image.
+   
+   Another difference between the two options is `--mount` support all three storage types but `--volume` only support Bind Mound.
 3. Tmpfs.
 
    Needless to say, *tmpfs* is a memory filesystem.
 
 ## [SELinux](https://stackoverflow.com/q/24288616)
 
-When binding a file or mount a directory of host, SELinx policy in the container may restrict access to the shared pathname.
+When bind-mount a file or mount a directory of host, SELinx policy in the container may restrict access to the shared pathname.
 
 1. Temporarily turn off SELinux policy: 
 
@@ -151,17 +153,17 @@ When binding a file or mount a directory of host, SELinx policy in the container
 
 2. Adding a SELinux rule for the shared pathname:
 
-   ```
-   root@tux ~ # chcon -Rt svirt_sandbox_file_t /path/to/volume
+   ```bash
+   root@tux ~ # chcon -Rt svirt_sandbox_file_t /path/to/
    ```
 
-3. Pass argument `:z` or `:Z` to `-v, --volume` option:
+3. Pass argument `:z` or `:Z` to `--volume` option:
 
-   ```
+   ```bash
    -v /root/workspace:/root/workspace:z
    ```
 
-   This method does not apply to `--mount`.
+   Attention please, `--mount` does not support this.
 4. Pass `--privileged=true` to *docker run*.
 
    However, this method is discouraged as privileged containers bring in security risks. If it is the last resort, first create a privileged container and then create a non-priviledged container inside.
