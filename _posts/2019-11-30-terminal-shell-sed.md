@@ -15,9 +15,9 @@ As time flies, standalone terminals were outdated and _virtual terminal_ emerged
 
 Apart from virtual terminal, we have _terminal emulator_ when X window presents. Terminal emulator is similar to a virtual terminal but managed by an X server instead of directly by the kernel.
 
-We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, terminal emulator (e.g. *xterm*) etc. A pseudo terminal (e.g. */dev/pts/04*) actually consists of a pair of character mode devices, the master device and the slave device, though they appear to a single device name.
+We also have [pseudo terminal](https://unix.stackexchange.com/q/21147) (pts/xy) that is created and owned by a applications like *sshd*, terminal emulator (e.g. *xterm*) etc. A pseudo terminal is a device (e.g. file */dev/pts/04*), actually consisting of the master side and the slave side, though they appear to a single device name.
 
-When we *ssh* to a remote server, we establish a secure TCP connection to the remote *sshd* daemon. By default, we run a remote application through *ssh*, by default, which is a Shell like */bin/bash* if we does not explicitly provide a command. The remote application needs a terminal for I/O, namely STDIN/STDOUT/STDERR. So *sshd* creates a pseudo terminal for the application (e.g. Bash). *sshd* is associated with the master, while the remote application is associated with the slave. Here is simple data flow:
+When we *ssh* to a remote server, we establish a secure TCP connection to the remote *sshd* daemon. We run a remote application through SSH, by default, which is a Shell like */bin/bash* if we does not explicitly provide a command. The remote application needs a terminal for I/O, like STDIN/STDOUT/STDERR. So *sshd* creates a pseudo terminal for the application (e.g. Bash). *sshd* is associated with the master, while the remote application is associated with the slave. Here is simple data flow:
 
 ```
 |        local     |           Internet          |             remote            |
