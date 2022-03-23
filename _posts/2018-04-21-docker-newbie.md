@@ -315,7 +315,7 @@ Refer to [exec form or sh form](https://www.cnblogs.com/sparkdev/p/8461576.html)
 
 We can use *docker container inspect* to show the instructions and their forms. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`.
 
-We can pass custom commands and arguments when invoking *docker run*, which will override the CMD instruction. If there exists the ENTRYPOINT instruction in exec form, then custom arguments would be appended to the *cmd*. If the CMD instruction only contains parameters, it will serve as the default parameters of the ENTRYPOINT instruction in exec form. Custom arguments will override those in the CMD instruction. ENTRYPOINT in shell form would ignore custom arguments.
+We can pass custom commands and arguments when invoking *docker run*, which will override the CMD instruction and arguments thereof. If there exists the ENTRYPOINT instruction in exec form, then custom arguments would be appended to the ENTRYPOINT *cmd*. By default, ENTRYPOINT exec form will take extra arguments from CMD instruction in shell form. Custom arguments when *docker run* will override those in the CMD instruction. ENTRYPOINT in shell form would ignore custom arguments from CMD or *docker run*.
 
 Here is an illustration between CMD and ENTRYPOINT:
 
