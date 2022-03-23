@@ -15,7 +15,19 @@ As time flies, standalone terminals were outdated and _virtual terminal_ emerged
 
 Apart from virtual terminal, we have _terminal emulator_ when X window presents. Terminal emulator is similar to a virtual terminal but managed by an X server instead of directly by the kernel.
 
-We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, terminal emulator (e.g. *xterm*) etc. A pseudo terminal (e.g. /dev/pts/04) actually consists of a pair of character mode devices, the master device and the slave device. When we *ssh* to a remote server, the remote *sshd* creates a pseudo terminal for the session. *sshd* is associated with the master, while the server's Bash process is associated with the slave. After that, ssh/sshd transfer data between my local virtual terminal and remote pseudo terminal. Without the slave, how would the Bash process get its stdin/stdout/stderr? Similarly, terminal emulator (e.g. xterm) also creates pseudo terminal upon startup. The emulator connects to the master side while user processes connect to the slave side.
+We also have *pseudo terminal* (pts/xy) that is created and owned by a applications like *sshd*, terminal emulator (e.g. *xterm*) etc. A pseudo terminal (e.g. */dev/pts/04*) actually consists of a pair of character mode devices, the master device and the slave device, though they appear to a single device name.
+
+When we *ssh* to a remote server, we establish a secure TCP connection to the remote *sshd* daemon. By default, we run a remote application through *ssh*, by default, which is a Shell like */bin/bash* if we does not explicitly provide a command. The remote application needs a terminal for I/O, namely STDIN/STDOUT/STDERR. So *sshd* creates a pseudo terminal for the application (e.g. Bash). *sshd* is associated with the master, while the remote application is associated with the slave. Here is simple data flow:
+
+```
+|        local     |           Internet          |             remote            |
+|                  |                             |                               |
+| terminal --- ssh | --------------------------- | sshd - master -- slave - bash |
+|                  |                             |                               |
+|                  |                             |                               |
+```
+
+After that, ssh/sshd transfer data between local terminal and remote pseudo terminal. Without the slave, how would the Bash process get its STDIN/STDOUT/STDERR? Similarly, terminal emulator (e.g. xterm) also creates pseudo terminal upon startup. The emulator connects to the master side while user processes connect to the slave side. The local terminal above probably is a pseudo terminal of terminal emulator nowadays.
 
 Now let's move on to Shell. Terminal is where input and output happen (like typing program names), but Shell is a _job_ manager (desktop manager does the same thing). Nowadays, OS (Linux, Unix etc.) schedules multiple processes concurrently, namely _mutli-tasking_ support. Shell is the multi-tasking interface with end users, capable of starting, stopping, suspending, resuming etc. jobs. Upon login, the default Shell is ready for interaction.
 
