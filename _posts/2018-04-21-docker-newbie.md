@@ -54,6 +54,8 @@ Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine
 
 # Pull
 
+It is highly recommended to finish the "docker/getting-started" tutorial.
+
 ```bash
 root@tux ~ # docker search ubuntu                                        # search docker images by name on Docker Hub
 root@tux ~ # docker pull ubuntu:16.04                                    # specify a tag
