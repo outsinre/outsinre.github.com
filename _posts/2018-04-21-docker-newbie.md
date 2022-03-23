@@ -114,7 +114,7 @@ root@docker ~ # echo $?
 2. With `-d` option, containers run in in background mode and terminal is released immediately, otherwise in foreground mode.
 3. `-i` keeps STDIN open even if not attached and runs the container interactively.
 
-   `-t` allocates a pseudo-TTY connected to the container's STDIN.
+   `-t` allocates a pseudo-TTY connected for the container's STDIN/STDEOUT/STDERR. These two options usually work together.
 4. `--rm` automatically remove the container when it exits.
 5. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
 6. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
