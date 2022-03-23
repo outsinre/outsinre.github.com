@@ -400,3 +400,5 @@ Successfully tagged nginx:v3
       RUN /bin/bash -c 'useradd -ms /bin/bash -u 1000 -g 1000 username ; \
       echo "username:1C2B3A" | chpasswd'
       ```
+
+Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
