@@ -47,6 +47,7 @@ root@tux ~ # docker info                                                 # displ
 root@tux ~ # docker image/container ls [-a]                              # list images/containers
 root@tux ~ # docker [image] history                                      # show layers of an image
 root@tux ~ # docker inspect [ name | ID ]                                # display low-level details on any docker objects
+root@tux ~ # docker logs <container>
 ```
 
 Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine/reference/commandline/docker/).
@@ -201,6 +202,9 @@ root@tux ~ # docker container prune                # remove all stopped containe
 # Get into container
 
 ```bash
+root@tux ~ # docker exec webserver sh -c 'echo $PATH'
+root@tux ~ # docker exec webserver ps
+
 root@tux ~ # docker exec -it webserver bash
 #
 root@docker ~ # echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
@@ -224,9 +228,9 @@ root@tux ~ # docker history nginx:v2
    ```
 
    The `--rm` tells to remove the container upon exit.
-5. [docker attach](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
+5. [docker attach <container>](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
 
-   This command attaches the host's terminal STDIN, STDOUT and STDERR files (or any combination of the three) to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal.
+   This command attaches the host's terminal STDIN, STDOUT and STDERR files (or any combination of the three) to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal. It will display the output of the ENTRYPOINT/CMD process.
 
    For example, a container can be shutdown by `C-c` shortcut, sending the SIGINT signal (identical to SIGTERM) to the container by default. Rather, `C-p C-q` detaches from the container and leave it running in the background again.
 
