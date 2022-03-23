@@ -333,7 +333,7 @@ Refer to [Dockerfile reference](https://docs.docker.com/engine/reference/builder
 
 From *commit* example above, we can create new image layer but many negligible commands like *ls*, *pwd*, etc. are recourded as well.
 
-Similar to Makefile, Docker uses Dockerfile to define image with specified *instruction*s like FROM, COPY, RUN etc. Each instruction creates a new layer and a new image. In order to minimize number of layers and images, we'd better merge instructions.
+Similar to Makefile, Docker uses Dockerfile to define image with specified *instruction*s like FROM, COPY, RUN etc. Each instruction creates a new intermediate layer and a new intermediate image. In order to minimize number of layers and images, we'd better merge instructions as much as possible.
 
 In this section, we use Dockerfile to create image *nginx:v2*.
 
@@ -376,17 +376,18 @@ Successfully tagged nginx:v3
    ```
 
    The hypen character cannot be omitted!
-3. After the building, we can run *nginx:v3* image:
+3. If there exist multiple CMD/ENTRYPOINT instructions from different layers, only that of the topmost layer will execute upon container start. All the rest CMD/ENTRYPOINT are overriden.
+4. After the building, we can run *nginx:v3* image:
 
    ```bash
    root@tux ~ # docker run --name web3 -d -p 8081:80 --rm nginx:v3
    ```
-4. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
-5. Here is another Dockerfile instance:
+5. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
+6. Here is another Dockerfile instance:
 
    ```
    FROM centos:latest
-   RUN /bin/bash -c 'groupadd -g 1000 username ; useradd -ms /bin/bash -u 1000 -g 1000 username; echo "username:1C2B3A" | chpasswd'
+   RUN [/bin/bash, -c, 'groupadd -g 1000 username ; useradd -ms /bin/bash -u 1000 -g 1000 username; echo "username:1C2B3A" | chpasswd']
    CMD ["/bin/bash"]
    ```
 
