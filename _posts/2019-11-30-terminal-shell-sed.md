@@ -29,6 +29,8 @@ When we *ssh* to a remote server, we establish a secure TCP connection to the re
 
 After that, ssh/sshd transfer data between local terminal and remote pseudo terminal. Without the slave, how would the Bash process get its STDIN/STDOUT/STDERR? Similarly, terminal emulator (e.g. xterm) also creates pseudo terminal upon startup. The emulator connects to the master side while user processes connect to the slave side. The local terminal above probably is a pseudo terminal of terminal emulator nowadays.
 
+Sometimes you may hear of "attach STDIN/STDOUT" (like *docker attach*). It actually means creating a pipe between local terminal (e.g. xterm) and the remote terminal (e.g. docker container).
+
 Now let's move on to Shell. Terminal is where input and output happen (like typing program names), but Shell is a _job_ manager (desktop manager does the same thing). Nowadays, OS (Linux, Unix etc.) schedules multiple processes concurrently, namely _mutli-tasking_ support. Shell is the multi-tasking interface with end users, capable of starting, stopping, suspending, resuming etc. jobs. Upon login, the default Shell is ready for interaction.
 
 With Shell, we can _suspend_ the current _job_ to background with `Ctrl-Z`. On the contratry, `fg` put the first background job _foreground_ running again. Alternatively, `bg` send the job running background instead of suspending it. To start a program running in background, we can append `&` to program like `program-name &`. Different Shells may have different syntax to manage jobs.
