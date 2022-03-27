@@ -383,7 +383,8 @@ Successfully tagged nginx:v3
    root@tux ~ # docker run --name web3 -d -p 8081:80 --rm nginx:v3
    ```
 5. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
-6. Here is another Dockerfile instance:
+6. Sometimes, we may want to remove the cache of *build*, which can be accomplished by *docker builder prune -a*.
+7. Here is another Dockerfile instance:
 
    ```
    FROM centos:latest
