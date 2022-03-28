@@ -50,6 +50,7 @@ In Unix-like systems, we have to deal with environment variables such as PATH, M
 
    >Set up your environment (PATH, LANG, EDITOR, ...) in "~/.bash\_profile". Set up your bash shell (PS1, functions, shopts, ...) in "~/.bashrc". Then source ".bashrc" from ".bash_profile".
 
+   Check [dotfiles](https://mywiki.wooledge.org/DotFiles).
 8. You may see here and there recommendations to either put environment variable definitions in `~/.bashrc` or always launch login shells in terminals. Both are bad ideas. The most common problem with either of these ideas is that your environment variables will only be set in programs launched via the terminal, not in programs started directly with an icon or desktop menu or keyboard shortcut.
 
    But in Gentoo, the official Wiki recommends per-user setting in `~/.bashrc` which is sourced by `~/.bash_profile`.
