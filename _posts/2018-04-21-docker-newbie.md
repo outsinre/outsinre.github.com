@@ -81,6 +81,7 @@ root@tux ~ # docker image ls ubuntu
 
    To get image digest, we should firstly pull down a image, and use *inspect* list digests included.
 4. Any any time, Ctrl-C terminates the pull process.
+5. Docker support [proxy configuration](https://docs.docker.com/network/proxy/) when feteching the images.
 
 # [Run](https://docs.docker.com/engine/reference/run/) an Image and Create a Container
 
