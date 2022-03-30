@@ -134,15 +134,13 @@ Docker containers can read from or write to pathnames, either on host or on memo
 2. Bind Mount.
 
    Bind-mount a file or directory in the host to a file or directory in the container. The target can be read-only or read-write. For example, bind host */etc/resolv.conf* to a container, sharing name servers.
-   
-   Usually, for personal use, we just use Bind Mount with option `--volume , -v` or option `--mount`. Option `--mount` is recommended as it is more verbose, though `--volume, -v` won't be deprecated.
-   
-   If the file or directory on the host does not exist. `--volume` and `--mount` behaves differently. `--volume` would create the pathname as a *directory*, NOT a file, while `--mount` would report error. On the contrary, if the target pathname already exists in the container, both options would *obsecure* contents over there. This is useful if we'd like to test a new version of file/directory without rebuild a new image.
-   
-   Another difference between the two options is `--mount` support all three storage types but `--volume` only support Bind Mound.
-3. Tmpfs.
+3. `tmpfs` Mount.
 
-   Needless to say, *tmpfs* is a memory filesystem.
+   Needless to say, *tmpfs* is a memory filesystem that let container stores data in host memory.
+
+Option `--volume , -v` and `--mount` both support volume and (bind/tmpfs) mount, though we recommend `--mount` as it is more verbose.
+
+If the file or directory on the host does not exist. `--volume` and `--mount` behaves differently. `--volume` would create the pathname as a *directory*, NOT a file, while `--mount` would report error. On the contrary, if the target pathname already exists in the container, both options would *obsecure* contents over there. This is useful if we'd like to test a new version of file/directory without rebuild a new image. Another difference between the two options is `--mount` support all three storage types but `--volume` only support Bind Mound.
 
 ## [SELinux](https://stackoverflow.com/q/24288616)
 
