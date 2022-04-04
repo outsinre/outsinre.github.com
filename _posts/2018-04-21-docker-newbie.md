@@ -14,18 +14,29 @@ title: Docker Newbie
 2. Dockers comprises *image*, *container* and *registry*.
    1. Image is *static* and *readonly* like a minimal root filesystem, a daemon etc. There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (like Gentoo stage tarball).
 
-      An image consists of multiple filesystem layers.
+      An image consists of multiple filesystem layers. We can define an image by Dockerfile.
    2. Container is created on top of an image with the topmost filesystem layer storing *running* data. Processes within different containers are isolated - namespace.
 
       We can think of image and container as class and object in Object-oriented programming. 
-   3. Registry is *store* where users publicize, share and download *repostitory* which comprises different images of the same name. We will find different image versions are referenced to by *tag* or *digest*. The official registry is *docker.io* with a frontend website [Docker Hub](https://hub.docker.com).
-3. C/S mode.
+   3. Registry is *store* where users publicize, share and download *repostitory*. The default registry is *docker.io* with a frontend website [Docker Hub](https://hub.docker.com).
+   
+      Repository, on the other hand, actually refers to *name* of an image (e.g. *ubuntu*). We can specify *version* of a repository by a *tag* (label) like *ubuntu:16.04* (colon separator). The default tag is *latest*.
+3. Naming of an image
+
+   ```
+   registry.fqdn[:port]/[user/]repository[:tag | @<image-ID>]
+   ```
+
+   1. Default registry can be ommitted.
+   2. The *user* part means a registered user account in the regirstry.
+   3. *repository* is the default *name* of an image.
+   4. *image id* comprises a SHA256 *digest* like *ubuntu@abea36737d98dea6109e1e292e0b9e443f59864b* (at sign separator).
+4. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
    2. Server: local/remote *docker-engine* (i.e. *systemctl start docker*).
-4. [Layer storage](https://docs.docker.com/storage/storagedriver/) uses Union FS (recall that Live CD on USB stick requires Union FS). Only the topmost (container storage layer) is writable and volatile.
+5. [Layer storage](https://docs.docker.com/storage/storagedriver/) uses Union FS (recall that Live CD on USB stick requires Union FS). Only the topmost (container storage layer) is writable and volatile.
 
    Of the Union FS, *overlay2* is recommended over *aufs*. Either enable *overlay2* in kernel or build external module. *devicemapper* is also used in CentOS/RHEL. Pay attention to [CentOS/RHEL 的用户需要注意的事项](https://yeasy.gitbooks.io/docker_practice/content/image/rm.html#centosrhel-%E7%9A%84%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9) if *devicemapper* driver *loop-lvm* mode is used.
-5. Technically, Dockerfile defines image construction.
 
 # Daemon
 
@@ -57,29 +68,21 @@ Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine
 It is highly recommended to *pull* the [docker/getting-started](https://hub.docker.com/r/docker/getting-started) image, *run* and visit `http://localhost`.
 
 ```bash
-root@tux ~ # docker search ubuntu                                        # search docker images by name on Docker Hub
+root@tux ~ # docker search -f is-official=true ubuntu                    # search only official image
 root@tux ~ # docker pull ubuntu:16.04                                    # specify a tag
-root@tux ~ # docker pull ubuntu@<sha256>
+root@tux ~ # docker pull ubuntu@<sha256>                                 # specify an image ID
 root@tux ~ # docker image ls ubuntu
 ```
 
 1. *docker search* search docker images from registries defined in */etc/container/registries.conf*.
 
-   An image name is composed of three parts:
-
-   ```
-   registry.fqdn[:port]/[user/]img
-   ```
-
-   The search command line does not print imange tags or digests (SHA256 hash). Instead, go to the registry website or check third party tool [DevOps-Python-tools](https://github.com/HariSekhon/DevOps-Python-tools).
-2. By default, if only a name is specified, *pull* uses tag *latest* (i.e. 'ubuntu:latest'). Otherwise, provide either a specified tag (i.e. *ubuntu:16.04*) or digest (i.e. 'ubuntu@<sha256-value>').
-
-   The official registry domain *docker.io* can be omitted.
+   Unfortunately, it does *not* suport tags or IDs. Instead, go to the registry website or check third party tool [DevOps-Python-tools](https://github.com/HariSekhon/DevOps-Python-tools).
+2. We can offer *docker pull* a tag (i.e. 'ubuntu:latest') or an *image ID*.
 3. When pulling an image without its digest, we can update the image with the same *pull* command again.
 
-   On the contrary, with digest, the image if fixed and pinned to that exact version. This makes sure you are interacting with the exact image. However, upcoming security fixes are also missed.
+   On the contrary, with digest, the image is fixed and pinned to that exact version. This makes sure you are interacting with the exact image. However, upcoming security fixes are also missed.
 
-   To get image digest, we should firstly pull down a image, and use *inspect* list digests included.
+   To get image digest, we either go to the official registry, use `images --digests`, or even *inspect* command.
 4. Any any time, Ctrl-C terminates the pull process.
 5. Docker support [proxy configuration](https://docs.docker.com/network/proxy/) when feteching the images.
 
