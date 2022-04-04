@@ -29,7 +29,7 @@ title: Docker Newbie
 
    1. Default registry can be ommitted.
    2. The *user* part means a registered user account in the regirstry.
-   3. *repository* is the default *name* of an image.
+   3. *repository* is the default *name* of an image. Occasionally, we may see a repository containing a slash like "docker/getting-started". This is not unusual.
    4. *image id* comprises a SHA256 *digest* like *ubuntu@abea36737d98dea6109e1e292e0b9e443f59864b* (at sign separator).
 4. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
@@ -215,7 +215,7 @@ root@docker ~ # echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.htm
 root@docker ~ # exit
 #
 root@tux ~ # docker diff webserver
-root@tux ~ # docker commit -a 'jim' -m 'change front page' webserver nginx:v2
+root@tux ~ # docker container commit -a 'jim' -m 'change front page' webserver nginx:v2
 root@tux ~ # docker image ls nginx
 root@tux ~ # docker history nginx:v2
 ```
@@ -353,7 +353,7 @@ Just two lines! FROM imports the base image on which we will create the new laye
 Now we build the image:
 
 ```bash
-root@tux ~ # docker build -t nginx:v3 .
+root@tux ~ # docker build -t nginx:v3 -t nginx .
 #
 Sending build context to Docker daemon  2.048kB
 Step 1/2 : FROM nginx
@@ -366,27 +366,35 @@ Successfully built 18cc3a3480f0
 Successfully tagged nginx:v3
 ```
 
-1. During the building process, both an intermediate container (d5baea5c6341) and image (18cc3a3480f0) is created for 'RUN' instruction.
+1. The `-t` option of *docker build* actually refers to name of the target image. We can leave the tag part to use the default *latest*. We can also [supply multiple tags](https://stackoverflow.com/a/36398336). From example above, the second tag is the default *latest*.
+
+   If we specify a name that exists already, we detach that name from an existing image and associate it with the new image. The old image still exist and can be checked the "RepoTags" field of `docker inspect <image-id>`.
+2. During the building process, both an intermediate container (d5baea5c6341) and image (18cc3a3480f0) is created for 'RUN' instruction.
 
    The intermediate container defines a new layer which is then committed to create a new image. Afterwards, the intermediate container is removed, but the intermediate image is kept.
-2. The trailing dot means the current directory is the building *context* directory. It is also the Dockerfile's default location.
+3. The trailing dot means the current directory is the building *context* directory. It is also the default location of the Dockerfile. Sometimes, we exclude some context files from the durectory by the *.dockerignore* file, as below:
 
-   Docker sends all files within context directory to remote Docker engine (daemon). Image can be built without a context directory like:
+   ```bash
+   ~ $ echo ".git" >> .dockerignore
+   ```
+
+   Docker sends all files within context directory to remote Docker engine (daemon). Image can be built without a context directory if we don't have any supplementary files.
 
    ```bash
    root@tux ~ # docker build -t nginx:v3 - < /path/to/Dockerfile
    ```
 
    The hypen character cannot be omitted!
-3. If there exist multiple CMD/ENTRYPOINT instructions from different layers, only that of the topmost layer will execute upon container start. All the rest CMD/ENTRYPOINT are overriden.
-4. After the building, we can run *nginx:v3* image:
+4. If there exist multiple CMD/ENTRYPOINT instructions from different layers, only that of the topmost layer will execute upon container start. All the rest CMD/ENTRYPOINT are overriden.
+5. After the building, we can run *nginx:v3* image:
 
    ```bash
    root@tux ~ # docker run --name web3 -d -p 8081:80 --rm nginx:v3
    ```
-5. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
-6. Sometimes, we may want to remove the cache of *build*, which can be accomplished by *docker builder prune -a*.
-7. Here is another Dockerfile instance:
+
+6. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
+7. Sometimes, we may want to remove the cache of *build*, which can be accomplished by *docker builder prune -a*.
+8. Here is another Dockerfile instance:
 
    ```
    FROM centos:latest
@@ -405,3 +413,46 @@ Successfully tagged nginx:v3
       ```
 
 Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
+
+# Share an Image
+
+We can [share](https://docs.docker.com/get-started/04_sharing_app/) our own docker image to a registry (e.g. docker.io) by *docker push*.
+
+When pushing an image to remote repository, we should login and specify the registry account.
+
+```bash
+# token recommended; avoid password
+~ $ docker login -u myaccount
+
+~ $ docker push myaccount/nginx
+Using default tag: latest
+The push refers to repository [docker.io/myaccount/docker-getting-started]
+An image does not exist locally with the tag: myaccount/docker-getting-started
+```
+
+The error shows there is not such docker image. So, we should assign a new tag to an image:
+
+```bash
+~ $ docker tag nginx myaccount/nginx
+```
+
+You will find the two tags refer to the same image ID by *docker images*. Here is an example:
+
+```bash
+~ $ docker images
+REPOSITORY                        TAG                                        IMAGE ID       CREATED             SIZE
+docker-getting-started            latest                                     862614378b4c   About an hour ago   430MB
+outsinre/docker-getting-started   latest                                     862614378b4c   About an hour ago   430MB
+```
+
+After new tagging, we can push: 
+
+```bash
+~ $ docker push myaccount/nginx
+```
+
+Remember that if we want to use a different registry rather than the default *docker.io*, then add the registry to the new tag as well as follows.
+
+```bash
+~ $ docker tag nginx myregistry:5000/myaccount/nginx
+``
