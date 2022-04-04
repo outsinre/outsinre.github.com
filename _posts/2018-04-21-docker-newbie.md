@@ -205,10 +205,36 @@ root@tux ~ # docker container prune                # remove all stopped containe
 
 # Get into container
 
+Exec a simple command in container:
+
 ```bash
 root@tux ~ # docker exec webserver sh -c 'echo $PATH'
 root@tux ~ # docker exec webserver ps
+```
 
+Sometimes, we want to exec the command in the background when it does not generate any output or need any input:
+
+```bash
+root@tux ~ # docker exec -d webserver touch /tmp/test.txt
+```
+
+If we want to interactively and continuously control the container:
+
+```bash
+root@tux ~ # docker exec -it webserver bash
+```
+
+Apart from *docker exec*, [docker attach <container>](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
+
+This command attaches the host's terminal STDIN, STDOUT and STDERR files (or any combination of the three) to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal. It will display the output of the ENTRYPOINT/CMD process.
+
+For example, a container can be shutdown by `C-c` shortcut, sending the SIGINT signal (identical to SIGTERM) to the container by default. Rather, `C-p C-q` detaches from the container and leave it running in the background again.
+
+If the process is running as PID 1 (mostly */usr/bin/init*), it ignores any signal and will not terminate on SIGINT or SIGTERM unless it is coded to do so.
+
+# Create Image from Container #
+
+```bash
 root@tux ~ # docker exec -it webserver bash
 #
 root@docker ~ # echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
@@ -232,13 +258,6 @@ root@tux ~ # docker history nginx:v2
    ```
 
    The `--rm` tells to remove the container upon exit.
-5. [docker attach <container>](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
-
-   This command attaches the host's terminal STDIN, STDOUT and STDERR files (or any combination of the three) to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal. It will display the output of the ENTRYPOINT/CMD process.
-
-   For example, a container can be shutdown by `C-c` shortcut, sending the SIGINT signal (identical to SIGTERM) to the container by default. Rather, `C-p C-q` detaches from the container and leave it running in the background again.
-
-   If the process is running as PID 1 (mostly */usr/bin/init*), it ignores any signal and will not terminate on SIGINT or SIGTERM unless it is coded to do so.
 
 # [Networking Drivers](https://docs.docker.com/network/)
 
