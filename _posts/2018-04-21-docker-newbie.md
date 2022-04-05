@@ -115,11 +115,18 @@ root@docker ~ # echo $?
 ```
 
 1. When we run an image, a container is created with an extra layer of writable filesystem.
-2. By default, the [CMD/ENTRYPOINTWITH](#exec-and-shell) process (container root process) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDIN/STDOUT. So we can do something with the process.
+2. By default, the [CMD/ENTRYPOINTWITH](#exec-and-shell) process (container root process) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR (NO STDIN). So we can check the out of the root process.
 
-   We can use multiple `-a` options to control STDIN/STDOUT/STDERR attachment. For example, `docker run -a stdin -a stderr` don't care about STDOUT of the root process. Refer to [confused-about-docker-t-option-to-allocate-a-pseudo-tty](https://stackoverflow.com/q/30137135) and [Attach to STDIN/STDOUT/STDERR](https://docs.docker.com/engine/reference/commandline/run/#attach-to-stdinstdoutstderr--a).
+   We can use multiple `-a` options to control STDIN/STDOUT/STDERR combinations. For example, `docker run -a stdin -a stdout`. Refer to [confused-about-docker-t-option-to-allocate-a-pseudo-tty](https://stackoverflow.com/q/30137135) and [Attach to STDIN/STDOUT/STDERR](https://docs.docker.com/engine/reference/commandline/run/#attach-to-stdinstdoutstderr--a).
 
-   If we want to start the process in *background* mode, then add `-d` option. Containers runs in this mode will print the container ID and release host terminal immediately. If the root process exits, then the container exits as well.
+   If we want to start the process in *background* mode, then add `-d` option. Containers runs in this mode will print the container ID and release host terminal immediately. If the root process exits, then the container exits as well. So we cannot do like this:
+   
+   ```bash
+   ~ $ docker run -d -p 80:80 my_image service nginx start
+   ```
+   
+   As the root process *service* exits immediately after *nginx* is started.
+
 3. `-t` allocates a pseudo-TTY connected for the CMD/ENTRYPOINT process, especially useful when the process is an interactive Shell. The `-i` options keeps the process's STDIN open and runs the container interactively, so we can feed some data to the process even when `-d` is present, namely in *background* mode.
 
    The two options are usually used together.
