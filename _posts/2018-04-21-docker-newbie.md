@@ -115,15 +115,33 @@ root@docker ~ # echo $?
 ```
 
 1. When we run an image, a container is created with an extra layer of writable filesystem.
-2. With `-d` option, containers run in in background mode and terminal is released immediately, otherwise in foreground mode.
-3. `-i` keeps STDIN open even if not attached and runs the container interactively.
+2. By default, the [CMD/ENTRYPOINTWITH](#exec-and-shell) process (container root process) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDIN/STDOUT. So we can do something with the process. We can use multiple `-a` options to control STDIN/STDOUT/STDERR attachment. For example, `docker run -a stdin -a stderr` don't care about STDOUT of the root process.
 
-   `-t` allocates a pseudo-TTY connected for the container's STDIN/STDEOUT/STDERR. These two options usually work together.
+   If we want to start the process in *background* mode, then add `-d` option. Containers runs in this mode will print the container ID and release host terminal immediately. If the root process exits, then the container exits as well.
+3. `-t` allocates a pseudo-TTY connected for the CMD/ENTRYPOINT process, especially useful when the process is an interactive Shell. The `-i` options keeps the process's STDIN open and runs the container interactively, so we can feed some data to the process even when `-d` is present, namely in *background* mode.
+
+   The two options are usually used together.
 4. `--rm` automatically remove the container when it exits.
 5. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
 6. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
 6. `-u, --user` runs the image as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
 7. *bash* overrides CMD instruction by Dockerfile.
+
+Sometimes, we just want to play with a container, then we can do as follows:
+
+```bash
+root@tux ~ # docker run -d ubuntu bash -c "tail -f /dev/null"
+```
+
+Due to the `-d` option, we use *tail* command to keep the container running and not exit.
+
+```bash
+root@tux ~ #  docker run -it ubuntu ls /
+bin   dev  home  media  opt   root  sbin  sys  usr
+boot  etc  lib   mnt    proc  run   srv   tmp  var
+
+root@tux ~ # docker ps
+```
 
 # Data Share
 
@@ -212,7 +230,7 @@ root@tux ~ # docker exec webserver sh -c 'echo $PATH'
 root@tux ~ # docker exec webserver ps
 ```
 
-Sometimes, we want to exec the command in the background when it does not generate any output or need any input:
+Sometimes, we want to exec the command in the background when we do not care about its output or need not any input:
 
 ```bash
 root@tux ~ # docker exec -d webserver touch /tmp/test.txt
@@ -226,11 +244,11 @@ root@tux ~ # docker exec -it webserver bash
 
 Apart from *docker exec*, [docker attach <container>](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
 
-This command attaches the host's terminal STDIN, STDOUT and STDERR files (or any combination of the three) to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal. It will display the output of the ENTRYPOINT/CMD process.
+This command attaches the host terminal's STDIN, STDOUT and STDERR files to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal. It will display the output of the ENTRYPOINT/CMD process.
 
 For example, a container can be shutdown by `C-c` shortcut, sending the SIGINT signal (identical to SIGTERM) to the container by default. Rather, `C-p C-q` detaches from the container and leave it running in the background again.
 
-If the process is running as PID 1 (mostly */usr/bin/init*), it ignores any signal and will not terminate on SIGINT or SIGTERM unless it is coded to do so.
+If the process is running as PID 1 (like */usr/bin/init*), it ignores any signal and will not terminate on SIGINT or SIGTERM unless it is coded to do so.
 
 # Create Image from Container #
 
@@ -258,6 +276,9 @@ root@tux ~ # docker history nginx:v2
    ```
 
    The `--rm` tells to remove the container upon exit.
+5. We can *inspect* the target image, and will find "ContainerConfig" and "Config". They are almost identical.
+
+   "ContainerConfig" is the config of current container from within this image is committed, while the "Config" is the exact configuration of the image. Pay attention to the [Cmd](#exec-and-shell) parts. If we [build by Dockerfile](#build-image-by-dockerfile), then they looks different. The ContainerConfig this is the temporary container spawned to create the image. Check [what-is-different-of-config-and-containerconfig-of-docker-inspect](https://stackoverflow.com/q/36216220).
 
 # [Networking Drivers](https://docs.docker.com/network/)
 
@@ -339,8 +360,7 @@ Each instruction has two kinds of running forms:
 
 Refer to [exec form or sh form](https://www.cnblogs.com/sparkdev/p/8461576.html) for more details.
 
-
-We can use *docker container inspect* to show the instructions and their forms. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`.
+When there are multiple CMD or ENTRYPOINT instructions inherited from different image layers, only that of the topmost layer is respcted! We can use *docker container inspect* to show the instructions and their forms. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`.
 
 We can pass custom commands and arguments when invoking *docker run*, which will override the CMD instruction and arguments thereof. If there exists the ENTRYPOINT instruction in exec form, then custom arguments would be appended to the ENTRYPOINT *cmd*. By default, ENTRYPOINT exec form will take extra arguments from CMD instruction in shell form. Custom arguments when *docker run* will override those in the CMD instruction. ENTRYPOINT in shell form would ignore custom arguments from CMD or *docker run*.
 
@@ -404,7 +424,7 @@ Successfully tagged nginx:v3
    ```
 
    The hypen character cannot be omitted!
-4. If there exist multiple CMD/ENTRYPOINT instructions from different layers, only that of the topmost layer will execute upon container start. All the rest CMD/ENTRYPOINT are overriden.
+4. If there exist multiple CMD/ENTRYPOINT instructions from different layers, only that of the topmost layer will be executed upon container start. All the rest CMD/ENTRYPOINT are overriden.
 5. After the building, we can run *nginx:v3* image:
 
    ```bash
