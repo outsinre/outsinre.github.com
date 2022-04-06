@@ -115,42 +115,69 @@ root@docker ~ # echo $?
 ```
 
 1. When we run an image, a container is created with an extra layer of writable filesystem.
-2. By default, the [CMD/ENTRYPOINTWITH](#exec-and-shell) process (container root process) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR (NO STDIN). So we can check the out of the root process.
+2. By default, the root process of a container (PID 1), namely the [CMD/ENTRYPOINTWITH](#exec-and-shell) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR, but *not* STDIN. So we can see the output (error message included) of the root process as follows:
 
-   We can use multiple `-a` options to control STDIN/STDOUT/STDERR combinations. For example, `docker run -a stdin -a stdout`. Refer to [confused-about-docker-t-option-to-allocate-a-pseudo-tty](https://stackoverflow.com/q/30137135) and [Attach to STDIN/STDOUT/STDERR](https://docs.docker.com/engine/reference/commandline/run/#attach-to-stdinstdoutstderr--a).
+   ```bash
+   root@tux ~ # docker run -it ubuntu ls /
+   bin   dev  home  media  opt   root  sbin  sys  usr
+   boot  etc  lib   mnt    proc  run   srv   tmp  var
+   
+   root@tux ~ # docker run ubuntu ls /
+   bin
+   boot
+   dev
+   etc
+   home
+   lib
+   media
+   mnt
+   opt
+   proc
+   root
+   run
+   sbin
+   srv
+   sys
+   tmp
+   usr
+   var
+   ```
 
-   If we want to start the process in *background* mode, then add `-d` option. Containers runs in this mode will print the container ID and release host terminal immediately. If the root process exits, then the container exits as well. So we cannot do like this:
+   We can use multiple `-a` options to control the attachment combinations of STDIN/STDOUT/STDERR. To following example, we can even input to the root process as long as its STDIN is open. Refer to [confused-about-docker-t-option-to-allocate-a-pseudo-tty](https://stackoverflow.com/q/30137135) and [Attach to STDIN/STDOUT/STDERR](https://docs.docker.com/engine/reference/commandline/run/#attach-to-stdinstdoutstderr--a).
+   
+   ```bash
+   ~ $ docker run -a stdin -a stdout ...
+   ```
+
+   If we want to start the process in *background* mode, namely the *detach* mode, then add the `-d` option. Containers runs in this mode will print the container ID and release host terminal immediately. So we cannot input to the root process or see the output or error message: STDIN/STDOUT/STDERR closed. If the root process exits, then the container exits as well. So we cannot do like this:
    
    ```bash
    ~ $ docker run -d -p 80:80 my_image service nginx start
    ```
    
-   As the root process *service* exits immediately after *nginx* is started.
+   As the root process *service* exits immediately after *nginx* is started. The next example will keep the container running as the *tail* command persists:
+   
+   ```
+   root@tux ~ # docker run -d ubuntu bash -c "tail -f /dev/null"
+   ```
 
-3. `-t` allocates a pseudo-TTY connected for the CMD/ENTRYPOINT process, especially useful when the process is an interactive Shell. The `-i` options keeps the process's STDIN open and runs the container interactively, so we can feed some data to the process even when `-d` is present, namely in *background* mode.
+3. `-t` allocates a pseudo-TTY connected for the root process, especially useful when the process is an interactive Shell. The `-i` option forces the process's STDIN to be open and runs the container interactively, so we can *input* some data to the process directly even when `-d` is present. For example:
+
+   ```bash
+   echo test | docker run -i ubuntu cat -
+   test
+   ```
 
    The two options are usually used together.
 4. `--rm` automatically remove the container when it exits.
-5. `-w` lets the COMMAND (i.e. *bash*) be executed inside the given directory (created on demand).
+5. `-w` lets the root process running inside the given directory that is created on demand.
 6. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
-6. `-u, --user` runs the image as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
-7. *bash* overrides CMD instruction by Dockerfile.
+6. `-u, --user` runs the root process as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
+7. *bash* overrides the CMD/ENTRYPOINT instructions of the image.
 
-Sometimes, we just want to play with a container, then we can do as follows:
+Here is a note about the different options:
 
-```bash
-root@tux ~ # docker run -d ubuntu bash -c "tail -f /dev/null"
-```
-
-Due to the `-d` option, we use *tail* command to keep the container running and not exit.
-
-```bash
-root@tux ~ #  docker run -it ubuntu ls /
-bin   dev  home  media  opt   root  sbin  sys  usr
-boot  etc  lib   mnt    proc  run   srv   tmp  var
-
-root@tux ~ # docker ps
-```
+![docker run](assets/docker-run-adit.jpg)
 
 # Data Share
 
