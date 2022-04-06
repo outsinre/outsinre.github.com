@@ -177,7 +177,7 @@ root@docker ~ # echo $?
 
 Here is a note about the different options:
 
-![docker run](assets/docker-run-adit.jpg)
+![docker run](/assets/docker-run-adit.jpg)
 
 # Data Share
 
