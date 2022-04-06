@@ -179,6 +179,8 @@ Here is a note about the different options:
 
 ![docker run](/assets/docker-run-adit.jpg)
 
+Please also follow this post [Cannot pipe to docker run with stdin attached](https://stackoverflow.com/q/71761103/2336707).
+
 # Data Share
 
 Docker containers can read from or write to pathnames, either on host or on memory filesystem - to share data. There are [three storage types](https://docs.docker.com/storage/):
