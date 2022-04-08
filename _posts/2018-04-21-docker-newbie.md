@@ -118,11 +118,11 @@ root@docker ~ # echo $?
 2. By default, the root process of a container (PID 1), namely the [CMD/ENTRYPOINTWITH](#exec-and-shell) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR, but *not* STDIN. So we can see the output (error message included) of the root process as follows:
 
    ```bash
-   root@tux ~ # docker run -it ubuntu ls /
+   root@tux ~ # docker run -t --rm ubuntu ls /
    bin   dev  home  media  opt   root  sbin  sys  usr
    boot  etc  lib   mnt    proc  run   srv   tmp  var
    
-   root@tux ~ # docker run ubuntu ls /
+   root@tux ~ # docker run --rm ubuntu ls /
    bin
    boot
    dev
@@ -149,7 +149,7 @@ root@docker ~ # echo $?
    ~ $ docker run -a stdin -a stdout ...
    ```
 
-   If we want to start the process in *background* mode, namely the *detach* mode, then add the `-d` option. Containers runs in this mode will print the container ID and release host terminal immediately. So we cannot input to the root process or see the output or error message: STDIN/STDOUT/STDERR closed. If the root process exits, then the container exits as well. So we cannot do like this:
+   If we want to start the process in *background* mode, namely the *detach* mode, then add the `-d` option. Containers runs in this mode will print the container ID and release host terminal immediately. So we cannot input to the root process or see the output or error message: STDIN/STDOUT/STDERR detached. If the root process exits, then the container exits as well. So we cannot do like this:
    
    ```bash
    ~ $ docker run -d -p 80:80 my_image service nginx start
@@ -161,14 +161,26 @@ root@docker ~ # echo $?
    root@tux ~ # docker run -d ubuntu bash -c "tail -f /dev/null"
    ```
 
-3. `-t` allocates a pseudo-TTY connected for the root process, especially useful when the process is an interactive Shell. The `-i` option forces the process's STDIN to be open and runs the container interactively, so we can *input* some data to the process directly even when `-d` is present. For example:
+3. `-t` allocates a pseudo-TTY connected for the root process, especially useful when the process is an *interactive* Shell. The `-i` option forces the process's STDIN to be open and runs the container interactively, so we can *input* some data to the process directly, which works even when `-d` is present. Here is an example:
 
    ```bash
    echo test | docker run -i ubuntu cat -
    test
    ```
 
-   The two options are usually used together.
+   The two options are usually used together for Shell: `-t` creates a pseudo-TTY, while `-i` makes the STDIN of the pseudo-TTY open for data input.
+   
+   ```bash
+   # STDIN not open by default, so keeps waiting for input
+   ~ $ dockder run -t --rm ubuntu bash
+   
+   # can input/output, but no standalone STDOUT, reuse that of host terminal
+   ~ $ docker run -i --rum ubunty bash
+   
+   # standalone stdin/stdout/stderr, also interactive for input
+   ~ $ docker run -it --rum ubunty bash
+   ```
+
 4. `--rm` automatically remove the container when it exits.
 5. `-w` lets the root process running inside the given directory that is created on demand.
 6. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
@@ -533,3 +545,7 @@ Remember that if we want to use a different registry rather than the default *do
 ```bash
 ~ $ docker tag nginx myregistry:5000/myaccount/nginx
 ``
+
+# Docker Compose #
+
+todo https://docs.docker.com/compose/compose-file/
