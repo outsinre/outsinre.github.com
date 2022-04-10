@@ -51,11 +51,14 @@ Switch to firewalld.
 ```bash
 ~ # systemctl status firewalld
 ~ # firewall-cmd --state
+~ # firewall-cmd --zone=public --list-all/list-ports/list-services
+
 ~ # firewall-cmd ----get-services
 ~ # firewall-cmd --get-zones/--list-all-zones
 ~ # firewall-cmd --get-default-zone/--get-active-zones
-~ # firewall-cmd --zone=public --list-all/list-ports/list-services
+
 ~ # firewall-cmd --reload
+
 ~ # iptables -S [-t nat]
 ```
 
@@ -90,6 +93,7 @@ Switch to firewalld.
 ```bash
 ~ # firewall-cmd --zone=public --add-port=12345/tcp
 ~ # firewall-cmd --reload (opt)
+
 ~ # firewall-cmd --permanent --zone=public --add-port=12345/tcp
 ```
 
@@ -101,7 +105,7 @@ Switch to firewalld.
 # Adding services
 
 ```bash
- ~ # firewall-cmd --permanent --zone=public --add-service={https,http}
+ ~ # firewall-cmd --permanent --zone=public --add-service=http --add-service=https
 ```
 
 # Create/modify services
@@ -133,7 +137,7 @@ Adding the new service to a zone:
 
 I think the easiest way is to copy an existing service XML to */etc/firewalld/services/myservice.xml* and edit that file directly.
 
-# *drop* a port
+# Disallow a port
 
 ```bash
 ~ # firewall-cmd --permanent --zone=drop --add-port=12345/tcp
