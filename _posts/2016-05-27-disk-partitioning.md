@@ -148,10 +148,10 @@ The resulting boundary is determined by **optimal_io_size** (check the formula a
 
 1. NTFS
 2. FAT 12/16/vfat/32
-4. EXT 2/3/4
+4. EXT 2/3/4, XFS
 5. BTRFS
 
-EFI System Partition (ESP) (including bootable USB stick) must be a FAT (FAT32 is recommended) filesystem.
+EFI System Partition (ESP) (including bootable USB stick) must be a FAT (FAT32 is recommended) filesystem. Now most Linux distributions use *xfs* instead of *ext4*.
 
 # Bootable USB stick
 

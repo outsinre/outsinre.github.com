@@ -106,7 +106,7 @@ On *sda*, find the separated free space:
 ```bash
 # pvcreate /dev/sda7 /dev/sda8
 # vgcreate vg /dev/sda7 /dev/sda8
-# lvcreate -l +100%FREE vg -name crypt
+# lvcreate -l 100%FREE vg -name crypt
 # pvdisplay / vgdisplay / lvdisplay / lvscan
 ```
 
