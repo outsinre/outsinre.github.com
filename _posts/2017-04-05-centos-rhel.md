@@ -145,6 +145,8 @@ By default, of the built-in repositories, only 'CentOS-Base.repo' is enabled.
 Cache:
 
 ```bash
+~ $ yum help [sub-command]
+
 ~ # yum clean [ all | packages | metadata | expire-cache | rpmdb | plugins ]
 ~ # yum makecache
 ```
@@ -200,7 +202,6 @@ To install packages for _group_ or _environment_ set:
 
 _dnf_ is compatible with but more powerful than _yum_. One of the newest feature provided is _module_.
 
-
 ```bash
 ~ # dnf module -h
 ~ # dnf module list nginx
@@ -219,6 +220,21 @@ The purpose of *module* is to manage package versions and profiles in an integra
 ```
 
 The only difference is that `dnf module` can provide better control when selecting pakage stream, version, arch etc.
+
+The following example shows how to control repo with *dnf* (applying to *yum* as well):
+
+```bash
+~ $ dnf help repolist 
+~ $ dnf repolist [--all | --enabled | --disabled]
+
+~ $ sudo dnf config-manager --add-repo /etc/yum.repos.d/oracle-epel-ol8.repo
+
+~ $ grep enabled /etc/yum.repos.d/oracle-epel-ol8.repo
+~ $ sudo dnf config-manager --set-enabled ol8_developer_EPEL
+~ $ duso dnf config-manager --set-disabled ol8_developer_EPEL
+
+~ $ dnf --enablerepo=repo1,repo2 -disablerepo=repo3,repo4 install pkg
+```
 
 # Repositories
 

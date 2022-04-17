@@ -26,7 +26,9 @@ Let's Encrypt officially recommends the [Certbot](https://certbot.eff.org/docs/u
 ~ # certbot certificates # List existing certificates
 ```
 
-To run *certbot*, we supply a subcommand like *certonly* (obtain a certificate), *install* (update vhost), *run* (both) etc. If no subcommand is given, then *run* is assumed. A subcommand accepts different types of plugins, namely *authenticator* plugins and *installer* plugins. The general usage looks like:
+To run *certbot*, we supply a subcommand like *certonly* (obtain a certificate), *install* (update vhost), *run* (both) etc. Whenever possible, try with `--dry-run` first.
+
+If no subcommand is given, then *run* is assumed. A subcommand accepts different types of plugins, namely *authenticator* plugins and *installer* plugins. The general usage looks like:
 
 ```
 certbot subcommand --plugin-name ...
@@ -66,7 +68,7 @@ A few custom configs:
 agree-tos = true
 
 # cert notification
-email = zh@zhstar.win
+email = alice@example.com
 
 # ECC key by default
 key-type = ecdsa
@@ -74,6 +76,9 @@ elliptic-curve = secp384r1
 
 # RSA key size
 rsa-key-size = 4096
+
+# renewal hook
+deploy-hook = systemctl reload nginx.service
 ```
 
 # Nginx Template
@@ -150,7 +155,7 @@ Though ACME protocol supports challenge with [tls-01](https://tools.ietf.org/htm
 
 With the *certbot* client, the only way to obtain a wildcard certificate from Let's Encrypt is using DNS Plugins. DNS plugins belong to the *authenticator* type but challenge you by DNS protocol.
 
-Basically, a DNS plugin uses a API token from the DNS platform to first add a TXT record and then remove that record, such that you are proved to own the domain name.
+Basically, a DNS plugin uses a API token from the DNS platform to first add a TXT record and then remove that record, such that you are proved to own the domain name. Therefore, the DNS authenticator does not interfere in web server.
 
 For each DNS platform, *certbot* provodes a corresponding DNS plugin. DNS plugins are not installed by default.
 
@@ -207,20 +212,48 @@ No matter which plugins you use, the generated certificates are placed under */e
 # tree /etc/letsencrypt/
 /etc/letsencrypt/
 ├── accounts
-│   └── acme-staging-v02.api.letsencrypt.org
+│   ├── acme-staging-v02.api.letsencrypt.org
+│   │   └── directory
+│   │       └── 74cfecb0fe45ec846ae6cc76b6ba0b44
+│   │           ├── meta.json
+│   │           ├── private_key.json
+│   │           └── regr.json
+│   └── acme-v02.api.letsencrypt.org
 │       └── directory
-│           └── abcdq383ndh08457vnlazc234c
+│           └── 34ec5a2656cb495bb9c7b74755d5dfad
 │               ├── meta.json
 │               ├── private_key.json
 │               └── regr.json
+├── archive
+│   └── example.com
+│       ├── cert1.pem
+│       ├── chain1.pem
+│       ├── fullchain1.pem
+│       └── privkey1.pem
+├── cli.ini
+├── csr
+│   └── 0000_csr-certbot.pem
+├── keys
+│   └── 0000_key-certbot.pem
+├── live
+│   ├── README
+│   └── example.com
+│       ├── cert.pem -> ../../archive/example.com/cert1.pem
+│       ├── chain.pem -> ../../archive/example.com/chain1.pem
+│       ├── fullchain.pem -> ../../archive/example.com/fullchain1.pem
+│       ├── privkey.pem -> ../../archive/example.com/privkey1.pem
+│       └── README
 ├── renewal
+│   └── example.com.conf
 └── renewal-hooks
     ├── deploy
     ├── post
     └── pre
+
+18 directories, 20 files
 ```
 
-You will find a certificate has different version, namely *fullchain.pem*, *chain.pem* and *cert.pem*. Use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002) as it is a superset of *chain* and *cert.pem*.
+You will find a certificate has different version, namely *fullchain.pem*, *chain.pem* and *cert.pem*. Use *fullchain.pem* [whenever possible](https://github.com/v2ray/v2ray-core/issues/509#issuecomment-319321002) as it is a combination of *chain.pem* and *cert.pem*. Use *chain.pem* for OCSP stapling as that does not require the leaf cert.
 
 First, list existing certificates:
 
@@ -229,15 +262,7 @@ First, list existing certificates:
 ~ # certbot certificates --cert-name example.com
 ```
 
-It's not unusual that multiple certificates containe some of the same domains.
-
-From the output, you will find each certificate has a name. Pass argument `--cert-name` to specify a particular certificate for subcommands like *certonly*, *run*, *certificates*, *renew*, *delete* etc.
-
-When *certonly* is provided the `--cert-name` argument, it will update that particular certificate or create a new one based on that certificate. You can combine `--cert-name` with the `--expand` argument to add domain names into the certificate. Alternatively, you can combine it with the `--force-renewal` argument to create a new copy of the existing certificate.
-
-```bash
-~ # certbot certonly --cert-name example.com [--expand | --force-renewal ] ...
-```
+It's not unusual that different certificates share common FQDNs. From the output, you will find each certificate has a name. By default, it's named afer the first FQDN from option `--domains`. We can explicitly set a certificate name with option `--cert-name`.
 
 ## Change a Certificate's Domains ##
 
@@ -247,23 +272,30 @@ Add new domains to an existing certificate with argument `--expand`.
 ~ # certbot certonly --expand --cert-name example.com --webroot -w /var/www/log.example.com -d blog.example.com --dry-run
 ```
 
-But the it is recommended to abandon the `--expand` option such that you can either add or remove domains by supplying a complete new list of domains to the `-d` argument.
+But the it is recommended to abandon the `--expand` option such that you can either add or remove domains by supplying a complete new list of domains to the `-d` option.
 
 ```bash
 ~ # certbot certonly --cert-name example.com --webroot -w /var/www/log.example.com -d blog.example.com --dry-run
 ```
 
-After the above operation, the certificate *example.com* only contains domain name *blog.example.com*.
+After the above operation, the certificate *example.com* only contains domain name *blog.example.com*. It actually just create a new certificate with the same name!
 
 ## Renew a Certificate ##
 
 Let's Encrypt certificates expire after 90 days and can be renewed if a certificiate expires in less than 30 days. Renewing a certificate is actually to generate a new identical copy of the original certificate, using the same arguments which they are created with. The only difference is the expiration date is updated.
 
+Renewal just create a new certificate with the same name! So we can just re-run the command used to obtain the certificate, as in section [Obtain a Certificate](#obtain-a-certificate).
+
+But sometimes, we need fine control over renewal. Certbot stores a renewal configuration for each certificate:
+
+```bash
+~ # realpath example.com.conf
+/etc/letsencrypt/renewal/example.com.conf
+```
+
 A certificate can be manually renewed or automatically renewed.
 
 ### Manual Renewal ###
-
-To manually renew an individual certificate, just re-run the command used to obtain it, as in section [Obtain a Certificate](#obtain-a-certificate).
 
 To interactively renew *all* of your certificates, invoke the *renew* subcommand.
 
@@ -273,7 +305,7 @@ To interactively renew *all* of your certificates, invoke the *renew* subcommand
 ~ # cerbot renew --deploy-hook /path/to/hook-script.sh --dry-run
 ```
 
-The `--deploy-hook` reloads the web server if and only if the certificate is successfully renewed. You can add the hook to its configuration file under */etc/letsencrypt/renewal/*:
+The `--deploy-hook` will execute a program if and only if the certificate is successfully renewed. You can add the hook to its renewal configuration file.
 
 ```
 # /etc/letsencrypt/renewal/example.com.conf
@@ -282,7 +314,7 @@ The `--deploy-hook` reloads the web server if and only if the certificate is suc
 deploy_hook = systemctl reload nginx.service
 ```
 
-You can also put the hook command in an *executable* script under */etc/letsencrypt/renewal-hooks/deploy/*:
+You can also put the hook into */etc/letsencrypt/renewal-hooks/deploy/*. For example, here is a hook script:
 
 ```bash
 #!/usr/bin/env bash
@@ -305,7 +337,7 @@ Renewal of [standalone certificates](#standalone-authenticator) requires port 80
 ~ # cerbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" --dry-run
 ```
 
-Attention please; the two hooks will be executed no matter of sucessful or failed renewal. Similarly, you can put the hooks into configuration files or script files.
+Attention please; unlike the `--deploy-hook` hook, the `--pre-hook` and `--post-hook` will be executed no matter of sucessful or failed renewal. Similarly, you can put the hooks into configuration files or script files.
 
 ### Automatic Renwal ###
 
@@ -331,6 +363,8 @@ Systemd timer:
 ~ # systemctl start certbot-renew.timer
 ~ # systemctl list-timers -all
 ```
+
+The *certbot-renew.timer* would invoke *certbot-renew.service* automatically.
 
 ## Backup the Account and Certificates ##
 
@@ -462,7 +496,7 @@ The destination can be anywhare but the `-d` demands domain name. Attention plea
 
 *acme.sh* maintains two copies of a certificate, one for internal usage, one for webserver. On the contrary, *certbot* use symblic!
 
-The `--reloadcmd` is critical to tell Nginx reload renewed certificates. Check *~/.acme.sh/en.zhstar.win_ecc/en.zhstar.win.conf* , we will find the reload command is encoded by base64:
+The `--reloadcmd` is critical to tell Nginx reload renewed certificates. Check *~/.acme.sh/en.example.com_ecc/en.example.com.conf* , we will find the reload command is encoded by base64:
 
 ```
 Le_ReloadCmd='__ACME_BASE64__START_c3lzdGVtY3RsIHJlbG9hZCBuZ2lueC5zZXJ2aWNl__ACME_BASE64__END_'
