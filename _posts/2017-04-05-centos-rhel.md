@@ -182,6 +182,10 @@ Install:
 
 ```bash
 ~ # yum [-y] install pkg1 pkg2
+
+# will install dependency automatically
+~ # yum install /path/to/pkg.rpm
+
 ~ # yum reinstall pkg1 pkg2
 
 ~ # yum upgrade pkg1 pkg2
