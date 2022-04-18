@@ -69,9 +69,14 @@ It is highly recommended to *pull* the [docker/getting-started](https://hub.dock
 
 ```bash
 root@tux ~ # docker search -f is-official=true ubuntu                    # search only official image
+
 root@tux ~ # docker pull ubuntu:16.04                                    # specify a tag
 root@tux ~ # docker pull ubuntu@<sha256>                                 # specify an image ID
-root@tux ~ # docker image ls ubuntu
+
+root@tux ~ # docker pull amd64/amazonlinux                               # AMD64
+root@tux ~ # docker pull arm64v8/amazonlinux                             # Apple M1 ARM64
+
+root@tux ~ # docker images
 ```
 
 1. *docker search* search docker images from registries defined in */etc/container/registries.conf*.
@@ -86,7 +91,7 @@ root@tux ~ # docker image ls ubuntu
 4. Any any time, Ctrl-C terminates the pull process.
 5. Docker support [proxy configuration](https://docs.docker.com/network/proxy/) when feteching the images.
 
-# [Run](https://docs.docker.com/engine/reference/run/) an Image and Create a Container
+# Create a Container
 
 Syntax:
 
@@ -115,7 +120,10 @@ root@docker ~ # echo $?
 ```
 
 1. When we run an image, a container is created with an extra layer of writable filesystem.
-2. By default, the root process of a container (PID 1), namely the [CMD/ENTRYPOINTWITH](#exec-and-shell) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR, but *not* STDIN. So we can see the output (error message included) of the root process as follows:
+2. To be compatible with AMD64/ARM64, we can add the `--platform linux/x86_64` or `--platform linux/arm64`. Check [multi-platform-docker-build](https://github.com/BretFisher/multi-platform-docker-build).
+
+   This also applies to [docker build](#build-image-by-dockerfile).
+3. By default, the root process of a container (PID 1), namely the [CMD/ENTRYPOINTWITH](#exec-and-shell) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR, but *not* STDIN. So we can see the output (error message included) of the root process as follows:
 
    ```bash
    root@tux ~ # docker run -t --rm ubuntu ls /
@@ -161,7 +169,7 @@ root@docker ~ # echo $?
    root@tux ~ # docker run -d ubuntu bash -c "tail -f /dev/null"
    ```
 
-3. `-t` allocates a pseudo-TTY connected for the root process, especially useful when the process is an *interactive* Shell. The `-i` option forces the process's STDIN to be open and runs the container interactively, so we can *input* some data to the process directly, which works even when `-d` is present. Here is an example:
+4. `-t` allocates a pseudo-TTY connected for the root process, especially useful when the process is an *interactive* Shell. The `-i` option forces the process's STDIN to be open and runs the container interactively, so we can *input* some data to the process directly, which works even when `-d` is present. Here is an example:
 
    ```bash
    echo test | docker run -i ubuntu cat -
@@ -181,11 +189,11 @@ root@docker ~ # echo $?
    ~ $ docker run -it --rum ubunty bash
    ```
 
-4. `--rm` automatically remove the container when it exits.
-5. `-w` lets the root process running inside the given directory that is created on demand.
-6. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
-6. `-u, --user` runs the root process as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
-7. *bash* overrides the CMD/ENTRYPOINT instructions of the image.
+5. `--rm` automatically remove the container when it exits.
+6. `-w` lets the root process running inside the given directory that is created on demand.
+7. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
+8. `-u, --user` runs the root process as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
+9. *bash* overrides the CMD/ENTRYPOINT instructions of the image.
 
 Here is a note about the different options:
 
@@ -500,6 +508,8 @@ Successfully tagged nginx:v3
       RUN /bin/bash -c 'useradd -ms /bin/bash -u 1000 -g 1000 username ; \
       echo "username:1C2B3A" | chpasswd'
       ```
+
+9. Check [multi-platform-docker-build](https://github.com/BretFisher/multi-platform-docker-build) for AMD64/ARM64 arch issue. This also applies to [Create a Container](#create-a-container).
 
 Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
 
