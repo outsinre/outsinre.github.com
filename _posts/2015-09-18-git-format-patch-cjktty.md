@@ -72,8 +72,11 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ```bash
    ~ # cd /usr/src/linux/
    ~ # patch -p1 --verbose --dry-run < /path/to/cjktty.patch
+
+   ~ # git apply -p1 --whitespace=warn --verbose --stat < /path/to/cjktty.patch
    ~ # git apply -p1 --whitespace=warn --verbose --numstat < /path/to/cjktty.patch
    ~ # git apply -p1 --whitespace=warn --verbose --check < /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose --summary < /path/to/cjktty.patch
    ```
    
    When testing patch file, it might remind errors like:
