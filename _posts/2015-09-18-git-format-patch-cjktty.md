@@ -69,8 +69,14 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    4. We recommend to use *format-patch* to include commit messages, making it more appropriate for most scenarios involving exchanging patches over the Internet. Details refer to reference 1.
 6. Test the patch
 
+   Attention please; the `-p1` must be right, otherwise the wrong files would be patched even if no errors prompt up. Inpsect the patch file to see the pathname.
+
    ```bash
    ~ # cd /usr/src/linux/
+   
+   # determine the '-p' option value
+   ~ # less /path/to/cjktty.patch
+
    ~ # patch -p1 --verbose --dry-run < /path/to/cjktty.patch
 
    ~ # git apply -p1 --whitespace=warn --verbose --stat < /path/to/cjktty.patch
@@ -95,7 +101,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ```bash
    ~ # cd /usr/src/linux/
    ~ # patch -p1 --verbose < /path/to/cjktty.patch
-   ~ # git apply --whitespace=warn --verbose < /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose < /path/to/cjktty.patch
    ```
    
 7. If you want to make sure the patch is applied correctly,
@@ -103,7 +109,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ```bash
    ~ # cd /usr/src/linux/
    ~ # patch -p1 --verbose --dry-run -R < /path/to/cjktty.patch
-   ~ # git apply --whitespace=warn --verbose --check -R < /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose --check -R < /path/to/cjktty.patch
    ```
    
    You can reverse a patch by adding *-R* argument.
