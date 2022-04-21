@@ -79,10 +79,10 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
 
    ~ # patch -p1 --verbose --dry-run < /path/to/cjktty.patch
 
-   ~ # git apply -p1 --whitespace=warn --verbose --stat < /path/to/cjktty.patch
-   ~ # git apply -p1 --whitespace=warn --verbose --numstat < /path/to/cjktty.patch
-   ~ # git apply -p1 --whitespace=warn --verbose --check < /path/to/cjktty.patch
-   ~ # git apply -p1 --whitespace=warn --verbose --summary < /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose --stat /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose --numstat /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose --check /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose --summary /path/to/cjktty.patch
    ```
    
    When testing patch file, it might remind errors like:
@@ -101,7 +101,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ```bash
    ~ # cd /usr/src/linux/
    ~ # patch -p1 --verbose < /path/to/cjktty.patch
-   ~ # git apply -p1 --whitespace=warn --verbose < /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose /path/to/cjktty.patch
    ```
    
 7. If you want to make sure the patch is applied correctly,
@@ -109,7 +109,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ```bash
    ~ # cd /usr/src/linux/
    ~ # patch -p1 --verbose --dry-run -R < /path/to/cjktty.patch
-   ~ # git apply -p1 --whitespace=warn --verbose --check -R < /path/to/cjktty.patch
+   ~ # git apply -p1 --whitespace=warn --verbose --check -R /path/to/cjktty.patch
    ```
    
    You can reverse a patch by adding *-R* argument.
