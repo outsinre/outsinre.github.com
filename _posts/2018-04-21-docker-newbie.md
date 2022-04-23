@@ -217,9 +217,11 @@ Docker containers can read from or write to pathnames, either on host or on memo
 
    Needless to say, *tmpfs* is a memory filesystem that let container stores data in host memory.
 
-Option `--volume , -v` and `--mount` both support volume and (bind/tmpfs) mount, though we recommend `--mount` as it is more verbose.
+We use option `--volume , -v` and `--mount` to share data between containers and hosts. `--mount` is recommended as it support all 3 kinds of data sharing and is more verbose. `--volume` will be deprecated soon.
 
-If the file or directory on the host does not exist. `--volume` and `--mount` behaves differently. `--volume` would create the pathname as a *directory*, NOT a file, while `--mount` would report error. On the contrary, if the target pathname already exists in the container, both options would *obsecure* contents over there. This is useful if we'd like to test a new version of file/directory without rebuild a new image. Another difference between the two options is `--mount` support all three storage types but `--volume` only support Bind Mound.
+If the file or directory on the host does not exist. `--volume` and `--mount` behaves differently. `--volume` would create the pathname as a *directory*, NOT a file, while `--mount` would report error.
+
+On the other hand, if the target pathname already exists in the container, both options would *obsecure* contents over there. This is useful if we'd like to test a new version of code without touching the original copies.
 
 ## [SELinux](https://stackoverflow.com/q/24288616)
 
