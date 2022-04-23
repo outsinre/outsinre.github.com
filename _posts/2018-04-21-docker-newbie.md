@@ -190,10 +190,11 @@ root@docker ~ # echo $?
    ```
 
 5. `--rm` automatically remove the container when it exits.
-6. `-w` lets the root process running inside the given directory that is created on demand.
-7. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
-8. `-u, --user` runs the root process as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
-9. *bash* overrides the CMD/ENTRYPOINT instructions of the image.
+6. Check [Data Share](#data-share) for `--mount`.
+7. `-w` lets the root process running inside the given directory that is created on demand.
+8. `--net, --network` connects the container to a network. By default, it is *bridge*. Details are discussed in later sections.
+9. `-u, --user` runs the root process as a non-root user. Attention that, the username is that within the container. So the image creator should create that name in Dockerfile.
+10. *bash* overrides the CMD/ENTRYPOINT instructions of the image.
 
 Here is a note about the different options:
 
