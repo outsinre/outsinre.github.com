@@ -561,4 +561,8 @@ Remember that if we want to use a different registry rather than the default *do
 
 # Docker Compose #
 
-todo https://docs.docker.com/compose/compose-file/
+todo
+
+the compose project name by default is named after `PWD`.
+
+https://docs.docker.com/compose/compose-file/
