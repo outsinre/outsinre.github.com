@@ -69,7 +69,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    4. We recommend to use *format-patch* to include commit messages, making it more appropriate for most scenarios involving exchanging patches over the Internet. Details refer to reference 1.
 6. Test the patch
 
-   Attention please; the `-p1` must be right, otherwise the wrong files would be patched even if no errors prompt up. Inpsect the patch file to see the pathname.
+   Attention please; the `-p [num]` must be right, otherwise the wrong files would be patched even when no errors prompt up. Inpsect the patch file to see the pathname.
 
    ```bash
    ~ # cd /usr/src/linux/
@@ -96,6 +96,21 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    
    1. Error number 2708 (reported by *patch*) refers to line number in Linux-cjktty sources, while 2689 (reported by *git apply*) in Gentoo-sources. Search 2708 or 2689 in patch file and check either/both kernel sources.
    2. Some error are caused by extra whitespaces, especially those on *blank* lines.
+   
+   By default, all pathnames will be patched. Sometimes, we can patch only perticular pathnames by `git apply --include <pattern>`. *patch* does not support this feature.
+   
+   ```bash
+   ~ # git apply --verbose --whitespace=warn -p1 --include '*myfile.lua' --stat /path/to/cjktty.patch
+   ~ # git apply --verbose --whitespace=warn -p1 --include '/path/to/dir' --stat /path/to/cjktty.patch
+   ```
+   
+   Vice versa, we can `--exclude <pattern>`:
+   
+   ```bash
+   ~ # git apply --verbose --whitespace=warn -p1 --exclude <pathname-pattern> --stat /path/to/cjktty.patch
+   ```
+
+   If both `--include` and `--exlude` options are present, the *first match* determines if a pathname is patched or not.
 7. Apply the patch
 
    ```bash
@@ -104,7 +119,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ~ # git apply --verbose --whitespace=warn -p1 /path/to/cjktty.patch
    ```
    
-7. If you want to make sure the patch is applied correctly,
+8. We can, revert the patch by the `-R` option.
 
    ```bash
    ~ # cd /usr/src/linux/
@@ -113,7 +128,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ```
    
    You can reverse a patch by adding *-R* argument.
-8. If /usr/src/linux source is polluted by patch error, you can re-install the kernel source.
+9. If /usr/src/linux source is polluted by patch error, you can re-install the kernel source.
 
    >We cannot *reverse* a patch error.
 
@@ -125,5 +140,5 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    
    1. Pay attention to use *unmerge* instead of *depclean*. The former will keep package dependencies.
    2. Maybe we can just extract the source code to */usr/src/linux*.
-9. Reference
+1. Reference
    1. [How to get patch files from multiple commits?](http://stackoverflow.com/q/32643640/2336707).
