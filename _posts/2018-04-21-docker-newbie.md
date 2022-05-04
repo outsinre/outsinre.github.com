@@ -563,6 +563,6 @@ Remember that if we want to use a different registry rather than the default *do
 
 todo
 
-the compose project name by default is named after `PWD`.
+the compose project name by default is named after `PWD`. The name of containers share the same prefix (i.e. name of the project).
 
 https://docs.docker.com/compose/compose-file/
