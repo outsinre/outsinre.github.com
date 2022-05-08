@@ -87,6 +87,8 @@ Start Docker:
 ~ $ sudo systemctl start docker
 
 ~ $ docker info
+~ $ docker ps
+~ $ docker compose ls
 ```
 
 The daemon manages everything!
