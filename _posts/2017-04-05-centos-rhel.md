@@ -248,9 +248,13 @@ Of the [3rd party repositories](https://wiki.centos.org/AdditionalResources/Repo
 ~ # yum repolist [all|enabled|disabled]
 
 ~ # yum-config-manager --add-repo <repo-url>
+~ # yum update -y
+
 ~ # yum repolist [all|enabled|disabled]
 ~ # yum-config-manager --disable <repo-id>
+
 ~ # yum-config-manager --enable <repo-id>
+~ # yum update -y
 ```
 
 To remove a repo, just remove the file within */etc/yum.repos.d*.
