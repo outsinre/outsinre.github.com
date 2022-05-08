@@ -38,14 +38,30 @@ title: Docker Newbie
 
    Of the Union FS, *overlay2* is recommended over *aufs*. Either enable *overlay2* in kernel or build external module. *devicemapper* is also used in CentOS/RHEL. Pay attention to [CentOS/RHEL 的用户需要注意的事项](https://yeasy.gitbooks.io/docker_practice/content/image/rm.html#centosrhel-%E7%9A%84%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9) if *devicemapper* driver *loop-lvm* mode is used.
 
-# Daemon
+# Installation #
 
-Install [docker-ce instead of docker-ee](https://docs.docker.com/install/linux/docker-ce/centos/)
+Install [docker-ce instead of docker-ee](https://docs.docker.com/engine/install/). We can either install by Docker official repo or by system package manager. To simplify the process, we install by system package manager:
 
 ```bash
-~ # systemctl enable docker
-~ # systemctl status docker
-~ # systemctl start docker
+~ $ sudo yum install docker
+```
+
+In order to run *docker* as a normal user, add the account to *docker* group:
+
+```bash
+~ $ sudo usermod -aG docker <username>
+
+~ $ reboot
+```
+
+# Daemon
+
+Start Docker:
+
+```bash
+~ $ sudo systemctl enable docker
+~ $ systemctl status docker
+~ $ sudo systemctl start docker
 ```
 
 The daemon manages everything!
@@ -53,12 +69,12 @@ The daemon manages everything!
 # Command Sample #
 
 ```bash
-root@tux ~ # fgrep -qa docker /proc/1/cgroup; echo $?                    # check if it is a docker
-root@tux ~ # docker info                                                 # display the outline of docker environment
-root@tux ~ # docker image/container ls [-a]                              # list images/containers
-root@tux ~ # docker [image] history                                      # show layers of an image
-root@tux ~ # docker inspect [ name | ID ]                                # display low-level details on any docker objects
-root@tux ~ # docker logs <container>
+~ $ fgrep -qa docker /proc/1/cgroup; echo $?                    # check if it is a docker
+~ $ docker info                                                 # display the outline of docker environment
+~ $ docker image/container ls [-a]                              # list images/containers
+~ $ docker [image] history                                      # show layers of an image
+~ $ docker inspect [ name | ID ]                                # display low-level details on any docker objects
+~ $ docker logs <container>
 ```
 
 Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine/reference/commandline/docker/).
@@ -68,15 +84,15 @@ Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine
 It is highly recommended to *pull* the [docker/getting-started](https://hub.docker.com/r/docker/getting-started) image, *run* and visit `http://localhost`.
 
 ```bash
-root@tux ~ # docker search -f is-official=true ubuntu                    # search only official image
+~ $ docker search -f is-official=true ubuntu                    # search only official image
 
-root@tux ~ # docker pull ubuntu:16.04                                    # specify a tag
-root@tux ~ # docker pull ubuntu@<sha256>                                 # specify an image ID
+~ $ docker pull ubuntu:16.04                                    # specify a tag
+~ $ docker pull ubuntu@<sha256>                                 # specify an image ID
 
-root@tux ~ # docker pull amd64/amazonlinux                               # AMD64
-root@tux ~ # docker pull arm64v8/amazonlinux                             # Apple M1 ARM64
+~ $ docker pull amd64/amazonlinux                               # AMD64
+~ $ docker pull arm64v8/amazonlinux                             # Apple M1 ARM64
 
-root@tux ~ # docker images
+~ $ docker images
 ```
 
 1. *docker search* search docker images from registries defined in */etc/container/registries.conf*.
@@ -102,7 +118,7 @@ docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 Example:
 
 ```bash
-root@tux ~ # docker run --name centos-5.8 \
+~ $ docker run --name centos-5.8 \
 -d \
 -it \
 --rm \
@@ -126,11 +142,11 @@ root@docker ~ # echo $?
 3. By default, the root process of a container (PID 1), namely the [CMD/ENTRYPOINTWITH](#exec-and-shell) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR, but *not* STDIN. So we can see the output (error message included) of the root process as follows:
 
    ```bash
-   root@tux ~ # docker run -t --rm ubuntu ls /
+   ~ $ docker run -t --rm ubuntu ls /
    bin   dev  home  media  opt   root  sbin  sys  usr
    boot  etc  lib   mnt    proc  run   srv   tmp  var
    
-   root@tux ~ # docker run --rm ubuntu ls /
+   ~ $ docker run --rm ubuntu ls /
    bin
    boot
    dev
@@ -166,7 +182,7 @@ root@docker ~ # echo $?
    As the root process *service* exits immediately after *nginx* is started. The next example will keep the container running as the *tail* command persists:
    
    ```
-   root@tux ~ # docker run -d ubuntu bash -c "tail -f /dev/null"
+   ~ $ docker run -d ubuntu bash -c "tail -f /dev/null"
    ```
 
 4. `-t` allocates a pseudo-TTY connected for the root process, especially useful when the process is an *interactive* Shell. The `-i` option forces the process's STDIN to be open and runs the container interactively, so we can *input* some data to the process directly, which works even when `-d` is present. Here is an example:
@@ -231,14 +247,14 @@ When bind-mount a file or mount a directory of host, SELinx policy in the contai
 1. Temporarily turn off SELinux policy: 
 
    ```bash
-   root@tux ~ # su -c "setenforce 0"
-   root@tux ~ # docker restart container-ID
+   ~ $ su -c "setenforce 0"
+   ~ $ docker restart container-ID
    ```
 
 2. Adding a SELinux rule for the shared pathname:
 
    ```bash
-   root@tux ~ # chcon -Rt svirt_sandbox_file_t /path/to/
+   ~ $ chcon -Rt svirt_sandbox_file_t /path/to/
    ```
 
 3. Pass argument `:z` or `:Z` to `--volume` option:
@@ -257,18 +273,18 @@ When bind-mount a file or mount a directory of host, SELinx policy in the contai
 # Manage a Nginx Container
 
 ```bash
-root@tux ~ # docker run --name webserver \
+~ $ docker run --name webserver \
 -d \
 --net host
 --mount type=bind,source=/tmp/logs,target=/var/log/nginx \
 -p 8080:80 nginx
 
-root@tux ~ # docker container ls
-root@tux ~ # docker container logs webserver
-root@tux ~ # docker container stop/kill webserver
-root@tux ~ # docker container start webserver
-root@tux ~ # docker container rm webserve          # remove one or more container (even running instances)
-root@tux ~ # docker container prune                # remove all stopped container
+~ $ docker container ls
+~ $ docker container logs webserver
+~ $ docker container stop/kill webserver
+~ $ docker container start webserver
+~ $ docker container rm webserve          # remove one or more container (even running instances)
+~ $ docker container prune                # remove all stopped container
 ```
 
 1. `-p` maps host port 8080 to container port 80 that is already bound to host Nginx process.
@@ -287,20 +303,20 @@ root@tux ~ # docker container prune                # remove all stopped containe
 Exec a simple command in container:
 
 ```bash
-root@tux ~ # docker exec webserver sh -c 'echo $PATH'
-root@tux ~ # docker exec webserver ps
+~ $ docker exec webserver sh -c 'echo $PATH'
+~ $ docker exec webserver ps
 ```
 
 Sometimes, we want to exec the command in the background when we do not care about its output or need not any input:
 
 ```bash
-root@tux ~ # docker exec -d webserver touch /tmp/test.txt
+~ $ docker exec -d webserver touch /tmp/test.txt
 ```
 
 If we want to interactively and continuously control the container:
 
 ```bash
-root@tux ~ # docker exec -it webserver bash
+~ $ docker exec -it webserver bash
 ```
 
 Apart from *docker exec*, [docker attach <container>](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
@@ -314,15 +330,15 @@ If the process is running as PID 1 (like */usr/bin/init*), it ignores any signal
 # Create Image from Container #
 
 ```bash
-root@tux ~ # docker exec -it webserver bash
+~ $ docker exec -it webserver bash
 #
 root@docker ~ # echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
 root@docker ~ # exit
 #
-root@tux ~ # docker diff webserver
-root@tux ~ # docker container commit -a 'jim' -m 'change front page' webserver nginx:v2
-root@tux ~ # docker image ls nginx
-root@tux ~ # docker history nginx:v2
+~ $ docker diff webserver
+~ $ docker container commit -a 'jim' -m 'change front page' webserver nginx:v2
+~ $ docker image ls nginx
+~ $ docker history nginx:v2
 ```
 
 1. We modified container layer storage. Use *diff* to check details.
@@ -333,7 +349,7 @@ root@tux ~ # docker history nginx:v2
 4. To verify the new image:
 
    ```bash
-   root@tux ~ # docker run --name web2 -d -p 8081:80 --rm nginx:v2
+   ~ $ docker run --name web2 -d -p 8081:80 --rm nginx:v2
    ```
 
    The `--rm` tells to remove the container upon exit.
@@ -372,10 +388,10 @@ The Docker's networking subsystem is *pluggable*, using drivers. Below is a simp
 Docker automates network configuration upon container startup. We can customize that on purpose.
 
 ```bash
-root@tux ~ # docker network ls
-root@tux ~ # docker network create -d bridge mynet
-root@tux ~ # docker run -it --name ubt1604 -v /src/hostdir:/opt/condir:rw --network mynet ubuntu:16.04
-root@tux ~ # docker network inspect mynet
+~ $ docker network ls
+~ $ docker network create -d bridge mynet
+~ $ docker run -it --name ubt1604 -v /src/hostdir:/opt/condir:rw --network mynet ubuntu:16.04
+~ $ docker network inspect mynet
 ```
 
 Use the `--net` or `--network` option. To the 'host' networking driver, just pass `--net host` option to *docker run*.
@@ -440,9 +456,9 @@ Similar to Makefile, Docker uses Dockerfile to define image with specified *inst
 In this section, we use Dockerfile to create image *nginx:v2*.
 
 ```bash
-root@tux ~ # mkdir mynginx
-root@tux ~ # cd mynginx
-root@tux ~ # vim Dockerfile
+~ $ mkdir mynginx
+~ $ cd mynginx
+~ $ vim Dockerfile
 #
 FROM nginx
 RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
@@ -453,7 +469,7 @@ Just two lines! FROM imports the base image on which we will create the new laye
 Now we build the image:
 
 ```bash
-root@tux ~ # docker build -t nginx:v3 -t nginx .
+~ $ docker build -t nginx:v3 -t nginx .
 #
 Sending build context to Docker daemon  2.048kB
 Step 1/2 : FROM nginx
@@ -481,7 +497,7 @@ Successfully tagged nginx:v3
    Docker sends all files within context directory to remote Docker engine (daemon). Image can be built without a context directory if we don't have any supplementary files.
 
    ```bash
-   root@tux ~ # docker build -t nginx:v3 - < /path/to/Dockerfile
+   ~ $ docker build -t nginx:v3 - < /path/to/Dockerfile
    ```
 
    The hypen character cannot be omitted!
@@ -489,7 +505,7 @@ Successfully tagged nginx:v3
 5. After the building, we can run *nginx:v3* image:
 
    ```bash
-   root@tux ~ # docker run --name web3 -d -p 8081:80 --rm nginx:v3
+   ~ $ docker run --name web3 -d -p 8081:80 --rm nginx:v3
    ```
 
 6. Apart from builing a new docker image for the web server, we can utilize 'Data Share' to attach a Volume or Bind Mount to the base docker image. Build the web server within the attached storage instead.
@@ -557,7 +573,7 @@ Remember that if we want to use a different registry rather than the default *do
 
 ```bash
 ~ $ docker tag nginx myregistry:5000/myaccount/nginx
-``
+```
 
 # Docker Compose #
 
