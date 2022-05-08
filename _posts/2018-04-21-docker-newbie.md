@@ -73,8 +73,10 @@ Install Docker Compose manually:
 ~ $ sudo curl -sSL https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/lib/docker/cli-plugins/docker-compose
 
 ~ $ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-
 ~ $ docker compose version
+
+~ $ PATH="/usr/local/lib/docker/cli-plugins/:$PATH"
+~ $ docker-compose version
 ```
 
 # Daemon
