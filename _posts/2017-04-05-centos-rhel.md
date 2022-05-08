@@ -244,6 +244,17 @@ The following example shows how to control repo with *dnf* (applying to *yum* as
 
 Of the [3rd party repositories](https://wiki.centos.org/AdditionalResources/Repositories), IUS and Remi (both depend on EPEL) is recommended over Webtatic.
 
+```bash
+~ # yum repolist [all|enabled|disabled]
+
+~ # yum-config-manager --add-repo <repo-url>
+~ # yum repolist [all|enabled|disabled]
+~ # yum-config-manager --disable <repo-id>
+~ # yum-config-manager --enable <repo-id>
+```
+
+To remove a repo, just remove the file within */etc/yum.repos.d*.
+
 ## EPEL not from RHEL ##
 
 EPEL (Extra Packages for Enterprise Linux) is open source and free community based repository project from [Fedora](https://fedoraproject.org/wiki/EPEL) team which provides 100% high quality add-on software packages.
@@ -251,7 +262,6 @@ EPEL (Extra Packages for Enterprise Linux) is open source and free community bas
 ```bash
 ~ # yum info epel-release
 ~ # yum install epel-release
-~ # yum repolist enabled
 ```
 
 To specify repository when installing package:

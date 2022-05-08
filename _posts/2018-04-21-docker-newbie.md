@@ -40,7 +40,7 @@ title: Docker Newbie
 
 # Installation #
 
-Install [docker-ce instead of docker-ee](https://docs.docker.com/engine/install/). We can either install by Docker official repo or by system package manager. To simplify the process, we install by system package manager:
+Install [docker-ce instead of docker-ee](https://docs.docker.com/engine/install/). We can either install [by Docker official repo](https://docs.docker.com/engine/install/rhel/#install-using-the-repository) (highly recommended) or by system package manager. To simplify the process, we install by system package manager:
 
 ```bash
 ~ $ sudo yum install docker
