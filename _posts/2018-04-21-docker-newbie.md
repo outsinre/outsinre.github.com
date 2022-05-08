@@ -40,10 +40,22 @@ title: Docker Newbie
 
 # Installation #
 
-Install [docker-ce instead of docker-ee](https://docs.docker.com/engine/install/). We can either install [by Docker official repo](https://docs.docker.com/engine/install/rhel/#install-using-the-repository) (highly recommended) or by system package manager. To simplify the process, we install by system package manager:
+We only [install](https://docs.docker.com/engine/install/) Docker CE version. For Windows and MacOS, Docker Desktop includes both Docker and [Docker Compose](#docker-compose). On Linux, it is highly recommended to install Docker and Docker Compose by [official repo](https://docs.docker.com/engine/install/rhel/#install-using-the-repository).
+
+On Linux, alternatively, we install Docker by package manager, and then install Docker Compose by [downloading binary file manually](https://docs.docker.com/compose/install/#install-the-binary-manually).
+
+Install Docker by package manager:
 
 ```bash
+~ $ sudo yum update -y
+
+# CentOS
 ~ $ sudo yum install docker
+
+# Amazon Linux 2 - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html
+~ $ sudo amazon-linux-extras install docker
+
+~ $ docker info
 ```
 
 In order to run *docker* as a normal user, add the account to *docker* group:
@@ -54,6 +66,17 @@ In order to run *docker* as a normal user, add the account to *docker* group:
 ~ $ reboot
 ```
 
+Install Docker Compose manually:
+
+```bash
+~ $ sudo mkdir -p /usr/local/lib/docker/cli-plugins
+~ $ sudo curl -sSL https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/lib/docker/cli-plugins/docker-compose
+
+~ $ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+~ $ docker compose version
+```
+
 # Daemon
 
 Start Docker:
@@ -62,6 +85,8 @@ Start Docker:
 ~ $ sudo systemctl enable docker
 ~ $ systemctl status docker
 ~ $ sudo systemctl start docker
+
+~ $ docker info
 ```
 
 The daemon manages everything!
