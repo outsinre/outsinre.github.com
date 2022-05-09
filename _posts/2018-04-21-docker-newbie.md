@@ -55,7 +55,7 @@ Install Docker by package manager:
 # Amazon Linux 2 - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html
 ~ $ sudo amazon-linux-extras install docker
 
-~ $ docker info
+~ $ docker version
 ```
 
 In order to run *docker* as a normal user, add the account to *docker* group:
