@@ -75,7 +75,7 @@ Install Docker Compose manually:
 ~ $ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 ~ $ docker compose version
 
-~ $ PATH="/usr/local/lib/docker/cli-plugins/:$PATH"
+~ $ PATH="/usr/local/lib/docker/cli-plugins:$PATH"
 ~ $ docker-compose version
 ```
 
