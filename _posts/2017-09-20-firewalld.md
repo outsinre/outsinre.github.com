@@ -169,15 +169,17 @@ I think the easiest way is to copy an existing service XML to */etc/firewalld/se
 # drop zone
 # test
 ~ # firewall-cmd --zone=drop --add-port=12345/tcp --timeout 5m
-# permaneng
+# permanent
 ~ # firewall-cmd --permanent --zone=drop --add-port=12345/tcp
 
 # default zone
+# test
 ~ # firewall-cmd --zone=public --remove-port=12345/tcp --timeout 5m
+# permanent
 ~ # firewall-cmd --permanent --zone=public --add-port=12345/tcp
 ```
 
-Then access to port 12345 would be dropped.
+By default, the *drop* zone is not [activated](#status).
 
 # Finally
 
