@@ -22,9 +22,7 @@ title: firewalld
    ~ # yum list iptables iptables-services firewalld
    ```
 
-3. Specially, firewalld introduces *zone* to defines the level of trust for network connections, which resembles Microsoft Windows firewall.
-
-   Rules are attached to a zone.
+3. Specially, firewalld introduces *zone* to defines the level of trust for a connection, IP source or interface, which resembles Microsoft Windows firewall. Rules are created within a zone. A zone is bound to one or more interfaces, IP sources or interfaces, but a connection, interface or IP source can *only* be part of one zone.
 
 # mask iptables service
 
@@ -42,6 +40,7 @@ Switch to firewalld.
 ~ # yum install iptables firewalld
 ~ # systemctl enable firewalld
 ~ # systemctl start firewalld
+~ # systemctl status firewalld
 ```
 
 >Don't break SSH connection as the default SSH port in default zone is 22 that is usually changed by administrator, otherwise you could no longer SSH into server.
@@ -49,24 +48,49 @@ Switch to firewalld.
 # Status
 
 ```bash
-~ # systemctl status firewalld
-~ # firewall-cmd --state
-~ # firewall-cmd --zone=public --list-all/list-ports/list-services
-
-~ # firewall-cmd ----get-services
-~ # firewall-cmd --get-zones/--list-all-zones
-~ # firewall-cmd --get-default-zone/--get-active-zones
-
 ~ # firewall-cmd --reload
+~ # firewall-cmd --state
 
-~ # iptables -S [-t nat]
+# print zone names
+~ # firewall-cmd --get-zones
+# print all zone details
+~ # firewall-cmd --list-all-zones
+# default is 'pulbic'
+~ # firewall-cmd --get-default-zone
+# zones that has bindings
+~ # firewall-cmd --get-active-zone
+
+# print all service names
+~ # firewall-cmd --get-services
+# print a service detail
+~ # firewall-cmd --info-service https
+
+# print objects in a zone
+~ # firewall-cmd --zone=public --list-services
+~ # firewall-cmd --zone=public --list-ports
+~ # firewall-cmd --zone=public --list-interfaces
+~ # firewall-cmd --zone=public --list-sources
+# print all objects in a zone
+~ # firewall-cmd --zone=public --list-all
+~ # firewall-cmd --info-zone public
 ```
 
-1. Default zone is *public* to which unmatched traffic would be directed.
+1. Default zone is *public* to which unmatched traffic would be applied.
 
    For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted. 
-2. We *activate* a zone (`--get-active-zones`) by binding a network interface or source IP address range(s) to it. Any firewall rules in the zone then apply to that network interface or IP address range(s).
-3. We can also examine *firewalld* settings by *iptables* command.
+2. We *activate* a zone (`--get-active-zones`) by binding a network interface, source IP address range(s) or ports to it.
+
+As *firewalld* sites on top of *iptables*, we can manipulate underlying *iptables* rules with *firewall-cmd* directly with the `--direct` option.
+
+```bash
+~ # firewall-cmd --direct --get-all-chains
+~ # firewall-cmd --direct --get-chains nat
+
+~ # firewall-cmd --direct --get-all-rules
+~ # firewall-cmd --direct --get-rules nat
+```
+
+Attention please; do not use *iptables* command to manipulate *firewalld* rules as that would make things complicated.
 
 # service and port
 
