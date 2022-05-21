@@ -3,25 +3,19 @@ layout: post
 title: firewalld
 ---
 
-# firewalld VS iptables
+1. toc
+{:toc}
 
-1. Stack layers
+# firewalld and iptables #
 
-   1. firewalld/iptables service -> iptables command -> kernel packet filter (netfilter).
-   2. We should know the difference between a *service* and shell *command* in terms of *iptables*.
-   3. *firewalld* still requires *iptables command* underneath.
+1. [Firewalld](https://firewalld.org/) stack
 
-   Hence, no matter which service you prefer, *iptables command* is essential.
+   1. iptables CLI -> iptables daemon -> kernel netfilter -> xtables/nftables. We should know the difference between a *service* and shell *command* in terms of *iptables*.
+   2. firewall-cmd CLI -> firewalld daemon -> iptables/nft CLI. Before firewalld 0.6.0, the underlying is *iptables*, not it becomes *nft*. Here is an illustration of before 0.6.0:
 
-   ![firewall](/assets/firewall.png)
+      ![firewall](/assets/firewall.png)
 
-   At the very top, sits the GUI tool.
-2. Check packages
-
-   ```bash
-   ~ # yum list iptables iptables-services firewalld
-   ```
-
+      At the very top, sits the GUI tool.
 3. Specially, firewalld introduces *zone* to defines the level of trust for a connection, IP source or interface, which resembles Microsoft Windows firewall. Rules are created within a zone. A zone is bound to one or more interfaces, IP sources or interfaces, but a connection, interface or IP source can *only* be part of one zone.
 
 # mask iptables service
@@ -92,6 +86,14 @@ As *firewalld* sites on top of *iptables*, we can manipulate underlying *iptable
 
 Attention please; do not use *iptables* command to manipulate *firewalld* rules as that would make things complicated.
 
+# Runtime and Permaneng #
+
+When updating *firewalld* rules, option `--permanent` does not affect runtime rules but write to disk for accross boot.
+
+1. When [changing](#disallow-ports) something, do not add `--permanent` option and add `--timeout` option to have a test, especially when you change the SSH port or disallow a port.
+2. After that either execute the update again with the `--permanent` option or run `firewall-cmd --runtime-to-permanent`.
+3. [Reload rules](#finally) into runtime if step 1 is skipped.
+
 # service and port
 
 1. Services are pre-defined well-known ports like http, https etc.
@@ -161,10 +163,18 @@ Adding the new service to a zone:
 
 I think the easiest way is to copy an existing service XML to */etc/firewalld/services/myservice.xml* and edit that file directly.
 
-# Disallow a port
+# Disallow Ports #
 
 ```bash
+# drop zone
+# test
+~ # firewall-cmd --zone=drop --add-port=12345/tcp --timeout 5m
+# permaneng
 ~ # firewall-cmd --permanent --zone=drop --add-port=12345/tcp
+
+# default zone
+~ # firewall-cmd --zone=public --remove-port=12345/tcp --timeout 5m
+~ # firewall-cmd --permanent --zone=public --add-port=12345/tcp
 ```
 
 Then access to port 12345 would be dropped.
