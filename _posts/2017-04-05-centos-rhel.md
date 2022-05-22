@@ -166,21 +166,20 @@ Query:
 ~ # yum upgrade [pkg]
 
 ~ # yum provides /path/to/file             # rpm -qf
-
 ~ # yum repoquery -f /path/to/file
+~ # yum repoqeury --provides /path/to/file
+~ # yum repoqeury --whatprovides /path/to/file
+
 ~ # yum repoquery -l pkg
 
-~ # repoquery --list pkg
-~ # repoquery --list pkg
+~ # yum repoquery --deplist pkg
+~ # yum repoquery --whatdepends pkg
 ```
 
 1. _update_ is synonym to _upgrade_.
 2. *list --updates* is almost the same as *check-update*. As the command form implies, *check-update* is useful in Shell script while *list --updates* is for humans on the command line.
 
    Please pay attention, their exit status code difference.
-3. *yum provides* only search which package provides the pathname. `rpm -qf` requires that the package is installed or existence of the *.rpm* file.
-
-   To speed up the search, use command *repoquery* from *yum-utils* package. Especially, it list all files provided by a package even it is not installed.
 
 Install:
 
