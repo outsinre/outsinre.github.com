@@ -75,11 +75,10 @@ Query installed packages:
 ~ # rpm -qa | grep 'regex'
 
 ~ # rpm -qi pkg; rpm -qip pkg.rpm                     # query pkg information
-~ # rpm -ql pkg; rpm -qlp pkg.rpm                     # list pkg files
-~ # rpm -qR pkg; rpm -qRp pkg.rpm                     # list package it requires - dependencies
+~ # rpm -qR pkg; rpm -qRp pkg.rpm                     # dependencies
 
-~ # rpm -qf /path/to/file                             # file owner
-~ # rpm -qdf /path/to/file                            # file owner's man pages
+~ # rpm -ql pkg; rpm -qlp pkg.rpm                     # files in a package
+~ # rpm -qf /path/to/file                             # package that owns the file
 ```
 
 Verify:
@@ -168,7 +167,10 @@ Query:
 
 ~ # yum provides /path/to/file             # rpm -qf
 
-~ # repoquery --whatprovides '*bin/grep'
+~ # yum repoquery -f /path/to/file
+~ # yum repoquery -l pkg
+
+~ # repoquery --list pkg
 ~ # repoquery --list pkg
 ```
 
@@ -176,9 +178,9 @@ Query:
 2. *list --updates* is almost the same as *check-update*. As the command form implies, *check-update* is useful in Shell script while *list --updates* is for humans on the command line.
 
    Please pay attention, their exit status code difference.
-3. 'yum provides' only search which package provides the pathname. 'rpm -qf' requires that the package is installed or existence of the *.rpm* file.
+3. *yum provides* only search which package provides the pathname. `rpm -qf` requires that the package is installed or existence of the *.rpm* file.
 
-   Tp speed up the search, use 'repoquery' from 'yum-utils' package. Especially, it list all files provided by a package even it is not installed.
+   To speed up the search, use command *repoquery* from *yum-utils* package. Especially, it list all files provided by a package even it is not installed.
 
 Install:
 
