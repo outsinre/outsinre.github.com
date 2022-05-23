@@ -606,8 +606,11 @@ Remember that if we want to use a different registry rather than the default *do
 
 # Docker Compose #
 
-todo
-
 the compose project name by default is named after `PWD`. The name of containers share the same prefix (i.e. name of the project).
+
+Unlike [docker run](#create-a-container), *docker compose up* does [not](https://stackoverflow.com/q/49293967/2336707) support `-e` option to read system environment variables. We can achieve the same goal as follows:
+
+1. Create a `.env` file in the compose *project* folder (default to `PWD`), and define environment variables within. We can customize the file location by `--env-file` option.
+2. Prefix environment variables directly, like *VAR=VAL docker compose up*.
 
 https://docs.docker.com/compose/compose-file/
