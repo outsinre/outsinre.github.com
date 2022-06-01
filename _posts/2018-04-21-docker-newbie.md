@@ -151,7 +151,7 @@ Example:
 -d \
 -it \
 --rm \
---mount type=bind,source=/home/jim/workspace/,target=/home/jim/workspace/ \
+--mount type=bind,src=/home/jim/workspace/,dst=/home/jim/workspace/,ro \
 -w /home/jim/workspace/ \
 --net host
 -u $(id -u):$(id -g) \
