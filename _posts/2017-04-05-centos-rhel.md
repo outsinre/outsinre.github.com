@@ -71,7 +71,7 @@ _rpm_ manages package file directly, maintaining a database of package informati
 Query installed packages:
 
 ```bash
-~ # rpm -qa name='globbing'
+~ # rpm -qa 'globbing'
 ~ # rpm -qa | grep 'regex'
 
 ~ # rpm -qi pkg; rpm -qip pkg.rpm                     # query pkg information
@@ -157,9 +157,11 @@ Query:
 ```bash
 ~ # yum history
 
-~ # yum list [--all | --installed | --available | --upgrades] [pkg]
-~ # yum info [--all | --installed | --available | --upgrades] [pkg] # more details
+~ # yum list [all | installed | available | updates ] [pkg]
+~ # yum info [all | installed | available | updates ] [pkg] # more details
+
 ~ # yum search pkg
+~ # yum --showduplicates search pkg    # show all versions
 
 ~ # yum repolist [--all | --enabled | --disabled]
 ~ # yum check-update
@@ -180,6 +182,7 @@ Query:
 2. *list --updates* is almost the same as *check-update*. As the command form implies, *check-update* is useful in Shell script while *list --updates* is for humans on the command line.
 
    Please pay attention, their exit status code difference.
+2. Install *yum-utils* to use *repoquery*.
 
 Install:
 
