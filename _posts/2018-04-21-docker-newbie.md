@@ -610,7 +610,8 @@ To pass environment variables to containers, we can:
 
 1. `-e, --env` applies [only](https://stackoverflow.com/q/49293967/2336707) to `docker run`. This method [reveal](https://stackoverflow.com/a/30494145/2336707) sensitive values in Shell history. We can firstly *export* the variable on CLI, then pass `--env VAR` without the value part.
 2. [--env-file](https://docs.docker.com/compose/env-file/) (default `$PWD/.env`) applies both to `docker run` and [docker compose](#docker-compose). This fits when there are a lot of variables to pass in.
-3. [docker compose](#docker-compose) can pick up [a few compose-specific variables](https://docs.docker.com/compose/reference/envvars/) from CLI, so just *export* it. CLI variables can also be for [substitution in compose file](https://docs.docker.com/compose/compose-file/compose-file-v3/#variable-substitution).
+3. [docker compose](#docker-compose) can pick up [a few compose-specific variables](https://docs.docker.com/compose/reference/envvars/) from CLI, so just *export* it.
+4. CLI variables can also be for [substitution in compose file](https://docs.docker.com/compose/compose-file/compose-file-v3/#variable-substitution).
 
 # Docker Compose #
 
