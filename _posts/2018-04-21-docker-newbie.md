@@ -440,7 +440,7 @@ Use the `--net` or `--network` option. To the 'host' networking driver, just pas
 
 ## link ##
 
-The legacy communication method is `--link` that copies information (e.g. [ENV Variables](#env-variables)) from *source* container to *receipt* (*target*) container, and provides network access from receipt container to source container.
+The legacy communication method is `--link`. Docker copies information (e.g. [ENV Variables](#env-variables)) from *source* container to *receipt* (*target*) container, and provides network access from receipt container to source container.
 
 Take `docker run --name web --link postgres:alias ...` for example, the newly created *web* is receipt container and the existing *postgres* is source container.
 
@@ -495,7 +495,7 @@ PING db (172.17.0.3) 56(84) bytes of data.
 64 bytes from db (172.17.0.3): icmp_seq=3 ttl=64 time=0.136 ms
 ```
 
-Attention please; `--link` is only one-way link, so receipt container cannot access to target container. To achieve bi-directional communication, please use [network](#networking-drivers).
+Attention please; `--link` is only one-way link. Info is transferred from source containers to receipt containers but source containers know nothing about receipt containers. To achieve bi-directional communication, please use [network](#networking-drivers).
 
 # exec and shell #
 
