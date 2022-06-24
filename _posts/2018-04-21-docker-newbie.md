@@ -450,6 +450,7 @@ Here is an example:
 
 ```bash
 ## source container
+
 13:47:23 zachary@Zacharys-MacBook-Pro ~$ docker run --name postgres -e HELLO=world -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:14
 25732d58f238b1d3e83fc52ea3c8b91f75290385066e6541d616e68eecd6cfdd
 
@@ -459,7 +460,9 @@ world
 
 
 ## receipt/target container
+
 13:48:11 zachary@Zacharys-MacBook-Pro ~$ docker run --name ubuntu -it --link postgres:db ubuntu bash
+
 # src in hosts
 root@8e95191dba0e:/# cat /etc/hosts
 127.0.0.1       localhost
@@ -495,7 +498,7 @@ PING db (172.17.0.3) 56(84) bytes of data.
 64 bytes from db (172.17.0.3): icmp_seq=3 ttl=64 time=0.136 ms
 ```
 
-Attention please; `--link` is only one-way link. Info is transferred from source containers to receipt containers but source containers know nothing about receipt containers. To achieve bi-directional communication, please use [network](#networking-drivers).
+Attention please; `--link` is one-way link only. Info is transferred from source containers to receipt containers but source containers know nothing about receipt containers. To achieve bi-directional communication, please use [network](#networking-drivers).
 
 # exec and shell #
 
