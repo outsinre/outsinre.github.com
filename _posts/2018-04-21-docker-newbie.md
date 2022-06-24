@@ -388,7 +388,9 @@ root@docker ~ # exit
 
 # [Networking Drivers](https://docs.docker.com/network/)
 
-The Docker's networking subsystem is *pluggable*, using drivers. Below is a simple explanation:
+The Docker's networking subsystem is *pluggable*, using drivers. Docker provides multiple built-in networks, based on which we can define our own custom networks.
+
+Below is a simple explanation:
 
 1. Bridge
 
@@ -396,7 +398,9 @@ The Docker's networking subsystem is *pluggable*, using drivers. Below is a simp
 
    ![docker netowrk](/assets/docker-net.png)
 
-   Please pay attention: this is different from the *bridge* mode of VMWare or VirtualBox (real Virtual Machine). VMWare and VirtualBox's bridge is deployed directly on the host's interface and appears to be a real physical device parallel to the host and can be connected to directly from within LAN.
+   If we define a custom *bridge* network, containers within can communicate with each other by alias or name, otherwise they can [only](https://docs.docker.com/network/bridge/#differences-between-user-defined-bridges-and-the-default-bridge) communicate by IP addresses.
+
+   Pay attention please; this is different from the *bridge* mode of VMWare or VirtualBox (real Virtual Machine). VMWare and VirtualBox's bridge is deployed directly on the host's interface and appears to be a real physical device parallel to the host and can be connected to from within LAN directly.
 2. Host
 
    Share the host's networking directly without isolation. However, LAN devices cannot differntiate between containers and the host as there is not individual IP addressed assigned to containers.
