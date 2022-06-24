@@ -6,7 +6,7 @@ title: Docker Newbie
 1. toc
 {:toc}
 
-# [ABCs](https://yeasy.gitbooks.io/docker_practice/content/introduction/what.html)
+# ABCs #
 
 1. Application layer isolation.
 
@@ -79,7 +79,7 @@ Install Docker Compose manually:
 ~ $ docker-compose version
 ```
 
-# Daemon
+# Daemon #
 
 Start Docker:
 
@@ -95,7 +95,7 @@ Start Docker:
 
 The daemon manages everything!
 
-# Command Sample #
+# CLI Sample #
 
 ```bash
 ~ $ fgrep -qa docker /proc/1/cgroup; echo $?                    # check if it is a docker
@@ -108,7 +108,7 @@ The daemon manages everything!
 
 Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine/reference/commandline/docker/).
 
-# Pull
+# Pull Images #
 
 It is highly recommended to *pull* the [docker/getting-started](https://hub.docker.com/r/docker/getting-started) image, *run* and visit `http://localhost`.
 
@@ -136,7 +136,7 @@ It is highly recommended to *pull* the [docker/getting-started](https://hub.dock
 4. Any any time, Ctrl-C terminates the pull process.
 5. Docker support [proxy configuration](https://docs.docker.com/network/proxy/) when feteching the images.
 
-# Create a Container
+# Launch Containers #
 
 Syntax:
 
@@ -247,7 +247,7 @@ Here is a note about the different options:
 
 Please also follow this post [Cannot pipe to docker run with stdin attached](https://stackoverflow.com/q/71761103/2336707).
 
-# Data Share
+# Data Share #
 
 Docker containers can read from or write to pathnames, either on host or on memory filesystem - to share data. There are [three storage types](https://docs.docker.com/storage/):
 
@@ -269,9 +269,18 @@ If the file or directory on the host does not exist. `--volume` and `--mount` be
 
 On the other hand, if the target pathname already exists in the container, both options would *obsecure* contents over there. This is useful if we'd like to test a new version of code without touching the original copies.
 
-## [SELinux](https://stackoverflow.com/q/24288616)
+## ENV Variables ##
 
-When bind-mount a file or mount a directory of host, SELinx policy in the container may restrict access to the shared pathname.
+To pass environment variables to containers, we can:
+
+1. `-e, --env` applies [only](https://stackoverflow.com/q/49293967/2336707) to `docker run`. This method [reveal](https://stackoverflow.com/a/30494145/2336707) sensitive values in Shell history. We can firstly *export* the variable on CLI, then pass `--env VAR` without the value part.
+2. [--env-file](https://docs.docker.com/compose/env-file/) (default `$PWD/.env`) applies both to `docker run` and [docker compose](#docker-compose). This fits when there are a lot of variables to pass in.
+3. [docker compose](#docker-compose) can pick up [a few compose-specific variables](https://docs.docker.com/compose/reference/envvars/) from CLI, so just *export* it.
+4. CLI variables can also be for [substitution in compose file](https://docs.docker.com/compose/compose-file/compose-file-v3/#variable-substitution).
+
+## SELinux ##
+
+When bind-mount a file or mount a directory of host, SELinx policy in the container [may restrict access](https://stackoverflow.com/q/24288616) to the shared pathname.
 
 1. Temporarily turn off SELinux policy: 
 
@@ -299,7 +308,7 @@ When bind-mount a file or mount a directory of host, SELinx policy in the contai
 
    Privilege permissions can have fine-grained control by `--cap-add` or `--cap-drop`, which is recommended!
 
-# Manage a Nginx Container
+# Nginx Container Sample #
 
 ```bash
 ~ $ docker run --name webserver \
@@ -327,7 +336,7 @@ When bind-mount a file or mount a directory of host, SELinx policy in the contai
 4. Visit the Nginx container page at *http://host-ip:8080*.
 5. *stop* attempts to trigger a [*graceful*](https://superuser.com/a/757497) shutdown by sending the standard POSIX signal SIGTERM, whereas *kill* just kills the process by sending SIGKILL signal.
 
-# Get into container
+## Get into Container ##
 
 Exec a simple command in container:
 
@@ -356,7 +365,7 @@ For example, a container can be shutdown by `C-c` shortcut, sending the SIGINT s
 
 If the process is running as PID 1 (like */usr/bin/init*), it ignores any signal and will not terminate on SIGINT or SIGTERM unless it is coded to do so.
 
-# Create Image from Container #
+# Docker Commit #
 
 ```bash
 ~ $ docker exec -it webserver bash
@@ -386,9 +395,9 @@ root@docker ~ # exit
 
    "ContainerConfig" is the config of current container from within this image is committed, while the "Config" is the exact configuration of the image. Pay attention to the [Cmd](#exec-and-shell) parts. If we [build by Dockerfile](#build-image-by-dockerfile), then they looks different. The ContainerConfig this is the temporary container spawned to create the image. Check [what-is-different-of-config-and-containerconfig-of-docker-inspect](https://stackoverflow.com/q/36216220).
 
-# [Networking Drivers](https://docs.docker.com/network/)
+# Networking Drivers #
 
-The Docker's networking subsystem is *pluggable*, using drivers. Docker provides multiple built-in networks, based on which we can define our own custom networks.
+The Docker's networking subsystem is *pluggable*, using drivers. Docker provides multiple built-in networks, based on which we can [define custom networks](#self-define-network).
 
 Below is a simple explanation:
 
@@ -398,7 +407,7 @@ Below is a simple explanation:
 
    ![docker netowrk](/assets/docker-net.png)
 
-   If we define a custom *bridge* network, containers within can communicate with each other by alias or name, otherwise they can [only](https://docs.docker.com/network/bridge/#differences-between-user-defined-bridges-and-the-default-bridge) communicate by IP addresses.
+   If we define a [custom](#self-define-network) *bridge* network, containers within can communicate with each other by alias or name, otherwise they can [only](https://docs.docker.com/network/bridge/#differences-between-user-defined-bridges-and-the-default-bridge) communicate by IP addresses.
 
    Pay attention please; this is different from the *bridge* mode of VMWare or VirtualBox (real Virtual Machine). VMWare and VirtualBox's bridge is deployed directly on the host's interface and appears to be a real physical device parallel to the host and can be connected to from within LAN directly.
 2. Host
@@ -416,7 +425,7 @@ Below is a simple explanation:
 
    Disable networking.
 
-## Manual Network Configuration
+## Self-define Network ##
 
 Docker automates network configuration upon container startup. We can customize that on purpose.
 
@@ -428,6 +437,65 @@ Docker automates network configuration upon container startup. We can customize 
 ```
 
 Use the `--net` or `--network` option. To the 'host' networking driver, just pass `--net host` option to *docker run*.
+
+## link ##
+
+The legacy communication method is `--link` that copies information (e.g. [ENV Variables](#env-variables)) from *source* container to *receipt* (*target*) container, and provides network access from receipt container to source container.
+
+Take `docker run --name web --link postgres:alias ...` for example, the newly created *web* is receipt container and the existing *postgres* is source container.
+
+`--link` is amost [deprecated](https://docs.docker.com/network/links/) as we can use other features to accomplish the same functionalities. For example, for info copy, use [ENV Variables](#env-variables) or [data share](#data-share). For network communication, just follow [Networking Drivers](#network-drivers) and [Self-define Network](#self-define-network).
+
+Here is an example:
+
+```bash
+## source container
+13:47:23 zachary@Zacharys-MacBook-Pro ~$ docker run --name postgres -e HELLO=world -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:14
+25732d58f238b1d3e83fc52ea3c8b91f75290385066e6541d616e68eecd6cfdd
+
+13:47:39 zachary@Zacharys-MacBook-Pro ~$ docker exec -it postgres bash
+root@25732d58f238:/# echo $HELLO
+world
+
+
+## receipt/target container
+13:48:11 zachary@Zacharys-MacBook-Pro ~$ docker run --name ubuntu -it --link postgres:db ubuntu bash
+# src in hosts
+root@8e95191dba0e:/# cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.17.0.3      db 25732d58f238 postgres
+172.17.0.4      8e95191dba0e
+
+# src ENVs
+root@8e95191dba0e:/# env | grep DB_ | sort
+DB_ENV_GOSU_VERSION=1.14
+DB_ENV_HELLO=world
+DB_ENV_LANG=en_US.utf8
+DB_ENV_PGDATA=/var/lib/postgresql/data
+DB_ENV_PG_MAJOR=14
+DB_ENV_PG_VERSION=14.4-1.pgdg110+1
+DB_ENV_POSTGRES_HOST_AUTH_METHOD=trust
+DB_NAME=/ubuntu/db
+DB_PORT=tcp://172.17.0.3:5432
+DB_PORT_5432_TCP=tcp://172.17.0.3:5432
+DB_PORT_5432_TCP_ADDR=172.17.0.3
+DB_PORT_5432_TCP_PORT=5432
+DB_PORT_5432_TCP_PROTO=tcp
+
+# src network
+root@8e95191dba0e:/# ping db
+PING db (172.17.0.3) 56(84) bytes of data.
+64 bytes from db (172.17.0.3): icmp_seq=1 ttl=64 time=0.210 ms
+64 bytes from db (172.17.0.3): icmp_seq=2 ttl=64 time=0.452 ms
+64 bytes from db (172.17.0.3): icmp_seq=3 ttl=64 time=0.136 ms
+```
+
+Attention please; `--link` is only one-way link, so receipt container cannot access to target container. To achieve bi-directional communication, please use [network](#networking-drivers).
 
 # exec and shell #
 
@@ -448,22 +516,22 @@ Each instruction has two kinds of running forms:
    ```
 
    By default, */bin/sh* will be used to run the *cmd* as:
-   
+
    ```
    /bin/sh -c 'cmd para1 para2 ...'
    ```
-   
+
    It is the preferred form of the RUN instruction to install package in the image and exit.
 2. exec form.
 
    The *cmd* is ran directly without any Shell involvement, which is the preferred form of CMD and ENTRYPOINT as we usually launch a daemon background within the container. No need to maintain a Shell process.
-   
+
    ```
    <instruction> ["cmd", "para1", "para2", ...]
    ```
-   
+
    We can hack by changing the *cmd* to */bin/bash*:
-   
+
    ```
    <instruction> ["/bin/bash", "-c", "cmd", "para1", "para2", ...]
    ```
@@ -480,9 +548,9 @@ Here is an illustration between CMD and ENTRYPOINT:
 
 Refer to [Dockerfile reference](https://docs.docker.com/engine/reference/builder/) for more details.
 
-# Build Image by Dockerfile
+# Docker Build Dockerfile #
 
-From *commit* example above, we can create new image layer but many negligible commands like *ls*, *pwd*, etc. are recourded as well.
+From [commit](#docker-commit) example above, we can create new image layer but many negligible commands like *ls*, *pwd*, etc. are recourded as well.
 
 Similar to Makefile, Docker uses Dockerfile to define image with specified *instruction*s like FROM, COPY, RUN etc. Each instruction creates a new intermediate layer and a new intermediate image. In order to minimize number of layers and images, we'd better merge instructions as much as possible.
 
@@ -561,11 +629,11 @@ Successfully tagged nginx:v3
       echo "username:1C2B3A" | chpasswd'
       ```
 
-9. Check [multi-platform-docker-build](https://github.com/BretFisher/multi-platform-docker-build) for AMD64/ARM64 arch issue. This also applies to [Create a Container](#create-a-container).
+9. Check [multi-platform-docker-build](https://github.com/BretFisher/multi-platform-docker-build) for AMD64/ARM64 arch issue. This also applies to [Create a Container](#launch-containers).
 
 Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
 
-# Share an Image
+# Share Images #
 
 We can [share](https://docs.docker.com/get-started/04_sharing_app/) our own docker image to a registry (e.g. docker.io) by *docker push*.
 
@@ -607,15 +675,6 @@ Remember that if we want to use a different registry rather than the default *do
 ```bash
 ~ $ docker tag nginx myregistry:5000/myaccount/nginx
 ```
-
-# ENV Variables #
-
-To pass environment variables to containers, we can:
-
-1. `-e, --env` applies [only](https://stackoverflow.com/q/49293967/2336707) to `docker run`. This method [reveal](https://stackoverflow.com/a/30494145/2336707) sensitive values in Shell history. We can firstly *export* the variable on CLI, then pass `--env VAR` without the value part.
-2. [--env-file](https://docs.docker.com/compose/env-file/) (default `$PWD/.env`) applies both to `docker run` and [docker compose](#docker-compose). This fits when there are a lot of variables to pass in.
-3. [docker compose](#docker-compose) can pick up [a few compose-specific variables](https://docs.docker.com/compose/reference/envvars/) from CLI, so just *export* it.
-4. CLI variables can also be for [substitution in compose file](https://docs.docker.com/compose/compose-file/compose-file-v3/#variable-substitution).
 
 # Docker Compose #
 
