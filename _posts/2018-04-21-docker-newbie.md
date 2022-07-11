@@ -116,7 +116,7 @@ It is highly recommended to *pull* the [docker/getting-started](https://hub.dock
 ~ $ docker search -f is-official=true ubuntu                    # search only official image
 
 ~ $ docker pull ubuntu:16.04                                    # specify a tag
-~ $ docker pull ubuntu@<sha256>                                 # specify an image ID
+~ $ docker pull ubuntu@sha256:<hash>                            # specify an image ID
 
 ~ $ docker pull amd64/amazonlinux                               # AMD64
 ~ $ docker pull arm64v8/amazonlinux                             # Apple M1 ARM64
