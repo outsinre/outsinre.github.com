@@ -683,4 +683,9 @@ Remember that if we want to use a different registry rather than the default *do
 
 the compose project name by default is named after `PWD`. The name of containers share the same prefix (i.e. name of the project).
 
+we can [share compose configurations](https://docs.docker.com/compose/extends) between files and/or projects by:
+
+1. multiple compose files
+2. extending services from another compose file.
+
 https://docs.docker.com/compose/compose-file/
