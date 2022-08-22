@@ -689,3 +689,5 @@ we can [share compose configurations](https://docs.docker.com/compose/extends) b
 2. extending services from another compose file.
 
 https://docs.docker.com/compose/compose-file/
+
+In Docker Compose file, we can use *build* to build an image from Docker file (https://stackoverflow.com/q/57840820/2336707). Alternatively, we can also provide multiple commands to *command* (https://stackoverflow.com/q/30063907/2336707).
