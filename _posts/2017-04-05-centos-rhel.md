@@ -168,21 +168,21 @@ Query:
 ~ # yum upgrade [pkg]
 
 ~ # yum provides /path/to/file             # rpm -qf
-~ # yum repoquery -f /path/to/file
-~ # yum repoqeury --provides /path/to/file
-~ # yum repoqeury --whatprovides /path/to/file
+~ # repoquery -f /path/to/file
+~ # repoqeury --provides /path/to/file
+~ # repoqeury --whatprovides /path/to/file
 
-~ # yum repoquery -l pkg
+~ # repoquery -l pkg
 
-~ # yum repoquery --deplist pkg
-~ # yum repoquery --whatdepends pkg
+~ # repoquery --deplist pkg
+~ # repoquery --whatdepends pkg
 ```
 
 1. _update_ is synonym to _upgrade_.
 2. *list --updates* is almost the same as *check-update*. As the command form implies, *check-update* is useful in Shell script while *list --updates* is for humans on the command line.
 
    Please pay attention, their exit status code difference.
-2. Install *yum-utils* to use *repoquery*.
+2. Make sure *yum-utils* is installed to use *repoquery*.
 
 Install:
 
