@@ -127,6 +127,7 @@ Read more about quorum at [why-zookeeper-on-odd-number-nodes?](http://www.coreja
    2. Instances can dynamically join (get a share from other instances) and/or leave (i.e. die) a group (its partitions are transferred to others).
 
    By the way, consumer group has a unique identifier that is [created by Java consumer API](https://stackoverflow.com/q/43118671), *not* by ZooKeeper or Kafka producer.
+9. Early versions of Kafka depends on *external* Zookeeper. Recent Kafka has built Zookeeper into release packages. More aggressively, Kafka (>= 2.8.0) can [run without Zookeeper](https://kafka.apache.org/quickstart), with self-managed quorum (e.g. Kafka Raft).
 
 # [Deployment](https://progressive-code.com/post/17/Setup-a-Kafka-cluster-with-3-nodes-on-CentOS-7)
 
