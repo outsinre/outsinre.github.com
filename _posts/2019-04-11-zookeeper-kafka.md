@@ -312,9 +312,9 @@ autopurge.purgeInterval=2                 # cleanup every 2 hours
 
 4lw.commands.whitelist=*                  # new in 3.5.3, enable all four-letter commands
 
-server.1=logger1:2888:3888
-server.2=logger2:2888:3888
-server.3=logger3:2888:3888
+server.1=logger1:2888:3888                # communication within Zookeeper cluster
+server.2=logger2:2888:3888                # port 2888 used to contact leader
+server.3=logger3:2888:3888                # port 3888 used to elect leader
 ```
 
 In the example above, the server hostname 'logger1', 'logger2' and 'logger3' is their */etc/hosts* aliases, otherwise use IP addresses.
