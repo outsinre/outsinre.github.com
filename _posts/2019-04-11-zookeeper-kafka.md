@@ -868,7 +868,7 @@ Next, we launch a consumer on the topic:
 
 ```bash
 logger@container-logger1 ~ $ kafka-console-consumer.sh
-logger@container-logger1 ~ $ kafka-console-consumer.sh --bootstrap-server logger2:9092 --topic test-topic
+logger@container-logger1 ~ $ kafka-console-consumer.sh --bootstrap-server logger2:9092 --topic test-topic --from-beginning
 ```
 
 No explicit consumer group is created here. By default, 'kafka-console-consumer.sh' will create a random group ID through Java consumer API.
