@@ -256,6 +256,9 @@ Docker containers can read from or write to pathnames, either on host or on memo
    By default, running data of a container is layered on top of the image used to create it. A *volume* decouples that data from both the host or the container. Just think of a Windows partition or removable disk drive.
 
    Volumes are managed by Docker and persist. Data within can be shared among multiple containers, as well as between the host and a container.
+   
+   >Beofre you restart a docker compose project, please run "docker volume prune", otherwise history data might interrupt new containers.
+
 2. Bind Mount.
 
    Bind-mount a file or directory in the host to a file or directory in the container. The target can be read-only or read-write. For example, bind host */etc/resolv.conf* to a container, sharing name servers.
