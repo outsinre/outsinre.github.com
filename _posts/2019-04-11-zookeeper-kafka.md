@@ -778,61 +778,6 @@ The script does *not* accept any options and just sends 'SIGTERM' signal to the 
 1. Stop Kafka before ZooKeeper;
 2. It takes time to stop Kafka cluster, so wait for while!
 
-## Dynamic Update Mode
-
-From Kafka 1.1 onwards, directives could be [updated/overriden dynamically](https://kafka.apache.org/documentation/#dynamicbrokerconfigs). The [Broker's Dynamic Update Mode](https://kafka.apache.org/documentation/#configuration) column may be:
-
-1. read-only: requires restart for update;
-2. per-broker: can be updated for each broker on the fly;
-3. cluster-wide: can be updated for all brokers; may also be updated for an individual broker.
-4. Some directives can be changed dynamically per-topic, like the directive 'num.partitions'.
-
-To get a list of supported directives on command line:
-
-```bash
-logger@container-logger1 ~ $ kafka-configs.sh --help
-```
-
-To check current broker configuration:
-
-```bash
-logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --describe
-```
-
-Change number of cleanup threads for commit logs:
-
-```bash
-# per-broker
-logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --alter --add-config log.cleaner.threads=2
-logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --describe
-```
-
-To apply the change to all brokers, use option `--entity-default`:
-
-```bash
-# cluster-wide
-logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-default --alter --add-config log.cleaner.threads=2
-logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-default --describe
-```
-
-To revert the dynamic modification and restore the static value configured:
-
-```bash
-logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --alter --delete-config log.cleaner.threads
-logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --describe
-```
-
-A directive may be configured at multiple levels in the follow order of precedence:
-
-1. Dynamic per-broker;
-2. Dynamic cluster-wide;
-3. Static in 'server.properties';
-4. Kafka default.
-
-## Kafka Security
-
-Post [introduction-to-apache-kafka-security](https://medium.com/@stephane.maarek/introduction-to-apache-kafka-security-c8951d410adf) gives a clear outline on Kafka security mechanisms. It recommends [SASL/SCRAM](https://docs.confluent.io/4.0.0/kafka/authentication_sasl_scram.html) method.
-
 ## Topic Creation
 
 Kafka provides a simple console producer and consumer script, quite handy for test.
@@ -932,7 +877,78 @@ logger@container-logger1 ~ $ kafka-console-consumer.sh --bootstrap-server logger
 logger@container-logger2 ~ $ kafka-consumer-groups.sh --bootstrap-server logger2:9092 --describe --group consumer-group-12345
 ```
 
-# Note
+## Kafka Security ##
 
-1. Whenever one or more servers are supplied to `--zookeeper`, `--broker-list` etc., only a subset of the total servers is required as they serve only as seeds from which the full server list is retrieved.
-2. It seems many built-in scripts does not accept `-h, --help` arguments. Zero arguments will bring about the help message.
+Post [introduction-to-apache-kafka-security](https://medium.com/@stephane.maarek/introduction-to-apache-kafka-security-c8951d410adf) gives a clear outline on Kafka security mechanisms. It recommends [SASL/SCRAM](https://docs.confluent.io/4.0.0/kafka/authentication_sasl_scram.html) method.
+
+Kafka uses [Java Authentication and Authorization Service (JAAS)](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jaas/JAASRefGuide.html) for both server side security setup and client side authentication.
+
+There are [two ways](https://docs.confluent.io/platform/current/kafka/authentication_sasl/index.html#client-jaas-configurations) to [provide JAAS data](https://stackoverflow.com/a/45757197/2336707) (e.g., SASL).
+
+1. Configuration property string like `sasl.jaas.config=`, which is recommended.
+
+   Put the following line into [.properties](#kafka-configuration) as below. Please make sure the trailing semi-colon is present.
+   
+   ```
+   sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="(username)" password="(password)";
+   ```
+   
+   Built-in CLI clients can automatically detect the security setup. If not, please use CLI option `--command-string` (e.g. *kafka-topics.sh*).
+2. Java Property static file.
+
+   For example, on server side, we can pass the static file as below.
+   
+   ```bash
+   export KAFKA_OPTS="-Djava.security.auth.login.config=/path/to/kafka_jaas.conf"
+   ```
+   
+## Dynamic Update Mode ##
+
+From Kafka 1.1 onwards, directives could be [updated/overriden dynamically](https://kafka.apache.org/documentation/#dynamicbrokerconfigs). The [Broker's Dynamic Update Mode](https://kafka.apache.org/documentation/#configuration) column may be:
+
+1. read-only: requires restart for update;
+2. per-broker: can be updated for each broker on the fly;
+3. cluster-wide: can be updated for all brokers; may also be updated for an individual broker.
+4. Some directives can be changed dynamically per-topic, like the directive 'num.partitions'.
+
+To get a list of supported directives on command line:
+
+```bash
+logger@container-logger1 ~ $ kafka-configs.sh --help
+```
+
+To check current broker configuration:
+
+```bash
+logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --describe
+```
+
+Change number of cleanup threads for commit logs:
+
+```bash
+# per-broker
+logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --alter --add-config log.cleaner.threads=2
+logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --describe
+```
+
+To apply the change to all brokers, use option `--entity-default`:
+
+```bash
+# cluster-wide
+logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-default --alter --add-config log.cleaner.threads=2
+logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-default --describe
+```
+
+To revert the dynamic modification and restore the static value configured:
+
+```bash
+logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --alter --delete-config log.cleaner.threads
+logger@container-logger1 ~ $ kafka-configs.sh --bootstrap-server logger1:9092 --entity-type brokers --entity-name 2 --describe
+```
+
+A directive may be configured at multiple levels in the follow order of precedence:
+
+1. Dynamic per-broker;
+2. Dynamic cluster-wide;
+3. Static in 'server.properties';
+4. Kafka default.
