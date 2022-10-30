@@ -86,7 +86,7 @@ As *firewalld* sites on top of *iptables*, we can manipulate underlying *iptable
 
 Attention please; do not use *iptables* command to manipulate *firewalld* rules as that would make things complicated.
 
-# Runtime and Permaneng #
+# Runtime and Permanent #
 
 When updating *firewalld* rules, option `--permanent` does not affect runtime rules but write to disk for accross boot.
 
