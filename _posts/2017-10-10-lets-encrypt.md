@@ -162,7 +162,7 @@ For each DNS platform, *certbot* provodes a corresponding DNS plugin. DNS plugin
 Take [Cloudflare](https://certbot-dns-cloudflare.readthedocs.io/en/stable/) for example. Firstly, let's install DNS plugin:
 
 ```bash
-~ $ sudo dnf install python3-certbot-dns-cloudflare
+~ $ sudo dnf --enablerepo ol8_developer_EPEL install python3-certbot-dns-cloudflare
 ```
 
 Then create API token for the DNS plugin at [API Token](https://dash.cloudflare.com/?to=/:account/profile/api-tokens). Please configure the IP whitelist. We test the token:
@@ -172,7 +172,7 @@ Then create API token for the DNS plugin at [API Token](https://dash.cloudflare.
 >      -H "Authorization: Bearer xxxxxxxxxxxxxyyyyyyyyyyyyyzzzzzzzzzzzzz" \
 >      -H "Content-Type:application/json"
 
-~ $ curl -X GET "https://api.cloudflare.com/client/v4/zones/fooooooooooobarrrrrrrrrrr" \
+~ $ curl -X GET "https://api.cloudflare.com/client/v4/zones/" \
 >      -H "Authorization: Bearer xxxxxxxxxxxxxyyyyyyyyyyyyyzzzzzzzzzzzzz" \
 >      -H "Content-Type:application/json"
 ```
@@ -193,15 +193,14 @@ The token is used for both cert creation and renewal. Store the token somewhere:
 Finally create wildcard certificate:
 
 ```bash
-~ # certbot certonly \
+~ # certbot certonly --dry-run \
 --dns-cloudflare \
 --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
 --dns-cloudflare-propagation-seconds 60 \
 --domains example.com,*.example.com \
 --cert-name example.com \
 --key-type ecdsa \
---elliptic-curve secp384r1 \
---dry-run ; echo
+--elliptic-curve secp384r1 ; echo
 ```
 
 # Manage a Certificate #
@@ -278,7 +277,7 @@ But the it is recommended to abandon the `--expand` option such that you can eit
 ~ # certbot certonly --cert-name example.com --webroot -w /var/www/log.example.com -d blog.example.com --dry-run
 ```
 
-After the above operation, the certificate *example.com* only contains domain name *blog.example.com*. It actually just create a new certificate with the same name!
+After the above operation, the certificate *example.com* only contains domain name *blog.example.com*. It actually just creates a new certificate with the same name!
 
 ## Renew a Certificate ##
 
@@ -370,9 +369,20 @@ The *certbot-renew.timer* would invoke *certbot-renew.service* automatically.
 
 Your account credentials have been saved in your Certbot configuration directory at */etc/letsencrypt/*. You should make a secure backup of this folder now. This configuration directory will also contain certificates and private keys obtained by Certbot so making regular backups of this folder is ideal.
 
-# Install a Certificate
+## Share Certificates ##
 
-You can update web server's SSL vhost configuration accordingly once the certificate is ready. Here is a template:
+Say we have obtained a certificate and configured auto-renewal on server A, but want to use the same certificate on server B. How to [achive this](https://stackoverflow.com/q/37391158)?
+
+Basically, we have two methods.
+
+1. Write a [deploy-hook](#manual-renewal) to *rsync* renewed certificate and key to server B.
+2. Start from scratch on server B to obtain new certificate with the same procedure in this post. Don't worry about conflicts as obtaining a new certificate justs create a brand new one.
+
+   The only concern is the number limit of renewal per-certificate. Currently, Let's Encrypte allows 5 renewal per month for an individual certificate.
+
+# Deploy Certificates #
+
+You can update web server's SSL vhost configuration accordingly once the certificate is ready as below. We can follow [Mozilla SSL Config Recommendation](https://ssl-config.mozilla.org/) to get a secure and comptabile template.
 
 ```
 server {
