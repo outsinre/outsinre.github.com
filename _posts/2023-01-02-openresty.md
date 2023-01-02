@@ -104,7 +104,7 @@ Build from sources.
 16:16:43 outsinre@zhtux ~/misc/openresty-1.21.4.1$ sudo make install
 ```
 
-Set Env.
+Set Env. Program *openresty* is a symbolic link to program *nginx*.
 
 ```bash
 # .bash_profile
