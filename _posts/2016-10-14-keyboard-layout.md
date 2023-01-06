@@ -26,7 +26,7 @@ comments: true
    *keymap=us* sets keyboard layout to *us.map.gz* while *extended_keymaps* is a comma-listed *extension*s.
 
    In this post, we will ignore *extended_keymaps*.
-3 .To switch Caps/Ctrl or turn off Caps, we can modiy the *keycode* in keymap (decompressed). Before that, let's examine the *us.map* format:
+3. To switch Caps/Ctrl or turn off Caps, we can modiy the *keycode* in keymap (decompressed). Before that, let's examine the *us.map* format:
 
    ```
    include "linux-with-alt-and-altgr"
@@ -104,7 +104,7 @@ comments: true
    Insert *xmodmap ~/.Xmodmap* command to *~/.xinitrc*,  *~/.Xresources*, *~/.xprofile* (Gnome Display Manager) or whatever. Alternatively, we can add it to desktop's *autostart* list. Most desktops (Xfce4, Gnome, or KDE) supports such setting.
 4. XKB command line tool *x11-apps/setxkbmap* is a relativelly high level tool. If present, it resets */etc/conf.d/keymap* and *xmodmap* settings.
 
-   Edit *~/.xinitrc* (or whatever) and call *setxkbmap* from there.
+   Edit *~/.xinitrc* or *~/.xprofile* and call *setxkbmap* from there.
 
    ```
    /usr/bin/setxkbmap -option "ctrl:swapcaps"
