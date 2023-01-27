@@ -20,7 +20,9 @@ Download sources.
 14:47:33 outsinre@zhtux ~/misc$ curl -O https://openresty.org/download/openresty-1.21.4.1.tar.gz.asc
 ```
 
-Import and sign the public PGP key of Yichun Zhang A0E98066
+# Verify Sources #
+
+[Import and sign](https://www.zhstar.win/2016/02/13/gnupg/#importing-keys) the public PGP key of Yichun Zhang A0E98066
 
 ```bash
 14:47:33 outsinre@zhtux ~/misc$ gpg --recv-key A0E98066
