@@ -773,6 +773,26 @@ XTerm.vt100.translations: #override \n\
 
 Notice that each key binding line must be separated by `\n\`.
 
+# Alacritty #
+
+[xterm](#xterm) is really outdated, use [Alacritty](https://wiki.archlinux.org/title/Alacritty) on Arch Linux.
+
+However, Alacritty sets ENV variable `TERM` to *alacritty* which would [break](https://wiki.archlinux.org/title/Alacritty#Terminal_functionality_unavailable_in_remote_shells) remote shell (e.g. SSH) like below.
+
+```
+WARNING: terminal is not fully functional
+```
+
+For general compatibility, we can configure Alacritty and set ENV `TERM` to *xterm-256color*.
+
+```bash
+# /usr/share/doc/alacritty/example/alacritty.yml
+# /.config/alacritty/alacritty.yml
+
+env:
+  TERM: xterm-256color
+```
+
 # Resolution
 
 ## Virtual terminal
