@@ -6,7 +6,7 @@ title: OpenResty
 1. toc
 {:toc}
 
-This post presents the way to manually build [OpenResty](http://openresty.org) on archlinux. On [macOS](https://www.zhstar.win/2020/10/12/macos/#homebrew-tap), please use [Homebrew tap](http://openresty.org/en/installation.html#binary-packages). For a quick playaround, try with [Docker image](https://hub.docker.com/r/openresty/openresty).
+This post presents the way to manually build [OpenResty](http://openresty.org) on archlinux. For a quick playaround, try with [Docker image](https://hub.docker.com/r/openresty/openresty).
 
 # Grab Sources #
 
@@ -136,3 +136,25 @@ OpenResty ships with program *resty* (written with Perl) that can execute OpenRe
 ```
 
 To quickly open a simple HTTP server, follow [OpenResty Getting Started](http://openresty.org/en/getting-started.html).
+
+# macOS #
+
+Check [OpenResty brew tap](https://github.com/openresty/homebrew-brew).
+
+Install.
+
+```bash
+~ $ brew tap openresty/brew
+~ $ brew install openresty-debug
+
+~ $ type openresty
+```
+
+Export Env.
+
+```bash
+# ~/.bash_profile
+
+export OPENRESTY_PREFIX=$(brew --prefix openresty/brew/openresty-debug)
+PATH="$OPENRESTY_PREFIX/nginx/sbin:$OPENRESTY_PREFIX/luajit/bin/:$PATH"
+```
