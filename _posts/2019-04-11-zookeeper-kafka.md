@@ -879,29 +879,27 @@ logger@container-logger2 ~ $ kafka-consumer-groups.sh --bootstrap-server logger2
 
 ## Kafka Security ##
 
-Post [introduction-to-apache-kafka-security](https://medium.com/@stephane.maarek/introduction-to-apache-kafka-security-c8951d410adf) gives a clear outline on Kafka security mechanisms. It recommends [SASL/SCRAM](https://docs.confluent.io/4.0.0/kafka/authentication_sasl_scram.html) method.
+Post [introduction-to-apache-kafka-security](https://medium.com/@stephane.maarek/introduction-to-apache-kafka-security-c8951d410adf) gives a clear outline on Kafka security mechanisms. It recommends [SASL/SCRAM](https://docs.confluent.io/4.0.0/kafka/authentication_sasl_scram.html) method (Zookeeper only supports `SASL/DIGEST-MD5`).
 
 Kafka uses [Java Authentication and Authorization Service (JAAS)](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jaas/JAASRefGuide.html) for both server side security setup and client side authentication.
 
 There are [two ways](https://docs.confluent.io/platform/current/kafka/authentication_sasl/index.html#client-jaas-configurations) to [provide JAAS data](https://stackoverflow.com/a/45757197/2336707) (e.g., SASL).
 
-1. Configuration property string like `sasl.jaas.config=`, which is recommended.
+1. Configuration property string in [.properties](#kafka-configuration) like `sasl.jaas.config=`. This is the recommended method.
 
-   Put the following line into [.properties](#kafka-configuration) as below. Please make sure the trailing semi-colon is present.
+   Below is an example. Please make sure the trailing semi-colon is present.
    
    ```
    sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="(username)" password="(password)";
    ```
    
-   Built-in CLI clients can automatically detect the security setup. If not, please use CLI option `--command-string` (e.g. *kafka-topics.sh*).
-2. Java Property static file.
-
-   For example, on server side, we can pass the static file as below.
+   Built-in CLI clients can automatically detect the security setup. If not, add option `--command-string` to *kafka-topics.sh*, or option `--producer.config` to *kafka-console-producer.sh*.
+2. JAAS file. For example, on server side, we can pass the static file as below.
    
    ```bash
    export KAFKA_OPTS="-Djava.security.auth.login.config=/path/to/kafka_jaas.conf"
    ```
-   
+
 ## Dynamic Update Mode ##
 
 From Kafka 1.1 onwards, directives could be [updated/overriden dynamically](https://kafka.apache.org/documentation/#dynamicbrokerconfigs). The [Broker's Dynamic Update Mode](https://kafka.apache.org/documentation/#configuration) column may be:
