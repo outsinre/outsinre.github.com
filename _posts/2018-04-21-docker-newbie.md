@@ -262,6 +262,8 @@ Docker containers can read from or write to pathnames, either on host or on memo
 2. Bind Mount.
 
    Bind-mount a file or directory in the host to a file or directory in the container. The target can be read-only or read-write. For example, bind host */etc/resolv.conf* to a container, sharing name servers.
+   
+   Attention please; to bind-mount a file, please provide the absolute path, otherwise the dest pathname in the container might be a directory! Check [How to mount a single file in a volume](https://stackoverflow.com/q/42248198/2336707).
 3. `tmpfs` Mount.
 
    Needless to say, *tmpfs* is a memory filesystem that let container stores data in host memory.
@@ -691,6 +693,6 @@ we can [share compose configurations](https://docs.docker.com/compose/extends) b
 1. multiple compose files
 2. extending services from another compose file.
 
-https://docs.docker.com/compose/compose-file/
+when bind-mount a file, pay attention to provide the absolute path. check [data share](#data-share).
 
 In Docker Compose file, we can use *build* to build an image from Docker file (https://stackoverflow.com/q/57840820/2336707). Alternatively, we can also provide multiple commands to *command* (https://stackoverflow.com/q/30063907/2336707).
