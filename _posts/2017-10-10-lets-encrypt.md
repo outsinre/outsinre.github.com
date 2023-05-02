@@ -180,14 +180,15 @@ Then create API token for the DNS plugin at [API Token](https://dash.cloudflare.
 The token is used for both cert creation and renewal. Store the token somewhere:
 
 ```bash
-~ # mkdir -p ~/.secrets/certbot
+~ # mkdir -p ~/root/.secrets/certbot
+~ # chmod 700 ~/root/.secrets/certbot
 
-~ # cat > ~/.secrets/certbot/cloudflare.ini <<EOF
+~ # cat > /root/.secrets/certbot/cloudflare.ini <<EOF
 > # Cloudflare API token used by Certbot
 > dns_cloudflare_api_token = xxxxxxxxxxxxxyyyyyyyyyyyyyzzzzzzzzzzzzz
 > EOF
 
-~ # chmod 600 ~/.secrets/certbot/cloudflare.ini
+~ # chmod 600 /root/.secrets/certbot/cloudflare.ini
 ```
 
 Finally create wildcard certificate:
@@ -195,7 +196,7 @@ Finally create wildcard certificate:
 ```bash
 ~ # certbot certonly --dry-run \
 --dns-cloudflare \
---dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
+--dns-cloudflare-credentials /root/.secrets/certbot/cloudflare.ini \
 --dns-cloudflare-propagation-seconds 60 \
 --domains example.com,*.example.com \
 --cert-name example.com \
