@@ -415,11 +415,13 @@ Below is a simple explanation:
    If we define a [custom](#self-define-network) *bridge* network, containers within can communicate with each other by alias or name, otherwise they can [only](https://docs.docker.com/network/bridge/#differences-between-user-defined-bridges-and-the-default-bridge) communicate by IP addresses.
 
    Pay attention please; this is different from the *bridge* mode of VMWare or VirtualBox (real Virtual Machine). VMWare and VirtualBox's bridge is deployed directly on the host's interface and appears to be a real physical device parallel to the host and can be connected to from within LAN directly.
-2. Host
+2. [Host](https://docs.docker.com/network/host/)
 
-   Share the host's networking directly without isolation. However, LAN devices cannot differntiate between containers and the host as there is not individual IP addressed assigned to containers.
-
-   The host mode is preferred when the service exposes a port publicly like Nginx servers.
+   Share the host's networking directly without isolation. However, LAN devices cannot differntiate between containers and the host as there is not individual IP addressed assigned to containers. The host mode is preferred when the service exposes a port publicly like Nginx servers.
+   
+   To use host network, just add `network_mode: host` to [Dockder compose file](#docker-compose), and but must remove the [ports mappings](https://docs.docker.com/compose/compose-file/05-services/#ports) as containers share the same network as the host.
+   
+   Unfortunately, [host mode does not work on macOS](https://github.com/docker/for-mac/issues/1031).
 3. Overlay
 
    Overlay connects multiple Docker daemons together, creating a distributed network among multiple Docker daemon hosts. This network sits on top of (overlays) the host-specific networks, allowing containers connected to it.
