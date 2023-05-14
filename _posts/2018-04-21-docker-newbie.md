@@ -40,9 +40,9 @@ title: Docker Newbie
 
 # Installation #
 
-We only [install](https://docs.docker.com/engine/install/) Docker CE version. For Windows and MacOS, Docker Desktop includes both Docker and [Docker Compose](#docker-compose). On Linux, it is highly recommended to install Docker and Docker Compose by [official repo](https://docs.docker.com/engine/install/rhel/#install-using-the-repository).
+We only [install](https://docs.docker.com/engine/install/) Docker CE version. For Windows and MacOS, Docker Desktop includes both Docker and [Docker Compose](#docker-compose). On Linux, it is highly recommended to install Docker and Docker Compose by [official repo](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository), or install by [downloaded packages](https://docs.docker.com/engine/install/ubuntu/#install-from-a-package).
 
-On Linux, alternatively, we install Docker by package manager, and then install Docker Compose by [downloading binary file manually](https://docs.docker.com/compose/install/#install-the-binary-manually).
+On Amazon Linux 2, we can install Docker by package manager, and then install Docker Compose by [downloading binary file manually](https://docs.docker.com/compose/install/#install-the-binary-manually).
 
 Install Docker by package manager:
 
