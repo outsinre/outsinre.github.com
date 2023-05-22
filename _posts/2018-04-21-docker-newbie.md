@@ -95,6 +95,49 @@ Start Docker:
 
 The daemon manages everything!
 
+# docker.sock #
+
+Docker daemon creates a Unix socket file at [/var/run/docker.sock](https://stackoverflow.com/q/35110146/2336707) by which we can communicate with the daemon via RESTful API.
+
+```bash
+~ $ curl --unix-socket --no-buffer /var/run/docker.sock http://localhost/events
+~ $ curl --unix-socket /var/run/docker.sock http://localhost/version
+~ $ curl --unix-socket /var/run/docker.sock http://localhost/images/json | jq
+~ $ curl --unix-socket /var/run/docker.sock http://localhost/containers/json | jq
+```
+
+We can also create containers inside another container by [mounting](#data-share) the socket file, as long as [docker CLI is available](https://askubuntu.com/a/1388299/226303).
+
+```bash
+# on host
+~ $ docker run --name docker-sock --rm -it -v /var/run/docker.sock:/var/run/docker.sock docker sh
+
+# within docker-sock
+/ # docker run --name docker-in-docker --rm -it ubuntu bash
+
+# within docker-in-docker
+root@978d8704d548:/#
+```
+
+On the host terminal, we can retrieve the *nested* containers
+
+```bash
+~ $ docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS           NAMES
+978d8704d548   ubuntu    "bash"                   5 seconds ago    Up 4 seconds                    docker-in-docker
+a3b93da63e90   docker    "dockerd-entrypoint.…"   17 seconds ago   Up 16 seconds   2375-2376/tcp   docker-sock
+```
+
+We can also get all containers from within *docker-sock*.
+
+```bash
+/ # docker ps -a
+CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                       PORTS                NAMES
+a3b93da63e90   docker                   "dockerd-entrypoint.…"   4 minutes ago   Up 4 minutes                 2375-2376/tcp        docker-sock
+0dadcbdeb804   862614378b4c             "docker-entrypoint.s…"   13 months ago   Exited (0) 13 months ago                          eloquent_jones
+f3f0faf83ac5   docker/getting-started   "/docker-entrypoint.…"   14 months ago   Exited (255) 13 months ago   0.0.0.0:80->80/tcp   romantic_colden
+```
+
 # CLI Sample #
 
 ```bash
