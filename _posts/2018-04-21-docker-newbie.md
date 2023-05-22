@@ -138,6 +138,8 @@ a3b93da63e90   docker                   "dockerd-entrypoint.…"   4 minutes ago
 f3f0faf83ac5   docker/getting-started   "/docker-entrypoint.…"   14 months ago   Exited (255) 13 months ago   0.0.0.0:80->80/tcp   romantic_colden
 ```
 
+However, mounting *docker.sock* would make your host [vulnerable to attack](https://dev.to/pbnj/docker-security-best-practices-45ih#docker-engine) as Docker daemon is ran as *root*.
+
 # CLI Sample #
 
 ```bash
