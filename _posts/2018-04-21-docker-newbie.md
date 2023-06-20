@@ -302,7 +302,7 @@ Docker containers can read from or write to pathnames, either on host or on memo
 
    Volumes are managed by Docker and persist. Data within can be shared among multiple containers, as well as between the host and a container.
    
-   >Beofre you restart a docker compose project, please run "docker volume prune", otherwise history data might interrupt new containers.
+   >Beofre you restart a docker compose project, please run "docker volume prune -a", otherwise history data might interrupt new containers.
 
 2. Bind Mount.
 
