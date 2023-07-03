@@ -87,6 +87,23 @@ Verify. List discrepancies between installed files and files recorded in metadat
 ~ # rpm -V pkg; rpm -Vp pkg.rpm
 ```
 
+Kering:
+
+```bash
+~ # rpm --import /path/to/key.pub
+~ # rpmkeys --import http://www.example.com/key.pub
+```
+
+Once imported, all public keys in the keyring can be managed as a package. Commands applied to a package also apply to a key like query, erase, information etc.
+
+```bash
+~ # ls /etc/pki/rpm-gpg/
+
+~ # rpm -qa gpg-pubkey*
+
+~ # rpm -qi gpg-pubkey-db42a60e
+```
+
 Signature. To verify a RPM file is not corrupted (e.g. due to network transmission) and correctly signed (by developer).
 
 ```bash
@@ -111,6 +128,9 @@ kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm:
 ~ $ rpm -qip kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm | grep Signature
 warning: kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm: Header V4 RSA/SHA256 Signature, key ID 1a62ff7c: NOKEY
 Signature   : RSA/SHA256, Sat 01 Jul 2023 04:11:14 AM UTC, Key ID 998dff461a62ff7c
+
+~ $ rpm -qp --queryformat '%{NAME}-%{VERSION}-%{RELEASE} %{SIGPGP:pgpsig}\n' kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm
+kong-enterprise-edition-3.3.1.0-1 RSA/SHA256, Sat 01 Jul 2023 04:11:15 AM UTC, Key ID 998dff461a62ff7c
 
 # import the signing key
 ~ $ sudo rpm --import https://docs.konghq.com/assets/keys/2023-rpm.asc
@@ -177,22 +197,6 @@ Uninstall/Erase:
 
 ```bash
 ~ # rpm -evv pkg                     # uninstall a pkg
-```
-
-Kering:
-
-```bash
-~ # rpm --import /path/to/key.pub
-~ # rpmkeys --import http://www.example.com/key.pub
-```
-
-Once imported, all public keys in the keyring can be managed as a package. Commands applied to a package also apply to a key like query, erase, information etc.
-
-```bash
-~ # ls /etc/pki/rpm-gpg/
-~ # rpm -qa gpg-pubkey*
-~ # rpm -q gpg-pubkey --queryformat "%{summary} ->%{version}-%{release}\n"
-~ # rpm -qi gpg-pubkey-db42a60e
 ```
 
 ## yum
