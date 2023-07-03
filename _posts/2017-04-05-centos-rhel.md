@@ -81,13 +81,77 @@ Query installed packages:
 ~ # rpm -qf /path/to/file                             # package that owns the file
 ```
 
-Verify:
+Verify. List discrepancies between installed files and files recorded in metadata from local RPM database.
 
 ```bash
-~ # rpm -V pkg; rpm -Vp pkg.rpm                       # verify
+~ # rpm -V pkg; rpm -Vp pkg.rpm
 ```
 
-Verifying a package compares information about files installed locally with information about files taken from the package _metadata_ stored in the RPM database. Any discrepancies are displayed.
+Signature. To verify a RPM file is not corrupted (e.g. due to network transmission) and correctly signed (by developer).
+
+```bash
+# verify MD5
+# ok
+rpm -Kv --nosignature kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm
+kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm:
+    Header SHA256 digest: OK
+    Payload SHA256 digest: OK
+
+# verify both MD5 and signature
+# MD5: ok
+# signature: key not found
+~ $ rpm -Kv kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm
+kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm:
+    Header V4 RSA/SHA256 Signature, key ID 1a62ff7c: NOKEY
+    Header SHA256 digest: OK
+    Payload SHA256 digest: OK
+    V4 RSA/SHA256 Signature, key ID 1a62ff7c: NOKEY
+
+# get signing key ID from RPM file
+~ $ rpm -qip kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm | grep Signature
+warning: kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm: Header V4 RSA/SHA256 Signature, key ID 1a62ff7c: NOKEY
+Signature   : RSA/SHA256, Sat 01 Jul 2023 04:11:14 AM UTC, Key ID 998dff461a62ff7c
+
+# import the signing key
+~ $ sudo rpm --import https://docs.konghq.com/assets/keys/2023-rpm.asc
+
+# list GPG key in RPM database
+~ $ rpm -qa gpg-pubkey*
+gpg-pubkey-be1229cf-5631588c
+gpg-pubkey-fd431d51-4ae0493b
+gpg-pubkey-1a62ff7c-639852e2
+gpg-pubkey-d4082792-5b32db75
+
+# examine the GPG key
+~ $ rpm -qi gpg-pubkey-1a62ff7c-639852e2
+Name        : gpg-pubkey
+Version     : 1a62ff7c
+Release     : 639852e2
+Architecture: (none)
+Install Date: Mon 03 Jul 2023 05:45:24 AM UTC
+Group       : Public Keys
+Size        : 0
+License     : pubkey
+Signature   : (none)
+Source RPM  : (none)
+Build Date  : Tue 13 Dec 2022 10:24:34 AM UTC
+Build Host  : localhost
+Relocations : (not relocatable)
+Packager    : Bazel Testing
+Summary     : gpg(Bazel Testing)
+Description :
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: rpm-4.14.3 (NSS-3)
+...
+
+# verify again
+~ $ rpm -Kv kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm
+kong-enterprise-edition-3.3.1.0.rhel8.amd64.rpm:
+    Header V4 RSA/SHA256 Signature, key ID 1a62ff7c: OK
+    Header SHA256 digest: OK
+    Payload SHA256 digest: OK
+    V4 RSA/SHA256 Signature, key ID 1a62ff7c: OK
+```
 
 Install:
 
