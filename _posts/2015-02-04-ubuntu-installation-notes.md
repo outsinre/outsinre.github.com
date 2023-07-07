@@ -10,7 +10,7 @@ title: Ubuntu and Debian
 
 *dpkg* is the underlying tool of [apt-get](#apt-and-apt-get).
 
-Info.
+Metadata.
 
 ```bash
 ~ $ dpkg --info/-I kong-enterprise-edition_2.8.4.2_all.deb
@@ -33,7 +33,8 @@ Info.
  Conflicts: kong-community-edition, kong-enterprise-edition-fips
  Description: Kong is a distributed gateway for APIs and Microservices, focused on high performance and reliability.
 
-~ $ dpkg -f kong-enterprise-edition_2.8.4.2_all.deb
+# all fields
+~ $ dpkg --field/-g kong-enterprise-edition_2.8.4.2_all.deb
 Package: kong-enterprise-edition
 Version: 2.8.4.2
 Section: default
@@ -47,6 +48,7 @@ Depends: ca-certificates, libpcre3, perl, zlib1g-dev, libyaml-0-2
 Conflicts: kong-community-edition, kong-enterprise-edition-fips
 Description: Kong is a distributed gateway for APIs and Microservices, focused on high performance and reliability.
 
+# specific field
 ~ $ dpkg -f kong-enterprise-edition_2.8.4.2_all.deb Version
 2.8.4.2
 
@@ -67,6 +69,16 @@ Install.
 ~ $ sudo apt-get --fix-broken install
 
 ~ $ kong version
+```
+
+Remove.
+
+```bash
+# keep config and runtime data
+~ $ sudo dpkg --remove/-r <pkg-name>
+
+# clean config and runtime data
+~ $ sudo dpkg --pruge/-p <pkg-name>
 ```
 
 # apt and apt-get #
@@ -91,4 +103,12 @@ Install.
 
 # search from repo
 ~ $ sudo apt/apt-get install <pkg-name>=<pkg-version>
+```
+
+Remove.
+
+```bash
+~ $ sudo apt/apt-get remove <pkg-name>
+
+~ $ sudo apt/apt-get autoremove
 ```
