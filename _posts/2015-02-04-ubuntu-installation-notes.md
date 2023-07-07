@@ -1,15 +1,94 @@
 ---
 layout: post
-title: Ubuntu 14.04 Installation Notes
+title: Ubuntu and Debian
 ---
 
-1. sources.list apt
-2. /etc/fstab, refer to Gentoo's installation notes.
-    1. [MountingWindowsPartitions](https://help.ubuntu.com/community/MountingWindowsPartitions)
-3. clear dash history (settings)
-4. Chinese language support & sogou input
-5. Chrome / flashplugin
-6. Wifi certificate: /usr/share/ca-certificates/mozilla/AddTrust_External_Root.crt
-7. texlive 2014; install windows & adobe fonts;
-8. Configure locale in Ubuntu [Configure Locales in Ubuntu](https://www.thomas-krenn.com/en/wiki/Configure_Locales_in_Ubuntu)
-8. 搜狗输入法。安装之前要先安装中文支持，就是上面的第四步。直接去搜狗官网下载deb文件，双击运行，默认打开了新得力，点击安装即可。默认还会安装fctix控制面板。一切顺利！ But you cannot set `LANG` OR `LC_CTYPE` to `zh_CN.GBK` or `zh_CN.GB18030`, otherwise you cannot input Chinese characters. I think Sogou currently does not support `GBK`, `GB2312` or `GB18030`.
+1. toc
+{:toc}
+
+# dpkg #
+
+*dpkg* is the underlying tool of [apt-get](#apt-and-apt-get).
+
+Info.
+
+```bash
+~ $ dpkg --info/-I kong-enterprise-edition_2.8.4.2_all.deb
+ new Debian package, version 2.0.
+ size 58635042 bytes: control archive=104837 bytes.
+       1 bytes,     0 lines      conffiles
+     524 bytes,    12 lines      control
+  366935 bytes,  3828 lines      md5sums
+     862 bytes,    30 lines   *  postinst
+ Package: kong-enterprise-edition
+ Version: 2.8.4.2
+ Section: default
+ Priority: extra
+ Architecture: all
+ Maintainer: Kong Inc. <support@konghq.com>
+ Installed-Size: 220993
+ Replaces: kong-community-edition, kong-enterprise-edition-fips
+ Provides: kong, lapis, luarocks, luarocks-admin
+ Depends: ca-certificates, libpcre3, perl, zlib1g-dev, libyaml-0-2
+ Conflicts: kong-community-edition, kong-enterprise-edition-fips
+ Description: Kong is a distributed gateway for APIs and Microservices, focused on high performance and reliability.
+
+~ $ dpkg -f kong-enterprise-edition_2.8.4.2_all.deb
+Package: kong-enterprise-edition
+Version: 2.8.4.2
+Section: default
+Priority: extra
+Architecture: all
+Maintainer: Kong Inc. <support@konghq.com>
+Installed-Size: 220993
+Replaces: kong-community-edition, kong-enterprise-edition-fips
+Provides: kong, lapis, luarocks, luarocks-admin
+Depends: ca-certificates, libpcre3, perl, zlib1g-dev, libyaml-0-2
+Conflicts: kong-community-edition, kong-enterprise-edition-fips
+Description: Kong is a distributed gateway for APIs and Microservices, focused on high performance and reliability.
+
+~ $ dpkg -f kong-enterprise-edition_2.8.4.2_all.deb Version
+2.8.4.2
+
+# contents of deb file
+~ $ dpkg --contents/-c kong-enterprise-edition_2.8.4.2_all.deb
+
+# congents of repo pkg
+~ $ dpkg --listfiles/-L kong-enterprise-edition
+```
+
+Install.
+
+```bash
+~ $ sudo dpkg --install kong-enterprise-edition_2.8.4.2_all.deb
+
+# optionally if needs to install depenency
+~ $ sudo apt-get update
+~ $ sudo apt-get --fix-broken install
+
+~ $ kong version
+```
+
+# apt and apt-get #
+
+*apt* is a user-friendly high-level wrapper of *apg-get* and mainly used on Debian system, but please *apt-get* is the default on Ubuntu system. Nowadays, both *apt* and *apt-get* are avaiable on Ubuntu and Debian.
+
+Search.
+
+```bash
+~ $ apt list --all-versions kong-enterprise-edition
+
+~ $ apt-cache show kong-enterprise-edition | grep [V]ersion
+
+~ $ apt/apt-cache policy kong-enterprise-edition
+```
+
+Install.
+
+```bash
+# pathname to deb file
+~ $ sudo apt/apt-get install ./kong-enterprise-edition_2.8.4.2_all.deb
+
+# search from repo
+~ $ sudo apt/apt-get install <pkg-name>=<pkg-version>
+```
