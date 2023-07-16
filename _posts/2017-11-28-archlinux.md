@@ -880,6 +880,13 @@ user@host ~ $ pacman -S fcitx-im fcitx-configtool
 
 Then, append *run fcitx-autostart* into *~/.config/awesome/autostart.sh* and relaunch awesome.
 
+If some QT applications cannot input Chinese, ensure the following packages are available.
+
+```bash
+user@host ~ $ pacman -Qi fcitx-qt5
+user@host ~ $ pacman -Qi fcitx-qt6
+```
+
 # WPS #
 
 WPS on Linux has two version, namely *wps-office-cn* and *wps-office*. The CN version has much more features!
