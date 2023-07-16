@@ -696,19 +696,24 @@ pacman has two data warehouses:
 
 ## AUR ##
 
+Use [wps-office-cn](https://aur.archlinux.org/packages/wps-office-cn) as an example.
+
 ```bash
 # get the PKGBUILD file
 ~ $ git \
--c 'url.https://aur.archlinux.org/st.git.insteadOf=https://aur.archlinux.org/st.git' \
+-c 'url.https://aur.archlinux.org/wps-office-cn.git.insteadOf=https://aur.archlinux.org/wps-office-cn.git' \
 clone --depth=1 \
-https://aur.archlinux.org/st.git
+https://aur.archlinux.org/wps-office-cn.git
 
 # build the package
+~ $ cd wps-office-cn$
 ~ $ makepkg
 
 # install the package
-~ # pacman -U st-0.8.4-1-x86_64.pkg.tar.zst
+~ $ sudo pacman -U wps-office-cn-11.1.0.11698-1-x86_64.pkg.tar.zst
 ```
+
+*wpspdf* relies on [libtiff5](https://aur.archlinux.org/packages/libtiff5).
 
 To upgrade the package, repeat the above procedures.
 
