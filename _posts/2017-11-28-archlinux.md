@@ -666,7 +666,8 @@ pacman has two data warehouses:
 [root@host ~ #] pacman -Si pkg                         # show pkg info
 [root@host ~ #] pacman -Sg grp                         # show group info
 [root@host ~ #] pacman -S pkg1 pkg2                    # install pkg1 and pkg2
-                                                       
+
+[root@host ~ #] pacman -Sy archlinux-keyring           # upgrade keyring first
 [root@host ~ #] pacman -Syu                            # roll the system
 [root@host ~ #] pacman -Syu pkg                        # roll the system and install pgk
                                                        
