@@ -698,7 +698,10 @@ pacman has two data warehouses:
 
 ```bash
 # get the PKGBUILD file
-~ $ git clone https://aur.archlinux.org/st.git
+~ $ git \
+-c 'url.https://aur.archlinux.org/st.git.insteadOf=https://aur.archlinux.org/st.git' \
+clone --depth=1 \
+https://aur.archlinux.org/st.git
 
 # build the package
 ~ $ makepkg
