@@ -685,7 +685,7 @@ pacman has two data warehouses:
                                                        
 [root@host ~ #] pacman -R pkg                          # remove pkg but leave dependencies alone
 [root@host ~ #] pacman -R grp
-[root@host ~ #] pacman -Rs pkg                         # remove pkg and orphan dependencies
+[root@host ~ #] pacman -Rs pkg                         # remove pkg and orphan dependencies; report error: argument '-' specified with empty stdin when no orphans
 
 [root@host ~ #] pacman -Qtd                            # query orphaned packages
 [root@host ~ #] pacman -Qtdq | pacman -Rns -           # remove orphaned packages
