@@ -707,7 +707,7 @@ https://aur.archlinux.org/wps-office-cn.git
 
 # build the package
 ~ $ cd wps-office-cn$
-~ $ makepkg
+~ $ makepkg -sirc
 
 # install the package
 ~ $ sudo pacman -U wps-office-cn-11.1.0.11698-1-x86_64.pkg.tar.zst
