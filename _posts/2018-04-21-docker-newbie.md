@@ -95,6 +95,10 @@ Start Docker:
 
 The daemon manages everything!
 
+# host.docker.internal #
+
+Containers using the [brdige network](#networking-drivers) can access to host services by FQDN `host.docker.internal`.
+
 # docker.sock #
 
 Docker daemon creates a Unix socket file at [/var/run/docker.sock](https://stackoverflow.com/q/35110146/2336707) by which we can communicate with the daemon via RESTful API.
