@@ -95,10 +95,6 @@ Start Docker:
 
 The daemon manages everything!
 
-# host.docker.internal #
-
-Containers using the [brdige network](#networking-drivers) can access to host services by FQDN `host.docker.internal`.
-
 # docker.sock #
 
 Docker daemon creates a Unix socket file at [/var/run/docker.sock](https://stackoverflow.com/q/35110146/2336707) by which we can communicate with the daemon via RESTful API.
@@ -480,6 +476,37 @@ Below is a simple explanation:
 5. none
 
    Disable networking.
+
+## host.docker.internal ##
+
+Containers using the [brdige network](#networking-drivers) can access to host services by FQDN `host.docker.internal`.
+
+Pay attention that the "Host" header is different from *host.docker.internal*, in the example below.
+
+```bash
+~$ docker exec -it alpine sh
+
+/ # curl -v http://localhost/anything --connect-to localhost:80:host.docker.internal:80
+* processing: http://localhost/anything
+* Connecting to hostname: host.docker.internal
+* Connecting to port: 80
+*   Trying 192.168.65.254:80...
+* Connected to host.docker.internal (192.168.65.254) port 80
+> GET /anything HTTP/1.1
+> Host: localhost
+> User-Agent: curl/8.2.1
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Server: openresty/1.21.4.2rc1
+< Date: Sat, 05 Aug 2023 06:45:34 GMT
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Connection: close
+<
+{"message":"hello, world"}
+* Closing connection
+```
 
 ## Self-define Network ##
 
