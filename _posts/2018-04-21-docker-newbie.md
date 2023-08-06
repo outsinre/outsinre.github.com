@@ -583,6 +583,26 @@ PING db (172.17.0.3) 56(84) bytes of data.
 
 Attention please; `--link` is one-way link only. Info is transferred from source containers to receipt containers but source containers know nothing about receipt containers. To achieve bi-directional communication, please use [network](#networking-drivers).
 
+# netshoot #
+
+To debug containers' network issues, we can make use of [netshoot](https://github.com/outsinre/netshoot).
+
+The netshoot container has a world of built-in network troubleshooting tools like *nmap*, [tcpdump](http://www.tcpdump.org/tcpdump_man.html), etc. We just need to attach the netshoot container to the target container's network namespace.
+
+```bash
+~ $ docker run --name netshoot \
+--rm \
+-it \
+--network container:<target-name|target-ID> \
+--mount type=bind,src=./data/,dst=/data \
+-d nicolaka/netshoot
+
+~ $ docker exec -it netshoot zsh
+
+# capture packets of target container
+~ # tcpdump -i eth0 port 6379 -w /data/redis.pcap
+```
+
 # exec and shell #
 
 Usually, in the end of image, we have three kinds of *instruction*:
