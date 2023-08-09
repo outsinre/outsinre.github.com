@@ -1,6 +1,6 @@
 ---
 layout: post
-title: CentOS RHRL
+title: CentOS RHEL
 ---
 
 1. toc
