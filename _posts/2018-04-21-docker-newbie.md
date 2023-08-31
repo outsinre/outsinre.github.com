@@ -479,9 +479,14 @@ Below is a simple explanation:
 
 ## host.docker.internal ##
 
-Containers using the [brdige network](#networking-drivers) can access to host services by FQDN `host.docker.internal`.
+Occasionally, we want to access to host services from within containers.
 
-Pay attention that the "Host" header is different from *host.docker.internal*, in the example below.
+1. If the container is booted with [host network](#networking-drivers), then use `localhost` or `127.0.0.1`.
+2. If the container is booted with [bridge network](#networking-drivers), then use `host.docker.internal`. Depending on the platform, we might [need a bit setup](https://stackoverflow.com/a/62431165/2336707).
+   1. On macOS, `host.docker.internal` is intuitively supported.
+   2. On Linux, we should manually add `host.docker.internal:host-gateway` to `docker run --add-host` or to `extra_hosts` of docker compose.
+
+`host.docker.internal` only routes requests to the host, but please use the correct "Host" header. See example below.
 
 ```bash
 ~$ docker exec -it alpine sh
