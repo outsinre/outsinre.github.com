@@ -484,9 +484,9 @@ Occasionally, we want to access to host services from within containers.
 1. If the container is booted with [host network](#networking-drivers), then use `localhost` or `127.0.0.1`.
 2. If the container is booted with [bridge network](#networking-drivers), then use `host.docker.internal`. Depending on the platform, we might [need a bit setup](https://stackoverflow.com/a/62431165/2336707).
    1. On macOS, `host.docker.internal` is intuitively supported.
-   2. On Linux, we should manually add `host.docker.internal:host-gateway` to `docker run --add-host` or to `extra_hosts` of docker compose.
+   2. On Linux, we should manually add `host.docker.internal:host-gateway` to `docker run --add-host` or to [extra\_hosts](https://docs.docker.com/compose/compose-file/05-services/#extra_hosts) of [docker compose](#docker-compose). This would add an entry in "/etc/hosts".
 
-`host.docker.internal` only routes requests to the host, but please use the correct "Host" header. See example below.
+The hostname "host.docker.internal" is used only for connection, so please set the correct "Host" header. See example below.
 
 ```bash
 ~$ docker exec -it alpine sh
