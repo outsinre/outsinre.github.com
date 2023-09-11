@@ -28,8 +28,8 @@ title: Docker Newbie
    ```
 
    1. Default registry can be ommitted.
-   2. The *user* part means a registered user account in the regirstry.
-   3. *repository* is the default *name* of an image. Occasionally, we may see a repository containing a slash like "docker/getting-started". This is not unusual.
+   2. The *user* part means a registered user account in the registry.
+   3. *repository* is the default *name* of an image.
    4. *image id* comprises a SHA256 *digest* like *ubuntu@abea36737d98dea6109e1e292e0b9e443f59864b* (at sign separator).
 4. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
@@ -748,43 +748,62 @@ Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/
 
 We can [share](https://docs.docker.com/get-started/04_sharing_app/) our own docker image to a registry (e.g. docker.io) by *docker push*.
 
-When pushing an image to remote repository, we should login and specify the registry account.
+Suppose we have a nginx image got from Docker hub, and want to re-push it to Docker Hub under our own account.
+
+Get the image.
 
 ```bash
-# token recommended; avoid password
+~ $ docker pull nginx
+Using default tag: latest
+...
+```
+
+Push to our own account.
+
+```bash
 ~ $ docker login -u myaccount
 
 ~ $ docker push myaccount/nginx
 Using default tag: latest
-The push refers to repository [docker.io/myaccount/docker-getting-started]
-An image does not exist locally with the tag: myaccount/docker-getting-started
+...
 ```
 
-The error shows there is not such docker image. So, we should assign a new tag to an image:
+If we do not specify a tag, it defaults to *latest*. We can assign mutiple tages to the image.
 
 ```bash
-~ $ docker tag nginx myaccount/nginx
+~ $ docker tag nginx myaccount/nginx:2.0.0
+~ $ docker push myaccount/nginx:2.0.0
+
+~ $ docker tag nginx myaccount/nginx:2.0
+~ $ docker push myaccount/nginx:2.0
+
+~ $ docker tag nginx myaccount/nginx:2
+~ $ docker push myaccount/nginx:2
 ```
 
-You will find the two tags refer to the same image ID by *docker images*. Here is an example:
+If later on, we bumped the version, we can re-assign the *latest* tag.
 
 ```bash
-~ $ docker images
-REPOSITORY                        TAG                                        IMAGE ID       CREATED             SIZE
-docker-getting-started            latest                                     862614378b4c   About an hour ago   430MB
-outsinre/docker-getting-started   latest                                     862614378b4c   About an hour ago   430MB
-```
-
-After new tagging, we can push: 
-
-```bash
-~ $ docker push myaccount/nginx
+~ $ docker tag myaccount/nginx:2.1.0 myaccount/nginx:latest
+~ $ docker push myaccount/nginx:latest
 ```
 
 Remember that if we want to use a different registry rather than the default *docker.io*, then add the registry to the new tag as well as follows.
 
 ```bash
 ~ $ docker tag nginx myregistry:5000/myaccount/nginx
+```
+
+Here is an example to update the *latest* label to a new image.
+
+```bash
+docker pull kong/kong-gateway:3.1.1.1-debian
+
+docker tag kong/kong-gateway:3.1.1.1-debian kong/kong-gateway:3.1.1.1
+docker push kong/kong-gateway:3.1.1.1
+
+docker tag kong/kong-gateway:3.1.1.1-debian kong/kong-gateway:3.1
+docker push kong/kong-gateway:3.1
 ```
 
 # Docker Compose #
