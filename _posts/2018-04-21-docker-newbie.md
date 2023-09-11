@@ -750,7 +750,7 @@ We can [share](https://docs.docker.com/get-started/04_sharing_app/) our own dock
 
 Suppose we have a nginx image got from Docker hub, and want to re-push it to Docker Hub under our own account.
 
-Get the image.
+Get the official image.
 
 ```bash
 ~ $ docker pull nginx
@@ -758,17 +758,27 @@ Using default tag: latest
 ...
 ```
 
-Push to our own account.
+Push to our own account. If we do not specify a tag, it defaults to *latest*.
 
 ```bash
 ~ $ docker login -u myaccount
+
+~ $ docker tag nginx myaccount/nginx
 
 ~ $ docker push myaccount/nginx
 Using default tag: latest
 ...
 ```
 
-If we do not specify a tag, it defaults to *latest*. We can assign mutiple tages to the image.
+If we want to use a different registry rather than the default *docker.io*, then add the registry to the new tag as well as follows.
+
+```bash
+~ $ docker tag nginx myregistry:5000/myaccount/nginx
+
+~ $ docker push myregistry:5000/myaccount/nginx
+```
+
+We can assign mutiple tages to the image.
 
 ```bash
 ~ $ docker tag nginx myaccount/nginx:2.0.0
@@ -781,17 +791,11 @@ If we do not specify a tag, it defaults to *latest*. We can assign mutiple tages
 ~ $ docker push myaccount/nginx:2
 ```
 
-If later on, we bumped the version, we can re-assign the *latest* tag.
+We can re-assign the *latest* tag to another version.
 
 ```bash
 ~ $ docker tag myaccount/nginx:2.1.0 myaccount/nginx:latest
 ~ $ docker push myaccount/nginx:latest
-```
-
-Remember that if we want to use a different registry rather than the default *docker.io*, then add the registry to the new tag as well as follows.
-
-```bash
-~ $ docker tag nginx myregistry:5000/myaccount/nginx
 ```
 
 Here is an example to update the *latest* label to a new image.
@@ -805,6 +809,8 @@ docker push kong/kong-gateway:3.1.1.1
 docker tag kong/kong-gateway:3.1.1.1-debian kong/kong-gateway:3.1
 docker push kong/kong-gateway:3.1
 ```
+
+Refer to [do I need to manually tag "latest" when pushing to docker public repository?](https://stackoverflow.com/q/27643017/2336707).
 
 # Docker Compose #
 
