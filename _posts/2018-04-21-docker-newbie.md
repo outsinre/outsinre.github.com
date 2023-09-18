@@ -750,7 +750,7 @@ We can [share](https://docs.docker.com/get-started/04_sharing_app/) our own dock
 
 Suppose we have a nginx image got from Docker hub, and want to re-push it to Docker Hub under our own account.
 
-Get the official image.
+Get the official image. If we do not specify a tag, the *latest* image is pulled.
 
 ```bash
 ~ $ docker pull nginx
@@ -758,12 +758,12 @@ Using default tag: latest
 ...
 ```
 
-Push to our own account. If we do not specify a tag, it defaults to *latest*.
+Push to our own account. If we do not specify a tag, the image is tagged to *latest*.
 
 ```bash
 ~ $ docker login -u myaccount
 
-~ $ docker tag nginx myaccount/nginx
+~ $ docker tag <nginx|sha256> myaccount/nginx
 
 ~ $ docker push myaccount/nginx
 Using default tag: latest
@@ -773,7 +773,7 @@ Using default tag: latest
 If we want to use a different registry rather than the default *docker.io*, then add the registry to the new tag as well as follows.
 
 ```bash
-~ $ docker tag nginx myregistry:5000/myaccount/nginx
+~ $ docker tag <nginx|sha256> myregistry:5000/myaccount/nginx
 
 ~ $ docker push myregistry:5000/myaccount/nginx
 ```
@@ -781,24 +781,24 @@ If we want to use a different registry rather than the default *docker.io*, then
 We can assign mutiple tages to the image.
 
 ```bash
-~ $ docker tag nginx myaccount/nginx:2.0.0
+~ $ docker tag <nginx|sha256> myaccount/nginx:2.0.0
 ~ $ docker push myaccount/nginx:2.0.0
 
-~ $ docker tag nginx myaccount/nginx:2.0
+~ $ docker tag <nginx|sha256> myaccount/nginx:2.0
 ~ $ docker push myaccount/nginx:2.0
 
-~ $ docker tag nginx myaccount/nginx:2
+~ $ docker tag <nginx|sha256> myaccount/nginx:2
 ~ $ docker push myaccount/nginx:2
 ```
 
-We can re-assign the *latest* tag to another version.
+We can re-assign the *latest* tag to a new version.
 
 ```bash
 ~ $ docker tag myaccount/nginx:2.1.0 myaccount/nginx:latest
 ~ $ docker push myaccount/nginx:latest
 ```
 
-Here is an example to update the *latest* label to a new image.
+Here is a real world practice.
 
 ```bash
 docker pull kong/kong-gateway:3.1.1.1-debian
