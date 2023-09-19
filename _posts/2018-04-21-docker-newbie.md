@@ -798,19 +798,19 @@ We can re-assign the *latest* tag to a new version.
 ~ $ docker push myaccount/nginx:latest
 ```
 
-Here is a real world practice.
+A more advanced tool than *docker tag* is [regctl](https://github.com/regclient/regclient/blob/main/docs/regctl.md) as follows.
 
 ```bash
-docker pull kong/kong-gateway:3.1.1.1-debian
+~ $ regctl registry login
+~ $ regctl registry config
 
-docker tag kong/kong-gateway:3.1.1.1-debian kong/kong-gateway:3.1.1.1
-docker push kong/kong-gateway:3.1.1.1
+~ $ regctl image manifest kong/kong-gateway:latest
+~ $ regctl image inspect kong/kong-gateway:latest
 
-docker tag kong/kong-gateway:3.1.1.1-debian kong/kong-gateway:3.1
-docker push kong/kong-gateway:3.1
+~ $ regctl image copy kong/kong-gateway:3.3.1.0 kong/kong-gateway:latest
 ```
 
-Refer to [do I need to manually tag "latest" when pushing to docker public repository?](https://stackoverflow.com/q/27643017/2336707).
+*regctl image copy* pulls the containers (all architectures), retags them, and pushed them again (all architectures).
 
 # Docker Compose #
 
