@@ -807,7 +807,10 @@ A more advanced tool than *docker tag* is [regctl](https://github.com/regclient/
 ~ $ regctl image manifest kong/kong-gateway:latest
 ~ $ regctl image inspect kong/kong-gateway:latest
 
-~ $ regctl image copy kong/kong-gateway:3.3.1.0 kong/kong-gateway:latest
+~ $ regctl image manifest kong/kong-gateway:3.4.1.0
+
+~ $ regctl image copy kong/kong-gateway:3.4.1.0 kong/kong-gateway:latest
+~ $ regctl image copy kong/kong-gateway:3.4.1.0-ubuntu kong/kong-gateway:latest-ubuntu
 ```
 
 *regctl image copy* pulls the containers (all architectures), retags them, and pushed them again (all architectures). Please read <https://stackoverflow.com/a/68576882/2336707>, <https://stackoverflow.com/a/68317548/2336707> and <https://stackoverflow.com/q/71470604/2336707>.
