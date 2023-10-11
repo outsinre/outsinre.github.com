@@ -407,7 +407,7 @@ If we want to interactively and continuously control the container:
 ~ $ docker exec -it webserver bash
 ```
 
-Apart from *docker exec*, [docker attach <container>](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
+Apart from *docker exec*, [docker attach \<container\>](https://docs.docker.com/engine/reference/commandline/attach/) is also recommended.
 
 This command attaches the host terminal's STDIN, STDOUT and STDERR files to a running container, allowing interactive control or inspect as if the container was running directly in the host's terminal. It will display the output of the ENTRYPOINT/CMD process.
 
