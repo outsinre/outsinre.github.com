@@ -464,7 +464,7 @@ Below is a simple explanation:
 
    Share the host's networking directly without isolation. However, LAN devices cannot differntiate between containers and the host as there is not individual IP addressed assigned to containers. The host mode is preferred when the service exposes a port publicly like Nginx servers.
    
-   To use host network, just add `network_mode: host` to [Dockder compose file](#docker-compose), and but must remove the [ports mappings](https://docs.docker.com/compose/compose-file/05-services/#ports) as containers share the same network as the host.
+   To use host network, just add `network_mode: host` to [Dockder compose file](#docker-compose), and but must remove the [ports mappings](https://docs.docker.com/compose/compose-file/05-services/#ports) as containers share the same network as the host. Alternatively, add `--network=host` option to `docker run`.
    
    Unfortunately, [host mode does not work on macOS](https://github.com/docker/for-mac/issues/1031).
 3. Overlay
