@@ -364,7 +364,7 @@ root@archiso ~ # pacstrap /mnt nano
 
 1. This will install all packages from *base* and *base-devel* to the *root* partition. Around 200 MiB packages will be downloaded and 700 MiB disk space consumed. Ignore the warning on *locale* failure that will be handled after *chroot*.
 
-   *base* is a *meta* package while *base-devel* is a package *group*. Check [Meta package and package group](https://wiki.archlinux.org/index.php/Meta_package_and_package_group).
+   *base* and *base-devl* are *meta* packages. Check [Meta package and package group](https://wiki.archlinux.org/index.php/Meta_package_and_package_group).
 2. The *base* group does not even has a text editor. So we install *nano* explicitly here. Other groups or individual packages can also be appended to the *pacstrap* command. However, we'd better install only necessary packages at this stage. Of course, we can install packages within [chroot](#chroot) by *pacman* or when the OS is completely installed.
 
 ## fstab
