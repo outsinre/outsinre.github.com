@@ -56,16 +56,14 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    # or
    ~ $ git diff HEAD~3 -- > cjktty.patch
    # or
-   ~ $ git format-patch -3 HEAD --stdout > cjktty.patch
+   ~ $ git format-patch HEAD~3 --stdout > cjktty.patch
    # or
-   ~ $ git format-patch -3 9a5a7d3215307e28df3aea6ac09931a4d55e151e --stdout > cjktty.patch
+   ~ $ git format-patch -3 HEAD --stdout > cjktty.patch
    ```
    
    1. Pay attention to the order of commit ID (SHA1 hash). Put the earliest commit ID (4th) before the latest one (HEAD).
-   2. HEAD~3 means extract patch from top to 3rd commits (inclusive). The latest ID (HEAD) precedes the 3rd one.
-   3. *format-patch* is similar to *git diff*. *-n <commit-ID>* means patch *n* commits leading up to <commit-ID> (inclusive) of current branch. The patch file orgnization is a little different from that of *git diff*.
-
-      If you use the *git diff* command to compare the 3rd patch with the 1st, you will find them the same patch but with different patch format. Specially, *format-patch* contains more information.
+   2. `HEAD~3` means extract patch from top to 3rd commits (inclusive). The latest ID (HEAD) precedes the 3rd one.
+   3. *format-patch* is similar to *git diff*. `-n <commit>` is equivalent of `<commit>~n`. The patch file orgnization is a little different from that of *git diff*.
    4. We recommend to use *format-patch* to include commit messages, making it more appropriate for most scenarios involving exchanging patches over the Internet. Details refer to reference 1.
 6. Test the patch
 
@@ -127,7 +125,7 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    ~ # git apply --verbose --whitespace=warn -p1 --check -R /path/to/cjktty.patch
    ```
    
-   You can reverse a patch by adding *-R* argument.
+   You can reverse a patch by adding `-R` argument.
 9. If /usr/src/linux source is polluted by patch error, you can re-install the kernel source.
 
    >We cannot *reverse* a patch error.
@@ -142,3 +140,4 @@ In this post, we will show how to extract *cjktty.patch* from a patched kernel. 
    2. Maybe we can just extract the source code to */usr/src/linux*.
 1. Reference
    1. [How to get patch files from multiple commits?](http://stackoverflow.com/q/32643640/2336707).
+
