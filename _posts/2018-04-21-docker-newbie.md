@@ -477,6 +477,8 @@ Below is a simple explanation:
 
    Disable networking.
 
+Please read [How Docker Desktop Networking Works Under the Hood](https://www.docker.com/blog/how-docker-desktop-networking-works-under-the-hood/) regarding how Docker Destop achieves DNS, HTTP Proxy, TCP/IP stack, Port Forwarding, etc. network features via *vpnkit*.
+
 ## host.docker.internal ##
 
 Occasionally, we want to access to host services from within containers.
