@@ -908,3 +908,24 @@ After closing WPS, the background process refuses to exit:
 ```
 
 However, remove the excution permission may disallow WPS login. It's a trade-off.
+
+# ALSA #
+
+Assume the system has multiple audio cards, we may have adjust the default card.
+
+First, identify the card list.
+
+```bash
+~ $ aplay -l
+
+~ $ cat /proc/asound/cards
+```
+
+Then, update *~/.config/alsa/asoundrc*.
+
+```
+defaults.pcm.card 0
+defaults.ctl.card 0
+```
+
+Re-login and try `alsamixer` and `speaker-test`.
