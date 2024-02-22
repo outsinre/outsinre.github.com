@@ -625,13 +625,13 @@ Each instruction has two kinds of running forms:
 1. shell form.
 
    ```
-   <instruction> cmd para1 para2 ...
+   <instruction> cmd arg1 arg2 ...
    ```
 
    By default, */bin/sh* will be used to run the *cmd* as:
 
    ```
-   /bin/sh -c 'cmd para1 para2 ...'
+   /bin/sh -c 'cmd arg1 arg2 ...'
    ```
 
    It is the preferred form of the RUN instruction to install package in the image and exit.
@@ -640,20 +640,28 @@ Each instruction has two kinds of running forms:
    The *cmd* is ran directly without any Shell involvement, which is the preferred form of CMD and ENTRYPOINT as we usually launch a daemon background within the container. No need to maintain a Shell process.
 
    ```
-   <instruction> ["cmd", "para1", "para2", ...]
+   <instruction> ["cmd", "arg1", "arg2", ...]
    ```
 
    We can hack by changing the *cmd* to */bin/bash*:
 
    ```
-   <instruction> ["/bin/bash", "-c", "cmd", "para1", "para2", ...]
+   <instruction> ["/bin/bash", "-c", "cmd", "arg1", "arg2", ...]
    ```
 
 Refer to [exec form or sh form](https://www.cnblogs.com/sparkdev/p/8461576.html) for more details.
 
-When there are multiple CMD or ENTRYPOINT instructions inherited from different image layers, only that of the topmost layer is respcted! We can use *docker container inspect* to show the instructions and their forms. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`.
+When there are multiple CMD or ENTRYPOINT instructions inherited from different image layers, only that of the topmost layer is respected! We can use *docker container inspect* to show the instructions and their forms. For example, *nginx* image has `CMD ["nginx", "-g", "daemon off;"]`.
 
 We can pass custom commands and arguments when invoking *docker run*, which will override the CMD instruction and arguments thereof. If there exists the ENTRYPOINT instruction in exec form, then custom arguments would be appended to the ENTRYPOINT *cmd*. By default, ENTRYPOINT exec form will take extra arguments from CMD instruction in shell form. Custom arguments when *docker run* will override those in the CMD instruction. ENTRYPOINT in shell form would ignore custom arguments from CMD or *docker run*.
+
+We can override ENTRYPOINT via option `--entrypoint` as follows.
+
+```bash
+# docker run --entrypoint /path/to/cmd <image> -a arg1 -b arg2 arg3
+
+~ $ docker run --entrypoint /bin/bash -it nginx
+```
 
 Here is an illustration between CMD and ENTRYPOINT:
 
