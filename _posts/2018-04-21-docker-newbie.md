@@ -212,7 +212,7 @@ root@docker ~ # echo $?
 1. When we run an image, a container is created with an extra layer of writable filesystem.
 2. To be compatible with AMD64/ARM64, we can add the `--platform linux/x86_64` or `--platform linux/arm64`. Check [multi-platform-docker-build](https://github.com/BretFisher/multi-platform-docker-build).
 
-   This also applies to [docker build](#build-image-by-dockerfile).
+   This also applies to [docker build](#docker-build-dockerfile).
 3. By default, the root process of a container (PID 1), namely the [CMD/ENTRYPOINTWITH](#exec-and-shell) is started in the *forground* mode. The host terminal is [attached](#get-into-container) to the process's STDOUT/STDERR, but *not* STDIN. So we can see the output (error message included) of the root process as follows:
 
    ```bash
@@ -443,7 +443,7 @@ root@docker ~ # exit
    The `--rm` tells to remove the container upon exit.
 5. We can *inspect* the target image, and will find "ContainerConfig" and "Config". They are almost identical.
 
-   "ContainerConfig" is the config of current container from within this image is committed, while the "Config" is the exact configuration of the image. Pay attention to the [Cmd](#exec-and-shell) parts. If we [build by Dockerfile](#build-image-by-dockerfile), then they looks different. The ContainerConfig this is the temporary container spawned to create the image. Check [what-is-different-of-config-and-containerconfig-of-docker-inspect](https://stackoverflow.com/q/36216220).
+   "ContainerConfig" is the config of current container from within this image is committed, while the "Config" is the exact configuration of the image. Pay attention to the [Cmd](#exec-and-shell) parts. If we [build by Dockerfile](#docker-build-dockerfile), then they looks different. The ContainerConfig this is the temporary container spawned to create the image. Check [what-is-different-of-config-and-containerconfig-of-docker-inspect](https://stackoverflow.com/q/36216220).
 
 # Networking Drivers #
 
@@ -751,6 +751,7 @@ Successfully tagged nginx:v3
       ```
 
 9. Check [multi-platform-docker-build](https://github.com/BretFisher/multi-platform-docker-build) for AMD64/ARM64 arch issue. This also applies to [Create a Container](#launch-containers).
+10. Some commands may have ask interactive questions. Please check [DEBIAN_FRONTEND=noninteractive](https://serverfault.com/q/949991).
 
 Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
 
