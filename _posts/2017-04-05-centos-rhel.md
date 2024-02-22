@@ -473,6 +473,8 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 For how to build RPM package, refer to "logging/filebeat-zookeeper-kafka".
 
+Refer to [How to create a Linux RPM package](https://www.redhat.com/sysadmin/create-rpm-package).
+
 ## Extracting RPM
 
 Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *cipo*:
