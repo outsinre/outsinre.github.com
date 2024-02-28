@@ -530,21 +530,31 @@ Use the `--net` or `--network` option. To the 'host' networking driver, just pas
 
 ## SSH Agent Forwarding ##
 
-For Docker Desktop on macOS or Linux, we can [forward SSH agent on host to container](https://docs.docker.com/desktop/networking/#ssh-agent-forwarding). So there is no need to launch SSh agent within contaienr again.
+In order not to set up a new SSH environment within containers, we can [forward SSH agent on host to container](https://docs.docker.com/desktop/networking/#ssh-agent-forwarding).
+
+For [Docker Desktop](https://docs.docker.com/desktop/) on macOS and Linux. If this does not work on macOS, check the workaround at [/run/host-services/ssh-auth.sock doesn't work](https://github.com/docker/for-mac/issues/6541) and also see [macOS SSH agent forwarding not working any longer](https://github.com/docker/for-mac/issues/7204).
 
 ```bash
-# Launch new SSH agent
 ~ $ docker run --rm -it -u root \
---mount "type=bind,src=$HOME/.ssh/id_rsa_kh,dst=/root/.ssh/id_rsa_kh,ro" \
+--mount "type=bind,src=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock,ro" \
+-e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
 --entrypoint /bin/bash kong/kong-gateway:latest
-root@3442a4bc63cd:/# eval "$( /usr/bin/ssh-agent -s )"
-root@3442a4bc63cd:/# ssh-add ~/.ssh/id_rsa_kh
 
-# forward SSH agent
-~ $ docker run --rm -it -u root \
---mount "type=bind,src=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock" -e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
---entrypoint /bin/bash kong/kong-gateway:latest
+root@3442a4bc63cd:/# ssh-add -l
 ```
+
+For [Docker engine](https://docs.docker.com/engine/):
+
+```bash
+~ $ docker run --rm -it -u root \
+--mount "type=bind,src=$SSH_AUTH_SOCK,target=/run/host-services/ssh-auth.sock,ro" \
+-e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
+--entrypoint /bin/bash kong/kong-gateway:latest
+
+root@3442a4bc63cd:/# ssh-add -l
+```
+
+Attention that, if you are SSH into from macOS to Linux VPS, the SSH agent might be forwarded to the Linux VPS, depending on the SSH config on macOS. This is totally a different topic. Containers in the Linux VPS has no access to the forwarded macOS SSH agent, and we should launch a new one in the Linux VPS.
 
 ## link ##
 
