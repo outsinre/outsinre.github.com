@@ -532,7 +532,7 @@ Use the `--net` or `--network` option. To the 'host' networking driver, just pas
 
 In order not to set up a new SSH environment within containers, we can [forward SSH agent on host to container](https://docs.docker.com/desktop/networking/#ssh-agent-forwarding).
 
-For [Docker Desktop](https://docs.docker.com/desktop/) on macOS and Linux. If this does not work on macOS, check the workaround at [/run/host-services/ssh-auth.sock doesn't work](https://github.com/docker/for-mac/issues/6541) and also see [macOS SSH agent forwarding not working any longer](https://github.com/docker/for-mac/issues/7204).
+For [Docker Desktop](https://docs.docker.com/desktop/) on macOS and Linux. If this does not work on macOS, see the workaround at [macOS SSH agent forwarding not working any longer](https://github.com/docker/for-mac/issues/7204).
 
 ```bash
 ~ $ docker run --rm -it -u root \
