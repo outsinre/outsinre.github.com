@@ -554,7 +554,7 @@ For [Docker engine](https://docs.docker.com/engine/):
 root@3442a4bc63cd:/# ssh-add -l
 ```
 
-Attention that, if you are SSH into from macOS to Linux VPS, the SSH agent might be forwarded to the Linux VPS, depending on the SSH config on macOS. This is totally a different topic. Containers in the Linux VPS has no access to the forwarded macOS SSH agent, and we should launch a new one in the Linux VPS.
+Attention that, if you are SSH into Linux VPS from macOS, the SSH agent might be forwarded to the Linux VPS, depending on the SSH config on macOS. This is totally a different topic. Containers in the Linux VPS has no access to the forwarded macOS SSH agent, and we should launch a new one in the Linux VPS.
 
 ## link ##
 
