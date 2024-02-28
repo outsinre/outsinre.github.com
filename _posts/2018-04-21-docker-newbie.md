@@ -655,7 +655,7 @@ When there are multiple CMD or ENTRYPOINT instructions inherited from different 
 
 We can pass custom commands and arguments when invoking *docker run*, which will override the CMD instruction and arguments thereof. If there exists the ENTRYPOINT instruction in exec form, then custom arguments would be appended to the ENTRYPOINT *cmd*. By default, ENTRYPOINT exec form will take extra arguments from CMD instruction in shell form. Custom arguments when *docker run* will override those in the CMD instruction. ENTRYPOINT in shell form would ignore custom arguments from CMD or *docker run*.
 
-We can override ENTRYPOINT via option `--entrypoint` as follows.
+We can override ENTRYPOINT and/or CMD as follows.
 
 ```bash
 # docker run --entrypoint /path/to/cmd <image> -a arg1 -b arg2 arg3
@@ -664,6 +664,8 @@ We can override ENTRYPOINT via option `--entrypoint` as follows.
 
 ~ $ docker run --rm --entrypoint /bin/bash kong/kong-gateway:latest -c "kong version"
 Kong Enterprise 3.6.1.0
+
+# docker run --entrypoint '' <image> /path/to/cmd -a arg1 -b arg2 arg3
 
 ~ $ docker run --rm --entrypoint '' -it kong/kong-gateway:latest /bin/bash -c "kong version"
 Kong Enterprise 3.6.1.0
