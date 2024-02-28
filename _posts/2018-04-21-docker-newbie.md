@@ -528,6 +528,24 @@ Docker automates network configuration upon container startup. We can customize 
 
 Use the `--net` or `--network` option. To the 'host' networking driver, just pass `--net host` option to *docker run*.
 
+## SSH Agent Forwarding ##
+
+For Docker Desktop on macOS or Linux, we can [forward SSH agent on host to container](https://docs.docker.com/desktop/networking/#ssh-agent-forwarding). So there is no need to launch SSh agent within contaienr again.
+
+```bash
+# Launch new SSH agent
+~ $ docker run --rm -it -u root \
+--mount "type=bind,src=$HOME/.ssh/id_rsa_kh,dst=/root/.ssh/id_rsa_kh,ro" \
+--entrypoint /bin/bash kong/kong-gateway:latest
+root@3442a4bc63cd:/# eval "$( /usr/bin/ssh-agent -s )"
+root@3442a4bc63cd:/# ssh-add ~/.ssh/id_rsa_kh
+
+# forward SSH agent
+~ $ docker run --rm -it -u root \
+--mount "type=bind,src=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock" -e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
+--entrypoint /bin/bash kong/kong-gateway:latest
+```
+
 ## link ##
 
 The legacy communication method is `--link`. Docker copies information (e.g. [ENV Variables](#env-variables)) from *source* container to *receipt* (*target*) container, and provides network access from receipt container to source container.
