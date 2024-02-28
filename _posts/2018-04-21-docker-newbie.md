@@ -664,6 +664,9 @@ We can override ENTRYPOINT via option `--entrypoint` as follows.
 
 ~ $ docker run --rm --entrypoint /bin/bash kong/kong-gateway:latest -c "kong version"
 Kong Enterprise 3.6.1.0
+
+~ $ docker run --rm --entrypoint '' -it kong/kong-gateway:latest /bin/bash -c "kong version"
+Kong Enterprise 3.6.1.0
 ```
 
 Here is an illustration between CMD and ENTRYPOINT:
