@@ -18,19 +18,22 @@ title: Docker Newbie
    2. Container is created on top of an image with the topmost filesystem layer storing *running* data. Processes within different containers are isolated - namespace.
 
       We can think of image and container as class and object in Object-oriented programming. 
-   3. Registry is *store* where users publicize, share and download *repostitory*. The default registry is *docker.io* with a frontend website [Docker Hub](https://hub.docker.com).
+   3. Registry is *store* where users publicize, share and download *repostitory*. The default registry is *docker.io* or *registry-1.docker.io* with a frontend website [Docker Hub](https://hub.docker.com).
    
       Repository, on the other hand, actually refers to *name* of an image (e.g. *ubuntu*). We can specify *version* of a repository by a *tag* (label) like *ubuntu:16.04* (colon separator). The default tag is *latest*.
-3. Naming of an image
+3. [Naming of an image](https://docs.docker.com/reference/cli/docker/image/tag/#description)
 
    ```
-   registry.fqdn[:port]/[user/]repository[:tag | @<image-ID>]
+   registry.fqdn[:port]/[namespace/]repository[:tag | @<image-ID>]
    ```
 
    1. Default registry can be ommitted.
-   2. The *user* part means a registered user account in the registry.
-   3. *repository* is the default *name* of an image.
-   4. *image id* comprises a SHA256 *digest* like *ubuntu@abea36737d98dea6109e1e292e0b9e443f59864b* (at sign separator).
+   2. The *namespace* part means a registered account in the registry. It can be an individual user name or an organization name like "kong".
+   3. *repository* is the default *name* of an image like "ubuntu" and "kong-gateway".
+   4. *tag* is a string. Default to *latest*.
+   5. *image id* comprises a SHA256 *digest* like *@sha256:abea36737d98dea6109e1e292e0b9e443f59864b*.
+   
+   Specifying an image by tag can always gets the latest updates. For example, every time *ubuntu:22.04* or *kong/kong:3.4* is updated, it refers to a new image with different digest (e.g. fix CVEs or introduce CVEs). On the other hand, an image specified by digest always is pinned to that specific image. See [Pin actions to a full length commit SHA for security concerns](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions).
 4. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
    2. Server: local/remote *docker-engine* (i.e. *systemctl start docker*).
@@ -100,7 +103,7 @@ The daemon manages everything!
 Docker daemon creates a Unix socket file at [/var/run/docker.sock](https://stackoverflow.com/q/35110146/2336707) by which we can communicate with the daemon via RESTful API.
 
 ```bash
-~ $ curl --unix-socket --no-buffer /var/run/docker.sock http://localhost/events
+~ $ curl --unix-socket /var/run/docker.sock --no-buffer http://localhost/events
 ~ $ curl --unix-socket /var/run/docker.sock http://localhost/version
 ~ $ curl --unix-socket /var/run/docker.sock http://localhost/images/json | jq
 ~ $ curl --unix-socket /var/run/docker.sock http://localhost/containers/json | jq
@@ -162,9 +165,6 @@ It is highly recommended to *pull* the [docker/getting-started](https://hub.dock
 
 ~ $ docker pull ubuntu:16.04                                    # specify a tag
 ~ $ docker pull ubuntu@sha256:<hash>                            # specify an image ID
-
-~ $ docker pull amd64/amazonlinux                               # AMD64
-~ $ docker pull arm64v8/amazonlinux                             # Apple M1 ARM64
 
 ~ $ docker images
 ```
