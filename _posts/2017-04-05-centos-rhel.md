@@ -480,15 +480,17 @@ Refer to [How to create a Linux RPM package](https://www.redhat.com/sysadmin/cre
 Upon receving a *.rpm* file, we can extract the contents with *rpm2cpio* and *cipo*:
 
 ```bash
-~ $ mkdir dst; cd dst
-~ $ rpm2cpio /path/to/pkg.rpm | cpio -idmv
+~ $ rpm2cpio /path/to/pkg.rpm | cpio -idmv [--no-preserve-owner] [--no-absolute-filenames -D dst] '*resty*'
 ~ $ find .
 ```
 
-1. `-i`: extract;
-2. `-d`: make directories;
-3. `-m`: preserve modification time;
+1. `-i`: extract; `-t` list instead of extract.
+2. `-d`: make directories *dst* and others on demand.
+3. `-m`: preserve modification time.
 4. `-v`: verbose.
+5. `--no-preserve-owner`: replace the ownership with current user.
+6. `--no-absolute-filenames`: remove the root dir prefix `/`, and replace it with `-D`.
+7. `*resty*` is a Shell globbing pattern to extract only specific files. By default, extract all files.
 
 # locale #
 
