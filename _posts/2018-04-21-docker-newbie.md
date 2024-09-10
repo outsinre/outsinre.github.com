@@ -14,7 +14,7 @@ title: Docker Newbie
 2. Dockers comprises *image*, *container* and *registry*.
    1. Image is *static* and *readonly* like a minimal root filesystem, a daemon etc. There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (like Gentoo stage tarball).
 
-      An image consists of multiple filesystem layers. We can define an image by Dockerfile.
+      An image consists of multiple filesystem layers. We can define an image by [Dockerfile](#docker-build-dockerfile).
    2. Container is created on top of an image with the topmost filesystem layer storing *running* data. Processes within different containers are isolated - namespace.
 
       We can think of image and container as class and object in Object-oriented programming. 
@@ -415,36 +415,6 @@ For example, a container can be shutdown by `C-c` shortcut, sending the SIGINT s
 
 If the process is running as PID 1 (like */usr/bin/init*), it ignores any signal and will not terminate on SIGINT or SIGTERM unless it is coded to do so.
 
-# Docker Commit #
-
-```bash
-~ $ docker exec -it webserver bash
-#
-root@docker ~ # echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
-root@docker ~ # exit
-#
-~ $ docker diff webserver
-~ $ docker container commit -a 'jim' -m 'change front page' webserver nginx:v2
-~ $ docker image ls nginx
-~ $ docker history nginx:v2
-```
-
-1. We modified container layer storage. Use *diff* to check details.
-2. Visit the Nginx container page again.
-3. *commit* records modification as a new layer and create a new image.
-
-   Avoid *commit* command as miscellaneous operations (garbage) are recorded either. As discussed in "Data Share" section, we can make use of Volume, Bind Mount, or tmpfs, or resort to 'Build Image by Dockerfile' section below.
-4. To verify the new image:
-
-   ```bash
-   ~ $ docker run --name web2 -d -p 8081:80 --rm nginx:v2
-   ```
-
-   The `--rm` tells to remove the container upon exit.
-5. We can *inspect* the target image, and will find "ContainerConfig" and "Config". They are almost identical.
-
-   "ContainerConfig" is the config of current container from within this image is committed, while the "Config" is the exact configuration of the image. Pay attention to the [Cmd](#exec-and-shell) parts. If we [build by Dockerfile](#docker-build-dockerfile), then they looks different. The ContainerConfig this is the temporary container spawned to create the image. Check [what-is-different-of-config-and-containerconfig-of-docker-inspect](https://stackoverflow.com/q/36216220).
-
 # Networking Drivers #
 
 The Docker's networking subsystem is *pluggable*, using drivers. Docker provides multiple built-in networks, based on which we can [define custom networks](#self-define-network).
@@ -476,6 +446,14 @@ Below is a simple explanation:
 5. none
 
    Disable networking.
+
+# DNS #
+
+Docker Destkop has multiple built-in DNS servers as follows.
+
+![docker-desktop-dns.png](figs/docker-desktop-dns.png)
+
+When resolving containers within the the same Docker network, the internal DNS within *dockerd* is utilized. However, resolving hostnames outside of the Docker network, would be forwarded to host via CoreDNS.
 
 Please read [How Docker Desktop Networking Works Under the Hood](https://www.docker.com/blog/how-docker-desktop-networking-works-under-the-hood/) regarding how Docker Destop achieves DNS, HTTP Proxy, TCP/IP stack, Port Forwarding, etc. network features via *vpnkit*.
 
@@ -705,7 +683,39 @@ Here is an illustration between CMD and ENTRYPOINT:
 
 Refer to [Dockerfile reference](https://docs.docker.com/engine/reference/builder/) for more details.
 
-# Docker Build Dockerfile #
+# Custom Image #
+
+## Docker Commit ##
+
+```bash
+~ $ docker exec -it webserver bash
+#
+root@docker ~ # echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
+root@docker ~ # exit
+#
+~ $ docker diff webserver
+~ $ docker container commit -a 'jim' -m 'change front page' webserver nginx:v2
+~ $ docker image ls nginx
+~ $ docker history nginx:v2
+```
+
+1. We modified container layer storage. Use *diff* to check details.
+2. Visit the Nginx container page again.
+3. *commit* records modification as a new layer and create a new image.
+
+   Avoid *commit* command as miscellaneous operations (garbage) are recorded either. As discussed in "Data Share" section, we can make use of Volume, Bind Mount, or tmpfs, or resort to 'Build Image by Dockerfile' section below.
+4. To verify the new image:
+
+   ```bash
+   ~ $ docker run --name web2 -d -p 8081:80 --rm nginx:v2
+   ```
+
+   The `--rm` tells to remove the container upon exit.
+5. We can *inspect* the target image, and will find "ContainerConfig" and "Config". They are almost identical.
+
+   "ContainerConfig" is the config of current container from within this image is committed, while the "Config" is the exact configuration of the image. Pay attention to the [Cmd](#exec-and-shell) parts. If we [build by Dockerfile](#docker-build-dockerfile), then they looks different. The ContainerConfig this is the temporary container spawned to create the image. Check [what-is-different-of-config-and-containerconfig-of-docker-inspect](https://stackoverflow.com/q/36216220).
+
+## Docker Build Dockerfile ##
 
 From [commit](#docker-commit) example above, we can create new image layer but many negligible commands like *ls*, *pwd*, etc. are recourded as well.
 
@@ -722,12 +732,12 @@ FROM nginx
 RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
 ```
 
-Just two lines! FROM imports the base image on which we will create the new layer. If we do not want any base image, use the special null image *scratch*.
+Just two lines! FROM imports the [base image](https://docs.docker.com/build/building/base-images/) on which we will create the new layer. If we do not want any base image, use the [special null image scratch](https://docs.docker.com/build/building/base-images/#create-a-minimal-base-image-using-scratch).
 
-Now we build the image:
+Now we build the image. Please refer to [Docker Build Overview](https://docs.docker.com/build/concepts/overview/) to check the difference between *docker buildx* and *docker build*. To put it simple, *docker build* is wrapper of *docker buildx* with default arguments.
 
 ```bash
-~ $ docker build -t nginx:v3 -t nginx .
+~ $ docker buildx build --no-cache --load -t nginx:v3 -t nginx -f Dockerfile .
 #
 Sending build context to Docker daemon  2.048kB
 Step 1/2 : FROM nginx
@@ -864,13 +874,10 @@ A more advanced tool than *docker tag* is [regctl](https://github.com/regclient/
 
 # Docker Compose #
 
-the compose project name by default is named after `PWD`. The name of containers share the same prefix (i.e. name of the project).
+The compose project name by default is named after `PWD`. The name of containers share the same prefix (i.e. name of the project).
 
-we can [share compose configurations](https://docs.docker.com/compose/extends) between files and/or projects by:
+We can [share compose configurations](https://docs.docker.com/compose/extends) between files and/or projects by including other compose files or extending a service from from another service of another compose file. Check "biji/archive/kong-dev-compose.yaml".
 
-1. multiple compose files
-2. extending services from another compose file.
-
-when bind-mount a file, pay attention to provide the absolute path. check [data share](#data-share).
+When bind-mount a file, pay attention to provide the absolute path. Check [data share](#data-share).
 
 In Docker Compose file, we can use *build* to build an image from Docker file (https://stackoverflow.com/q/57840820/2336707). Alternatively, we can also provide multiple commands to *command* (https://stackoverflow.com/q/30063907/2336707).
