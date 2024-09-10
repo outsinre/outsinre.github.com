@@ -447,11 +447,11 @@ Below is a simple explanation:
 
    Disable networking.
 
-# DNS #
+## DNS ##
 
 Docker Destkop has multiple built-in DNS servers as follows.
 
-![docker-desktop-dns.png](figs/docker-desktop-dns.png)
+![docker-desktop-dns.png](/assets/docker-desktop-dns.png)
 
 When resolving containers within the the same Docker network, the internal DNS within *dockerd* is utilized. However, resolving hostnames outside of the Docker network, would be forwarded to host via CoreDNS.
 
