@@ -870,7 +870,7 @@ A more advanced tool than *docker tag* is [regctl](https://github.com/regclient/
 ~ $ regctl image copy kong/kong-gateway:3.4.1.0-ubuntu kong/kong-gateway:latest-ubuntu
 ```
 
-*regctl image copy* pulls the containers (all architectures), retags them, and pushed them again (all architectures). Please read <https://stackoverflow.com/a/68576882/2336707>, <https://stackoverflow.com/a/68317548/2336707> and <https://stackoverflow.com/q/71470604/2336707>.
+*regctl image copy* pulls the containers (all architectures), retags them, and pushed them again (all architectures). Please read [1](https://stackoverflow.com/a/68576882/2336707), [2](https://stackoverflow.com/a/68317548/2336707) and [3](https://stackoverflow.com/q/71470604/2336707).
 
 # Docker Compose #
 
@@ -880,4 +880,4 @@ We can [share compose configurations](https://docs.docker.com/compose/extends) b
 
 When bind-mount a file, pay attention to provide the absolute path. Check [data share](#data-share).
 
-In Docker Compose file, we can use *build* to build an image from Docker file (https://stackoverflow.com/q/57840820/2336707). Alternatively, we can also provide multiple commands to *command* (https://stackoverflow.com/q/30063907/2336707).
+In Docker Compose file, we can also use [buildx](#docker-build-dockerfile) to [build an image from Dockerfile](https://stackoverflow.com/q/57840820/2336707). Alternatively, we can also [run multiple commands](https://stackoverflow.com/q/30063907/2336707).
