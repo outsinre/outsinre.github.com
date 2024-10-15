@@ -27,17 +27,17 @@ title: Docker Newbie
    registry.fqdn[:port]/[namespace/]repository[:tag | @<image-ID>]
    ```
 
-   1. Default registry can be ommitted.
+   1. Default registry can be ommitted. Others like `quay.io` must be provided.
    2. The *namespace* part means a registered account in the registry. It can be an individual user name or an organization name like "kong".
    3. *repository* is the default *name* of an image like "ubuntu" and "kong-gateway".
    4. *tag* is a string. Default to *latest*.
    5. *image id* comprises a SHA256 *digest* like *@sha256:abea36737d98dea6109e1e292e0b9e443f59864b*.
    
-   Specifying an image by tag can always gets the latest updates. For example, every time *ubuntu:22.04* or *kong/kong:3.4* is updated, it refers to a new image with different digest (e.g. fix CVEs or introduce CVEs). On the other hand, an image specified by digest always is pinned to that specific image. See [Pin actions to a full length commit SHA for security concerns](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions).
+   Specifying an image by tag can always gets the latest updates. For example, every time a patch release is released (e.g. *kong/kong:3.4.5*), *kong/kong:3.4* refers to that patch version `3.4.5` with a different digest. On the other hand, an image specified by digest always is pinned to that specific image. See [Pin actions to a full length commit SHA for security concerns](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions).
 4. C/S mode.
    1. Client: user command line (i.e. *docker image ls*)
-   2. Server: local/remote *docker-engine* (i.e. *systemctl start docker*).
-5. [Layer storage](https://docs.docker.com/storage/storagedriver/) uses Union FS (recall that Live CD on USB stick requires Union FS). Only the topmost (container storage layer) is writable and volatile.
+   2. Server: local/remote [docker-engine](#daemon) (i.e. *systemctl start docker*).
+5. [Layer storage](https://docs.docker.com/storage/storagedriver/) uses Union FS (recall that Live CD on USB stick requires Union FS). Only the topmost (container storage layer) is writable, but volatile.
 
    Of the Union FS, *overlay2* is recommended over *aufs*. Either enable *overlay2* in kernel or build external module. *devicemapper* is also used in CentOS/RHEL. Pay attention to [CentOS/RHEL 的用户需要注意的事项](https://yeasy.gitbooks.io/docker_practice/content/image/rm.html#centosrhel-%E7%9A%84%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9) if *devicemapper* driver *loop-lvm* mode is used.
 
@@ -98,7 +98,7 @@ Start Docker:
 
 The daemon manages everything!
 
-# docker.sock #
+## docker.sock ##
 
 Docker daemon creates a Unix socket file at [/var/run/docker.sock](https://stackoverflow.com/q/35110146/2336707) by which we can communicate with the daemon via RESTful API.
 
@@ -141,7 +141,7 @@ a3b93da63e90   docker                   "dockerd-entrypoint.…"   4 minutes ago
 f3f0faf83ac5   docker/getting-started   "/docker-entrypoint.…"   14 months ago   Exited (255) 13 months ago   0.0.0.0:80->80/tcp   romantic_colden
 ```
 
-However, mounting *docker.sock* would make your host [vulnerable to attack](https://dev.to/pbnj/docker-security-best-practices-45ih#docker-engine) as Docker daemon is ran as *root*.
+However, mounting *docker.sock* would make your host [vulnerable to attack](https://dev.to/pbnj/docker-security-best-practices-45ih#docker-engine) as Docker daemon within the container is ran as *root*.
 
 # CLI Sample #
 
