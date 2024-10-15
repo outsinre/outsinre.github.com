@@ -803,11 +803,11 @@ Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/
 
 # Share Images #
 
-We can [share](https://docs.docker.com/get-started/04_sharing_app/) our own docker image to a registry (e.g. docker.io) by *docker push*.
+We can [share](https://docs.docker.com/get-started/04_sharing_app/) our own docker image to a registry (e.g. `docker.io`) by *docker push*.
 
-Suppose we have a nginx image got from Docker hub, and want to re-push it to Docker Hub under our own account.
+Suppose we have a nginx image got from Docker hub, and want to re-push it to Docker Hub under a personal account.
 
-Get the official image. If we do not specify a tag, the *latest* image is pulled.
+Pull official image. If we do not specify a tag, the *latest* image is pulled.
 
 ```bash
 ~ $ docker pull nginx
@@ -815,11 +815,15 @@ Using default tag: latest
 ...
 ```
 
-Push to our own account. If we do not specify a tag, the image is tagged to *latest*.
+Login to the personal account.
 
 ```bash
 ~ $ docker login -u myaccount
+```
 
+Push to my personal account. If we do not specify a tag, the image is tagged to *latest*.
+
+```bash
 ~ $ docker tag <nginx|sha256> myaccount/nginx
 
 ~ $ docker push myaccount/nginx
@@ -827,12 +831,12 @@ Using default tag: latest
 ...
 ```
 
-If we want to use a different registry rather than the default *docker.io*, then add the registry to the new tag as well as follows.
+If we want to use a different registry rather than the default `docker.io`, then add the registry to the new tag as well as follows.
 
 ```bash
-~ $ docker tag <nginx|sha256> myregistry:5000/myaccount/nginx
+~ $ docker tag <nginx|sha256> myregistry.com:5000/myaccount/nginx
 
-~ $ docker push myregistry:5000/myaccount/nginx
+~ $ docker push myregistry.com:5000/myaccount/nginx
 ```
 
 We can assign mutiple tages to the image.
@@ -855,7 +859,7 @@ We can re-assign the *latest* tag to a new version.
 ~ $ docker push myaccount/nginx:latest
 ```
 
-A more advanced tool than *docker tag* is [regctl](https://github.com/regclient/regclient/blob/main/docs/regctl.md) as follows.
+If the imange is multi-platform (e.g. AMD64 and ARM64) capable, we have to repeat the pull, tag and push for each platform via option `--platform`. The more advanced tool [regctl](https://github.com/regclient/regclient/blob/main/docs/regctl.md) takes care of all platforms with just one command. Please read [1](https://stackoverflow.com/a/68576882/2336707), [2](https://stackoverflow.com/a/68317548/2336707) and [3](https://stackoverflow.com/q/71470604/2336707).
 
 ```bash
 ~ $ regctl registry login
@@ -866,11 +870,24 @@ A more advanced tool than *docker tag* is [regctl](https://github.com/regclient/
 
 ~ $ regctl image manifest kong/kong-gateway:3.4.1.0
 
+# pull, tag and push
 ~ $ regctl image copy kong/kong-gateway:3.4.1.0 kong/kong-gateway:latest
 ~ $ regctl image copy kong/kong-gateway:3.4.1.0-ubuntu kong/kong-gateway:latest-ubuntu
 ```
 
-*regctl image copy* pulls the containers (all architectures), retags them, and pushed them again (all architectures). Please read [1](https://stackoverflow.com/a/68576882/2336707), [2](https://stackoverflow.com/a/68317548/2336707) and [3](https://stackoverflow.com/q/71470604/2336707).
+Apart from pushing a personal account, we can [share Docker images via a tar file](https://gist.github.com/outsinre/d2b58b289425fbdd2d0f0294f3fdf0c9).
+
+```bash
+~ $ docker images 'kong-wp'
+
+~ $ docker image save -o kong-wp-3501.tar kong-wp:3.5.0.1
+
+# for file transmission
+~ $ tar -cJvf kong-wp-3501.tar.xz kong-wp-3501.tar
+~ $ tar -xJvf kong-wp-3501.tar.xz
+
+~ $ docker image load -i kong-wp-3501.tar
+```
 
 # Docker Compose #
 
