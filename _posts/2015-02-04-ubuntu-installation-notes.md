@@ -59,6 +59,14 @@ Description: Kong is a distributed gateway for APIs and Microservices, focused o
 ~ $ dpkg --listfiles/-L kong-enterprise-edition
 ```
 
+Search installed.
+
+```bash
+~ $ dpkg -l | grep pkg
+
+~ $ dpkg -s pkg | grep Status
+```
+
 Install.
 
 ```bash
@@ -93,6 +101,12 @@ Search.
 ~ $ apt-cache show kong-enterprise-edition | grep [V]ersion
 
 ~ $ apt/apt-cache policy kong-enterprise-edition
+```
+
+Search installed.
+
+```bash
+~ $ apt list pkg --installed
 ```
 
 Install.
