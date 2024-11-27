@@ -8,7 +8,7 @@ title: Ubuntu and Debian
 
 # dpkg #
 
-*dpkg* is the underlying tool of [apt-get](#apt-and-apt-get).
+*dpkg* interacts with the `.deb` binary directly, and is the underlying tool of [apt-get](#apt-and-apt-get).
 
 Metadata.
 
@@ -62,9 +62,9 @@ Description: Kong is a distributed gateway for APIs and Microservices, focused o
 Search installed.
 
 ```bash
-~ $ dpkg -l | grep pkg
+~ $ dpkg -l | grep pkg*
 
-~ $ dpkg -s pkg | grep Status
+~ $ dpkg -s pkg* | grep Status
 ```
 
 Install.
@@ -106,7 +106,7 @@ Search.
 Search installed.
 
 ```bash
-~ $ apt list pkg --installed
+~ $ apt list --installed pkg 
 ```
 
 Install.
