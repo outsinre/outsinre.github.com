@@ -220,24 +220,28 @@ CLIENT_RANDOM 373ad1cfde82cc6ac98ed54f3b5dbfda9eabee9fe49886b1d3c040aa7bef7ddd 6
 
 ## Decrypt Kong Traffic ##
 
-Before, we start Kong, we need two special settings.
+Before, we start Kong, we need three special settings.
 
-1. Configure [the environment SSLKEYLOGFILE variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong.
+1. Set the environment variable "SSLKEYLOGFILE".
 
    ```bash
-   ~ $ export SSLKEYLOGFILE=/tmp/pre-mastersecret.txt
+   ~ $ export SSLKEYLOGFILE=/usr/local/kong/pre-mastersecret.txt
+   ```
 
+2. Configure [the environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong.
+
+   ```bash
    # Insert 'env SSLKEYLOGFILE;' into 'nginx.conf'
    ~ $ export KONG_NGINX_MAIN_ENV=SSLKEYLOGFILE
    ```
 
-2. Preload the shared library "libsslkeylog.so" for Kong.
+3. Preload the shared library "libsslkeylog.so" for Kong.
 
    ```bash
    ~ $ export LD_PRELOAD=/usr/local/kong/lib/libsslkeylog.so
    ```
 
-Now, create a Kong container in DB-less mode against the custom image.
+Let's start Kong in DB-less mode as an example.
 
 ```bash
 ~ $ docker run --rm \
