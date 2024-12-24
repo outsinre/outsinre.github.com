@@ -16,31 +16,31 @@ Generally speaking, there are three ways to support "SSLKEYLOGFILE".
 
 1. Capture TLS traffic on client side.
 
-   Clients like mitmproxy (TLS proxy), `openssl s_client`, cURL, Firefox, Chrome, etc. all supports "SSLKEYLOGFILE". So, we just need to set this variable before launching the client and before capturing the TLS traffic.
+   Clients like mitmproxy (TLS proxy), `openssl s_client`, cURL, Firefox, Chrome, etc. all natively support "SSLKEYLOGFILE". So, we just need to set this variable before launching the client and before capturing the TLS traffic.
 2. Capture TLS traffic on Nginx side.
 
    Nginx by default does not provide the ability to dump the TLS (Pre)MasterSecret. We have to hack the OpenSSL library.
    1. Make use of 3rd-party Nginx modules like [nginx-sslkeylog](https://github.com/tiandrey/nginx-sslkeylog). There is another similar patch available at [PATCH SSL: Added SSLKEYLOGFILE key material to debug logging](https://mailman.nginx.org/pipermail/nginx-devel/2024-January/W5CRPNYOC72XXFF45KQSD3VNNMGJ4WMR.html).
-   2. Preload [sslkeylog.c](#sslkeylog.c). Compared to method 2.1, it does not require patching and building. It uses [LD_PRELOAD](https://man7.org/linux/man-pages/man8/ld.so.8.html) to preload a new shared library that could dump TLS (Pre)MasterSecret if "SSLKEYLOGFILE" is present.
+   2. Preload [sslkeylog.c](#sslkeylogc). Compared to method 2.1, it does not require patching and building. It uses [LD_PRELOAD](https://man7.org/linux/man-pages/man8/ld.so.8.html) to preload a newly built shared library that could dump TLS (Pre)MasterSecret if "SSLKEYLOGFILE" is present.
 3. Make use of [GDB to read TLS (Pre)MasterSecret from core dump](https://security.stackexchange.com/a/80174/248863).
+
+This post focuses on the method 2.2.
 
 # sslkeylog.c #
 
-In this section, I will build a shared library "libsslkeylog.so" from [sslkeylog.c](https://github.com/Lekensteyn/wireshark-notes/tree/master/src). The shared library can dump TLS (Pre)MasterSecret if it is preloaded to Nginx and the environment variable "SSLKEYLOGFILE" is imported into "nginx.conf".
+In this section, I will build a shared library "libsslkeylog.so" from GitHub repo [sslkeylog.c](https://github.com/Lekensteyn/wireshark-notes/tree/master/src). The shared library can dump TLS (Pre)MasterSecret if it is preloaded to Nginx and the environment variable "SSLKEYLOGFILE" is imported into "nginx.conf".
 
 I will use Nginx's derivation Kong Gateway and Docker image to demonstrate the details.
 
 ## Compose Dockerfile ##
 
-The Dockerfile is available at [sslkeylogfile.Dockerfile](https://gist.github.com/outsinre/bde97c641b1830bb2d4207176ab29969).
-
-In the build stage, the script [sslkeylog.sh](#decrypt-curl-traffic) is used to verify the built object "libsslkeylog.so".
+The Dockerfile is available at [sslkeylogfile.Dockerfile](https://gist.github.com/outsinre/bde97c641b1830bb2d4207176ab29969). In the build stage, the script [sslkeylog.sh](#decrypt-curl-traffic) is used to verify the shared library "libsslkeylog.so".
 
 ```
 ./sslkeylog.sh curl -sI https://www.google.com
 ```
 
-The test output from the [building process](#build-image) is as follows.
+The test output from the [building process](#build-custom-image) is as follows.
 
 ```
 #7 1.555 + ./sslkeylog.sh curl -sI https://www.google.com
@@ -66,7 +66,9 @@ The test output from the [building process](#build-image) is as follows.
 #7 1.899
 ```
 
-## Build Image ##
+We will cover more details on the verification script laster on.
+
+## Build Custom Image ##
 
 ```bash
 ~ $ BUILDKIT_PROGRESS=plain docker buildx build --no-cache --load -t 'kong-custom:3.9.0.0' -f sslkeylogfile.Dockerfile .
@@ -78,7 +80,7 @@ kong-custom   3.9.0.0   b85219c906ce   34 minutes ago   498MB
 
 ## Decrypt cURL Traffic ##
 
-Create a container against the custom image and locate the built object "libsslkeylog.so".
+Create a container against the custom image and locate the shared library "libsslkeylog.so".
 
 ```bash
 ~ $ docker run --rm \
@@ -93,7 +95,7 @@ kong@72a118f01128:/usr/local/kong/lib$ ls -l libsslkeylog.so
 -rwxr-xr-x 1 root root 71736 Dec 24 03:25 libsslkeylog.so
 ```
 
-Import the script [sslkeylog.sh](https://github.com/Lekensteyn/wireshark-notes/blob/master/src/sslkeylog.sh). Ensure the script and the build object reside in the same directory - `/usr/local/kong/lib`. You can optionally provide "SSLKEYLOGFILE" to specify a pathname, otherwise the dumped (Pre)MasterSecret is printed to the stderr.
+Copy the verification script [sslkeylog.sh](https://github.com/Lekensteyn/wireshark-notes/blob/master/src/sslkeylog.sh) to the directory of the shared library - `/usr/local/kong/lib`. You can optionally provide "SSLKEYLOGFILE" to specify a pathname, otherwise the dumped (Pre)MasterSecret is printed to the stderr.
 
 ```bash
 kong@72a118f01128:/usr/local/kong/lib$ pwd
@@ -105,11 +107,11 @@ kong@72a118f01128:/usr/local/kong/lib$ nano -w sslkeylog.sh
 kong@72a118f01128:/usr/local/kong/lib$ chmod +x sslkeylog.sh
 ```
 
-Actually, cURL officially supports "SSLKEYLOGFILE", without the help of the build object "libsslkeylog.so". However, the script [preloads LD_PRELOAD](https://github.com/Lekensteyn/wireshark-notes/blob/b166e14c2bf79f4a61cbcd01ca92a2c418ac9550/src/sslkeylog.sh#L62C12-L62C22) the build object to verify it is working as expected when "SSLKEYLOGFILE" is configured.
+As stated above, cURL native supports "SSLKEYLOGFILE", without the help of the newly built shared library "libsslkeylog.so". However, the shared library can also dump TLS (Pre)MasterSecret if it is [preloaded](https://github.com/Lekensteyn/wireshark-notes/blob/b166e14c2bf79f4a61cbcd01ca92a2c418ac9550/src/sslkeylog.sh#L62C12-L62C22) and "SSLKEYLOGFILE" is set. Hence, we use cURL to verify the shared library works as expected.
 
 ### Decrypt TLS 1.3 ###
 
-Capture the TLS traffic before triggering the request.
+Start traffic capturing.
 
 ```bash
 ~ $ docker run --rm --name testsslkeylogfile -it --network container:sslkeylogfile --mount type=bind,src="${HOME}/misc",dst=/tcpdump -d nicolaka/netshoot
@@ -127,7 +129,7 @@ tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot leng
 -rw-r--r--    1 root     root          8938 Dec 24 06:47 sslkeylogfile.pcap
 ```
 
-Each TLS 1.3 session needs 5 secrets to decrypt traffic.
+Trigger the request.
 
 ```bash
 kong@72a118f01128:/usr/local/kong/lib$ :> /tmp/premaster.txt
@@ -147,7 +149,11 @@ cache-control: private
 set-cookie: AEC=AZ6Zc-Xnia3ReOwqLapj8yFlujpG9zCCT-Rq3eBye07oMwzr-WLr1OnluLA; expires=Sun, 22-Jun-2025 06:30:07 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax
 set-cookie: NID=520=aAOm9hYIhcaWIbS4Mfxf3juDrMpiQJUc8Zs0TTLliXo1wgOdaqmqfaHsrSWvRU8gWzmrR0gwqxBySnfQHrgt7_aS8lIiu1yYnU06APwBYMcv6kFvmCR6w1H8100azBwocZ4ScXG6-NqPj8T13hkMZNn-1Noi4TCdXRfzIZZqsygShH_hQ50vnjGiNdjOkeE; expires=Wed, 25-Jun-2025 06:30:07 GMT; path=/; domain=.google.com; HttpOnly
 alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+```
 
+Each TLS 1.3 session needs 5 session secrets to decrypt traffic.
+
+```bash
 kong@72a118f01128:/usr/local/kong/lib$ cat /tmp/premaster.txt
 # SSL key logfile generated by sslkeylog.c
 SERVER_HANDSHAKE_TRAFFIC_SECRET 6755ae538171e4100113858b989890d9ddbbb80a5f71180f8c45c5d29220d538 bc84ec978a446acf0b0da5a674b236b75d73ba0bcb949ebb8c73edf127987b8fec8af48c24e4995485c4132ae865ad8e
@@ -182,7 +188,7 @@ Use Wireshark to decrypt and analyze the TLS traffic.
 
 ### Decrypt TLS 1.2 ###
 
-Each TLS 1.2 session just needs 1 secret to decrypt traffic.
+Decrypting TLS 1.2 traffic is almost the same as decrypting the traffic of TLS 1.3 traffic. I will skip the cpaturing and decrypting part in this sub-section.
 
 ```bash
 kong@72a118f01128:/usr/local/kong/lib$ :> /tmp/premaster.txt
@@ -202,19 +208,21 @@ cache-control: private
 set-cookie: AEC=AZ6Zc-XYq2E4RNGSN48i3AiXeBdwUJJsDimdVa_UQSnVCt2Rx6fqu1j1Lg; expires=Sun, 22-Jun-2025 06:35:02 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax
 set-cookie: NID=520=Vn8bZrsr2eiT_doMDp6KS8Jvo5lXFMX2z-acFRLxWxwYuGfnFWKwdmd8Y8eZV-kgphfnmPqVjW-0689KjGfUmcZVSHsuz-JMFKxN3CIbczHD2VIJqywOBeIZv3ef5IHr0MdcKNvJffcra9mp-X3QFolGZUylIbjkRybTgY14OIUVfZ2pr3tXSAKVKGk2OCE; expires=Wed, 25-Jun-2025 06:35:02 GMT; path=/; domain=.google.com; HttpOnly
 alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+```
 
+Pay attention that each TLS 1.2 session needs just 1 session secret to decrypt traffic.
+
+```bash
 kong@72a118f01128:/usr/local/kong/lib$ cat /tmp/premaster.txt
 # SSL key logfile generated by sslkeylog.c
 CLIENT_RANDOM 373ad1cfde82cc6ac98ed54f3b5dbfda9eabee9fe49886b1d3c040aa7bef7ddd 6f526e02d325fbaf0e5406ba6f644ba5c8d5a3c8d2fb534913ba47d9ed8f97f5fff36a058f7625cd974d3fea508d2d43
 ```
 
-I will skip the cpaturing and decrypting part in this sub-section.
-
 ## Decrypt Kong Traffic ##
 
-Similar to [Decrypt cURL traffic](#decrypt-curl-traffic), we need to do two things.
+Before, we start Kong, we need two special settings.
 
-1. [Import the environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) "SSLKEYLOGFILE" to Kong.
+1. Configure [the environment SSLKEYLOGFILE variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong.
 
    ```bash
    ~ $ export SSLKEYLOGFILE=/tmp/pre-mastersecret.txt
@@ -223,13 +231,13 @@ Similar to [Decrypt cURL traffic](#decrypt-curl-traffic), we need to do two thin
    ~ $ export KONG_NGINX_MAIN_ENV=SSLKEYLOGFILE
    ```
 
-2. Preload the built object "libsslkeylog.so" to Nginx.
+2. Preload the shared library "libsslkeylog.so" for Kong.
 
    ```bash
    ~ $ export LD_PRELOAD=/usr/local/kong/lib/libsslkeylog.so
    ```
 
-Create a Kong container in DB-less mode against the custom image.
+Now, create a Kong container in DB-less mode against the custom image.
 
 ```bash
 ~ $ docker run --rm \
@@ -248,18 +256,17 @@ kong-custom:3.9.0.0
 ~ $ docker ps -f 'name=sslkeylogfile'
 CONTAINER ID   IMAGE                 COMMAND                  CREATED              STATUS                        PORTS                                                            NAMES
 bcf77d685ed8   kong-custom:3.9.0.0   "/entrypoint.sh kong…"   About a minute ago   Up About a minute (healthy)   8002-8004/tcp, 0.0.0.0:8000-8001->8000-8001/tcp, 8443-8447/tcp   sslkeylogfile
-```
 
-Check if Kong correctly finds the environment variable.
-
-```bash
 ~ $ docker exec -it sslkeylogfile bash
 kong@57d808a5eb3f:/$ ps -eFH | grep [n]ginx
 kong         1     0  1 134701 98936  1 08:38 ?        00:00:01 nginx: master process /usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong -c nginx.conf
 kong      2549     1  1 669837 129140 2 08:38 ?        00:00:01   nginx: worker process
 ...
+```
 
+Check if Kong correctly finds the environment variable.
 
+```bash
 kong@57d808a5eb3f:/$ env | grep SSLKEYLOGFILE
 SSLKEYLOGFILE=/usr/local/kong/pre-mastersecret.txt
 
@@ -267,7 +274,7 @@ kong@57d808a5eb3f:/$ grep -F env /usr/local/kong/nginx.conf
 env SSLKEYLOGFILE;
 ```
 
-Check if Kong correctly preloads the built library.
+Check if Kong correctly preloads the shared library.
 
 ```bash
 kong@57d808a5eb3f:/$ ls -l /usr/local/kong/lib/libsslkeylog.so
@@ -278,7 +285,7 @@ nginx     1 kong  mem    REG              254,1             2635191 /usr/local/k
 nginx     1 kong  mem    REG              254,1             2642476 /usr/local/kong/lib/libsslkeylog.so (path dev=0,216)
 ```
 
-Load [the sample declarative config](https://gist.github.com/outsinre/bde97c641b1830bb2d4207176ab29969) to Kong.
+Load [the sample runtime declarative config](https://gist.github.com/outsinre/bde97c641b1830bb2d4207176ab29969) to Kong.
 
 ```bash
 ~ $ curl -sS localhost:8001/ | jq -r .configuration.database
@@ -291,7 +298,7 @@ off
 
 ### Decrypt TLS 1.3 ###
 
-The process is almost the same as that in [Decrypt TLS 1.3](#decrypt-tls-1.3).
+The process is almost the same as that in [Decrypt cURL TLS 1.3](#decrypt-tls-1.3).
 
 Start traffic capturing.
 
@@ -346,3 +353,8 @@ Successfully copied 4.61kB to /Users/zachary/misc/.
 Use Wireshark to decrypt and analyze the TLS traffic.
 
 ![kong-libsslkeylog-dsb.png](/assets/kong-libsslkeylog-dsb.png)
+
+# References #
+
+1. [Wireshark TLS](https://wiki.wireshark.org/TLS).
+2. [Extracting openssl pre-master secret from nginx](https://security.stackexchange.com/q/216065/248863).
