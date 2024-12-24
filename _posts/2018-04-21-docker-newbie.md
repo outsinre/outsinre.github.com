@@ -737,7 +737,7 @@ Just two lines! FROM imports the [base image](https://docs.docker.com/build/buil
 Now we build the image. Please refer to [Docker Build Overview](https://docs.docker.com/build/concepts/overview/) to check the difference between *docker buildx* and *docker build*. To put it simple, *docker build* is wrapper of *docker buildx* with default arguments.
 
 ```bash
-~ $ docker buildx build --no-cache --load -t nginx:v3 -t nginx -f Dockerfile .
+~ $ BUILDKIT_PROGRESS=plain docker buildx build --no-cache --load -t nginx:v3 -t nginx -f Dockerfile .
 #
 Sending build context to Docker daemon  2.048kB
 Step 1/2 : FROM nginx
