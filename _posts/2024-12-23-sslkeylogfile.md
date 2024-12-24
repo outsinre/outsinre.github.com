@@ -109,7 +109,7 @@ kong@72a118f01128:/usr/local/kong/lib$ chmod +x sslkeylog.sh
 
 As stated above, cURL native supports "SSLKEYLOGFILE", without the help of the newly built shared library "libsslkeylog.so". However, the shared library can also dump TLS (Pre)MasterSecret if it is [preloaded](https://github.com/Lekensteyn/wireshark-notes/blob/b166e14c2bf79f4a61cbcd01ca92a2c418ac9550/src/sslkeylog.sh#L62C12-L62C22) and "SSLKEYLOGFILE" is set. Hence, we use cURL to verify the shared library works as expected.
 
-### Decrypt TLS 1.3 ###
+### Decrypt cURL TLS 1.3 ###
 
 Start traffic capturing.
 
@@ -186,9 +186,9 @@ Use Wireshark to decrypt and analyze the TLS traffic.
 
 ![curl-libsslkeylog-dsb.png](/assets/curl-libsslkeylog-dsb.png)
 
-### Decrypt TLS 1.2 ###
+### Decrypt cURL TLS 1.2 ###
 
-Decrypting TLS 1.2 traffic is almost the same as decrypting the traffic of TLS 1.3 traffic. I will skip the cpaturing and decrypting part in this sub-section.
+Decrypting traffic of TLS 1.2 is almost the same as decrypting the traffic of TLS 1.3. I will leave this part to you.
 
 ```bash
 kong@72a118f01128:/usr/local/kong/lib$ :> /tmp/premaster.txt
@@ -296,9 +296,9 @@ off
 ~ $ curl -sS http://localhost:8001/config | jq -r .config
 ```
 
-### Decrypt TLS 1.3 ###
+### Decrypt Kong TLS 1.3 ###
 
-The process is almost the same as that in [Decrypt cURL TLS 1.3](#decrypt-tls-1.3).
+The process is almost the same as that in [Decrypt cURL TLS 1.3](#decrypt-curl-tls-1.3).
 
 Start traffic capturing.
 
