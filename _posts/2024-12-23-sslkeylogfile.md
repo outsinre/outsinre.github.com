@@ -241,6 +241,19 @@ Before, we start Kong, we need three special settings.
      SSLKEYLOGFILE: /usr/local/kong/pre-mastersecret.txt
    ```
 
+   If Kong is managed by systemd, then [insert](/2021/07/19/systemd/#systemd-drop-in) the the variable to "kong-enterprise-edition.service".
+
+   ```bash
+   ~ $ sudo systemctl edit kong-enterprise-edition.service
+   ### Editing /etc/systemd/system/kong-enterprise-edition.service.d/override.conf
+   ### Anything between here and the comment below will become the new contents of the file
+   ...
+   Environment=SSLKEYLOGFILE=/usr/local/kong/pre-mastersecret.txt
+   ...
+
+   ~ $ systemctl daemon-reload
+   ```
+
 2. Configure [the environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong.
 
    ```bash
@@ -252,7 +265,20 @@ Before, we start Kong, we need three special settings.
 
    ```yml
    env:
-     KONG_NGINX_MAIN_ENV: SSLKEYLOGFILE
+     nginx_main_env: SSLKEYLOGFILE
+   ```
+
+   If Kong is managed by systemd, then [insert](/2021/07/19/systemd/#systemd-drop-in) the the variable to "kong-enterprise-edition.service".
+
+   ```bash
+   ~ $ sudo systemctl edit kong-enterprise-edition.service
+   ### Editing /etc/systemd/system/kong-enterprise-edition.service.d/override.conf
+   ### Anything between here and the comment below will become the new contents of the file
+   ...
+   Environment=KONG_NGINX_MAIN_ENV=SSLKEYLOGFILE
+   ...
+
+   ~ $ systemctl daemon-reload
    ```
 
 3. Preload the shared library "libsslkeylog.so" for Kong.
@@ -276,6 +302,19 @@ Before, we start Kong, we need three special settings.
    ```yml
    customEnv:
      LD_PRELOAD: /usr/local/kong/lib/libsslkeylog.so
+   ```
+
+   If Kong is managed by systemd, then [insert](/2021/07/19/systemd/#systemd-drop-in) the the variable to "kong-enterprise-edition.service".
+
+   ```bash
+   ~ $ sudo systemctl edit kong-enterprise-edition.service
+   ### Editing /etc/systemd/system/kong-enterprise-edition.service.d/override.conf
+   ### Anything between here and the comment below will become the new contents of the file
+   ...
+   Environment=LD_PRELOAD=/usr/local/kong/lib/libsslkeylog.so
+   ...
+
+   ~ $ systemctl daemon-reload
    ```
 
 For a demostration purpose, I will deploy Kong in DB-less mode. Pay attention to the three special settings.
