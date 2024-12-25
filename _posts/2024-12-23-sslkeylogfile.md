@@ -228,6 +228,12 @@ Before, we start Kong, we need three special settings.
    ~ $ export SSLKEYLOGFILE=/usr/local/kong/pre-mastersecret.txt
    ```
 
+   As we `export`, it affects all child processes launched in this terminal. Avoid this by prepending the variable to "kong start".
+
+   ```bash
+   ~ $ env SSLKEYLOGFILE=/usr/local/kong/pre-mastersecret.txt kong start
+   ```
+
    If Kong is deployed with Helm Charts, set it in the Helm values.
 
    ```yml
@@ -253,6 +259,16 @@ Before, we start Kong, we need three special settings.
 
    ```bash
    ~ $ export LD_PRELOAD=/usr/local/kong/lib/libsslkeylog.so
+   ```
+
+   As we `export`, it affects all child processes launched in this terminal. Avoid this by prepending the variable to "kong start", or use the dynamic loader `ld.so` or `ld-linux.so` with the option `--preload` against "nginx".
+
+   ```bash
+   ~ $ LD_DEBUG="all,unused,statistics" LD_PRELOAD=/usr/local/kong/lib/libsslkeylog.so \
+   kong start
+
+   ~ $ LD_DEBUG="all,unused,statistics" ld.so --preload "/usr/local/kong/lib/libsslkeylog.so" \
+   /usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong/ -c nginx.conf
    ```
 
    If Kong is deployed with Helm Charts, do it in the Helm values.
