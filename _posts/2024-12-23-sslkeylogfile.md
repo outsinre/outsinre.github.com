@@ -228,11 +228,25 @@ Before, we start Kong, we need three special settings.
    ~ $ export SSLKEYLOGFILE=/usr/local/kong/pre-mastersecret.txt
    ```
 
+   If Kong is deployed with Helm Charts, set it in the Helm values.
+
+   ```yml
+   customEnv:
+     SSLKEYLOGFILE: /usr/local/kong/pre-mastersecret.txt
+   ```
+
 2. Configure [the environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong.
 
    ```bash
    # Insert 'env SSLKEYLOGFILE;' into 'nginx.conf'
    ~ $ export KONG_NGINX_MAIN_ENV=SSLKEYLOGFILE
+   ```
+
+   If Kong is deployed with Helm Charts, configure it in the Helm values.
+
+   ```yml
+   env:
+     KONG_NGINX_MAIN_ENV: SSLKEYLOGFILE
    ```
 
 3. Preload the shared library "libsslkeylog.so" for Kong.
@@ -241,7 +255,14 @@ Before, we start Kong, we need three special settings.
    ~ $ export LD_PRELOAD=/usr/local/kong/lib/libsslkeylog.so
    ```
 
-Let's start Kong in DB-less mode as an example.
+   If Kong is deployed with Helm Charts, do it in the Helm values.
+
+   ```yml
+   customEnv:
+     LD_PRELOAD: /usr/local/kong/lib/libsslkeylog.so
+   ```
+
+For a demostration purpose, I will deploy Kong in DB-less mode. Pay attention to the three special settings.
 
 ```bash
 ~ $ docker run --rm \
