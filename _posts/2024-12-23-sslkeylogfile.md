@@ -317,7 +317,7 @@ Before, we start Kong, we need three special settings.
    ~ $ systemctl daemon-reload
    ```
 
-### Start Kong ###
+### Create Kong Container ###
 
 For a demostration purpose, I will start Kong in DB-less mode. Pay attention to the three special settings.
 
