@@ -317,6 +317,8 @@ Before, we start Kong, we need three special settings.
    ~ $ systemctl daemon-reload
    ```
 
+### Start Kong ###
+
 For a demostration purpose, I will start Kong in DB-less mode. Pay attention to the three special settings.
 
 ```bash
@@ -367,6 +369,10 @@ nginx      1 kong  mem       REG              254,1             2635191 /usr/loc
 nginx      1 kong  mem       REG              254,1             2642476 /usr/local/kong/lib/libsslkeylog.so (path dev=0,216)
 nginx   2550 kong  mem       REG              254,1             2635191 /usr/local/kong/lib/libssl.so.3 (path dev=0,216)
 nginx   2550 kong  mem       REG              254,1             2642476 /usr/local/kong/lib/libsslkeylog.so (path dev=0,216)
+
+# even affect "ls" as the variable LD_PRELOAD is exported
+kong@3ce3b73ed92d:/$ ldd /usr/bin/ls | grep ssl
+  /usr/local/kong/lib/libsslkeylog.so (0x0000ffffa1420000)
 ```
 
 Load [the sample runtime declarative config](https://gist.github.com/outsinre/bde97c641b1830bb2d4207176ab29969) to Kong.
