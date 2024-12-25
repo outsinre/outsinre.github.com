@@ -254,7 +254,7 @@ Before, we start Kong, we need three special settings.
    ~ $ systemctl daemon-reload
    ```
 
-2. Configure [the environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong.
+2. Configure the [environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong. This is a must as Nginx removes all environment variables inherited from its parent process except the "TZ" variable.
 
    ```bash
    # Insert 'env SSLKEYLOGFILE;' into 'nginx.conf'
@@ -317,7 +317,7 @@ Before, we start Kong, we need three special settings.
    ~ $ systemctl daemon-reload
    ```
 
-For a demostration purpose, I will deploy Kong in DB-less mode. Pay attention to the three special settings.
+For a demostration purpose, I will start Kong in DB-less mode. Pay attention to the three special settings.
 
 ```bash
 ~ $ docker run --rm \
@@ -344,11 +344,13 @@ kong      2549     1  1 669837 129140 2 08:38 ?        00:00:01   nginx: worker 
 ...
 ```
 
-Check if Kong correctly finds the environment variable.
+Check if the three special settings are correctly configured.
 
 ```bash
-kong@57d808a5eb3f:/$ env | grep SSLKEYLOGFILE
+kong@3ce3b73ed92d:/$ env | grep 'SSLKEYLOGFILE\|KONG_NGINX_MAIN_ENV\|LD_PRELOAD'
 SSLKEYLOGFILE=/usr/local/kong/pre-mastersecret.txt
+KONG_NGINX_MAIN_ENV=SSLKEYLOGFILE
+LD_PRELOAD=/usr/local/kong/lib/libsslkeylog.so
 
 kong@57d808a5eb3f:/$ grep -F env /usr/local/kong/nginx.conf
 env SSLKEYLOGFILE;
@@ -360,9 +362,11 @@ Check if Kong correctly preloads the shared library.
 kong@57d808a5eb3f:/$ ls -l /usr/local/kong/lib/libsslkeylog.so
 -rwxr-xr-x 1 root root 71736 Dec 24 03:25 /usr/local/kong/lib/libsslkeylog.so
 
-kong@57d808a5eb3f:/$ lsof -nP -a -p 1 | grep ssl
-nginx     1 kong  mem    REG              254,1             2635191 /usr/local/kong/lib/libssl.so.3 (path dev=0,216)
-nginx     1 kong  mem    REG              254,1             2642476 /usr/local/kong/lib/libsslkeylog.so (path dev=0,216)
+kong@3ce3b73ed92d:/$ lsof -nP -a -p 1,2550 | grep ssl
+nginx      1 kong  mem       REG              254,1             2635191 /usr/local/kong/lib/libssl.so.3 (path dev=0,216)
+nginx      1 kong  mem       REG              254,1             2642476 /usr/local/kong/lib/libsslkeylog.so (path dev=0,216)
+nginx   2550 kong  mem       REG              254,1             2635191 /usr/local/kong/lib/libssl.so.3 (path dev=0,216)
+nginx   2550 kong  mem       REG              254,1             2642476 /usr/local/kong/lib/libsslkeylog.so (path dev=0,216)
 ```
 
 Load [the sample runtime declarative config](https://gist.github.com/outsinre/bde97c641b1830bb2d4207176ab29969) to Kong.
