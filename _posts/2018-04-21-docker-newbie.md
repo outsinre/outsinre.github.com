@@ -6,40 +6,155 @@ title: Docker Newbie
 1. toc
 {:toc}
 
-# ABCs #
+# Architecture #
 
-1. Application layer isolation.
+In general, [Docker works client-server mode](https://docs.docker.com/get-started/docker-overview/#docker-architecture).
 
-   It is not and lighter than virtual machine. Docker just provides application dependencies while VM virtualizes everything including hardware and OS.
-2. Dockers comprises *image*, *container* and *registry*.
-   1. Image is *static* and *readonly* like a minimal root filesystem, a daemon etc. There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (like Gentoo stage tarball).
+![docker-architecture.png](../assets/docker-architecture.png)
 
-      An image consists of multiple filesystem layers. We can define an image by [Dockerfile](#docker-build-dockerfile).
-   2. Container is created on top of an image with the topmost filesystem layer storing *running* data. Processes within different containers are isolated - namespace.
+1. [Docker Engine](#docker-engine), also called Docker Daemon, is the *dockerd* that manages the images, containers, volumes, network, etc.
 
-      We can think of image and container as class and object in Object-oriented programming. 
-   3. Registry is *store* where users publicize, share and download *repostitory*. The default registry is *docker.io* or *registry-1.docker.io* with a frontend website [Docker Hub](https://hub.docker.com).
-   
-      Repository, on the other hand, actually refers to *name* of an image (e.g. *ubuntu*). We can specify *version* of a repository by a *tag* (label) like *ubuntu:16.04* (colon separator). The default tag is *latest*.
-3. [Naming of an image](https://docs.docker.com/reference/cli/docker/image/tag/#description)
+   The daemon serves requests by REST API over local Unix socket or over network interface.
+2. Docker Client (cli) are *docker*, *docker-compose*, etc.
 
-   ```
-   registry.fqdn[:port]/[namespace/]repository[:tag | @<image-ID>]
-   ```
+   CLI options and arguments are consolidated and transformed to REST API.
 
-   1. Default registry can be ommitted. Others like `quay.io` must be provided.
-   2. The *namespace* part means a registered account in the registry. It can be an individual user name or an organization name like "kong".
-   3. *repository* is the default *name* of an image like "ubuntu" and "kong-gateway".
-   4. *tag* is a string. Default to *latest*.
-   5. *image id* comprises a SHA256 *digest* like *@sha256:abea36737d98dea6109e1e292e0b9e443f59864b*.
-   
-   Specifying an image by tag can always gets the latest updates. For example, every time a patch release is released (e.g. *kong/kong:3.4.5*), *kong/kong:3.4* refers to that patch version `3.4.5` with a different digest. On the other hand, an image specified by digest always is pinned to that specific image. See [Pin actions to a full length commit SHA for security concerns](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions).
-4. C/S mode.
-   1. Client: user command line (i.e. *docker image ls*)
-   2. Server: local/remote [docker-engine](#daemon) (i.e. *systemctl start docker*).
-5. [Layer storage](https://docs.docker.com/storage/storagedriver/) uses Union FS (recall that Live CD on USB stick requires Union FS). Only the topmost (container storage layer) is writable, but volatile.
+## Docker Engine ##
 
-   Of the Union FS, *overlay2* is recommended over *aufs*. Either enable *overlay2* in kernel or build external module. *devicemapper* is also used in CentOS/RHEL. Pay attention to [CentOS/RHEL 的用户需要注意的事项](https://yeasy.gitbooks.io/docker_practice/content/image/rm.html#centosrhel-%E7%9A%84%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9) if *devicemapper* driver *loop-lvm* mode is used.
+"Docker Engine" and "Docker" are sometimes used interchangeably. Most of the time, it is merely the daemon part. But occasionally, it may refer to the collection of Docker daemon, the Docker REST API and the Docker client. In this section, we focus on the daemon.
+
+Docker Engine relies on Linux kernel under the hood, like the [namespace](https://man7.org/linux/man-pages/man7/namespaces.7.html) (containers isolation), [cgroup](https://man7.org/linux/man-pages/man7/cgroups.7.html) (resources management), libraries, etc.
+
+At the very beginning, Docker Engine is an integrated piece of daemon including all capabilities to manage containers, images, volumes, network, etc.
+
+```
++--------------+            +-----------------+        +----------+   
+|              | REST API   |  Docker Engine  |        |+----------+  
+|  docker CLI  +----------->|                 +------->+|+----------+ 
+|              |            |     dockerd     |         +|+----------+
++--------------+            +-----------------+          +|container+|
+                                                          +----------+
+```
+
+Later on (2017), in order to expand its adoption and add neutrality and modularity, the core capabilities are donated to CNCF as [containerd/](https://www.docker.com/blog/containerd-vs-docker/). The Docker Engine only focuses on developer experience like login/build/inspect/log.
+
+```
+                                                       +--------------+
++--------------+            +-----------------+        |              |       +----------+
+|              | REST API   |  Docker Engine  |  gRPC  | containerd   |       |+----------+
+|  docker CLI  +----------->|                 +------->|     +------+ +------>+|+----------+ 
+|              |            |     dockerd     |        |     | runc | |        +|+----------+
++--------------+            +-----------------+        |     +------+ |         +|container+|
+                                                       +--------------+          +----------+
+```
+
+In the meantime, the [Open Container Initiative (OCI)](https://opencontainers.org/) standardizes the *containerd*. According to the standard, the responsibility of creating containers was removed from *containerd* in faviour of *runtime* (e.g. *runc*). The interaction with Linux namespace and Linux cgroup has shifted from *containerd* to *runtime*. We call *containerd* the high-level runtime, managing container lifecycle, images, volumes, network, etc.
+
+```
+                                                       +--------------+
++--------------+            +-----------------+        |              |       +----------+
+|              | REST API   |  Docker Engine  |  gRPC  | containerd   |       |+----------+
+|  docker CLI  +----------->|                 +------->|     +------+ +------>+|+----------+ 
+|              |            |     dockerd     |        |     | runc | |        +|+----------+
++--------------+            +-----------------+        |     +------+ |         +|container+|
+                                                       +--------------+          +----------+
+```
+
+With OCI, everyone can build his own containerization system. Nowadays, there exist [multiple OCI runtimes](https://docs.docker.com/engine/daemon/alternative-runtimes/). In order to support those runtimes, Docker inserts a new component between *containerd* and *runtime*, namely the [containerd-shim](https://docs.docker.com/engine/daemon/alternative-runtimes/). The *containerd-shim* invokes the *runtime* to create the container. Once the container is created, the *runtime* exits and the lifecycle management is handed over to *containerd* and *container-shim*.
+
+```
+                                                                                                   container lifecycle
+                                                                                   +--------------------------------------------+
+                                                                                   |                                            v
+                                                                                   |                   +---------------+   +---------+
+                                                                                   |                   | runtime youki +-->|container|
+                                                                                   |                   |     exit      |   +---------+
+                                                                                   |                   +---------------+
+                                                                                   v                      ^
++--------------+            +-----------------+        +--------------+    +-----------------+            |
+|              |  REST API  |  Docker Engine  |  gRPC  |  High-level  |    |                 |   image    |
+|  docker CLI  +----------->|                 +------->|   runtime    +--->| containerd-shim +------------+
+|              |            |     dockerd     |        |  containerd  |    |                 |   bundle   |
++--------------+            +-----------------+        +--------------+    +-----------------+            |
+                                                                                   ^                      v
+                                                                                   |                   +--------------+    +---------+
+                                                                                   |                   | runtime runc +--->|container|
+                                                                                   |                   |     exit     |    +---------+
+                                                                                   |                   +--------------+         ^
+                                                                                   |                                            |
+                                                                                   +--------------------------------------------+
+                                                                                                   container lifecycle
+```
+
+More and more middle layers are added to the architecture, making it too complicated. [podman](https://podman.io/) is much more simpler as follows. There is no *dockerd*, *conainerd* or *container-shim*.
+
+```
+podman CLI -> runtime runc -> containers
+```
+
+You are strongly recommended to read <https://stackoverflow.com/q/46649592/2336707>. The following output is a demonstration in my dev environment. Two containers were created and they are the child processes of the `containerd-shim-runc-v2`.
+
+```bash
+ubuntu@ip-172-31-9-194:~/misc$ docker run --name httpbin -P -d kennethreitz/httpbin
+4bd1077052750a2a7552e4347bcbba483d47f2555b89874606c0b04b93f7c2dc
+
+ubuntu@ip-172-31-9-194:~/misc$ docker run --rm -itd ubuntu
+18be920d5a998ceee5f438ae43c7d1171fec6d34d4742c66611ff7a63f9d6a68
+
+ubuntu@ip-172-31-9-194:~/misc$ docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+a598c760b207   ubuntu                 "/bin/bash"              29 minutes ago   Up 29 minutes                                               ubuntu
+4bd107705275   kennethreitz/httpbin   "gunicorn -b 0.0.0.0…"   48 minutes ago   Up 48 minutes   0.0.0.0:32768->80/tcp, [::]:32768->80/tcp   httpbin
+
+ubuntu@ip-172-31-9-194:~/misc$ ps  -eF --forest
+# dockerd
+root         530       1  0 570701 82248  3 Dec23 ?        00:00:29 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+root       15033     530  0 436282 3968   0 Dec27 ?        00:00:00  \_ /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 32768 -container-ip 172.17.0.2 -container-port 80
+root       15040     530  0 399416 3840   0 Dec27 ?        00:00:00  \_ /usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 32768 -container-ip 172.17.0.2 -container-port 80
+# containerd
+root         357       1  0 468968 48524  3 Dec23 ?        00:02:22 /usr/bin/containerd
+# container httpbin
+root       15063       1  0 309542 13748  0 Dec27 ?        00:00:04 /usr/bin/containerd-shim-runc-v2 -namespace moby -id 4bd1077052750a2a7552e4347bcbba483d47f2555b89874606c0b04b93f7c2dc -address /run/containerd/containerd.sock
+root       15083   15063  0 21495 24480   0 Dec27 ?        00:00:05  \_ /usr/bin/python3 /usr/local/bin/gunicorn -b 0.0.0.0:80 httpbin:app -k gevent
+root       15109   15083  0 32493 33912   3 Dec27 ?        00:00:08      \_ /usr/bin/python3 /usr/local/bin/gunicorn -b 0.0.0.0:80 httpbin:app -k gevent
+# container ubuntu
+root       15363       1  0 309542 13780  3 Dec27 ?        00:00:04 /usr/bin/containerd-shim-runc-v2 -namespace moby -id a598c760b2071f4951d35d255d3669ce3e9877534b36efcd21e2dfcb8727b136 -address /run/containerd/containerd.sock
+root       15383   15363  0  1147  3840   2 Dec27 pts/0    00:00:00  \_ /bin/bash
+```
+
+### Docker Desktop ###
+
+As Docker Engine, containerd, shim, runtime all depend on Linux kernel, a Linux virtual machine is required to use Docker and run containers on Window and macOS. The Docker Engine, containerd, runtime and Docker objects (e.g. images) all reside in the Linux virtual machine. The Docker CLI remains on the host.
+
+As such, Docker provides the Docker Desktop. Docker Desktop is an [all-in-one](https://docs.docker.com/desktop/) (including GUI) software and gives us a uniform expiernce accross Linux, Window and macOS. Especially, Docker Desktop creates the Linux virtual machine for us, so that we are not bothered on this. On Window and macOS, Docker Desktop utilizes native virtualization framework (Hyper-V and WSL 2 of Windows; Hypervisor of macOS) to boost performance. On Linux system, Docker Desktop is not a must. However, if we choose it, the Virtual Machine is still created.
+
+# Image Container and Registry #
+
+Dockers comprises *image*, *container* and *registry*.
+
+1. Image is *static*, *readonly* and a *minimal* root filesystem [bundle](#share-image). There are many highly qualified base iamge from official registry like *nginx*, *redis*, *php*, *python*, *ruby* etc. Especially, we have *ubuntu*, *centos*, etc. that are just OS minimal bare bones (like Gentoo stage tarball).
+
+   An image consists of multiple incremental layers that are defined by a [Dockerfile](#docker-build-dockerfile). Correspondingly, we call the image storage [layer storage](https://docs.docker.com/storage/storagedriver/) based on Union Filesytem (FS). Recall that booting USB stick also uses Union FS. The most adopted Union FS are *overlay2*.
+2. Container is a set of processes with added isolation (Linux namespace) and resource management (Linux cgroup).
+
+   It is created on top of a base image with an additional layer storing *running* but volatile data. We can think of image and container as class and object in Object-oriented programming. 
+3. Registry is *store* where users publicize, share and download *repostitory*. The default registry is *docker.io* or *registry-1.docker.io* with a frontend website [Docker Hub](https://hub.docker.com).
+
+   Repository, on the other hand, actually refers to *name* of an image (e.g. *ubuntu*). We can specify *version* of a repository by a *tag* (label) like *ubuntu:16.04* (colon separator). The default tag is *latest*.
+
+The [naming of an image](https://docs.docker.com/reference/cli/docker/image/tag/#description) follows the format as follows.
+
+```
+registry.fqdn[:port]/[namespace/]repository[:tag | @<image-ID>]
+```
+
+1. Default registry can be ommitted. Others like `quay.io` must be provided.
+2. The *namespace* part means a registered account in the registry. It can be an individual user name or an organization name like "kong".
+3. *repository* is the default *name* of an image like "ubuntu" and "kong-gateway".
+4. *tag* is a string. Default to *latest*.
+5. *image id* comprises a SHA256 *digest* like *@sha256:abea36737d98dea6109e1e292e0b9e443f59864b*.
+
+Specifying an image by tag can always gets the latest updates. For example, every time a patch release is released (e.g. *kong/kong:3.4.5*), *kong/kong:3.4* refers to that patch version `3.4.5` with a different digest. On the other hand, an image specified by digest always is pinned to that specific image. See [Pin actions to a full length commit SHA for security concerns](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions).
 
 # Installation #
 
@@ -82,7 +197,7 @@ Install Docker Compose manually:
 ~ $ docker-compose version
 ```
 
-# Daemon #
+# Start Daemon #
 
 Start Docker:
 
@@ -146,7 +261,8 @@ However, mounting *docker.sock* would make your host [vulnerable to attack](http
 # CLI Sample #
 
 ```bash
-~ $ fgrep -qa docker /proc/1/cgroup; echo $?                    # check if it is a docker
+~ $ fgrep -qa docker /proc/1/cgroup; echo $?                    # check if it is within a docker or on the host
+
 ~ $ docker info                                                 # display the outline of docker environment
 ~ $ docker image/container ls [-a]                              # list images/containers
 ~ $ docker [image] history                                      # show layers of an image
@@ -291,6 +407,10 @@ Here is a note about the different options:
 ![docker run](/assets/docker-run-adit.jpg)
 
 Please also follow this post [Cannot pipe to docker run with stdin attached](https://stackoverflow.com/q/71761103/2336707).
+
+# Runtime metrics #
+
+Please see <https://docs.docker.com/engine/containers/runmetrics/>.
 
 # Data Share #
 

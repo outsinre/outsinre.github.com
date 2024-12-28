@@ -254,11 +254,12 @@ Before, we start Kong, we need three special settings.
    ~ $ systemctl daemon-reload
    ```
 
-2. Configure the [environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) for Kong. This is a must as Nginx removes all environment variables inherited from its parent process except the "TZ" variable.
+2. Let Kong [inherit the environment variable](http://nginx.org/en/docs/ngx_core_module.html#env) by inserting `env SSLKEYLOGFILE;` into "nginx.conf". It is a must as Nginx removes all environment variables inherited from its parent process except the "TZ" variable.
 
    ```bash
-   # Insert 'env SSLKEYLOGFILE;' into 'nginx.conf'
    ~ $ export KONG_NGINX_MAIN_ENV=SSLKEYLOGFILE
+   # -or-
+   ~ $ env KONG_NGINX_MAIN_ENV=SSLKEYLOGFILE kong start
    ```
 
    If Kong is deployed with Helm Charts, configure it in the Helm values.
