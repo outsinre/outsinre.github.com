@@ -10,7 +10,7 @@ title: Docker Newbie
 
 In general, [Docker works client-server mode](https://docs.docker.com/get-started/docker-overview/#docker-architecture).
 
-![docker-architecture.png](../assets/docker-architecture.png)
+![docker-architecture.png](/assets/docker-architecture.png)
 
 1. [Docker Engine](#docker-engine), also called Docker Daemon, is the *dockerd* that manages the images, containers, volumes, network, etc.
 
