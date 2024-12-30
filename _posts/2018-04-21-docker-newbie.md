@@ -14,10 +14,10 @@ In general, [Docker works in client-server mode](https://docs.docker.com/get-sta
 
 1. Server-side [Docker Engine](#docker-engine), also called Docker Daemon, is the *dockerd* that manages the containers, images, volumes, networks, etc.
 
-   The daemon serves requests by REST API over [local Unix socket](#dockersock) or over network interface.
+   The daemon serves requests by RESTful API [over local Unix socket or over remote network interface](https://docs.docker.com/engine/daemon/remote-access/).
 2. Client-sdie Docker CLI are *docker*, *docker-compose*, etc.
 
-   CLI options and arguments are consolidated and transformed to REST API.
+   CLI options and arguments are consolidated and transformed to REST API. If we know the API spec, we can even [use curl to manage Docker objects](#dockersock).
 
 The term "Docker" most of the time means the overall architecture.
 
@@ -132,7 +132,11 @@ root       15383   15363  0  1147  3840   2 Dec27 pts/0    00:00:00  \_ /bin/bas
 
 In order to run containers on Window and macOS, a Linux virtual machine is required to host *dockerd*, *containerd*, *containerd-shim*, *runtime*, etc. The Docker CLI remains on the host.
 
-As such, Docker provides the Docker Desktop. Docker Desktop is an [all-in-one](https://docs.docker.com/desktop/) (including GUI) software and gives us a uniform expiernce accross Linux, Window and macOS. Especially, Docker Desktop creates the Linux virtual machine for us, so that we are not bothered on this. On Window and macOS, Docker Desktop utilizes native virtualization framework (Hyper-V and WSL 2 of Windows; Hypervisor of macOS) to boost performance. On Linux system, Docker Desktop is not a must. However, if we choose it, the Virtual Machine is still created.
+As such, Docker provides the Docker Desktop. Docker Desktop is an [all-in-one](https://docs.docker.com/desktop/) (including GUI) software and gives us a uniform expiernce accross Linux, Window and macOS.
+
+![docker-desktop.png](/assets/docker-desktop.png)
+
+Especially, Docker Desktop creates the Linux virtual machine for us, so that we are not bothered on this. On Window and macOS, Docker Desktop utilizes native virtualization framework (Hyper-V and WSL 2 of Windows; Hypervisor of macOS) to boost performance. On Linux system, Docker Desktop is not a must. However, if we choose it, the Virtual Machine is still created.
 
 # Image Container and Registry #
 
@@ -205,7 +209,7 @@ Install Docker Compose manually:
 
 # Start Daemon #
 
-Start Docker:
+Start Docker.
 
 ```bash
 ~ $ sudo systemctl enable docker
@@ -217,7 +221,12 @@ Start Docker:
 ~ $ docker compose ls
 ```
 
-The daemon manages everything!
+All data is located in the `/var/lib/docker` directory.
+
+```bash
+ubuntu@ip-172-31-9-194:~/misc$ sudo -E PATH=$PATH ls /var/lib/docker/
+buildkit  containers  engine-id  image  network  overlay2  plugins  runtimes  swarm  tmp  volumes
+```
 
 ## docker.sock ##
 
@@ -264,6 +273,34 @@ f3f0faf83ac5   docker/getting-started   "/docker-entrypoint.…"   14 months ago
 
 However, mounting *docker.sock* would make your host [vulnerable to attack](https://dev.to/pbnj/docker-security-best-practices-45ih#docker-engine) as Docker daemon within the container is ran as *root*.
 
+# Docker Context #
+
+Recall that Docker works [in client-server mode](#architecture), where the client connects to the server via RESTful API. As a developer, it is not unusual that we have different environment of different purposes such as development environment, staging environment, buildx environment, production environment, etc.
+
+For a single *docker* CLI to communicate with different Docker Engines, we have [Docker Context](https://docs.docker.com/engine/manage-resources/contexts/). A context is a profile recording the information of a Docker Engine like the IP address. To swtich between Docker Engines, just use *docker context* CLI.
+
+By default, only the local Unix socket is enabled. The example below enables IP socket listening and only binds to localhost for [security concern](https://docs.docker.com/engine/security/protect-access/).
+
+```bash
+~ $ sudo systemctl editedit docker.service
+# /etc/systemd/system/docker.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://127.0.0.1:2375 --containerd=/run/containerd/containerd.sock
+
+~ $ sudo systemctl daemon-reload
+
+~ $ sudo systemctl restart docker
+
+~ $ ps -eFH | grep [d]ockerd
+root       24927       1  0 552268 77412  3 07:29 ?        00:00:00   /usr/bin/dockerd -H fd:// -H tcp://127.0.0.1:2375 --containerd=/run/containerd/containerd.sock
+
+~ $ curl -sS http://localhost:2375/containers/json | jq -r '.[].Names'
+[
+  "/httpbin"
+]
+```
+
 # CLI Sample #
 
 ```bash
@@ -278,7 +315,7 @@ However, mounting *docker.sock* would make your host [vulnerable to attack](http
 
 Here is the full list of docker CLI: [Docker CLI](https://docs.docker.com/engine/reference/commandline/docker/).
 
-# Pull Images #
+# Pull Image #
 
 It is highly recommended to *pull* the [docker/getting-started](https://hub.docker.com/r/docker/getting-started) image, *run* and visit `http://localhost`.
 
