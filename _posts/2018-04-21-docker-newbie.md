@@ -98,6 +98,8 @@ More and more middle layers are added to the architecture, making it too complic
 podman CLI -> runtime runc -> containers
 ```
 
+We can actually create and run containers directly with *runtime runc*. It is out of the scope of this post, please read [official runc page](https://github.com/opencontainers/runc).
+
 You are strongly recommended to read <https://stackoverflow.com/q/46649592/2336707>. The following output is a demonstration in my dev environment. Two containers were created and they are the child processes of the `containerd-shim-runc-v2`.
 
 ```bash
@@ -342,7 +344,9 @@ It is highly recommended to *pull* the [docker/getting-started](https://hub.dock
 
 # Launch Containers #
 
-Syntax:
+*docker run* equals *docker create* plus *docker start*. Usually, we just *docker run*.
+
+Syntax.
 
 ```
 docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
@@ -1038,7 +1042,7 @@ If the imange is multi-platform (e.g. AMD64 and ARM64) capable, we have to repea
 ~ $ regctl image copy kong/kong-gateway:3.4.1.0-ubuntu kong/kong-gateway:latest-ubuntu
 ```
 
-Apart from pushing a personal account, we can [share Docker images via a tar file](https://gist.github.com/outsinre/d2b58b289425fbdd2d0f0294f3fdf0c9).
+Apart from pushing to a registry, we can just [share the image bundle](https://gist.github.com/outsinre/d2b58b289425fbdd2d0f0294f3fdf0c9).
 
 ```bash
 ~ $ docker images 'kong-wp'
@@ -1051,6 +1055,8 @@ Apart from pushing a personal account, we can [share Docker images via a tar fil
 
 ~ $ docker image load -i kong-wp-3501.tar
 ```
+
+Pay attention that image bundle is different from the [OCI container bundle](https://github.com/opencontainers/runtime-spec/blob/v1.2.0/bundle.md). See [What is the difference between save and export in Docker?](https://stackoverflow.com/q/22655867/2336707).
 
 # Docker Compose #
 
