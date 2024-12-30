@@ -8,24 +8,26 @@ title: Docker Newbie
 
 # Architecture #
 
-In general, [Docker works client-server mode](https://docs.docker.com/get-started/docker-overview/#docker-architecture).
+In general, [Docker works in client-server mode](https://docs.docker.com/get-started/docker-overview/#docker-architecture) illustrated in the figure below.
 
 ![docker-architecture.png](/assets/docker-architecture.png)
 
-1. [Docker Engine](#docker-engine), also called Docker Daemon, is the *dockerd* that manages the images, containers, volumes, network, etc.
+1. Server-side [Docker Engine](#docker-engine), also called Docker Daemon, is the *dockerd* that manages the containers, images, volumes, networks, etc.
 
-   The daemon serves requests by REST API over local Unix socket or over network interface.
-2. Docker Client (cli) are *docker*, *docker-compose*, etc.
+   The daemon serves requests by REST API over [local Unix socket](#dockersock) or over network interface.
+2. Client-sdie Docker CLI are *docker*, *docker-compose*, etc.
 
    CLI options and arguments are consolidated and transformed to REST API.
 
+The term "Docker" most of the time means the overall architecture.
+
 ## Docker Engine ##
 
-"Docker Engine" and "Docker" are sometimes used interchangeably. Most of the time, it is merely the daemon part. But occasionally, it may refer to the collection of Docker daemon, the Docker REST API and the Docker client. In this section, we focus on the daemon.
+Most of the time, Docker Daemon is merely the daemon part. But occasionally, it may refer to the collection of Docker daemon, the Docker REST API and the Docker client. In this section, we focus on the daemon.
 
-Docker Engine relies on Linux kernel under the hood, like the [namespace](https://man7.org/linux/man-pages/man7/namespaces.7.html) (containers isolation), [cgroup](https://man7.org/linux/man-pages/man7/cgroups.7.html) (resources management), libraries, etc.
+Docker Engine relies on Linux kernel under the hood, like the [namespace](https://man7.org/linux/man-pages/man7/namespaces.7.html) (containers isolation), [cgroup](https://man7.org/linux/man-pages/man7/cgroups.7.html) (resources management), libraries, etc. So, by "container", we actually mean "Linux container". But for convenience, we just call it "container".
 
-At the very beginning, Docker Engine is an integrated piece of daemon including all capabilities to manage containers, images, volumes, network, etc.
+At the very beginning, Docker Engine is an integrated piece of daemon including all capabilities to manage containers, images, volumes, networks, etc.
 
 ```
 +--------------+            +-----------------+        +----------+   
@@ -36,7 +38,7 @@ At the very beginning, Docker Engine is an integrated piece of daemon including 
                                                           +----------+
 ```
 
-Later on (2017), in order to expand its adoption and add neutrality and modularity, the core capabilities are donated to CNCF as [containerd/](https://www.docker.com/blog/containerd-vs-docker/). The Docker Engine only focuses on developer experience like login/build/inspect/log.
+Later on (2017), in order to expand its adoption and add neutrality and modularity, the core capabilities are donated to CNCF as a seperate daemon [containerd](https://www.docker.com/blog/containerd-vs-docker/) (i.e. *docker-containerd*). The Docker Engine only focuses on developer experience like serving login, build, inspect, log, etc. 
 
 ```
                                                        +--------------+
@@ -60,7 +62,9 @@ In the meantime, the [Open Container Initiative (OCI)](https://opencontainers.or
                                                        +--------------+          +----------+
 ```
 
-With OCI, everyone can build his own containerization system. Nowadays, there exist [multiple OCI runtimes](https://docs.docker.com/engine/daemon/alternative-runtimes/). In order to support those runtimes, Docker inserts a new component between *containerd* and *runtime*, namely the [containerd-shim](https://docs.docker.com/engine/daemon/alternative-runtimes/). The *containerd-shim* invokes the *runtime* to create the container. Once the container is created, the *runtime* exits and the lifecycle management is handed over to *containerd* and *container-shim*.
+With OCI, everyone can build his own containerization system. Nowadays, there exist [multiple OCI runtimes](https://docs.docker.com/engine/daemon/alternative-runtimes/). In order to support those runtimes, Docker inserts a new component between *containerd* and *runtime*, namely the [containerd-shim](https://docs.docker.com/engine/daemon/alternative-runtimes/) (e.g. *docker-containerd-shim*). The *containerd-shim* invokes the *runtime* (e.g. *runc*) to create the container. Once the container is created, the *runtime* exits and the lifecycle management is handed over to *containerd* and *container-shim*.
+
+Some of the runtimes are fully compatibile with *docker-containerd-shim* like the [youki](https://github.com/youki-dev/youki), while others are not like the [Wasmtime](https://wasmtime.dev/). Runtimes compatibile with *docker-containerd-shim* can be a drop-in replacement for *runc*. Runtimes incompatibile with *docker-containerd-shim* must implements their own *shim* according to [shim API](https://github.com/containerd/containerd/blob/main/core/runtime/v2/README.md).
 
 ```
                                                                                                    container lifecycle
@@ -68,25 +72,27 @@ With OCI, everyone can build his own containerization system. Nowadays, there ex
                                                                                    |                                            v
                                                                                    |                   +---------------+   +---------+
                                                                                    |                   | runtime youki +-->|container|
-                                                                                   |                   |     exit      |   +---------+
+                                                                                   |                   |    (exit)     |   +---------+
                                                                                    |                   +---------------+
                                                                                    v                      ^
 +--------------+            +-----------------+        +--------------+    +-----------------+            |
-|              |  REST API  |  Docker Engine  |  gRPC  |  High-level  |    |                 |   image    |
-|  docker CLI  +----------->|                 +------->|   runtime    +--->| containerd-shim +------------+
-|              |            |     dockerd     |        |  containerd  |    |                 |   bundle   |
+|              |  REST API  |  Docker Engine  |  gRPC  |  High-level  |    |                 |   image    |                     .
+|  docker CLI  +----------->|                 +------->|   runtime    +--->| containerd-shim +------------+                     .
+|              |            |     dockerd     |        |  containerd  |    |                 |   bundle   |                     .
 +--------------+            +-----------------+        +--------------+    +-----------------+            |
                                                                                    ^                      v
+                                                                                   |                   +--------------+
+                                                                                   |                   | runtime runc |    +---------+
+                                                                                   |                   |    (exit)    +--->|container|
                                                                                    |                   +--------------+    +---------+
-                                                                                   |                   | runtime runc +--->|container|
-                                                                                   |                   |     exit     |    +---------+
-                                                                                   |                   +--------------+         ^
-                                                                                   |                                            |
+                                                                                   |                                            ^
                                                                                    +--------------------------------------------+
                                                                                                    container lifecycle
 ```
 
-More and more middle layers are added to the architecture, making it too complicated. [podman](https://podman.io/) is much more simpler as follows. There is no *dockerd*, *conainerd* or *container-shim*.
+
+
+More and more middle layers are added to the architecture, making it too complicated. [podman](https://podman.io/), on the other hand, is much more simpler as follows. *podman* talks directly to the runtime, without *dockerd*, *conainerd* or *containerd-shim*.
 
 ```
 podman CLI -> runtime runc -> containers
@@ -124,7 +130,7 @@ root       15383   15363  0  1147  3840   2 Dec27 pts/0    00:00:00  \_ /bin/bas
 
 ### Docker Desktop ###
 
-As Docker Engine, containerd, shim, runtime all depend on Linux kernel, a Linux virtual machine is required to use Docker and run containers on Window and macOS. The Docker Engine, containerd, runtime and Docker objects (e.g. images) all reside in the Linux virtual machine. The Docker CLI remains on the host.
+In order to run containers on Window and macOS, a Linux virtual machine is required to host *dockerd*, *containerd*, *containerd-shim*, *runtime*, etc. The Docker CLI remains on the host.
 
 As such, Docker provides the Docker Desktop. Docker Desktop is an [all-in-one](https://docs.docker.com/desktop/) (including GUI) software and gives us a uniform expiernce accross Linux, Window and macOS. Especially, Docker Desktop creates the Linux virtual machine for us, so that we are not bothered on this. On Window and macOS, Docker Desktop utilizes native virtualization framework (Hyper-V and WSL 2 of Windows; Hypervisor of macOS) to boost performance. On Linux system, Docker Desktop is not a must. However, if we choose it, the Virtual Machine is still created.
 
