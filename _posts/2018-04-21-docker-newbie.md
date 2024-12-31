@@ -14,10 +14,10 @@ In general, [Docker works in client-server mode](https://docs.docker.com/get-sta
 
 1. Server-side [Docker Engine](#docker-engine), also called Docker Daemon, is the *dockerd* that manages the containers, images, volumes, networks, etc.
 
-   The daemon serves requests by RESTful API [over local Unix socket or over remote network interface](https://docs.docker.com/engine/daemon/remote-access/).
+   The daemon serves requests by RESTful API [over local Unix socket](#dockersock) or [over remote network interface](https://docs.docker.com/engine/daemon/remote-access/).
 2. Client-sdie Docker CLI are *docker*, *docker-compose*, etc.
 
-   CLI options and arguments are consolidated and transformed to REST API. If we know the API spec, we can even [use curl to manage Docker objects](#dockersock).
+   CLI options and arguments are consolidated and transformed to REST API. We can [use cURL to manage Docker objects](#dockersock).
 
 The term "Docker" most of the time means the overall architecture.
 
@@ -209,9 +209,9 @@ Install Docker Compose manually:
 ~ $ docker-compose version
 ```
 
-# Start Daemon #
+# Start daemon #
 
-Start Docker.
+Start Docker Engine.
 
 ```bash
 ~ $ sudo systemctl enable docker
@@ -232,7 +232,9 @@ buildkit  containers  engine-id  image  network  overlay2  plugins  runtimes  sw
 
 ## docker.sock ##
 
-Docker daemon creates a Unix socket file at [/var/run/docker.sock](https://stackoverflow.com/q/35110146/2336707) by which we can communicate with the daemon via RESTful API.
+The daemon listens for RESTful API requests via either an Unix socket file at [/var/run/docker.sock](https://docs.docker.com/reference/cli/dockerd/#daemon-socket-option) or an [IP address](#architecture). By default only the Unis socket file is enabled. See [Docker Context](#docker-context) for enabling the IP socket.
+
+We can communicate with the daemon directly with cURL according to the [Docker API spec](https://docs.docker.com/reference/api/engine/).
 
 ```bash
 ~ $ curl --unix-socket /var/run/docker.sock --no-buffer http://localhost/events
@@ -244,7 +246,7 @@ Docker daemon creates a Unix socket file at [/var/run/docker.sock](https://stack
 We can also create containers inside another container by [mounting](#data-share) the socket file, as long as [docker CLI is available](https://askubuntu.com/a/1388299/226303).
 
 ```bash
-# on host
+# on host use the special 'docker' image
 ~ $ docker run --name docker-sock --rm -it -v /var/run/docker.sock:/var/run/docker.sock docker sh
 
 # within docker-sock
@@ -281,7 +283,7 @@ Recall that Docker works [in client-server mode](#architecture), where the clien
 
 For a single *docker* CLI to communicate with different Docker Engines, we have [Docker Context](https://docs.docker.com/engine/manage-resources/contexts/). A context is a profile recording the information of a Docker Engine like the IP address. To swtich between Docker Engines, just use *docker context* CLI.
 
-By default, only the local Unix socket is enabled. The example below enables IP socket listening and only binds to localhost for [security concern](https://docs.docker.com/engine/security/protect-access/).
+By default, only the local Unix socket is enabled. The example below enables IP socket listening and but only binds to localhost for demo purpose. To expose the Docker Engine on public Internet, please follow the guide at [security concern](https://docs.docker.com/engine/security/protect-access/).
 
 ```bash
 ~ $ sudo systemctl editedit docker.service
