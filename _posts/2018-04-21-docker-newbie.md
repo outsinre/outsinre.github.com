@@ -965,8 +965,8 @@ Successfully tagged nginx:v3
       echo "username:1C2B3A" | chpasswd'
       ```
 
-9. Check [multi-platform-docker-build](https://github.com/BretFisher/multi-platform-docker-build) for AMD64/ARM64 arch issue. This also applies to [Create a Container](#launch-containers).
-10. Some commands may have ask interactive questions. Please check [DEBIAN_FRONTEND=noninteractive](https://serverfault.com/q/949991).
+9. Some commands may have ask interactive questions. Please check [DEBIAN_FRONTEND=noninteractive](https://serverfault.com/q/949991).
+10. See [multi-platform build](https://www.zhstar.win/2024/12/27/colima/#multi-platform-build).
 
 Refer to [Best practice for writing Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
 
