@@ -679,7 +679,7 @@ Use the `--net` or `--network` option. To the 'host' networking driver, just pas
 
 In order not to set up a new SSH environment within containers, we can [forward SSH agent on host to container](https://docs.docker.com/desktop/networking/#ssh-agent-forwarding).
 
-For [Docker Desktop](https://docs.docker.com/desktop/) on macOS and Linux. If this does not work on macOS, see the workaround at [macOS SSH agent forwarding not working any longer](https://github.com/docker/for-mac/issues/7204).
+For [Docker Desktop](https://docs.docker.com/desktop/):
 
 ```bash
 ~ $ docker run --rm -it -u root \
@@ -699,6 +699,20 @@ For [Docker engine](https://docs.docker.com/engine/):
 --entrypoint /bin/bash kong/kong-gateway:latest
 
 root@3442a4bc63cd:/# ssh-add -l
+```
+
+It may report permission issue. We should add the `w` (write) permission to the socket file. The example below shows the socket file disallows `w` by "others" that the "kong" account belongs to. See [macOS SSH agent forwarding not working any longer](https://github.com/docker/for-mac/issues/7204).
+
+```bash
+# in the container
+kong@66cbbf96f403:/$ ssh-add -l
+Error connecting to agent: Permission denied
+
+kong@66cbbf96f403:/$ ls -l $SSH_AUTH_SOCK
+srwxrwxr-x 1 501 ubuntu 0 Jan  2 13:11 /run/host-services/ssh-auth.sock
+
+# do it on the host or in the container
+~ $ sudo chmod o+w /run/host-services/ssh-auth.sock
 ```
 
 Attention that, if you are SSH into Linux VPS from macOS, the SSH agent might be forwarded to the Linux VPS, depending on the SSH config on macOS. This is totally a different topic. Containers in the Linux VPS has no access to the forwarded macOS SSH agent, and we should launch a new one in the Linux VPS.
