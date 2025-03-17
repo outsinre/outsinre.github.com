@@ -701,7 +701,7 @@ For [Docker engine](https://docs.docker.com/engine/):
 root@3442a4bc63cd:/# ssh-add -l
 ```
 
-It may report permission issue. We should add the `w` (write) permission to the socket file. The example below shows the socket file disallows `w` by "others" that the "kong" account belongs to. See [macOS SSH agent forwarding not working any longer](https://github.com/docker/for-mac/issues/7204).
+It may report permission issue. We should add the `w` (write) permission to the socket file. Do it on the host and/or within the container. The example below shows the socket file disallows `w` by "others" that the "kong" account belongs to. See [macOS SSH agent forwarding not working any longer](https://github.com/docker/for-mac/issues/7204).
 
 ```bash
 # in the container
@@ -711,7 +711,6 @@ Error connecting to agent: Permission denied
 kong@66cbbf96f403:/$ ls -l $SSH_AUTH_SOCK
 srwxrwxr-x 1 501 ubuntu 0 Jan  2 13:11 /run/host-services/ssh-auth.sock
 
-# do it on the host or in the container
 ~ $ sudo chmod o+w /run/host-services/ssh-auth.sock
 ```
 
