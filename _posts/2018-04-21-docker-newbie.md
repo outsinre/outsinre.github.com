@@ -778,26 +778,6 @@ PING db (172.17.0.3) 56(84) bytes of data.
 
 Attention please; `--link` is one-way link only. Info is transferred from source containers to receipt containers but source containers know nothing about receipt containers. To achieve bi-directional communication, please use [network](#networking-drivers).
 
-# netshoot #
-
-To debug containers' network issues, we can make use of [netshoot](https://github.com/outsinre/netshoot).
-
-The netshoot container has a world of built-in network troubleshooting tools like *nmap*, [tcpdump](http://www.tcpdump.org/tcpdump_man.html), etc. We just need to attach the netshoot container to the target container's network namespace.
-
-```bash
-~ $ docker run --name netshoot \
---rm \
--it \
---network container:<target-name|target-ID> \
---mount type=bind,src=./data/,dst=/data \
--d nicolaka/netshoot
-
-~ $ docker exec -it netshoot zsh
-
-# capture packets of target container
-~ # tcpdump -i eth0 port 6379 -w /data/redis.pcap
-```
-
 # exec and shell #
 
 Usually, in the end of image, we have three kinds of *instruction*:
@@ -1082,3 +1062,37 @@ We can [share compose configurations](https://docs.docker.com/compose/extends) b
 When bind-mount a file, pay attention to provide the absolute path. Check [data share](#data-share).
 
 In Docker Compose file, we can also use [buildx](#docker-build-dockerfile) to [build an image from Dockerfile](https://stackoverflow.com/q/57840820/2336707). Alternatively, we can also [run multiple commands](https://stackoverflow.com/q/30063907/2336707).
+
+# Troubleshooting #
+
+We can attach an ephemeral container to an existing container for troubleshooting purpose. The ephemeral container would share the target container's Linux namespaces.
+
+For example, to debug network issues, we can make use of [netshoot](https://github.com/outsinre/netshoot). The netshoot container has a world of built-in network troubleshooting tools like *nmap*, [tcpdump](http://www.tcpdump.org/tcpdump_man.html), etc. We just need to attach the netshoot container to the target container's network namespace.
+
+```bash
+~ $ docker run --name netshoot \
+--rm \
+--network container:<target-name|target-ID> \
+--mount type=bind,src=./data/,dst=/data \
+-itd nicolaka/netshoot
+
+~ $ docker exec -it netshoot zsh
+
+# capture packets of target container
+~ # tcpdump -i eth0 port 6379 -w /data/redis.pcap
+```
+
+For simple Linux utilities, we just use busybox.
+
+```bash
+~ $ docker run --name test \
+--rm \
+--net=container:opentelemetry-otel-collector-1 --pid=container:opentelemetry-otel-collector-1 \
+-it busybox:1.36
+
+/ # ps aux
+PID   USER     TIME  COMMAND
+    1 10001     1:12 /otelcol-contrib --config /etc/otelcol-contrib/config.yaml
+  212 root      0:00 sh
+  218 root      0:00 ps aux
+```
