@@ -1082,7 +1082,7 @@ For example, to debug network issues, we can make use of [netshoot](https://gith
 ~ # tcpdump -i eth0 port 6379 -w /data/redis.pcap
 ```
 
-For simple Linux utilities, we just use busybox.
+For simple Linux utilities, we just [busybox](https://github.com/mirror/busybox).
 
 ```bash
 ~ $ docker run --name test \
