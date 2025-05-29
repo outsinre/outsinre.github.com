@@ -16,13 +16,14 @@ Generally speaking, there are three ways to support "SSLKEYLOGFILE".
 
 1. Capture TLS traffic on client side.
 
-   Clients like mitmproxy (TLS proxy), `openssl s_client`, cURL, Firefox, Chrome, etc. all natively support "SSLKEYLOGFILE". So, we just need to set this variable before launching the client and before capturing the TLS traffic.
+   Clients like mitmproxy (TLS proxy), `s_client -keylogfile`, cURL, Firefox, Chrome, etc. all natively support "SSLKEYLOGFILE". So, we just need to set this variable before launching the client and before capturing the TLS traffic.
 2. Capture TLS traffic on Nginx side.
 
    Nginx by default does not provide the ability to dump the TLS (Pre)MasterSecret. We have to hack the OpenSSL library.
    1. Make use of 3rd-party Nginx modules like [nginx-sslkeylog](https://github.com/tiandrey/nginx-sslkeylog). There is another similar patch available at [PATCH SSL: Added SSLKEYLOGFILE key material to debug logging](https://mailman.nginx.org/pipermail/nginx-devel/2024-January/W5CRPNYOC72XXFF45KQSD3VNNMGJ4WMR.html).
    2. Preload [sslkeylog.c](#sslkeylogc). Compared to method 2.1, it does not require patching and building. It uses [LD_PRELOAD](https://man7.org/linux/man-pages/man8/ld.so.8.html) to preload a newly built shared library that could dump TLS (Pre)MasterSecret if "SSLKEYLOGFILE" is present.
 3. Make use of [GDB to read TLS (Pre)MasterSecret from core dump](https://security.stackexchange.com/a/80174/248863).
+4. OpenSSL 3.5 onwards support "SSLKEYLOGFILE" via the [enable-sslkeylog](https://github.com/openssl/openssl/pull/25297) configure option!
 
 This post focuses on the method 2.2.
 
