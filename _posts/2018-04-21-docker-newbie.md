@@ -811,11 +811,11 @@ Each instruction has two kinds of running forms:
    <instruction> ["cmd", "arg1", "arg2", ...]
    ```
 
-   We can hack by changing the *cmd* to */bin/bash*:
+If we want to run the *cmd* with Bash, we can use the exec form but explicitly invoke */bin/bash*.
 
-   ```
-   <instruction> ["/bin/bash", "-c", "cmd", "arg1", "arg2", ...]
-   ```
+```
+<instruction> ["/bin/bash", "-c", "cmd", "arg1", "arg2", ...]
+```
 
 Refer to [exec form or sh form](https://www.cnblogs.com/sparkdev/p/8461576.html) for more details.
 
